@@ -64,6 +64,7 @@
         /* Fix for dark header items in tutorial */
         header .tutorial-highlight {
             background-color: #0f172a;
+            z-index: 75; /* Ensure above overlay */
         }
     </style>
 </head>
@@ -148,7 +149,7 @@
 
                 // Tutorial Strings
                 tut_step1_title: "Welcome Aboard!",
-                tut_step1_desc: "This is dummy data: 'Future of Urban Living 2030'. Observe how nodes are distributed and connected.",
+                tut_step1_desc: "This is a real-world scenario: 'Global Tech Trends 2030'. Observe the signal distribution.",
                 tut_step2_title: "The Intelligence Key",
                 tut_step2_desc: "Paste your Gemini API Key here to enable AI analysis powers.",
                 tut_step3_title: "Grid Interaction",
@@ -456,11 +457,11 @@
 
         // DUMMY DATA FOR TUTORIAL
         const dummyData = [
-            { id: "d1", title: "Fusion Energy Tech", desc: "Breakthrough in net-positive energy", status: "emerging", x: 2.0, y: 9.5, connections: ["d5"] },
-            { id: "d2", title: "AI Governance Treaty", desc: "Global framework for AGI safety", status: "critical", x: 7.5, y: 8.0, connections: [] },
-            { id: "d3", title: "Lithium Crisis", desc: "Shortage stopping EV production", status: "escalating", x: 6.0, y: 7.0, connections: ["d4"] },
-            { id: "d4", title: "Personal Carbon Credits", desc: "Quota system for citizens", status: "watchlist", x: 4.0, y: 5.0, connections: [] },
-            { id: "d5", title: "Autonomous Grid", desc: "Self-healing power networks", status: "structural", x: 5.0, y: 8.5, connections: [] },
+            { id: "d1", title: "Commercial Nuclear Fusion", desc: "Net-energy gain reactors disrupting global baseload power markets.", status: "structural", x: 2.0, y: 9.5, connections: ["d5"] },
+            { id: "d2", title: "Generative AI Avatars", desc: "Human-like digital agents for personalized services & governance.", status: "emerging", x: 7.5, y: 8.0, connections: [] },
+            { id: "d3", title: "Algae-based Protein Economy", desc: "Mass cultivation replacing fish stocks due to ocean acidification.", status: "escalating", x: 6.0, y: 7.0, connections: ["d4"] },
+            { id: "d4", title: "Citiverse (Urban Metaverse)", desc: "Digital twins of cities for participatory urban planning & simulation.", status: "watchlist", x: 4.0, y: 5.0, connections: [] },
+            { id: "d5", title: "Autonomous Supply Chains", desc: "Self-repairing logistics networks resilient to climate shocks.", status: "critical", x: 5.0, y: 8.5, connections: [] },
         ];
 
         // INIT
@@ -602,7 +603,7 @@
                 title.innerText = t('tut_step4_title');
                 desc.innerText = t('tut_step4_desc');
                 btn.innerText = t('btn_finish');
-                placement = 'bottom-left';
+                placement = 'bottom-center';
             } else {
                 // End
                 overlay.classList.add('hidden');
@@ -624,6 +625,22 @@
                 } else if (placement === 'right') {
                     box.style.top = (rect.top + 50) + 'px';
                     box.style.left = (rect.right - 300) + 'px'; // Inside chart roughly
+                } else if (placement === 'bottom-center') {
+                    box.style.top = (rect.bottom + 15) + 'px';
+                    // Center the box relative to the target, but keep it on screen
+                    let leftPos = rect.left + (rect.width / 2) - 160; // 160 is half of box width (w-80 = 320px)
+                    // Simple boundary check (assuming screen width > 320px)
+                    if (leftPos + 320 > window.innerWidth) leftPos = window.innerWidth - 340;
+                    box.style.left = leftPos + 'px';
+                    
+                    // Adjust arrow to point to target center
+                    const arrow = document.getElementById('tut-arrow');
+                    // Reset arrow
+                    arrow.style.left = '50%';
+                    
+                    // If we shifted the box, shift arrow opposite way to keep pointing at target
+                    const shift = (rect.left + rect.width/2) - (leftPos + 160);
+                    arrow.style.left = `calc(50% + ${shift}px)`;
                 }
             }
         }
