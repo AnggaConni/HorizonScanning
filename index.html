@@ -1300,7 +1300,7 @@ Provide a comprehensive strategic analysis with:
 Format output in clear Markdown with headers, bullet points, and emphasis where appropriate.`;
 
             try {
-                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${key}`, {
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({ 
@@ -1315,7 +1315,9 @@ Format output in clear Markdown with headers, bullet points, and emphasis where 
                 });
                 
                 if(!res.ok) {
-                    throw new Error(`API Error: ${res.status} ${res.statusText}`);
+                    const errorData = await res.json().catch(() => ({}));
+                    const errorMessage = errorData?.error?.message || `HTTP ${res.status}: ${res.statusText}`;
+                    throw new Error(`API Error: ${res.status} - ${errorMessage}`);
                 }
                 
                 const data = await res.json();
@@ -1334,9 +1336,32 @@ Format output in clear Markdown with headers, bullet points, and emphasis where 
                 showToast("Analysis Complete!", "info");
                 
             } catch(e) { 
-                out.innerHTML = `<div class="bg-red-50 border border-red-200 rounded p-4 text-red-800">
-                    <strong>Analysis Error:</strong><br>${e.message}
-                    <br><br><small class="text-red-600">Check your API key and network connection.</small>
+                console.error("Analysis error details:", e);
+                let errorMsg = e.message;
+                let troubleshoot = '';
+                
+                if(e.message.includes('Failed to fetch') || e.message.includes('NetworkError')) {
+                    troubleshoot = `<strong>Possible causes:</strong>
+                    <ul style="margin-top: 10px; padding-left: 20px;">
+                        <li>Network connection issue - check your internet</li>
+                        <li>API key is invalid or expired - get a new one at <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: #0d9488;">ai.google.dev/aistudio</a></li>
+                        <li>API quota exceeded - check your usage limits</li>
+                        <li>CORS/browser restriction - try a different browser</li>
+                    </ul>`;
+                } else if(e.message.includes('API Error: 400')) {
+                    troubleshoot = 'Invalid request format. Please report this issue.';
+                } else if(e.message.includes('API Error: 401')) {
+                    troubleshoot = 'Invalid API key. Get a free key at <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: #0d9488;">ai.google.dev/aistudio</a>';
+                } else if(e.message.includes('API Error: 429')) {
+                    troubleshoot = 'Rate limit exceeded. Wait a few minutes and try again.';
+                } else {
+                    troubleshoot = 'Unexpected error. Check browser console (F12) for details.';
+                }
+                
+                out.innerHTML = `<div class="bg-red-50 border border-red-200 rounded p-4 text-red-800" style="font-size: 0.9em;">
+                    <strong style="font-size: 1.1em;">❌ Analysis Error</strong>
+                    <p style="margin: 10px 0; font-family: monospace; background: white; padding: 10px; border-radius: 4px; border: 1px solid #fca5a5;">${errorMsg}</p>
+                    <div style="margin-top: 15px;">${troubleshoot}</div>
                 </div>`;
                 showToast("Analysis Failed", "error");
             }
