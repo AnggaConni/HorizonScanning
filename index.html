@@ -48,23 +48,47 @@
         .canvas-container { cursor: crosshair; }
         .canvas-container.hovering-node { cursor: grab; }
         .canvas-container.dragging { cursor: grabbing; }
-        /* Scrollbar */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
 
-        /* Tutorial Highlight */
         .tutorial-highlight {
             position: relative;
             z-index: 60;
-            box-shadow: 0 0 0 4px #14b8a6, 0 0 0 5000px rgba(0,0,0,0.7); /* Ring + Dark Overlay */
+            box-shadow: 0 0 0 4px #14b8a6, 0 0 0 5000px rgba(0,0,0,0.7);
             border-radius: 6px;
             background-color: white; 
         }
-        /* Fix for dark header items in tutorial */
         header .tutorial-highlight {
             background-color: #0f172a;
-            z-index: 75; /* Ensure above overlay */
+            z-index: 75;
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .tutorial-progress {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+        .tutorial-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #cbd5e1;
+            transition: all 0.3s;
+        }
+        .tutorial-dot.active {
+            background: #14b8a6;
+            width: 24px;
+            border-radius: 4px;
         }
     </style>
 </head>
@@ -106,17 +130,25 @@
                 report_tooltip: "Export Laporan Lengkap",
                 jitter_label: "Spread Overlap",
                 
-                // Tutorial Strings
-                tut_step1_title: "Selamat Datang!",
-                tut_step1_desc: "Ini adalah data dummy: 'Future of Urban Living 2030'. Lihat bagaimana node tersebar dan terhubung.",
-                tut_step2_title: "Kunci Kecerdasan",
-                tut_step2_desc: "Masukkan API Key Gemini Anda di sini untuk mengaktifkan analisa AI.",
-                tut_step3_title: "Interaksi Grid",
-                tut_step3_desc: "Klik area kosong untuk tambah isu baru. Tarik node untuk ubah posisi Impact/Probability.",
-                tut_step4_title: "Analisa Instan",
-                tut_step4_desc: "Klik tombol petir ini kapan saja untuk meminta AI menganalisa pola data Anda saat ini.",
+                // Tutorial Strings - Enhanced
+                tut_step1_title: "Selamat Datang di Horizon Scanning!",
+                tut_step1_desc: "Ini adalah skenario nyata: 'Global Tech & Society 2025-2030'. Perhatikan bagaimana sinyal tersebar berdasarkan Impact vs Probability. Setiap titik adalah tren atau peristiwa yang harus dipantau.",
+                tut_step2_title: "Memahami Kuadran Strategis",
+                tut_step2_desc: "Wild Cards (kiri atas): dampak besar, probabilitas rendah. Critical (kanan atas): dampak besar, sangat mungkin terjadi - prioritas utama! Noise (kiri bawah): abaikan. Tactical (kanan bawah): dampak kecil tapi sudah pasti.",
+                tut_step3_title: "Status Sinyal: Klasifikasi 5 Tahap",
+                tut_step3_desc: "🟢 Emerging: baru muncul. 🟡 Watchlist: pantau terus. 🟠 Escalating: meningkat cepat. 🔴 Critical: butuh aksi sekarang. 🔵 Structural: mega-trend jangka panjang. Klik node untuk lihat detail.",
+                tut_step4_title: "Kunci Kecerdasan AI",
+                tut_step4_desc: "Masukkan API Key Gemini Anda (gratis di ai.google.dev). Ini akan membuka kemampuan AI untuk analisa pola, cluster, dan rekomendasi strategis otomatis.",
+                tut_step5_title: "Interaksi Grid: Drag & Click",
+                tut_step5_desc: "DRAG node untuk ubah posisi (Impact/Probability). CLICK area kosong untuk tambah sinyal baru. Grid ini adalah canvas strategis Anda - data Anda, keputusan Anda.",
+                tut_step6_title: "Koneksi & Dependensi",
+                tut_step6_desc: "Beberapa node terhubung dengan garis putus-putus - ini menunjukkan dependensi atau hubungan sebab-akibat. Edit node untuk tambah koneksi dan lihat sistem kompleks Anda.",
+                tut_step7_title: "Analisa Instan & Export",
+                tut_step7_desc: "Tombol petir: analisa AI instan. Tombol Report: export PDF lengkap dengan visualisasi + insight AI. Save/Load: simpan project sebagai file HTML yang self-contained. Selamat menggunakan!",
                 btn_next: "Lanjut",
-                btn_finish: "Selesai"
+                btn_prev: "Kembali",
+                btn_finish: "Selesai",
+                tut_skip: "Lewati Tutorial"
             },
             en: {
                 app_title: "Horizon Scan AI",
@@ -147,17 +179,25 @@
                 report_tooltip: "Export Full Report",
                 jitter_label: "Spread Overlap",
 
-                // Tutorial Strings
-                tut_step1_title: "Welcome Aboard!",
-                tut_step1_desc: "This is a real-world scenario: 'Global Tech Trends 2030'. Observe the signal distribution.",
-                tut_step2_title: "The Intelligence Key",
-                tut_step2_desc: "Paste your Gemini API Key here to enable AI analysis powers.",
-                tut_step3_title: "Grid Interaction",
-                tut_step3_desc: "Click empty space to add signals. Drag nodes to adjust Impact/Probability.",
-                tut_step4_title: "Instant Analysis",
-                tut_step4_desc: "Click this lightning bolt anytime to ask AI to analyze current patterns.",
+                // Tutorial Strings - Enhanced
+                tut_step1_title: "Welcome to Horizon Scanning!",
+                tut_step1_desc: "This is a real-world scenario: 'Global Tech & Society 2025-2030'. Observe how signals are distributed by Impact vs Probability. Each dot represents a trend or event to monitor.",
+                tut_step2_title: "Understanding Strategic Quadrants",
+                tut_step2_desc: "Wild Cards (top-left): high impact, low probability. Critical (top-right): high impact, highly likely - top priority! Noise (bottom-left): ignore. Tactical (bottom-right): low impact but certain.",
+                tut_step3_title: "Signal Status: 5-Stage Classification",
+                tut_step3_desc: "🟢 Emerging: just appeared. 🟡 Watchlist: monitor closely. 🟠 Escalating: rapidly accelerating. 🔴 Critical: needs immediate action. 🔵 Structural: long-term mega-trend. Click nodes to see details.",
+                tut_step4_title: "The Intelligence Key",
+                tut_step4_desc: "Enter your Gemini API Key (free at ai.google.dev). This unlocks AI capabilities for automatic pattern analysis, clustering, and strategic recommendations.",
+                tut_step5_title: "Grid Interaction: Drag & Click",
+                tut_step5_desc: "DRAG nodes to change position (Impact/Probability). CLICK empty space to add new signals. This grid is your strategic canvas - your data, your decisions.",
+                tut_step6_title: "Connections & Dependencies",
+                tut_step6_desc: "Some nodes are connected by dashed lines - these show dependencies or causal relationships. Edit nodes to add connections and see your complex system emerge.",
+                tut_step7_title: "Instant Analysis & Export",
+                tut_step7_desc: "Lightning button: instant AI analysis. Report button: export full PDF with visualization + AI insights. Save/Load: save project as self-contained HTML file. Happy scanning!",
                 btn_next: "Next",
-                btn_finish: "Finish"
+                btn_prev: "Back",
+                btn_finish: "Finish",
+                tut_skip: "Skip Tutorial"
             }
         };
 
@@ -176,10 +216,10 @@
             });
             
             // Tooltip updates for icon buttons
-            document.getElementById('btn-save-header').title = t('save_tooltip');
-            document.getElementById('btn-load-header').title = t('load_tooltip');
-            document.getElementById('btn-analyze-header').title = t('analyze_tooltip');
-            document.getElementById('btn-report-header').title = t('report_tooltip');
+            document.getElementById('btn-save-header')?.setAttribute('title', t('save_tooltip'));
+            document.getElementById('btn-load-header')?.setAttribute('title', t('load_tooltip'));
+            document.getElementById('btn-analyze-header')?.setAttribute('title', t('analyze_tooltip'));
+            document.getElementById('btn-report-header')?.setAttribute('title', t('report_tooltip'));
 
             updateQuadrantLabels();
             updateSelectOptions();
@@ -208,12 +248,27 @@
 
     <!-- TUTORIAL OVERLAY -->
     <div id="tutorial-overlay" class="hidden fixed inset-0 z-[70] pointer-events-none">
-        <div id="tutorial-box" class="absolute bg-white p-6 rounded-xl shadow-2xl border-2 border-teal-500 w-80 pointer-events-auto transition-all duration-300">
+        <div id="tutorial-box" class="absolute bg-white p-6 rounded-xl shadow-2xl border-2 border-teal-500 w-96 pointer-events-auto transition-all duration-300">
+            <!-- Progress Dots -->
+            <div id="tutorial-progress" class="tutorial-progress"></div>
+            
             <h3 id="tut-title" class="font-bold text-navy-900 text-lg mb-2">Title</h3>
-            <p id="tut-desc" class="text-slate-600 text-sm mb-4">Description</p>
-            <div class="flex justify-end">
-                <button onclick="nextTutorialStep()" class="bg-navy-900 text-white px-4 py-2 rounded text-xs font-bold hover:bg-teal-600" id="tut-btn">Next</button>
+            <p id="tut-desc" class="text-slate-600 text-sm mb-4 leading-relaxed">Description</p>
+            
+            <div class="flex justify-between items-center">
+                <button onclick="skipTutorial()" class="text-slate-400 hover:text-slate-600 text-xs font-medium" id="tut-skip-btn">
+                    <span data-i18n="tut_skip">Skip Tutorial</span>
+                </button>
+                <div class="flex gap-2">
+                    <button onclick="prevTutorialStep()" id="tut-prev-btn" class="hidden bg-slate-100 text-slate-600 px-4 py-2 rounded text-xs font-bold hover:bg-slate-200">
+                        <span data-i18n="btn_prev">Back</span>
+                    </button>
+                    <button onclick="nextTutorialStep()" class="bg-navy-900 text-white px-4 py-2 rounded text-xs font-bold hover:bg-teal-600" id="tut-btn">
+                        <span data-i18n="btn_next">Next</span>
+                    </button>
+                </div>
             </div>
+            
             <!-- Arrow -->
             <div id="tut-arrow" class="absolute w-4 h-4 bg-white border-t-2 border-l-2 border-teal-500 transform rotate-45 -top-2 left-1/2 -translate-x-1/2"></div>
         </div>
@@ -449,19 +504,142 @@
             analysis: null
         };
 
-        const STATUS_COLORS = { 'emerging': '#10b981', 'watchlist': '#f59e0b', 'escalating': '#f97316', 'critical': '#ef4444', 'structural': '#3b82f6' };
+        const STATUS_COLORS = { 
+            'emerging': '#10b981', 
+            'watchlist': '#f59e0b', 
+            'escalating': '#f97316', 
+            'critical': '#ef4444', 
+            'structural': '#3b82f6' 
+        };
+        
         let chartInstance = null;
         let isDragging = false;
         let draggedNodeIndex = -1;
         let tutorialStep = 0;
+        const TOTAL_TUTORIAL_STEPS = 7;
 
-        // DUMMY DATA FOR TUTORIAL
+        // ENHANCED REAL-WORLD DUMMY DATA FOR TUTORIAL
+        // Based on actual horizon scanning practices (2025-2030 timeframe)
         const dummyData = [
-            { id: "d1", title: "Commercial Nuclear Fusion", desc: "Net-energy gain reactors disrupting global baseload power markets.", status: "structural", x: 2.0, y: 9.5, connections: ["d5"] },
-            { id: "d2", title: "Generative AI Avatars", desc: "Human-like digital agents for personalized services & governance.", status: "emerging", x: 7.5, y: 8.0, connections: [] },
-            { id: "d3", title: "Algae-based Protein Economy", desc: "Mass cultivation replacing fish stocks due to ocean acidification.", status: "escalating", x: 6.0, y: 7.0, connections: ["d4"] },
-            { id: "d4", title: "Citiverse (Urban Metaverse)", desc: "Digital twins of cities for participatory urban planning & simulation.", status: "watchlist", x: 4.0, y: 5.0, connections: [] },
-            { id: "d5", title: "Autonomous Supply Chains", desc: "Self-repairing logistics networks resilient to climate shocks.", status: "critical", x: 5.0, y: 8.5, connections: [] },
+            // Critical Zone (High Impact, High Probability)
+            { 
+                id: "d1", 
+                title: "AI Regulation Framework", 
+                desc: "EU AI Act & global compliance reshaping tech development and deployment standards.", 
+                status: "critical", 
+                x: 7.5, 
+                y: 8.5, 
+                connections: ["d2", "d9"] 
+            },
+            { 
+                id: "d2", 
+                title: "Enterprise AI Adoption", 
+                desc: "70%+ Fortune 500 integrating generative AI across operations, customer service, R&D.", 
+                status: "escalating", 
+                x: 8.0, 
+                y: 7.5, 
+                connections: ["d10"] 
+            },
+            
+            // Wild Cards (High Impact, Low Probability)
+            { 
+                id: "d3", 
+                title: "Quantum Advantage Breakthrough", 
+                desc: "Error-corrected quantum computers solving real-world optimization problems.", 
+                status: "emerging", 
+                x: 2.5, 
+                y: 9.0, 
+                connections: ["d4"] 
+            },
+            { 
+                id: "d4", 
+                title: "Climate Tipping Point Cascade", 
+                desc: "Multiple Earth systems (AMOC, Amazon, ice sheets) reaching irreversible thresholds.", 
+                status: "watchlist", 
+                x: 3.5, 
+                y: 9.5, 
+                connections: ["d7"] 
+            },
+            
+            // Structural Trends (Long-term, certain)
+            { 
+                id: "d5", 
+                title: "Remote-First Economy", 
+                desc: "Permanent shift to distributed work models transforming real estate, cities, taxation.", 
+                status: "structural", 
+                x: 8.5, 
+                y: 6.5, 
+                connections: ["d6"] 
+            },
+            { 
+                id: "d6", 
+                title: "Demographic Inversion", 
+                desc: "More countries with declining populations than growing: pension, labor, consumption shifts.", 
+                status: "structural", 
+                x: 9.0, 
+                y: 7.0, 
+                connections: [] 
+            },
+            
+            // Tactical/Monitor Zone
+            { 
+                id: "d7", 
+                title: "Vertical Farming Scale-Up", 
+                desc: "LED-based indoor agriculture reaching price parity with traditional farming in urban areas.", 
+                status: "escalating", 
+                x: 6.5, 
+                y: 5.5, 
+                connections: ["d8"] 
+            },
+            { 
+                id: "d8", 
+                title: "Synthetic Media Proliferation", 
+                desc: "Deepfakes and AI-generated content becoming mainstream, eroding trust in digital media.", 
+                status: "critical", 
+                x: 8.5, 
+                y: 6.0, 
+                connections: [] 
+            },
+            
+            // Emerging/Watchlist signals
+            { 
+                id: "d9", 
+                title: "Brain-Computer Interfaces (Consumer)", 
+                desc: "Non-invasive BCIs for gaming, accessibility, and productivity entering consumer market.", 
+                status: "emerging", 
+                x: 4.5, 
+                y: 7.0, 
+                connections: [] 
+            },
+            { 
+                id: "d10", 
+                title: "Decentralized Identity Systems", 
+                desc: "Self-sovereign identity replacing centralized authentication for privacy-conscious users.", 
+                status: "watchlist", 
+                x: 5.5, 
+                y: 6.0, 
+                connections: [] 
+            },
+            
+            // Additional signals for richness
+            { 
+                id: "d11", 
+                title: "Space-Based Solar Power", 
+                desc: "First demonstration of orbital solar collection beaming energy to Earth ground stations.", 
+                status: "emerging", 
+                x: 2.0, 
+                y: 8.0, 
+                connections: [] 
+            },
+            { 
+                id: "d12", 
+                title: "Longevity Medicine Commercialization", 
+                desc: "Anti-aging therapies (senolytics, NAD+ boosters) moving from research to clinical availability.", 
+                status: "watchlist", 
+                x: 5.0, 
+                y: 7.5, 
+                connections: [] 
+            },
         ];
 
         // INIT
@@ -477,7 +655,7 @@
             const savedKey = localStorage.getItem('gemini_api_key');
             if(savedKey) {
                 document.getElementById('api-key').value = savedKey;
-                document.getElementById('api-status').classList.remove('hidden');
+                document.getElementById('api-status')?.classList.remove('hidden');
             }
             
             updateUIText();
@@ -487,7 +665,7 @@
             const val = document.getElementById('api-key').value;
             if(val) {
                 localStorage.setItem('gemini_api_key', val);
-                document.getElementById('api-status').classList.remove('hidden');
+                document.getElementById('api-status')?.classList.remove('hidden');
             }
         }
 
@@ -532,7 +710,7 @@
         }
 
         function startTutorial() {
-            // Tutorial Start with Dummy Data
+            // Tutorial Start with Enhanced Real-World Data
             appState.nodes = JSON.parse(JSON.stringify(dummyData)); // Deep copy
             initializeAppCommon();
             
@@ -563,21 +741,51 @@
             updateQuadrantLabels();
         }
 
-        // --- TUTORIAL SYSTEM ---
+        // --- ENHANCED TUTORIAL SYSTEM ---
+        function updateTutorialProgress() {
+            const container = document.getElementById('tutorial-progress');
+            container.innerHTML = '';
+            for(let i = 1; i <= TOTAL_TUTORIAL_STEPS; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'tutorial-dot' + (i === tutorialStep ? ' active' : '');
+                container.appendChild(dot);
+            }
+        }
+
         function showTutorialStep(step) {
             const overlay = document.getElementById('tutorial-overlay');
             const box = document.getElementById('tutorial-box');
             const title = document.getElementById('tut-title');
             const desc = document.getElementById('tut-desc');
             const btn = document.getElementById('tut-btn');
+            const prevBtn = document.getElementById('tut-prev-btn');
+            const skipBtn = document.getElementById('tut-skip-btn');
             
             // Remove previous highlights
             document.querySelectorAll('.tutorial-highlight').forEach(el => el.classList.remove('tutorial-highlight'));
             
             overlay.classList.remove('hidden');
+            updateTutorialProgress();
+            
+            // Show/hide prev button
+            if(step > 1) {
+                prevBtn.classList.remove('hidden');
+            } else {
+                prevBtn.classList.add('hidden');
+            }
+            
+            // Update button text
+            const btnTextSpan = btn.querySelector('span');
+            if(step === TOTAL_TUTORIAL_STEPS) {
+                btnTextSpan.setAttribute('data-i18n', 'btn_finish');
+                btnTextSpan.innerText = t('btn_finish');
+            } else {
+                btnTextSpan.setAttribute('data-i18n', 'btn_next');
+                btnTextSpan.innerText = t('btn_next');
+            }
             
             let targetEl = null;
-            let placement = 'bottom'; // Default placement
+            let placement = 'bottom';
 
             if (step === 1) {
                 // Intro - Focus on Chart
@@ -586,68 +794,105 @@
                 desc.innerText = t('tut_step1_desc');
                 placement = 'center';
             } else if (step === 2) {
-                // API Key
-                targetEl = document.getElementById('header-api-wrapper');
+                // Quadrants explanation
+                targetEl = document.getElementById('lbl-tr'); // Focus on critical quadrant
                 title.innerText = t('tut_step2_title');
                 desc.innerText = t('tut_step2_desc');
-                placement = 'bottom-left';
+                placement = 'center-bottom';
             } else if (step === 3) {
-                // Interaction
-                targetEl = document.getElementById('chart-container');
+                // Status/Classification - focus on a node
+                targetEl = document.getElementById('panel-nodes');
                 title.innerText = t('tut_step3_title');
                 desc.innerText = t('tut_step3_desc');
-                placement = 'right';
+                placement = 'left';
             } else if (step === 4) {
-                // Analyze
-                targetEl = document.getElementById('btn-analyze-header');
+                // API Key
+                targetEl = document.getElementById('header-api-wrapper');
                 title.innerText = t('tut_step4_title');
                 desc.innerText = t('tut_step4_desc');
-                btn.innerText = t('btn_finish');
+                placement = 'bottom-left';
+            } else if (step === 5) {
+                // Interaction
+                targetEl = document.getElementById('chart-container');
+                title.innerText = t('tut_step5_title');
+                desc.innerText = t('tut_step5_desc');
+                placement = 'right';
+            } else if (step === 6) {
+                // Connections
+                targetEl = document.getElementById('chart-container');
+                title.innerText = t('tut_step6_title');
+                desc.innerText = t('tut_step6_desc');
+                placement = 'center';
+            } else if (step === 7) {
+                // Analysis & Export
+                targetEl = document.getElementById('btn-analyze-header');
+                title.innerText = t('tut_step7_title');
+                desc.innerText = t('tut_step7_desc');
                 placement = 'bottom-center';
             } else {
                 // End
-                overlay.classList.add('hidden');
+                skipTutorial();
                 return;
             }
 
             // Highlighting
             if(targetEl) targetEl.classList.add('tutorial-highlight');
 
-            // Positioning Logic
+            // Positioning Logic (Enhanced)
             if(targetEl) {
                 const rect = targetEl.getBoundingClientRect();
                 if(placement === 'center') {
-                    box.style.top = (window.innerHeight/2 - 100) + 'px';
-                    box.style.left = (window.innerWidth/2 - 160) + 'px';
+                    box.style.top = (window.innerHeight/2 - 120) + 'px';
+                    box.style.left = (window.innerWidth/2 - 192) + 'px'; // 192 = w-96 / 2
+                } else if(placement === 'center-bottom') {
+                    box.style.top = (window.innerHeight/2 + 100) + 'px';
+                    box.style.left = (window.innerWidth/2 - 192) + 'px';
                 } else if (placement === 'bottom-left') {
                     box.style.top = (rect.bottom + 15) + 'px';
                     box.style.left = (rect.left - 20) + 'px';
-                } else if (placement === 'right') {
+                } else if (placement === 'left') {
                     box.style.top = (rect.top + 50) + 'px';
-                    box.style.left = (rect.right - 300) + 'px'; // Inside chart roughly
+                    box.style.left = (rect.left - 420) + 'px'; // Show to left of panel
+                    if(parseFloat(box.style.left) < 20) box.style.left = '20px';
+                } else if (placement === 'right') {
+                    box.style.top = (rect.top + 100) + 'px';
+                    box.style.left = (rect.right - 450) + 'px';
                 } else if (placement === 'bottom-center') {
                     box.style.top = (rect.bottom + 15) + 'px';
-                    // Center the box relative to the target, but keep it on screen
-                    let leftPos = rect.left + (rect.width / 2) - 160; // 160 is half of box width (w-80 = 320px)
-                    // Simple boundary check (assuming screen width > 320px)
-                    if (leftPos + 320 > window.innerWidth) leftPos = window.innerWidth - 340;
+                    let leftPos = rect.left + (rect.width / 2) - 192;
+                    if (leftPos + 384 > window.innerWidth) leftPos = window.innerWidth - 404;
+                    if (leftPos < 20) leftPos = 20;
                     box.style.left = leftPos + 'px';
                     
-                    // Adjust arrow to point to target center
                     const arrow = document.getElementById('tut-arrow');
-                    // Reset arrow
                     arrow.style.left = '50%';
-                    
-                    // If we shifted the box, shift arrow opposite way to keep pointing at target
-                    const shift = (rect.left + rect.width/2) - (leftPos + 160);
+                    const shift = (rect.left + rect.width/2) - (leftPos + 192);
                     arrow.style.left = `calc(50% + ${shift}px)`;
                 }
             }
         }
 
         function nextTutorialStep() {
-            tutorialStep++;
-            showTutorialStep(tutorialStep);
+            if(tutorialStep < TOTAL_TUTORIAL_STEPS) {
+                tutorialStep++;
+                showTutorialStep(tutorialStep);
+            } else {
+                skipTutorial();
+            }
+        }
+
+        function prevTutorialStep() {
+            if(tutorialStep > 1) {
+                tutorialStep--;
+                showTutorialStep(tutorialStep);
+            }
+        }
+
+        function skipTutorial() {
+            document.getElementById('tutorial-overlay').classList.add('hidden');
+            document.querySelectorAll('.tutorial-highlight').forEach(el => el.classList.remove('tutorial-highlight'));
+            tutorialStep = 0;
+            showToast("Tutorial completed! Start exploring.", "info");
         }
 
         // CHART LOGIC
@@ -664,12 +909,12 @@
                 beforeDatasetsDraw(chart) {
                     const { ctx, scales: { x, y } } = chart;
                     ctx.save();
-                    ctx.lineWidth = 1;
-                    ctx.strokeStyle = 'rgba(15, 23, 42, 0.15)';
+                    ctx.lineWidth = 1.5;
+                    ctx.strokeStyle = 'rgba(15, 23, 42, 0.2)';
                     ctx.setLineDash([5, 5]);
                     
                     appState.nodes.forEach(node => {
-                        if (node.connections) {
+                        if (node.connections && node.connections.length > 0) {
                             const startX = x.getPixelForValue(node.x);
                             const startY = y.getPixelForValue(node.y);
                             node.connections.forEach(tid => {
@@ -695,31 +940,36 @@
                     datasets: [{
                         label: 'Nodes',
                         data: appState.nodes,
-                        backgroundColor: (ctx) => ctx.raw ? (STATUS_COLORS[ctx.raw.status] || '#ccc') : '#ccc',
-                        pointRadius: 6, 
-                        pointHoverRadius: 10,
+                        backgroundColor: (ctx) => ctx.raw ? (STATUS_COLORS[ctx.raw.status] || '#94a3b8') : '#94a3b8',
+                        pointRadius: 7, 
+                        pointHoverRadius: 11,
                         pointBorderColor: '#fff',
-                        pointBorderWidth: 1.5,
-                        pointShadowColor: 'rgba(0,0,0,0.3)'
+                        pointBorderWidth: 2,
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    layout: { padding: 20 },
+                    layout: { padding: 25 },
                     events: ['mousemove', 'mouseout', 'click', 'touchstart', 'touchmove', 'mousedown', 'mouseup'],
                     scales: {
                         x: { 
                             min: -10, max: 10, 
-                            title: { display: true, text: () => appState.config.xLabel, color: '#0d9488', font: {weight:'bold'} },
-                            grid: { color: (c) => c.tick.value === 0 ? '#94a3b8' : '#e2e8f0', lineWidth: (c) => c.tick.value === 0 ? 2 : 1 },
-                            ticks: { stepSize: () => appState.config.gridStep } 
+                            title: { display: true, text: () => appState.config.xLabel, color: '#0d9488', font: {weight:'bold', size: 13} },
+                            grid: { 
+                                color: (c) => c.tick.value === 0 ? '#94a3b8' : '#e2e8f0', 
+                                lineWidth: (c) => c.tick.value === 0 ? 2 : 1 
+                            },
+                            ticks: { stepSize: () => appState.config.gridStep, font: { size: 11 } } 
                         },
                         y: { 
                             min: -10, max: 10, 
-                            title: { display: true, text: () => appState.config.yLabel, color: '#f59e0b', font: {weight:'bold'} },
-                            grid: { color: (c) => c.tick.value === 0 ? '#94a3b8' : '#e2e8f0', lineWidth: (c) => c.tick.value === 0 ? 2 : 1 },
-                            ticks: { stepSize: () => appState.config.gridStep } 
+                            title: { display: true, text: () => appState.config.yLabel, color: '#f59e0b', font: {weight:'bold', size: 13} },
+                            grid: { 
+                                color: (c) => c.tick.value === 0 ? '#94a3b8' : '#e2e8f0', 
+                                lineWidth: (c) => c.tick.value === 0 ? 2 : 1 
+                            },
+                            ticks: { stepSize: () => appState.config.gridStep, font: { size: 11 } } 
                         }
                     },
                     plugins: {
@@ -727,8 +977,18 @@
                         tooltip: {
                             mode: 'nearest', 
                             intersect: true,
+                            backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                            titleColor: '#fff',
+                            bodyColor: '#cbd5e1',
+                            padding: 12,
+                            displayColors: false,
                             callbacks: {
-                                label: (ctx) => `${ctx.raw.title} (${ctx.raw.x.toFixed(1)}, ${ctx.raw.y.toFixed(1)})`
+                                title: (ctx) => ctx[0].raw.title,
+                                label: (ctx) => [
+                                    `${appState.config.xLabel}: ${ctx.raw.x.toFixed(1)}`,
+                                    `${appState.config.yLabel}: ${ctx.raw.y.toFixed(1)}`,
+                                    `Status: ${ctx.raw.status}`
+                                ]
                             }
                         }
                     },
@@ -749,6 +1009,7 @@
                 if (points.length) {
                     isDragging = true;
                     draggedNodeIndex = points[0].index;
+                    container.classList.add('dragging');
                 }
             });
 
@@ -767,6 +1028,7 @@
                 if(isDragging) {
                     isDragging = false;
                     draggedNodeIndex = -1;
+                    container.classList.remove('dragging');
                     renderNodeList();
                     chartInstance.update();
                 }
@@ -775,8 +1037,9 @@
             canvas.addEventListener('click', (e) => {
                 if(isDragging) return;
                 const points = chartInstance.getElementsAtEventForMode(e, 'nearest', { intersect: true }, true);
-                if (points.length) openNodeModal(appState.nodes[points[0].index]);
-                else {
+                if (points.length) {
+                    openNodeModal(appState.nodes[points[0].index]);
+                } else {
                     const rect = canvas.getBoundingClientRect();
                     const x = Math.max(-10, Math.min(10, chartInstance.scales.x.getValueForPixel(e.clientX - rect.left)));
                     const y = Math.max(-10, Math.min(10, chartInstance.scales.y.getValueForPixel(e.clientY - rect.top)));
@@ -787,13 +1050,21 @@
 
         function updateChart() {
             if(!chartInstance) return;
-            const useJitter = document.getElementById('jitter-mode').checked;
+            const useJitter = document.getElementById('jitter-mode')?.checked || false;
             
             const displayData = appState.nodes.map(n => {
                 if(useJitter) {
-                    const conflict = appState.nodes.some(other => other.id !== n.id && Math.abs(other.x - n.x) < 0.2 && Math.abs(other.y - n.y) < 0.2);
+                    const conflict = appState.nodes.some(other => 
+                        other.id !== n.id && 
+                        Math.abs(other.x - n.x) < 0.3 && 
+                        Math.abs(other.y - n.y) < 0.3
+                    );
                     if(conflict) {
-                         return { ...n, x: n.x + (Math.random() - 0.5) * 0.5, y: n.y + (Math.random() - 0.5) * 0.5 };
+                         return { 
+                             ...n, 
+                             x: n.x + (Math.random() - 0.5) * 0.6, 
+                             y: n.y + (Math.random() - 0.5) * 0.6 
+                         };
                     }
                 }
                 return n;
@@ -820,7 +1091,8 @@
             appState.nodes.forEach(n => {
                 if(!node || n.id !== node.id) {
                     const opt = document.createElement('option');
-                    opt.value = n.id; opt.text = n.title;
+                    opt.value = n.id; 
+                    opt.text = n.title;
                     if(node && node.connections && node.connections.includes(n.id)) opt.selected = true;
                     conn.appendChild(opt);
                 }
@@ -833,7 +1105,7 @@
                 document.getElementById('node-status').value = node.status || 'emerging';
                 document.getElementById('node-x').value = node.x;
                 document.getElementById('node-y').value = node.y;
-                document.getElementById('btn-delete').classList.remove('hidden');
+                document.getElementById('btn-delete')?.classList.remove('hidden');
                 document.getElementById('modal-title').innerText = t('modal_edit');
             } else {
                 document.getElementById('node-id').value = '';
@@ -842,29 +1114,38 @@
                 document.getElementById('node-status').value = 'emerging';
                 document.getElementById('node-x').value = x;
                 document.getElementById('node-y').value = y;
-                document.getElementById('btn-delete').classList.add('hidden');
+                document.getElementById('btn-delete')?.classList.add('hidden');
                 document.getElementById('modal-title').innerText = t('modal_add');
             }
             updateRangeVal('val-x', document.getElementById('node-x').value);
             updateRangeVal('val-y', document.getElementById('node-y').value);
         }
 
-        function closeModal() { document.getElementById('node-modal').classList.add('hidden'); }
-        function updateRangeVal(id, val) { document.getElementById(id).innerText = val; }
+        function closeModal() { 
+            document.getElementById('node-modal')?.classList.add('hidden'); 
+        }
+        
+        function updateRangeVal(id, val) { 
+            const el = document.getElementById(id);
+            if(el) el.innerText = parseFloat(val).toFixed(1); 
+        }
 
         function saveNodeFromModal() {
-            const id = document.getElementById('node-id').value;
-            const title = document.getElementById('node-title').value;
-            if(!title) { showToast("Title required", "error"); return; }
+            const id = document.getElementById('node-id')?.value;
+            const title = document.getElementById('node-title')?.value;
+            if(!title || title.trim() === '') { 
+                showToast("Title required", "error"); 
+                return; 
+            }
             
             const newNode = {
                 id: id || crypto.randomUUID(),
-                title,
-                desc: document.getElementById('node-desc').value,
-                status: document.getElementById('node-status').value,
-                x: parseFloat(document.getElementById('node-x').value),
-                y: parseFloat(document.getElementById('node-y').value),
-                connections: Array.from(document.getElementById('node-connections').selectedOptions).map(o => o.value)
+                title: title.trim(),
+                desc: document.getElementById('node-desc')?.value || '',
+                status: document.getElementById('node-status')?.value || 'emerging',
+                x: parseFloat(document.getElementById('node-x')?.value || 0),
+                y: parseFloat(document.getElementById('node-y')?.value || 0),
+                connections: Array.from(document.getElementById('node-connections')?.selectedOptions || []).map(o => o.value)
             };
 
             if(id) {
@@ -877,40 +1158,69 @@
             closeModal();
             renderNodeList();
             updateChart();
-            showToast("Node Saved");
+            showToast("Node Saved", "info");
         }
 
         function deleteNode() {
-            const id = document.getElementById('node-id').value;
+            const id = document.getElementById('node-id')?.value;
             if(id) {
                 appState.nodes = appState.nodes.filter(n => n.id !== id);
+                // Remove connections to deleted node
                 appState.nodes.forEach(n => {
                     if(n.connections) n.connections = n.connections.filter(c => c !== id);
                 });
                 closeModal();
                 renderNodeList();
                 updateChart();
+                showToast("Node Deleted", "info");
             }
         }
 
         function renderNodeList() {
             const list = document.getElementById('nodes-list');
+            const countEl = document.getElementById('node-count');
+            const emptyEl = document.getElementById('empty-state');
+            
+            if(!list || !countEl || !emptyEl) return;
+            
             list.innerHTML = '';
-            document.getElementById('node-count').innerText = appState.nodes.length;
-            document.getElementById('empty-state').classList.toggle('hidden', appState.nodes.length > 0);
+            countEl.innerText = appState.nodes.length;
+            emptyEl.classList.toggle('hidden', appState.nodes.length > 0);
 
-            appState.nodes.forEach(n => {
+            // Sort by status priority and Y value
+            const statusPriority = { critical: 1, escalating: 2, watchlist: 3, structural: 4, emerging: 5 };
+            const sorted = [...appState.nodes].sort((a, b) => {
+                const priorityDiff = (statusPriority[a.status] || 999) - (statusPriority[b.status] || 999);
+                if(priorityDiff !== 0) return priorityDiff;
+                return b.y - a.y; // Higher Y first
+            });
+
+            sorted.forEach(n => {
                 const item = document.createElement('div');
                 item.className = "bg-white p-2 rounded border border-slate-200 cursor-pointer hover:border-teal-500 hover:shadow-md transition-all relative";
                 item.onclick = () => openNodeModal(n);
-                const color = STATUS_COLORS[n.status];
+                const color = STATUS_COLORS[n.status] || '#94a3b8';
+                
+                // Status icon
+                const statusIcons = {
+                    emerging: '🟢',
+                    watchlist: '🟡',
+                    escalating: '🟠',
+                    critical: '🔴',
+                    structural: '🔵'
+                };
+                
                 item.innerHTML = `
                     <div class="absolute left-0 top-0 bottom-0 w-1 rounded-l" style="background-color:${color}"></div>
                     <div class="pl-3">
-                        <div class="font-bold text-navy-900 text-xs truncate">${n.title}</div>
-                        <div class="text-[10px] text-slate-500 flex gap-2">
-                            <span>X:${n.x.toFixed(1)}</span>
-                            <span>Y:${n.y.toFixed(1)}</span>
+                        <div class="font-bold text-navy-900 text-xs truncate flex items-center gap-1">
+                            <span>${statusIcons[n.status] || ''}</span>
+                            <span>${n.title}</span>
+                        </div>
+                        <div class="text-[10px] text-slate-500 flex gap-2 mt-0.5">
+                            <span class="font-mono">X:${n.x.toFixed(1)}</span>
+                            <span class="font-mono">Y:${n.y.toFixed(1)}</span>
+                            ${n.connections && n.connections.length > 0 ? `<span class="text-teal-600">🔗${n.connections.length}</span>` : ''}
                         </div>
                     </div>
                 `;
@@ -919,92 +1229,195 @@
         }
 
         async function runAnalysis() {
-            const key = document.getElementById('api-key').value;
-            if(!key) { showToast("API Key Missing", "error"); return; }
+            const key = document.getElementById('api-key')?.value;
+            if(!key) { 
+                showToast("API Key Missing - Enter Gemini key first", "error"); 
+                return; 
+            }
             localStorage.setItem('gemini_api_key', key);
+
+            if(appState.nodes.length < 3) {
+                showToast("Add at least 3 nodes for meaningful analysis", "error");
+                return;
+            }
 
             // Open analysis tab
             switchTab('analysis');
 
             const out = document.getElementById('analysis-output');
-            out.innerHTML = `<div class="animate-pulse text-teal-600 font-bold">Analyzing ${appState.nodes.length} nodes...</div>`;
+            out.innerHTML = `
+                <div class="flex items-center gap-3 text-teal-600">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600"></div>
+                    <span class="font-bold">Analyzing ${appState.nodes.length} signals...</span>
+                </div>
+            `;
 
+            // Prepare context for AI
             const nodeCtx = appState.nodes.map(n => ({
-                title: n.title, status: n.status, x: n.x, y: n.y,
+                title: n.title,
+                desc: n.desc || '',
+                status: n.status,
+                x: n.x,
+                y: n.y,
                 links: n.connections ? n.connections.map(c => appState.nodes.find(x=>x.id===c)?.title).filter(Boolean) : []
             }));
 
-            const prompt = `Analyze this Horizon Scan Matrix (Range -10 to +10).
-            Axis: ${appState.config.xLabel} vs ${appState.config.yLabel}.
-            Nodes: ${JSON.stringify(nodeCtx)}
-            
-            Provide a strategic summary: 1. Clusters/Patterns 2. Critical Priorities (High X/Y) 3. Weak Signals 4. Recommendations.`;
+            const prompt = `You are a strategic foresight analyst. Analyze this Horizon Scan Matrix data.
+
+**Matrix Configuration:**
+- X-Axis: ${appState.config.xLabel} (range -10 to +10)
+- Y-Axis: ${appState.config.yLabel} (range -10 to +10)
+- Template: ${appState.config.template}
+
+**Signals Data:**
+${JSON.stringify(nodeCtx, null, 2)}
+
+**Analysis Framework:**
+Provide a comprehensive strategic analysis with:
+
+1. **Executive Summary** (2-3 sentences of key takeaways)
+
+2. **Cluster Analysis** 
+   - Identify thematic clusters and their strategic significance
+   - Note any geographic, sectoral, or temporal patterns
+
+3. **Priority Signals** 
+   - Highlight 3-5 most critical signals (high X and Y values)
+   - Explain why each demands immediate attention
+
+4. **Weak Signals & Wild Cards**
+   - Identify emerging low-probability, high-impact signals
+   - Assess which could become critical
+
+5. **System Dynamics**
+   - Analyze connections between signals (causal relationships)
+   - Identify potential cascade effects or feedback loops
+
+6. **Strategic Recommendations**
+   - Suggest 3-5 concrete actions based on the analysis
+   - Include both defensive (risk mitigation) and offensive (opportunity capture) moves
+
+Format output in clear Markdown with headers, bullet points, and emphasis where appropriate.`;
 
             try {
-                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`, {
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${key}`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+                    body: JSON.stringify({ 
+                        contents: [{ 
+                            parts: [{ text: prompt }] 
+                        }],
+                        generationConfig: {
+                            temperature: 0.7,
+                            maxOutputTokens: 2048,
+                        }
+                    })
                 });
+                
+                if(!res.ok) {
+                    throw new Error(`API Error: ${res.status} ${res.statusText}`);
+                }
+                
                 const data = await res.json();
-                if(data.error) throw new Error(data.error.message);
+                
+                if(data.error) {
+                    throw new Error(data.error.message);
+                }
+                
+                if(!data.candidates || !data.candidates[0]) {
+                    throw new Error("No response from AI");
+                }
+                
                 const md = data.candidates[0].content.parts[0].text;
                 appState.analysis = md;
                 out.innerHTML = marked.parse(md);
-            } catch(e) { out.innerText = "Error: " + e.message; }
+                showToast("Analysis Complete!", "info");
+                
+            } catch(e) { 
+                out.innerHTML = `<div class="bg-red-50 border border-red-200 rounded p-4 text-red-800">
+                    <strong>Analysis Error:</strong><br>${e.message}
+                    <br><br><small class="text-red-600">Check your API key and network connection.</small>
+                </div>`;
+                showToast("Analysis Failed", "error");
+            }
         }
 
         function saveProjectAsHTML() {
-            let source = document.documentElement.outerHTML;
-            const stateString = JSON.stringify(appState);
-            const scriptRegex = /<script id="embedded-data">([\s\S]*?)<\/script>/;
-            const newScript = `<script id="embedded-data">
+            try {
+                let source = document.documentElement.outerHTML;
+                const stateString = JSON.stringify(appState);
+                const scriptRegex = /<script id="embedded-data">([\s\S]*?)<\/script>/;
+                const newScript = `<script id="embedded-data">
         const embeddedData = ${stateString}; 
     <\/script>`;
-            const newSource = source.replace(scriptRegex, newScript);
-            const blob = new Blob([newSource], {type: "text/html"});
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = "horizon_project.html";
-            link.click();
-            showToast("Project Saved (HTML)");
+                const newSource = source.replace(scriptRegex, newScript);
+                const blob = new Blob([newSource], {type: "text/html"});
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                const timestamp = new Date().toISOString().slice(0, 10);
+                link.download = `horizon_project_${timestamp}.html`;
+                link.click();
+                showToast("Project Saved (HTML)", "info");
+            } catch(e) {
+                showToast("Save Failed: " + e.message, "error");
+            }
         }
 
         function loadProjectFromFile(input) {
             const file = input.files[0];
             if(!file) return;
+            
             const reader = new FileReader();
             reader.onload = function(e) {
                 const content = e.target.result;
                 try {
+                    // Try JSON first
                     let data = JSON.parse(content);
-                    if(data.nodes) { appState = data; startApp(); showToast("JSON Loaded"); return; }
+                    if(data.nodes && Array.isArray(data.nodes)) { 
+                        appState = data; 
+                        startApp(); 
+                        showToast("JSON Project Loaded", "info"); 
+                        return; 
+                    }
                 } catch(e) {
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(content, "text/html");
-                    const script = doc.getElementById('embedded-data');
-                    if(script) {
-                        const match = script.innerHTML.match(/const embeddedData = (\{.*?\});/);
-                        if(match && match[1]) { appState = JSON.parse(match[1]); startApp(); showToast("HTML Project Loaded"); return; }
+                    // Try HTML extraction
+                    try {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(content, "text/html");
+                        const script = doc.getElementById('embedded-data');
+                        if(script) {
+                            const match = script.innerHTML.match(/const embeddedData = (\{[\s\S]*?\});/);
+                            if(match && match[1]) { 
+                                appState = JSON.parse(match[1]); 
+                                startApp(); 
+                                showToast("HTML Project Loaded", "info"); 
+                                return; 
+                            }
+                        }
+                    } catch(htmlErr) {
+                        console.error("HTML parsing error:", htmlErr);
                     }
                 }
-                showToast("Invalid File", "error");
+                showToast("Invalid File Format", "error");
             };
             reader.readAsText(file);
         }
 
         async function exportReport() {
+            // Auto-run analysis if not yet done
             if (!appState.analysis || appState.analysis.trim() === "") {
-                const key = document.getElementById('api-key').value || localStorage.getItem('gemini_api_key');
+                const key = document.getElementById('api-key')?.value || localStorage.getItem('gemini_api_key');
                 if (key && appState.nodes.length >= 3) {
-                    showToast("Auto-running AI Analysis...");
+                    showToast("Auto-running AI Analysis for report...", "info");
                     await runAnalysis();
+                    await new Promise(r => setTimeout(r, 2000)); // Wait for analysis
                 } else {
-                    showToast("No Analysis. Report data-only.", "error");
+                    showToast("No Analysis Available - Report will be data-only", "error");
                     await new Promise(r => setTimeout(r, 1500));
                 }
             }
 
+            // Capture chart as image
             const canvas = document.getElementById('matrixChart');
             const ctx = canvas.getContext('2d');
             ctx.save();
@@ -1014,31 +1427,220 @@
             const img = canvas.toDataURL("image/png");
             ctx.restore();
             
+            // Generate comprehensive report
+            const timestamp = new Date().toLocaleString();
+            const criticalNodes = appState.nodes.filter(n => n.status === 'critical').length;
+            const escalatingNodes = appState.nodes.filter(n => n.status === 'escalating').length;
+            const emergingNodes = appState.nodes.filter(n => n.status === 'emerging').length;
+            
+            const reportHTML = `
+                <html>
+                <head>
+                    <title>Horizon Scan Report - ${new Date().toISOString().slice(0, 10)}</title>
+                    <style>
+                        body {
+                            font-family: 'Segoe UI', -apple-system, system-ui, sans-serif;
+                            padding: 50px 60px;
+                            max-width: 1000px;
+                            margin: 0 auto;
+                            color: #1e293b;
+                            line-height: 1.6;
+                        }
+                        h1 {
+                            border-bottom: 3px solid #0d9488;
+                            padding-bottom: 15px;
+                            color: #0f172a;
+                            margin-bottom: 10px;
+                        }
+                        .meta {
+                            margin-bottom: 40px;
+                            color: #64748b;
+                            font-size: 0.95em;
+                        }
+                        .summary-stats {
+                            display: grid;
+                            grid-template-columns: repeat(4, 1fr);
+                            gap: 15px;
+                            margin: 30px 0;
+                        }
+                        .stat-card {
+                            background: #f8fafc;
+                            padding: 20px;
+                            border-radius: 8px;
+                            border-left: 4px solid;
+                            text-align: center;
+                        }
+                        .stat-card.critical { border-left-color: #ef4444; }
+                        .stat-card.escalating { border-left-color: #f97316; }
+                        .stat-card.emerging { border-left-color: #10b981; }
+                        .stat-card.total { border-left-color: #0d9488; }
+                        .stat-number { font-size: 2em; font-weight: bold; color: #0f172a; }
+                        .stat-label { font-size: 0.85em; color: #64748b; text-transform: uppercase; }
+                        .analysis-box {
+                            background: #f0fdfa;
+                            padding: 30px;
+                            border-left: 5px solid #0d9488;
+                            margin: 40px 0;
+                            border-radius: 6px;
+                        }
+                        .analysis-box h2 {
+                            margin-top: 0;
+                            color: #0d9488;
+                        }
+                        img.chart {
+                            max-width: 100%;
+                            border: 1px solid #e2e8f0;
+                            border-radius: 8px;
+                            margin: 30px 0;
+                            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                        }
+                        table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin-top: 30px;
+                            font-size: 0.9em;
+                        }
+                        th, td {
+                            padding: 12px 15px;
+                            border-bottom: 1px solid #e2e8f0;
+                            text-align: left;
+                        }
+                        th {
+                            background: #f1f5f9;
+                            font-weight: 600;
+                            color: #475569;
+                        }
+                        tr:hover {
+                            background: #f8fafc;
+                        }
+                        .status-badge {
+                            padding: 4px 8px;
+                            border-radius: 4px;
+                            font-size: 0.85em;
+                            font-weight: 600;
+                        }
+                        .status-critical { background: #fee2e2; color: #991b1b; }
+                        .status-escalating { background: #ffedd5; color: #9a3412; }
+                        .status-watchlist { background: #fef3c7; color: #92400e; }
+                        .status-emerging { background: #d1fae5; color: #065f46; }
+                        .status-structural { background: #dbeafe; color: #1e40af; }
+                        @media print {
+                            body { padding: 20px; }
+                            .analysis-box { break-inside: avoid; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <h1>🎯 Horizon Scan Strategic Report</h1>
+                    <div class="meta">
+                        <strong>Generated:</strong> ${timestamp}<br>
+                        <strong>Matrix:</strong> ${appState.config.xLabel} vs ${appState.config.yLabel} (${appState.config.template})<br>
+                        <strong>Total Signals:</strong> ${appState.nodes.length}
+                    </div>
+                    
+                    <div class="summary-stats">
+                        <div class="stat-card critical">
+                            <div class="stat-number">${criticalNodes}</div>
+                            <div class="stat-label">Critical</div>
+                        </div>
+                        <div class="stat-card escalating">
+                            <div class="stat-number">${escalatingNodes}</div>
+                            <div class="stat-label">Escalating</div>
+                        </div>
+                        <div class="stat-card emerging">
+                            <div class="stat-number">${emergingNodes}</div>
+                            <div class="stat-label">Emerging</div>
+                        </div>
+                        <div class="stat-card total">
+                            <div class="stat-number">${appState.nodes.length}</div>
+                            <div class="stat-label">Total Signals</div>
+                        </div>
+                    </div>
+                    
+                    ${appState.analysis ? `
+                    <div class="analysis-box">
+                        <h2>🤖 AI Strategic Analysis</h2>
+                        ${marked.parse(appState.analysis)}
+                    </div>
+                    ` : '<p style="color: #64748b; font-style: italic;">No AI analysis available. Run analysis in the app to generate insights.</p>'}
+                    
+                    <h2>📊 Signal Distribution Matrix</h2>
+                    <img src="${img}" class="chart" alt="Horizon Scan Matrix">
+                    
+                    <h2>📋 Complete Signal Registry</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 40%;">Title</th>
+                                <th style="width: 20%;">Status</th>
+                                <th style="width: 15%;">${appState.config.xLabel}</th>
+                                <th style="width: 15%;">${appState.config.yLabel}</th>
+                                <th style="width: 10%;">Links</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${appState.nodes.map(n => `
+                                <tr>
+                                    <td><strong>${n.title}</strong>${n.desc ? '<br><small style="color: #64748b;">' + n.desc + '</small>' : ''}</td>
+                                    <td><span class="status-badge status-${n.status}">${n.status}</span></td>
+                                    <td>${n.x.toFixed(1)}</td>
+                                    <td>${n.y.toFixed(1)}</td>
+                                    <td>${n.connections ? n.connections.length : 0}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                    
+                    <div style="margin-top: 60px; padding-top: 20px; border-top: 1px solid #e2e8f0; text-align: center; color: #94a3b8; font-size: 0.85em;">
+                        Generated by <strong>Horizon Scan AI</strong> | Professional Foresight Platform
+                    </div>
+                    
+                    <script>window.print();<\/script>
+                </body>
+                </html>
+            `;
+            
             const win = window.open('', '_blank');
-            win.document.write(`
-                <html><head><title>Horizon Scan Report</title><style>body{font-family:'Segoe UI',sans-serif;padding:40px;max-width:900px;margin:0 auto;color:#1e293b;} h1{border-bottom:2px solid #0d9488;padding-bottom:10px;} .meta{margin-bottom:30px;color:#64748b;} .analysis-box{background:#f0fdfa;padding:30px;border-left:5px solid #0d9488;margin:40px 0;} table{width:100%;border-collapse:collapse;margin-top:20px;} th,td{padding:12px;border-bottom:1px solid #e2e8f0;text-align:left;} th{background:#f1f5f9;}</style></head>
-                <body><h1>Horizon Scan Strategic Report</h1><div class="meta">Generated: ${new Date().toLocaleString()} | Signals: ${appState.nodes.length}</div>
-                <div class="analysis-box"><h2>AI Insights</h2>${appState.analysis ? marked.parse(appState.analysis) : 'No analysis.'}</div>
-                <img src="${img}" style="max-width:100%;border:1px solid #e2e8f0;">
-                <h2>Signal Registry</h2><table><thead><tr><th>Title</th><th>Status</th><th>X</th><th>Y</th></tr></thead>
-                <tbody>${appState.nodes.map(n => `<tr><td>${n.title}</td><td>${n.status}</td><td>${n.x}</td><td>${n.y}</td></tr>`).join('')}</tbody></table>
-                <script>window.print()<\/script></body></html>`);
+            win.document.write(reportHTML);
             win.document.close();
         }
 
         function showToast(msg, type='info') {
+            const container = document.getElementById('toast-container');
+            if(!container) return;
+            
             const t = document.createElement('div');
-            t.className = `${type==='error'?'bg-red-500':'bg-navy-900'} text-white px-4 py-2 rounded shadow text-xs animate-bounce`;
-            t.innerText = msg;
-            document.getElementById('toast-container').appendChild(t);
-            setTimeout(()=>t.remove(), 3000);
+            const bgColor = type === 'error' ? 'bg-red-500' : 'bg-navy-900';
+            t.className = `${bgColor} text-white px-4 py-2 rounded shadow-lg text-xs font-medium animate-fade-in flex items-center gap-2`;
+            
+            const icon = type === 'error' ? '❌' : '✓';
+            t.innerHTML = `<span>${icon}</span><span>${msg}</span>`;
+            
+            container.appendChild(t);
+            setTimeout(() => {
+                t.style.opacity = '0';
+                t.style.transform = 'translateX(20px)';
+                t.style.transition = 'all 0.3s';
+                setTimeout(() => t.remove(), 300);
+            }, 3000);
         }
         
-        function switchTab(t) {
-            document.getElementById('panel-nodes').classList.toggle('hidden', t!=='nodes');
-            document.getElementById('panel-analysis').classList.toggle('hidden', t!=='analysis');
-            document.getElementById('tab-nodes').className = t==='nodes' ? "flex-1 py-3 text-xs font-bold text-navy-900 border-b-2 border-teal-500 bg-white" : "flex-1 py-3 text-xs font-bold text-slate-500 hover:text-navy-900 border-b-2 border-transparent";
-            document.getElementById('tab-analysis').className = t==='analysis' ? "flex-1 py-3 text-xs font-bold text-navy-900 border-b-2 border-teal-500 bg-white" : "flex-1 py-3 text-xs font-bold text-slate-500 hover:text-navy-900 border-b-2 border-transparent";
+        function switchTab(tabName) {
+            const nodesPanel = document.getElementById('panel-nodes');
+            const analysisPanel = document.getElementById('panel-analysis');
+            const nodesTab = document.getElementById('tab-nodes');
+            const analysisTab = document.getElementById('tab-analysis');
+            
+            if(!nodesPanel || !analysisPanel || !nodesTab || !analysisTab) return;
+            
+            nodesPanel.classList.toggle('hidden', tabName !== 'nodes');
+            analysisPanel.classList.toggle('hidden', tabName !== 'analysis');
+            
+            const activeClass = "flex-1 py-3 text-xs font-bold text-navy-900 border-b-2 border-teal-500 bg-white";
+            const inactiveClass = "flex-1 py-3 text-xs font-bold text-slate-500 hover:text-navy-900 border-b-2 border-transparent";
+            
+            nodesTab.className = tabName === 'nodes' ? activeClass : inactiveClass;
+            analysisTab.className = tabName === 'analysis' ? activeClass : inactiveClass;
         }
     </script>
 </body>
