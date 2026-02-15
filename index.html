@@ -56,15 +56,34 @@
         /* Tutorial Highlight */
         .tutorial-highlight {
             position: relative;
-            z-index: 60;
-            box-shadow: 0 0 0 4px #14b8a6, 0 0 0 5000px rgba(0,0,0,0.7); /* Ring + Dark Overlay */
-            border-radius: 6px;
-            background-color: white; 
+            z-index: 100 !important;
+            outline: 4px solid #14b8a6;
+            outline-offset: 4px;
+            box-shadow: 0 0 0 10000px rgba(0,0,0,0.7); 
+            pointer-events: auto !important;
         }
-        /* Fix for dark header items in tutorial */
-        header .tutorial-highlight {
-            background-color: #0f172a;
-            z-index: 75; /* Ensure above overlay */
+        
+        #tutorial-overlay {
+            pointer-events: none;
+        }
+
+        /* Tooltip behavior */
+        .header-btn {
+            position: relative;
+        }
+        .header-btn:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            white-space: nowrap;
+            z-index: 100;
         }
     </style>
 </head>
@@ -102,25 +121,24 @@
                 hint_drag: "Tarik node untuk geser. Klik kosong untuk tambah.",
                 save_tooltip: "Simpan Project (HTML)",
                 load_tooltip: "Buka Project (HTML/JSON)",
-                analyze_tooltip: "Mulai Analisa AI Sekarang",
+                analyze_tooltip: "Analisa AI Sekarang",
                 report_tooltip: "Export Laporan Lengkap",
                 jitter_label: "Spread Overlap",
                 
-                // Tutorial Strings
-                tut_step1_title: "Selamat Datang!",
-                tut_step1_desc: "Ini adalah data dummy: 'Future of Urban Living 2030'. Lihat bagaimana node tersebar dan terhubung.",
-                tut_step2_title: "Kunci Kecerdasan",
-                tut_step2_desc: "Masukkan API Key Gemini Anda di sini untuk mengaktifkan analisa AI.",
-                tut_step3_title: "Interaksi Grid",
-                tut_step3_desc: "Klik area kosong untuk tambah isu baru. Tarik node untuk ubah posisi Impact/Probability.",
-                tut_step4_title: "Analisa Instan",
-                tut_step4_desc: "Klik tombol petir ini kapan saja untuk meminta AI menganalisa pola data Anda saat ini.",
+                tut_step1_title: "Simulasi Masa Depan",
+                tut_step1_desc: "Kami telah memuat data riil: 'Tech & Society 2030'. Lihat bagaimana Teknologi Fusion (Structural) mempengaruhi ketahanan energi global.",
+                tut_step2_title: "Pusat Intelijen",
+                tut_step2_desc: "Masukkan API Key Gemini Anda di sini. Tanpa kunci ini, AI tidak dapat membaca pola data Anda.",
+                tut_step3_title: "Kanvas Interaktif",
+                tut_step3_desc: "Geser titik untuk ubah bobot. Garis putus-putus menunjukkan keterkaitan antar isu (Cause-Effect).",
+                tut_step4_title: "Analisa Kilat",
+                tut_step4_desc: "Klik tombol petir ini kapan saja untuk mendapatkan insight strategis dari AI secara instan.",
                 btn_next: "Lanjut",
                 btn_finish: "Selesai"
             },
             en: {
                 app_title: "Horizon Scan AI",
-                setup_title: "Professional Foresight Platform - Angga Conni Saputra",
+                setup_title: "Professional Foresight Platform",
                 lbl_template: "Select Matrix Template",
                 btn_load: "Open File",
                 btn_init: "Start New",
@@ -143,19 +161,18 @@
                 hint_drag: "Drag nodes to move. Click empty space to add.",
                 save_tooltip: "Save Project (HTML)",
                 load_tooltip: "Open Project (HTML/JSON)",
-                analyze_tooltip: "Trigger AI Analysis Now",
+                analyze_tooltip: "Analyze AI Now",
                 report_tooltip: "Export Full Report",
                 jitter_label: "Spread Overlap",
 
-                // Tutorial Strings
-                tut_step1_title: "Welcome Aboard!",
-                tut_step1_desc: "This is a real-world scenario: 'Global Tech Trends 2030'. Observe the signal distribution.",
-                tut_step2_title: "The Intelligence Key",
-                tut_step2_desc: "Paste your Gemini API Key here to enable AI analysis powers.",
-                tut_step3_title: "Grid Interaction",
-                tut_step3_desc: "Click empty space to add signals. Drag nodes to adjust Impact/Probability.",
+                tut_step1_title: "Future Simulation",
+                tut_step1_desc: "We loaded real signals: 'Tech & Society 2030'. See how Fusion Tech (Structural) connects to global energy resilience.",
+                tut_step2_title: "Intelligence Hub",
+                tut_step2_desc: "Paste your Gemini API Key here. This is the brain that powers all strategic insights.",
+                tut_step3_title: "Interactive Canvas",
+                tut_step3_desc: "Drag nodes to adjust weights. Dashed lines represent systemic causal relationships between signals.",
                 tut_step4_title: "Instant Analysis",
-                tut_step4_desc: "Click this lightning bolt anytime to ask AI to analyze current patterns.",
+                tut_step4_desc: "Trigger this lightning bolt anytime to get an AI summary of your current scanning results.",
                 btn_next: "Next",
                 btn_finish: "Finish"
             }
@@ -170,17 +187,9 @@
                 const key = el.getAttribute('data-i18n');
                 if(i18n[currentLang][key]) {
                     if(el.tagName === 'INPUT' && el.getAttribute('placeholder')) el.placeholder = i18n[currentLang][key];
-                    else if(el.tagName === 'BUTTON' && el.getAttribute('title')) el.title = i18n[currentLang][key];
                     else el.innerText = i18n[currentLang][key];
                 }
             });
-            
-            // Tooltip updates for icon buttons
-            document.getElementById('btn-save-header').title = t('save_tooltip');
-            document.getElementById('btn-load-header').title = t('load_tooltip');
-            document.getElementById('btn-analyze-header').title = t('analyze_tooltip');
-            document.getElementById('btn-report-header').title = t('report_tooltip');
-
             updateQuadrantLabels();
             updateSelectOptions();
         }
@@ -203,16 +212,15 @@
         }
     </script>
 
-    <!-- TOAST NOTIFICATION -->
-    <div id="toast-container" class="fixed top-5 right-5 z-[80] flex flex-col gap-2"></div>
+    <div id="toast-container" class="fixed top-5 right-5 z-[150] flex flex-col gap-2"></div>
 
     <!-- TUTORIAL OVERLAY -->
-    <div id="tutorial-overlay" class="hidden fixed inset-0 z-[70] pointer-events-none">
+    <div id="tutorial-overlay" class="hidden fixed inset-0 z-[120]">
         <div id="tutorial-box" class="absolute bg-white p-6 rounded-xl shadow-2xl border-2 border-teal-500 w-80 pointer-events-auto transition-all duration-300">
             <h3 id="tut-title" class="font-bold text-navy-900 text-lg mb-2">Title</h3>
-            <p id="tut-desc" class="text-slate-600 text-sm mb-4">Description</p>
+            <p id="tut-desc" class="text-slate-600 text-sm mb-4 leading-relaxed">Description</p>
             <div class="flex justify-end">
-                <button onclick="nextTutorialStep()" class="bg-navy-900 text-white px-4 py-2 rounded text-xs font-bold hover:bg-teal-600" id="tut-btn">Next</button>
+                <button onclick="nextTutorialStep()" class="bg-navy-900 text-white px-4 py-2 rounded text-xs font-bold hover:bg-teal-600 shadow-lg" id="tut-btn">Next</button>
             </div>
             <!-- Arrow -->
             <div id="tut-arrow" class="absolute w-4 h-4 bg-white border-t-2 border-l-2 border-teal-500 transform rotate-45 -top-2 left-1/2 -translate-x-1/2"></div>
@@ -275,7 +283,7 @@
     <div id="main-app" class="hidden flex-1 flex flex-col h-full bg-bg-light">
         
         <!-- Navbar -->
-        <header class="h-14 dark-panel flex items-center justify-between px-6 shadow-md z-20 transition-colors duration-300">
+        <header class="h-14 dark-panel flex items-center justify-between px-6 shadow-md z-[110]">
             <div class="flex items-center gap-4">
                 <div class="font-bold text-lg text-white"><i class="fa-solid fa-radar text-teal-400 mr-2"></i>Horizon <span class="text-xs opacity-50 font-normal border border-slate-600 px-1 rounded">PRO</span></div>
                 <div class="h-4 w-[1px] bg-slate-700"></div>
@@ -286,31 +294,29 @@
                 </div>
             </div>
 
-            <div class="flex items-center gap-3">
-                <div id="header-api-wrapper" class="relative group">
+            <div class="flex items-center gap-2">
+                <div id="header-api-wrapper" class="relative group mr-2">
                     <i class="fa-solid fa-key absolute left-3 top-2 text-slate-500 text-xs z-10"></i>
                     <input type="password" id="api-key" data-i18n="ph_apikey" placeholder="Gemini API Key" class="bg-navy-800 border border-slate-600 rounded pl-8 pr-3 py-1 text-xs w-32 focus:w-64 transition-all focus:border-teal-500 focus:outline-none text-white placeholder-slate-500" onchange="saveApiKey()">
                     <div id="api-status" class="hidden absolute right-2 top-1.5 text-teal-400 text-[10px] font-bold"><i class="fa-solid fa-check-circle"></i></div>
                 </div>
                 
-                <!-- Quick Analyze Button -->
-                <button id="btn-analyze-header" onclick="runAnalysis()" class="bg-teal-600 hover:bg-teal-500 text-white w-8 h-8 rounded-full flex items-center justify-center transition-all shadow-lg hover:shadow-teal-500/50 ml-2" title="Run AI Analysis Now">
+                <button id="btn-analyze-header" onclick="runAnalysis()" class="header-btn bg-teal-600 hover:bg-teal-500 text-white w-8 h-8 rounded-full flex items-center justify-center transition-all shadow-lg" data-tooltip="Analyze AI Now">
                     <i class="fa-solid fa-bolt"></i>
                 </button>
 
                 <div class="h-4 w-[1px] bg-slate-700 mx-1"></div>
 
-                <!-- Icons Only Actions -->
-                <button id="btn-save-header" onclick="saveProjectAsHTML()" class="text-slate-400 hover:text-white transition-colors p-2 rounded hover:bg-slate-700" title="Save Project (HTML)">
+                <button id="btn-save-header" onclick="saveProjectAsHTML()" class="header-btn text-slate-400 hover:text-white p-2 rounded hover:bg-slate-700" data-tooltip="Save Project (HTML)">
                     <i class="fa-solid fa-floppy-disk text-lg"></i>
                 </button>
-                <label id="btn-load-header" class="text-slate-400 hover:text-white transition-colors cursor-pointer p-2 rounded hover:bg-slate-700" title="Open Project">
+                <label id="btn-load-header" class="header-btn text-slate-400 hover:text-white p-2 rounded hover:bg-slate-700 cursor-pointer" data-tooltip="Open Project">
                     <input type="file" id="load-json-main" accept=".json,.html" class="hidden" onchange="loadProjectFromFile(this)">
                     <i class="fa-solid fa-folder-open text-lg"></i>
                 </label>
                 
                 <div class="h-4 w-[1px] bg-slate-700 mx-1"></div>
-                <button id="btn-report-header" onclick="exportReport()" class="text-teal-400 hover:text-white transition-colors ml-1 font-bold flex items-center gap-1 text-xs bg-navy-800 px-3 py-1.5 rounded border border-navy-800 hover:border-teal-500" title="Export Report">
+                <button id="btn-report-header" onclick="exportReport()" class="header-btn text-teal-400 hover:text-white font-bold flex items-center gap-1 text-xs bg-navy-800 px-3 py-1.5 rounded border border-navy-800 hover:border-teal-500" data-tooltip="Export Full Report">
                     <i class="fa-solid fa-file-export"></i> Report
                 </button>
             </div>
@@ -318,39 +324,29 @@
 
         <!-- Workspace -->
         <div class="flex-1 flex overflow-hidden">
-            
-            <!-- Left: Matrix Visualization -->
             <div class="flex-1 relative bg-slate-100 p-6 flex flex-col justify-center items-center overflow-hidden">
                 
-                <!-- Controls Overlay -->
                 <div class="absolute top-4 left-4 z-10 flex gap-2">
                     <div class="bg-white p-2 rounded shadow border border-slate-200 flex items-center gap-2">
-                        <span class="text-xs font-bold text-navy-900" data-i18n="grid_zoom">Zoom</span>
+                        <span class="text-xs font-bold text-navy-900">Zoom</span>
                         <input type="range" id="grid-zoom" min="0.5" max="2.5" step="0.5" value="1" class="w-16" oninput="updateGridDensity(this.value)">
                     </div>
                     <div class="bg-white p-2 rounded shadow border border-slate-200 flex items-center gap-2">
                         <input type="checkbox" id="jitter-mode" class="accent-teal-500" onchange="updateChart()">
-                        <label for="jitter-mode" class="text-xs font-bold text-navy-900 cursor-pointer" data-i18n="jitter_label">Spread</label>
+                        <label for="jitter-mode" class="text-xs font-bold text-navy-900 cursor-pointer">Spread</label>
                     </div>
                 </div>
 
-                <!-- Quadrant Labels -->
                 <div class="quadrant-label top-4 left-1/4 text-amber-600 border-amber-200" id="lbl-tl">Top-Left</div>
                 <div class="quadrant-label top-4 right-1/4 text-red-600 border-red-200" id="lbl-tr">Top-Right</div>
                 <div class="quadrant-label bottom-4 left-1/4 text-slate-500 border-slate-200" id="lbl-bl">Bottom-Left</div>
                 <div class="quadrant-label bottom-4 right-1/4 text-teal-600 border-teal-200" id="lbl-br">Bottom-Right</div>
                 
-                <div class="absolute bottom-2 left-1/2 transform -translate-x-1/2 text-[10px] text-slate-400 pointer-events-none" data-i18n="hint_drag">
-                    Drag nodes to move. Click empty space to add.
-                </div>
-
-                <!-- Chart Container -->
                 <div id="chart-container" class="w-full h-full relative bg-white border border-slate-200 rounded-lg shadow-inner canvas-container">
                     <canvas id="matrixChart"></canvas>
                 </div>
             </div>
 
-            <!-- Right: Data & Analysis Panel -->
             <div class="w-80 border-l border-slate-200 bg-white flex flex-col shadow-xl z-10">
                 <div class="flex border-b border-slate-200 bg-slate-50">
                     <button onclick="switchTab('nodes')" id="tab-nodes" class="flex-1 py-3 text-xs font-bold text-navy-900 border-b-2 border-teal-500 bg-white"><span data-i18n="nav_nodes">NODES</span> (<span id="node-count">0</span>)</button>
@@ -368,16 +364,16 @@
                 <div id="panel-analysis" class="hidden flex-1 flex flex-col overflow-hidden bg-white">
                     <div class="p-4 border-b border-slate-100">
                         <button onclick="runAnalysis()" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded shadow flex items-center justify-center gap-2 transition-colors">
-                            <i class="fa-solid fa-wand-magic-sparkles"></i> <span data-i18n="btn_run_ai">Run Gemini Analysis</span>
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> <span data-i18n="btn_run_ai">Run AI Analysis</span>
                         </button>
                     </div>
                     <div class="flex-1 overflow-y-auto p-5 prose prose-sm prose-slate max-w-none" id="analysis-output">
-                        <p class="text-slate-400 italic text-center mt-10">Analysis results will appear here.</p>
+                        <p class="text-slate-400 italic text-center mt-10">Analysis results appear here.</p>
                     </div>
                 </div>
 
                 <div class="p-4 border-t border-slate-200 bg-white">
-                     <button onclick="openNodeModal()" class="w-full border-2 border-dashed border-slate-300 hover:border-teal-500 text-slate-500 hover:text-teal-600 py-3 rounded-lg transition-colors text-xs font-bold uppercase flex items-center justify-center gap-2" data-i18n="btn_add_node">
+                     <button onclick="openNodeModal()" class="w-full border-2 border-dashed border-slate-300 hover:border-teal-500 text-slate-500 hover:text-teal-600 py-3 rounded-lg transition-colors text-xs font-bold uppercase flex items-center justify-center gap-2">
                         <i class="fa-solid fa-plus"></i> Manual Add
                     </button>
                 </div>
@@ -386,20 +382,20 @@
     </div>
 
     <!-- NODE MODAL -->
-    <div id="node-modal" class="hidden fixed inset-0 z-50 bg-navy-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-md p-6 rounded-xl shadow-2xl border border-slate-200 animate-fade-in">
+    <div id="node-modal" class="hidden fixed inset-0 z-[200] bg-navy-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md p-6 rounded-xl shadow-2xl border border-slate-200">
             <h3 class="text-lg font-bold text-navy-900 mb-4 flex items-center gap-2 border-b border-slate-100 pb-2">
-                <i class="fa-solid fa-pen-to-square text-teal-500"></i> <span id="modal-title" data-i18n="modal_edit">Edit Node</span>
+                <i class="fa-solid fa-pen-to-square text-teal-500"></i> <span id="modal-title">Edit Node</span>
             </h3>
             <input type="hidden" id="node-id">
             <div class="space-y-4 max-h-[60vh] overflow-y-auto pr-2">
                 <div>
-                    <label class="block text-xs font-bold text-slate-500 mb-1" data-i18n="lbl_title">Title</label>
-                    <input type="text" id="node-title" class="w-full bg-slate-50 border border-slate-300 rounded p-2 text-navy-900 focus:border-teal-500 focus:outline-none font-semibold">
+                    <label class="block text-xs font-bold text-slate-500 mb-1">Title</label>
+                    <input type="text" id="node-title" class="w-full bg-slate-50 border border-slate-300 rounded p-2 text-navy-900 focus:border-teal-500 outline-none font-semibold">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-slate-500 mb-1" data-i18n="lbl_status">Classification</label>
-                    <select id="node-status" class="w-full bg-slate-50 border border-slate-300 rounded p-2 text-xs text-navy-900 font-medium focus:border-teal-500 focus:outline-none">
+                    <label class="block text-xs font-bold text-slate-500 mb-1">Classification</label>
+                    <select id="node-status" class="w-full bg-slate-50 border border-slate-300 rounded p-2 text-xs text-navy-900 font-medium focus:border-teal-500 outline-none">
                         <option value="emerging">🟢 Emerging</option>
                         <option value="watchlist">🟡 Watchlist</option>
                         <option value="escalating">🟠 Escalating</option>
@@ -408,8 +404,8 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-slate-500 mb-1" data-i18n="lbl_desc">Description</label>
-                    <textarea id="node-desc" rows="2" class="w-full bg-slate-50 border border-slate-300 rounded p-2 text-navy-900 text-xs focus:border-teal-500 focus:outline-none"></textarea>
+                    <label class="block text-xs font-bold text-slate-500 mb-1">Description</label>
+                    <textarea id="node-desc" rows="2" class="w-full bg-slate-50 border border-slate-300 rounded p-2 text-navy-900 text-xs focus:border-teal-500 outline-none"></textarea>
                 </div>
                 <div class="bg-slate-50 p-3 rounded border border-slate-200">
                     <div class="grid grid-cols-2 gap-4">
@@ -426,8 +422,8 @@
                     </div>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-slate-500 mb-1" data-i18n="lbl_connect">Connect Nodes (Ctrl+Click)</label>
-                    <select id="node-connections" multiple class="w-full bg-slate-50 border border-slate-300 rounded p-2 text-xs text-navy-900 h-24 focus:border-teal-500 focus:outline-none"></select>
+                    <label class="block text-xs font-bold text-slate-500 mb-1">Connect Nodes (Ctrl+Click)</label>
+                    <select id="node-connections" multiple class="w-full bg-slate-50 border border-slate-300 rounded p-2 text-xs text-navy-900 h-24 focus:border-teal-500 outline-none"></select>
                 </div>
             </div>
             <div class="mt-6 flex justify-between border-t border-slate-100 pt-4">
@@ -442,7 +438,6 @@
 
     <!-- LOGIC -->
     <script>
-        // GLOBAL STATE
         let appState = {
             config: { xLabel: "Probability", yLabel: "Impact", template: "impact-prob", gridStep: 1 },
             nodes: [],
@@ -455,31 +450,24 @@
         let draggedNodeIndex = -1;
         let tutorialStep = 0;
 
-        // DUMMY DATA FOR TUTORIAL
         const dummyData = [
-            { id: "d1", title: "Commercial Nuclear Fusion", desc: "Net-energy gain reactors disrupting global baseload power markets.", status: "structural", x: 2.0, y: 9.5, connections: ["d5"] },
-            { id: "d2", title: "Generative AI Avatars", desc: "Human-like digital agents for personalized services & governance.", status: "emerging", x: 7.5, y: 8.0, connections: [] },
-            { id: "d3", title: "Algae-based Protein Economy", desc: "Mass cultivation replacing fish stocks due to ocean acidification.", status: "escalating", x: 6.0, y: 7.0, connections: ["d4"] },
-            { id: "d4", title: "Citiverse (Urban Metaverse)", desc: "Digital twins of cities for participatory urban planning & simulation.", status: "watchlist", x: 4.0, y: 5.0, connections: [] },
-            { id: "d5", title: "Autonomous Supply Chains", desc: "Self-repairing logistics networks resilient to climate shocks.", status: "critical", x: 5.0, y: 8.5, connections: [] },
+            { id: "d1", title: "Commercial Nuclear Fusion 2030", desc: "First net-energy gain reactor enters commercial phase, causing a 'structural' shift in global baseload power costs and energy independence for nations.", status: "structural", x: 2.0, y: 9.5, connections: ["d5"] },
+            { id: "d2", title: "AI Corporate Governance Agents", desc: "Generative agents taking seat on boards for real-time risk assessment. An 'emerging' signal for corporate law and ethics.", status: "emerging", x: 7.5, y: 7.0, connections: [] },
+            { id: "d3", title: "Lithium Supply Shock", desc: "Shortage stopping EV production. An 'escalating' risk that might force a shift to hydrogen or solid-state batteries.", status: "escalating", x: 6.0, y: 8.0, connections: ["d4"] },
+            { id: "d4", title: "Circular Algae Bio-Plastics", desc: "Biodegradable materials replacing PET. A 'watchlist' item gaining traction in EU markets.", status: "watchlist", x: 4.0, y: 5.0, connections: [] },
+            { id: "d5", title: "Global Carbon Tokenization", desc: "Blockchain-based tracking of every emission. A 'critical' infrastructure requirement for future trade.", status: "critical", x: 5.0, y: 8.5, connections: [] },
         ];
 
-        // INIT
         window.onload = function() {
-            // Check for embedded data (Self-contained HTML)
             if(typeof embeddedData !== 'undefined' && embeddedData !== null) {
                 appState = embeddedData;
                 startApp();
-                showToast("Project Restored from File");
             }
-
-            // Check API Key
             const savedKey = localStorage.getItem('gemini_api_key');
             if(savedKey) {
                 document.getElementById('api-key').value = savedKey;
                 document.getElementById('api-status').classList.remove('hidden');
             }
-            
             updateUIText();
         };
 
@@ -495,7 +483,6 @@
             const tpl = document.getElementById('matrix-template').value;
             const x = document.getElementById('axis-x-label');
             const y = document.getElementById('axis-y-label');
-            
             const map = {
                 'impact-prob': ['Probability', 'Impact'],
                 'impact-uncertainty': ['Uncertainty', 'Impact'],
@@ -515,7 +502,6 @@
                 document.getElementById('lbl-bl').innerText = bl;
                 document.getElementById('lbl-br').innerText = br;
             };
-
             if(tpl === 'impact-prob') setLabels("Wild Cards", "Critical", "Noise", "Tactical");
             else if(tpl === 'impact-uncertainty') setLabels("Scenarios", "Urgent", "Monitor", "Prepared");
             else if(tpl === 'urgency-importance') setLabels("Distraction", "Do First", "Drop", "Schedule");
@@ -526,467 +512,206 @@
         }
 
         function startApp() {
-            // Normal Start
-            appState.nodes = [];
+            if(!appState.nodes || appState.nodes.length === 0) appState.nodes = [];
             initializeAppCommon();
         }
 
         function startTutorial() {
-            // Tutorial Start with Dummy Data
-            appState.nodes = JSON.parse(JSON.stringify(dummyData)); // Deep copy
+            appState.nodes = JSON.parse(JSON.stringify(dummyData)); 
             initializeAppCommon();
-            
-            // Start Tutorial Sequence
             setTimeout(() => {
                 tutorialStep = 1;
                 showTutorialStep(1);
-            }, 800);
+            }, 500);
         }
 
         function initializeAppCommon() {
             appState.config.xLabel = document.getElementById('axis-x-label').value;
             appState.config.yLabel = document.getElementById('axis-y-label').value;
             appState.config.template = document.getElementById('matrix-template').value;
-
             document.getElementById('display-x-label').innerText = appState.config.xLabel;
             document.getElementById('display-y-label').innerText = appState.config.yLabel;
-            
             document.getElementById('setup-screen').classList.add('hidden');
             document.getElementById('main-app').classList.remove('hidden');
-
-            if(appState.analysis) {
-                document.getElementById('analysis-output').innerHTML = marked.parse(appState.analysis);
-            }
-
+            if(appState.analysis) document.getElementById('analysis-output').innerHTML = marked.parse(appState.analysis);
             initChart();
             renderNodeList();
             updateQuadrantLabels();
         }
 
-        // --- TUTORIAL SYSTEM ---
+        // --- TUTORIAL LOGIC ---
         function showTutorialStep(step) {
             const overlay = document.getElementById('tutorial-overlay');
             const box = document.getElementById('tutorial-box');
             const title = document.getElementById('tut-title');
             const desc = document.getElementById('tut-desc');
             const btn = document.getElementById('tut-btn');
+            const arrow = document.getElementById('tut-arrow');
             
-            // Remove previous highlights
             document.querySelectorAll('.tutorial-highlight').forEach(el => el.classList.remove('tutorial-highlight'));
-            
             overlay.classList.remove('hidden');
             
-            let targetEl = null;
-            let placement = 'bottom'; // Default placement
+            let targetId = '';
+            let pos = 'bottom';
 
-            if (step === 1) {
-                // Intro - Focus on Chart
-                targetEl = document.getElementById('chart-container');
-                title.innerText = t('tut_step1_title');
-                desc.innerText = t('tut_step1_desc');
-                placement = 'center';
-            } else if (step === 2) {
-                // API Key
-                targetEl = document.getElementById('header-api-wrapper');
-                title.innerText = t('tut_step2_title');
-                desc.innerText = t('tut_step2_desc');
-                placement = 'bottom-left';
-            } else if (step === 3) {
-                // Interaction
-                targetEl = document.getElementById('chart-container');
-                title.innerText = t('tut_step3_title');
-                desc.innerText = t('tut_step3_desc');
-                placement = 'right';
-            } else if (step === 4) {
-                // Analyze
-                targetEl = document.getElementById('btn-analyze-header');
-                title.innerText = t('tut_step4_title');
-                desc.innerText = t('tut_step4_desc');
-                btn.innerText = t('btn_finish');
-                placement = 'bottom-center';
-            } else {
-                // End
-                overlay.classList.add('hidden');
-                return;
+            switch(step) {
+                case 1:
+                    targetId = 'chart-container'; title.innerText = t('tut_step1_title'); desc.innerText = t('tut_step1_desc'); pos = 'center';
+                    break;
+                case 2:
+                    targetId = 'header-api-wrapper'; title.innerText = t('tut_step2_title'); desc.innerText = t('tut_step2_desc'); pos = 'bottom-left';
+                    break;
+                case 3:
+                    targetId = 'chart-container'; title.innerText = t('tut_step3_title'); desc.innerText = t('tut_step3_desc'); pos = 'top-right';
+                    break;
+                case 4:
+                    targetId = 'btn-analyze-header'; title.innerText = t('tut_step4_title'); desc.innerText = t('tut_step4_desc'); btn.innerText = t('btn_finish'); pos = 'bottom-right';
+                    break;
+                default:
+                    overlay.classList.add('hidden'); tutorialStep = 0; return;
             }
 
-            // Highlighting
+            const targetEl = document.getElementById(targetId);
             if(targetEl) targetEl.classList.add('tutorial-highlight');
 
-            // Positioning Logic
-            if(targetEl) {
-                const rect = targetEl.getBoundingClientRect();
-                if(placement === 'center') {
-                    box.style.top = (window.innerHeight/2 - 100) + 'px';
-                    box.style.left = (window.innerWidth/2 - 160) + 'px';
-                } else if (placement === 'bottom-left') {
-                    box.style.top = (rect.bottom + 15) + 'px';
-                    box.style.left = (rect.left - 20) + 'px';
-                } else if (placement === 'right') {
-                    box.style.top = (rect.top + 50) + 'px';
-                    box.style.left = (rect.right - 300) + 'px'; // Inside chart roughly
-                } else if (placement === 'bottom-center') {
-                    box.style.top = (rect.bottom + 15) + 'px';
-                    // Center the box relative to the target, but keep it on screen
-                    let leftPos = rect.left + (rect.width / 2) - 160; // 160 is half of box width (w-80 = 320px)
-                    // Simple boundary check (assuming screen width > 320px)
-                    if (leftPos + 320 > window.innerWidth) leftPos = window.innerWidth - 340;
-                    box.style.left = leftPos + 'px';
-                    
-                    // Adjust arrow to point to target center
-                    const arrow = document.getElementById('tut-arrow');
-                    // Reset arrow
-                    arrow.style.left = '50%';
-                    
-                    // If we shifted the box, shift arrow opposite way to keep pointing at target
-                    const shift = (rect.left + rect.width/2) - (leftPos + 160);
-                    arrow.style.left = `calc(50% + ${shift}px)`;
+            const rect = targetEl.getBoundingClientRect();
+            box.style.display = 'block';
+
+            if(pos === 'center') {
+                box.style.top = '50%'; box.style.left = '50%'; box.style.transform = 'translate(-50%, -50%)'; arrow.style.display = 'none';
+            } else {
+                arrow.style.display = 'block'; box.style.transform = 'none';
+                if(pos === 'bottom-left') {
+                    box.style.top = (rect.bottom + 15) + 'px'; box.style.left = rect.left + 'px'; arrow.style.left = '20px';
+                } else if(pos === 'bottom-right') {
+                    box.style.top = (rect.bottom + 15) + 'px'; box.style.left = (rect.right - 320) + 'px'; arrow.style.left = '280px';
+                } else if(pos === 'top-right') {
+                    box.style.top = (rect.top + 100) + 'px'; box.style.left = (rect.right - 340) + 'px'; arrow.style.left = '280px';
                 }
             }
         }
 
-        function nextTutorialStep() {
-            tutorialStep++;
-            showTutorialStep(tutorialStep);
-        }
+        function nextTutorialStep() { tutorialStep++; showTutorialStep(tutorialStep); }
 
-        // CHART LOGIC
         function initChart() {
             const ctx = document.getElementById('matrixChart').getContext('2d');
             const container = document.getElementById('chart-container');
-            
-            Chart.defaults.font.family = 'Inter';
-            Chart.defaults.color = '#64748b';
-
-            // Connection Plugin
             const connectionPlugin = {
                 id: 'connectionPlugin',
                 beforeDatasetsDraw(chart) {
                     const { ctx, scales: { x, y } } = chart;
-                    ctx.save();
-                    ctx.lineWidth = 1;
-                    ctx.strokeStyle = 'rgba(15, 23, 42, 0.15)';
-                    ctx.setLineDash([5, 5]);
-                    
+                    ctx.save(); ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(15, 23, 42, 0.15)'; ctx.setLineDash([5, 5]);
                     appState.nodes.forEach(node => {
                         if (node.connections) {
-                            const startX = x.getPixelForValue(node.x);
-                            const startY = y.getPixelForValue(node.y);
+                            const startX = x.getPixelForValue(node.x); const startY = y.getPixelForValue(node.y);
                             node.connections.forEach(tid => {
                                 const target = appState.nodes.find(n => n.id === tid);
-                                if (target) {
-                                    ctx.beginPath();
-                                    ctx.moveTo(startX, startY);
-                                    ctx.lineTo(x.getPixelForValue(target.x), y.getPixelForValue(target.y));
-                                    ctx.stroke();
-                                }
+                                if (target) { ctx.beginPath(); ctx.moveTo(startX, startY); ctx.lineTo(x.getPixelForValue(target.x), y.getPixelForValue(target.y)); ctx.stroke(); }
                             });
                         }
                     });
                     ctx.restore();
                 }
             };
-
             if(chartInstance) chartInstance.destroy();
-
             chartInstance = new Chart(ctx, {
                 type: 'scatter',
-                data: {
-                    datasets: [{
-                        label: 'Nodes',
-                        data: appState.nodes,
-                        backgroundColor: (ctx) => ctx.raw ? (STATUS_COLORS[ctx.raw.status] || '#ccc') : '#ccc',
-                        pointRadius: 6, 
-                        pointHoverRadius: 10,
-                        pointBorderColor: '#fff',
-                        pointBorderWidth: 1.5,
-                        pointShadowColor: 'rgba(0,0,0,0.3)'
-                    }]
-                },
+                data: { datasets: [{ label: 'Nodes', data: appState.nodes, backgroundColor: (ctx) => ctx.raw ? (STATUS_COLORS[ctx.raw.status] || '#ccc') : '#ccc', pointRadius: 7, pointHoverRadius: 11, pointBorderColor: '#fff', pointBorderWidth: 2, pointShadowColor: 'rgba(0,0,0,0.3)' }] },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    layout: { padding: 20 },
-                    events: ['mousemove', 'mouseout', 'click', 'touchstart', 'touchmove', 'mousedown', 'mouseup'],
+                    responsive: true, maintainAspectRatio: false, layout: { padding: 20 },
                     scales: {
-                        x: { 
-                            min: -10, max: 10, 
-                            title: { display: true, text: () => appState.config.xLabel, color: '#0d9488', font: {weight:'bold'} },
-                            grid: { color: (c) => c.tick.value === 0 ? '#94a3b8' : '#e2e8f0', lineWidth: (c) => c.tick.value === 0 ? 2 : 1 },
-                            ticks: { stepSize: () => appState.config.gridStep } 
-                        },
-                        y: { 
-                            min: -10, max: 10, 
-                            title: { display: true, text: () => appState.config.yLabel, color: '#f59e0b', font: {weight:'bold'} },
-                            grid: { color: (c) => c.tick.value === 0 ? '#94a3b8' : '#e2e8f0', lineWidth: (c) => c.tick.value === 0 ? 2 : 1 },
-                            ticks: { stepSize: () => appState.config.gridStep } 
-                        }
+                        x: { min: -10, max: 10, title: { display: true, text: () => appState.config.xLabel, color: '#0d9488', font: {weight:'bold'} }, grid: { color: (c) => c.tick.value === 0 ? '#94a3b8' : '#e2e8f0', lineWidth: (c) => c.tick.value === 0 ? 2 : 1 }, ticks: { stepSize: () => appState.config.gridStep } },
+                        y: { min: -10, max: 10, title: { display: true, text: () => appState.config.yLabel, color: '#f59e0b', font: {weight:'bold'} }, grid: { color: (c) => c.tick.value === 0 ? '#94a3b8' : '#e2e8f0', lineWidth: (c) => c.tick.value === 0 ? 2 : 1 }, ticks: { stepSize: () => appState.config.gridStep } }
                     },
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            mode: 'nearest', 
-                            intersect: true,
-                            callbacks: {
-                                label: (ctx) => `${ctx.raw.title} (${ctx.raw.x.toFixed(1)}, ${ctx.raw.y.toFixed(1)})`
-                            }
-                        }
-                    },
-                    onHover: (e, elements) => {
-                        if (isDragging) container.classList.add('dragging');
-                        else if (elements.length) container.classList.add('hovering-node');
-                        else container.classList.remove('hovering-node', 'dragging');
-                    }
+                    plugins: { legend: { display: false }, tooltip: { mode: 'nearest', intersect: true, callbacks: { label: (ctx) => `${ctx.raw.title} (${ctx.raw.x.toFixed(1)}, ${ctx.raw.y.toFixed(1)})` } } },
+                    onHover: (e, elements) => { if (isDragging) container.classList.add('dragging'); else if (elements.length) container.classList.add('hovering-node'); else container.classList.remove('hovering-node', 'dragging'); }
                 },
                 plugins: [connectionPlugin]
             });
 
-            // Drag Events
             const canvas = document.getElementById('matrixChart');
-            
-            canvas.addEventListener('mousedown', (e) => {
-                const points = chartInstance.getElementsAtEventForMode(e, 'nearest', { intersect: true }, true);
-                if (points.length) {
-                    isDragging = true;
-                    draggedNodeIndex = points[0].index;
-                }
-            });
-
-            window.addEventListener('mousemove', (e) => {
-                if (!isDragging || draggedNodeIndex === -1) return;
-                const rect = canvas.getBoundingClientRect();
-                const xVal = chartInstance.scales.x.getValueForPixel(e.clientX - rect.left);
-                const yVal = chartInstance.scales.y.getValueForPixel(e.clientY - rect.top);
-                
-                appState.nodes[draggedNodeIndex].x = Math.max(-10, Math.min(10, xVal));
-                appState.nodes[draggedNodeIndex].y = Math.max(-10, Math.min(10, yVal));
-                chartInstance.update('none');
-            });
-
-            window.addEventListener('mouseup', () => {
-                if(isDragging) {
-                    isDragging = false;
-                    draggedNodeIndex = -1;
-                    renderNodeList();
-                    chartInstance.update();
-                }
-            });
-
-            canvas.addEventListener('click', (e) => {
-                if(isDragging) return;
-                const points = chartInstance.getElementsAtEventForMode(e, 'nearest', { intersect: true }, true);
-                if (points.length) openNodeModal(appState.nodes[points[0].index]);
-                else {
-                    const rect = canvas.getBoundingClientRect();
-                    const x = Math.max(-10, Math.min(10, chartInstance.scales.x.getValueForPixel(e.clientX - rect.left)));
-                    const y = Math.max(-10, Math.min(10, chartInstance.scales.y.getValueForPixel(e.clientY - rect.top)));
-                    openNodeModal(null, x.toFixed(1), y.toFixed(1));
-                }
-            });
+            canvas.addEventListener('mousedown', (e) => { const pts = chartInstance.getElementsAtEventForMode(e, 'nearest', { intersect: true }, true); if (pts.length) { isDragging = true; draggedNodeIndex = pts[0].index; } });
+            window.addEventListener('mousemove', (e) => { if (!isDragging || draggedNodeIndex === -1) return; const rect = canvas.getBoundingClientRect(); const xVal = chartInstance.scales.x.getValueForPixel(e.clientX - rect.left); const yVal = chartInstance.scales.y.getValueForPixel(e.clientY - rect.top); appState.nodes[draggedNodeIndex].x = Math.max(-10, Math.min(10, xVal)); appState.nodes[draggedNodeIndex].y = Math.max(-10, Math.min(10, yVal)); chartInstance.update('none'); });
+            window.addEventListener('mouseup', () => { if(isDragging) { isDragging = false; draggedNodeIndex = -1; renderNodeList(); chartInstance.update(); } });
+            canvas.addEventListener('click', (e) => { if(isDragging) return; const pts = chartInstance.getElementsAtEventForMode(e, 'nearest', { intersect: true }, true); if (pts.length) openNodeModal(appState.nodes[pts[0].index]); else { const rect = canvas.getBoundingClientRect(); const x = Math.max(-10, Math.min(10, chartInstance.scales.x.getValueForPixel(e.clientX - rect.left))); const y = Math.max(-10, Math.min(10, chartInstance.scales.y.getValueForPixel(e.clientY - rect.top))); openNodeModal(null, x.toFixed(1), y.toFixed(1)); } });
         }
 
         function updateChart() {
             if(!chartInstance) return;
             const useJitter = document.getElementById('jitter-mode').checked;
-            
             const displayData = appState.nodes.map(n => {
-                if(useJitter) {
-                    const conflict = appState.nodes.some(other => other.id !== n.id && Math.abs(other.x - n.x) < 0.2 && Math.abs(other.y - n.y) < 0.2);
-                    if(conflict) {
-                         return { ...n, x: n.x + (Math.random() - 0.5) * 0.5, y: n.y + (Math.random() - 0.5) * 0.5 };
-                    }
-                }
+                if(useJitter) { const conflict = appState.nodes.some(other => other.id !== n.id && Math.abs(other.x - n.x) < 0.2 && Math.abs(other.y - n.y) < 0.2); if(conflict) return { ...n, x: n.x + (Math.random() - 0.5) * 0.5, y: n.y + (Math.random() - 0.5) * 0.5 }; }
                 return n;
             });
-
-            chartInstance.data.datasets[0].data = displayData;
-            chartInstance.options.scales.x.ticks.stepSize = appState.config.gridStep;
-            chartInstance.options.scales.y.ticks.stepSize = appState.config.gridStep;
-            chartInstance.update();
+            chartInstance.data.datasets[0].data = displayData; chartInstance.update();
         }
 
-        function updateGridDensity(val) {
-            appState.config.gridStep = parseFloat(val);
-            updateChart();
-        }
+        function updateGridDensity(val) { appState.config.gridStep = parseFloat(val); updateChart(); }
 
-        // NODE & DATA OPS
         function openNodeModal(node, x=0, y=0) {
-            const modal = document.getElementById('node-modal');
-            modal.classList.remove('hidden');
-            
-            const conn = document.getElementById('node-connections');
-            conn.innerHTML = '';
-            appState.nodes.forEach(n => {
-                if(!node || n.id !== node.id) {
-                    const opt = document.createElement('option');
-                    opt.value = n.id; opt.text = n.title;
-                    if(node && node.connections && node.connections.includes(n.id)) opt.selected = true;
-                    conn.appendChild(opt);
-                }
-            });
-
+            const modal = document.getElementById('node-modal'); modal.classList.remove('hidden');
+            const conn = document.getElementById('node-connections'); conn.innerHTML = '';
+            appState.nodes.forEach(n => { if(!node || n.id !== node.id) { const opt = document.createElement('option'); opt.value = n.id; opt.text = n.title; if(node && node.connections && node.connections.includes(n.id)) opt.selected = true; conn.appendChild(opt); } });
             if(node) {
-                document.getElementById('node-id').value = node.id;
-                document.getElementById('node-title').value = node.title;
-                document.getElementById('node-desc').value = node.desc || '';
-                document.getElementById('node-status').value = node.status || 'emerging';
-                document.getElementById('node-x').value = node.x;
-                document.getElementById('node-y').value = node.y;
-                document.getElementById('btn-delete').classList.remove('hidden');
-                document.getElementById('modal-title').innerText = t('modal_edit');
+                document.getElementById('node-id').value = node.id; document.getElementById('node-title').value = node.title; document.getElementById('node-desc').value = node.desc || ''; document.getElementById('node-status').value = node.status || 'emerging'; document.getElementById('node-x').value = node.x; document.getElementById('node-y').value = node.y; document.getElementById('btn-delete').classList.remove('hidden'); document.getElementById('modal-title').innerText = t('modal_edit');
             } else {
-                document.getElementById('node-id').value = '';
-                document.getElementById('node-title').value = '';
-                document.getElementById('node-desc').value = '';
-                document.getElementById('node-status').value = 'emerging';
-                document.getElementById('node-x').value = x;
-                document.getElementById('node-y').value = y;
-                document.getElementById('btn-delete').classList.add('hidden');
-                document.getElementById('modal-title').innerText = t('modal_add');
+                document.getElementById('node-id').value = ''; document.getElementById('node-title').value = ''; document.getElementById('node-desc').value = ''; document.getElementById('node-status').value = 'emerging'; document.getElementById('node-x').value = x; document.getElementById('node-y').value = y; document.getElementById('btn-delete').classList.add('hidden'); document.getElementById('modal-title').innerText = t('modal_add');
             }
-            updateRangeVal('val-x', document.getElementById('node-x').value);
-            updateRangeVal('val-y', document.getElementById('node-y').value);
+            updateRangeVal('val-x', document.getElementById('node-x').value); updateRangeVal('val-y', document.getElementById('node-y').value);
         }
 
         function closeModal() { document.getElementById('node-modal').classList.add('hidden'); }
         function updateRangeVal(id, val) { document.getElementById(id).innerText = val; }
 
         function saveNodeFromModal() {
-            const id = document.getElementById('node-id').value;
-            const title = document.getElementById('node-title').value;
-            if(!title) { showToast("Title required", "error"); return; }
-            
-            const newNode = {
-                id: id || crypto.randomUUID(),
-                title,
-                desc: document.getElementById('node-desc').value,
-                status: document.getElementById('node-status').value,
-                x: parseFloat(document.getElementById('node-x').value),
-                y: parseFloat(document.getElementById('node-y').value),
-                connections: Array.from(document.getElementById('node-connections').selectedOptions).map(o => o.value)
-            };
-
-            if(id) {
-                const idx = appState.nodes.findIndex(n => n.id === id);
-                if(idx > -1) appState.nodes[idx] = newNode;
-            } else {
-                appState.nodes.push(newNode);
-            }
-            
-            closeModal();
-            renderNodeList();
-            updateChart();
-            showToast("Node Saved");
+            const id = document.getElementById('node-id').value; const title = document.getElementById('node-title').value; if(!title) { showToast("Title required", "error"); return; }
+            const newNode = { id: id || crypto.randomUUID(), title, desc: document.getElementById('node-desc').value, status: document.getElementById('node-status').value, x: parseFloat(document.getElementById('node-x').value), y: parseFloat(document.getElementById('node-y').value), connections: Array.from(document.getElementById('node-connections').selectedOptions).map(o => o.value) };
+            if(id) { const idx = appState.nodes.findIndex(n => n.id === id); if(idx > -1) appState.nodes[idx] = newNode; } else { appState.nodes.push(newNode); }
+            closeModal(); renderNodeList(); updateChart(); showToast("Node Saved");
         }
 
-        function deleteNode() {
-            const id = document.getElementById('node-id').value;
-            if(id) {
-                appState.nodes = appState.nodes.filter(n => n.id !== id);
-                appState.nodes.forEach(n => {
-                    if(n.connections) n.connections = n.connections.filter(c => c !== id);
-                });
-                closeModal();
-                renderNodeList();
-                updateChart();
-            }
-        }
+        function deleteNode() { const id = document.getElementById('node-id').value; if(id) { appState.nodes = appState.nodes.filter(n => n.id !== id); appState.nodes.forEach(n => { if(n.connections) n.connections = n.connections.filter(c => c !== id); }); closeModal(); renderNodeList(); updateChart(); } }
 
         function renderNodeList() {
-            const list = document.getElementById('nodes-list');
-            list.innerHTML = '';
+            const list = document.getElementById('nodes-list'); list.innerHTML = '';
             document.getElementById('node-count').innerText = appState.nodes.length;
             document.getElementById('empty-state').classList.toggle('hidden', appState.nodes.length > 0);
-
             appState.nodes.forEach(n => {
-                const item = document.createElement('div');
-                item.className = "bg-white p-2 rounded border border-slate-200 cursor-pointer hover:border-teal-500 hover:shadow-md transition-all relative";
-                item.onclick = () => openNodeModal(n);
-                const color = STATUS_COLORS[n.status];
-                item.innerHTML = `
-                    <div class="absolute left-0 top-0 bottom-0 w-1 rounded-l" style="background-color:${color}"></div>
-                    <div class="pl-3">
-                        <div class="font-bold text-navy-900 text-xs truncate">${n.title}</div>
-                        <div class="text-[10px] text-slate-500 flex gap-2">
-                            <span>X:${n.x.toFixed(1)}</span>
-                            <span>Y:${n.y.toFixed(1)}</span>
-                        </div>
-                    </div>
-                `;
+                const item = document.createElement('div'); item.className = "bg-white p-2 rounded border border-slate-200 cursor-pointer hover:border-teal-500 hover:shadow-md transition-all relative"; item.onclick = () => openNodeModal(n);
+                const color = STATUS_COLORS[n.status]; item.innerHTML = `<div class="absolute left-0 top-0 bottom-0 w-1 rounded-l" style="background-color:${color}"></div><div class="pl-3"><div class="font-bold text-navy-900 text-xs truncate">${n.title}</div><div class="text-[10px] text-slate-500 flex gap-2"><span>X:${n.x.toFixed(1)}</span><span>Y:${n.y.toFixed(1)}</span></div></div>`;
                 list.appendChild(item);
             });
         }
 
         async function runAnalysis() {
-            const key = document.getElementById('api-key').value;
-            if(!key) { showToast("API Key Missing", "error"); return; }
-            localStorage.setItem('gemini_api_key', key);
-
-            // Open analysis tab
-            switchTab('analysis');
-
-            const out = document.getElementById('analysis-output');
-            out.innerHTML = `<div class="animate-pulse text-teal-600 font-bold">Analyzing ${appState.nodes.length} nodes...</div>`;
-
-            const nodeCtx = appState.nodes.map(n => ({
-                title: n.title, status: n.status, x: n.x, y: n.y,
-                links: n.connections ? n.connections.map(c => appState.nodes.find(x=>x.id===c)?.title).filter(Boolean) : []
-            }));
-
-            const prompt = `Analyze this Horizon Scan Matrix (Range -10 to +10).
-            Axis: ${appState.config.xLabel} vs ${appState.config.yLabel}.
-            Nodes: ${JSON.stringify(nodeCtx)}
-            
-            Provide a strategic summary: 1. Clusters/Patterns 2. Critical Priorities (High X/Y) 3. Weak Signals 4. Recommendations.`;
-
+            const key = document.getElementById('api-key').value; if(!key) { showToast("API Key Missing", "error"); return; }
+            localStorage.setItem('gemini_api_key', key); switchTab('analysis');
+            const out = document.getElementById('analysis-output'); out.innerHTML = `<div class="animate-pulse text-teal-600 font-bold">Thinking...</div>`;
+            const nodeCtx = appState.nodes.map(n => ({ title: n.title, status: n.status, x: n.x, y: n.y, links: n.connections ? n.connections.map(c => appState.nodes.find(x=>x.id===c)?.title).filter(Boolean) : [] }));
+            const prompt = `Analyze this Horizon Scan Matrix (-10 to +10). Axis: ${appState.config.xLabel} vs ${appState.config.yLabel}. Data: ${JSON.stringify(nodeCtx)}. Summary: Clusters, Criticals, Recommendations.`;
             try {
-                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-                });
-                const data = await res.json();
-                if(data.error) throw new Error(data.error.message);
-                const md = data.candidates[0].content.parts[0].text;
-                appState.analysis = md;
-                out.innerHTML = marked.parse(md);
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }) });
+                const data = await res.json(); if(data.error) throw new Error(data.error.message);
+                const md = data.candidates[0].content.parts[0].text; appState.analysis = md; out.innerHTML = marked.parse(md); showToast("AI Analysis Complete");
             } catch(e) { out.innerText = "Error: " + e.message; }
         }
 
         function saveProjectAsHTML() {
-            let source = document.documentElement.outerHTML;
-            const stateString = JSON.stringify(appState);
+            let source = document.documentElement.outerHTML; const stateString = JSON.stringify(appState);
             const scriptRegex = /<script id="embedded-data">([\s\S]*?)<\/script>/;
-            const newScript = `<script id="embedded-data">
-        const embeddedData = ${stateString}; 
-    <\/script>`;
+            const newScript = `<script id="embedded-data">const embeddedData = ${stateString};<\/script>`;
             const newSource = source.replace(scriptRegex, newScript);
-            const blob = new Blob([newSource], {type: "text/html"});
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = "horizon_project.html";
-            link.click();
-            showToast("Project Saved (HTML)");
+            const blob = new Blob([newSource], {type: "text/html"}); const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob); link.download = "horizon_project.html"; link.click(); showToast("Project Saved (HTML)");
         }
 
         function loadProjectFromFile(input) {
-            const file = input.files[0];
-            if(!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
+            const file = input.files[0]; if(!file) return;
+            const reader = new FileReader(); reader.onload = function(e) {
                 const content = e.target.result;
-                try {
-                    let data = JSON.parse(content);
-                    if(data.nodes) { appState = data; startApp(); showToast("JSON Loaded"); return; }
-                } catch(e) {
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(content, "text/html");
-                    const script = doc.getElementById('embedded-data');
-                    if(script) {
-                        const match = script.innerHTML.match(/const embeddedData = (\{.*?\});/);
-                        if(match && match[1]) { appState = JSON.parse(match[1]); startApp(); showToast("HTML Project Loaded"); return; }
-                    }
+                try { let data = JSON.parse(content); if(data.nodes) { appState = data; startApp(); showToast("JSON Loaded"); return; } } catch(e) {
+                    const parser = new DOMParser(); const doc = parser.parseFromString(content, "text/html"); const script = doc.getElementById('embedded-data');
+                    if(script) { const match = script.innerHTML.match(/const embeddedData = (\{.*?\});/); if(match && match[1]) { appState = JSON.parse(match[1]); startApp(); showToast("HTML Project Loaded"); return; } }
                 }
                 showToast("Invalid File", "error");
             };
@@ -996,50 +721,17 @@
         async function exportReport() {
             if (!appState.analysis || appState.analysis.trim() === "") {
                 const key = document.getElementById('api-key').value || localStorage.getItem('gemini_api_key');
-                if (key && appState.nodes.length >= 3) {
-                    showToast("Auto-running AI Analysis...");
-                    await runAnalysis();
-                } else {
-                    showToast("No Analysis. Report data-only.", "error");
-                    await new Promise(r => setTimeout(r, 1500));
-                }
+                if (key && appState.nodes.length >= 3) { showToast("Auto-running AI..."); await runAnalysis(); }
             }
-
-            const canvas = document.getElementById('matrixChart');
-            const ctx = canvas.getContext('2d');
-            ctx.save();
-            ctx.globalCompositeOperation = 'destination-over';
-            ctx.fillStyle = 'white';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            const img = canvas.toDataURL("image/png");
-            ctx.restore();
-            
-            const win = window.open('', '_blank');
-            win.document.write(`
-                <html><head><title>Horizon Scan Report</title><style>body{font-family:'Segoe UI',sans-serif;padding:40px;max-width:900px;margin:0 auto;color:#1e293b;} h1{border-bottom:2px solid #0d9488;padding-bottom:10px;} .meta{margin-bottom:30px;color:#64748b;} .analysis-box{background:#f0fdfa;padding:30px;border-left:5px solid #0d9488;margin:40px 0;} table{width:100%;border-collapse:collapse;margin-top:20px;} th,td{padding:12px;border-bottom:1px solid #e2e8f0;text-align:left;} th{background:#f1f5f9;}</style></head>
-                <body><h1>Horizon Scan Strategic Report</h1><div class="meta">Generated: ${new Date().toLocaleString()} | Signals: ${appState.nodes.length}</div>
-                <div class="analysis-box"><h2>AI Insights</h2>${appState.analysis ? marked.parse(appState.analysis) : 'No analysis.'}</div>
-                <img src="${img}" style="max-width:100%;border:1px solid #e2e8f0;">
-                <h2>Signal Registry</h2><table><thead><tr><th>Title</th><th>Status</th><th>X</th><th>Y</th></tr></thead>
-                <tbody>${appState.nodes.map(n => `<tr><td>${n.title}</td><td>${n.status}</td><td>${n.x}</td><td>${n.y}</td></tr>`).join('')}</tbody></table>
-                <script>window.print()<\/script></body></html>`);
+            const canvas = document.getElementById('matrixChart'); const ctx = canvas.getContext('2d');
+            ctx.save(); ctx.globalCompositeOperation = 'destination-over'; ctx.fillStyle = 'white'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+            const img = canvas.toDataURL("image/png"); ctx.restore();
+            const win = window.open('', '_blank'); win.document.write(`<html><body><h1>Report</h1>${appState.analysis?marked.parse(appState.analysis):''}<img src="${img}"></body></html>`);
             win.document.close();
         }
 
-        function showToast(msg, type='info') {
-            const t = document.createElement('div');
-            t.className = `${type==='error'?'bg-red-500':'bg-navy-900'} text-white px-4 py-2 rounded shadow text-xs animate-bounce`;
-            t.innerText = msg;
-            document.getElementById('toast-container').appendChild(t);
-            setTimeout(()=>t.remove(), 3000);
-        }
-        
-        function switchTab(t) {
-            document.getElementById('panel-nodes').classList.toggle('hidden', t!=='nodes');
-            document.getElementById('panel-analysis').classList.toggle('hidden', t!=='analysis');
-            document.getElementById('tab-nodes').className = t==='nodes' ? "flex-1 py-3 text-xs font-bold text-navy-900 border-b-2 border-teal-500 bg-white" : "flex-1 py-3 text-xs font-bold text-slate-500 hover:text-navy-900 border-b-2 border-transparent";
-            document.getElementById('tab-analysis').className = t==='analysis' ? "flex-1 py-3 text-xs font-bold text-navy-900 border-b-2 border-teal-500 bg-white" : "flex-1 py-3 text-xs font-bold text-slate-500 hover:text-navy-900 border-b-2 border-transparent";
-        }
+        function showToast(msg, type='info') { const t = document.createElement('div'); t.className = `${type==='error'?'bg-red-500':'bg-navy-900'} text-white px-4 py-2 rounded shadow text-xs animate-bounce`; t.innerText = msg; document.getElementById('toast-container').appendChild(t); setTimeout(()=>t.remove(), 3000); }
+        function switchTab(t) { document.getElementById('panel-nodes').classList.toggle('hidden', t!=='nodes'); document.getElementById('panel-analysis').classList.toggle('hidden', t!=='analysis'); document.getElementById('tab-nodes').className = t==='nodes' ? "flex-1 py-3 text-xs font-bold text-navy-900 border-b-2 border-teal-500 bg-white" : "flex-1 py-3 text-xs font-bold text-slate-500 hover:text-navy-900 border-b-2 border-transparent"; document.getElementById('tab-analysis').className = t==='analysis' ? "flex-1 py-3 text-xs font-bold text-navy-900 border-b-2 border-teal-500 bg-white" : "flex-1 py-3 text-xs font-bold text-slate-500 hover:text-navy-900 border-b-2 border-transparent"; }
     </script>
 </body>
 </html>
