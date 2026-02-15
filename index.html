@@ -794,11 +794,11 @@
                 desc.innerText = t('tut_step1_desc');
                 placement = 'center';
             } else if (step === 2) {
-                // Quadrants explanation
-                targetEl = document.getElementById('lbl-tr'); // Focus on critical quadrant
+                // Quadrants explanation - highlight entire chart to show all quadrants
+                targetEl = document.getElementById('chart-container');
                 title.innerText = t('tut_step2_title');
                 desc.innerText = t('tut_step2_desc');
-                placement = 'center-bottom';
+                placement = 'bottom-center';
             } else if (step === 3) {
                 // Status/Classification - focus on a node
                 targetEl = document.getElementById('panel-nodes');
@@ -858,7 +858,18 @@
                     box.style.top = (rect.top + 100) + 'px';
                     box.style.left = (rect.right - 450) + 'px';
                 } else if (placement === 'bottom-center') {
-                    box.style.top = (rect.bottom + 15) + 'px';
+                    // Position below the chart, centered
+                    const viewportHeight = window.innerHeight;
+                    const boxHeight = 200; // Approximate box height
+                    
+                    // If there's space below, show there
+                    if (rect.bottom + boxHeight + 30 < viewportHeight) {
+                        box.style.top = (rect.bottom + 20) + 'px';
+                    } else {
+                        // Otherwise show in the center of viewport
+                        box.style.top = (viewportHeight / 2 + 50) + 'px';
+                    }
+                    
                     let leftPos = rect.left + (rect.width / 2) - 192;
                     if (leftPos + 384 > window.innerWidth) leftPos = window.innerWidth - 404;
                     if (leftPos < 20) leftPos = 20;
@@ -866,8 +877,6 @@
                     
                     const arrow = document.getElementById('tut-arrow');
                     arrow.style.left = '50%';
-                    const shift = (rect.left + rect.width/2) - (leftPos + 192);
-                    arrow.style.left = `calc(50% + ${shift}px)`;
                 }
             }
         }
