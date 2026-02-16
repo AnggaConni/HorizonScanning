@@ -43,7 +43,8 @@
         body { background-color: #f8fafc; color: #0f172a; }
         .glass-panel { background: #ffffff; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
         .dark-panel { background: #0f172a; color: #f8fafc; }
-        .quadrant-label { position: absolute; font-size: 0.75rem; font-weight: 800; opacity: 0.7; text-transform: uppercase; pointer-events: none; z-index: 0; padding: 6px 10px; border-radius: 6px; background: rgba(255,255,255,0.9); border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        /* FIXED: z-index increased to 20 to ensure visibility over chart container */
+        .quadrant-label { position: absolute; font-size: 0.75rem; font-weight: 800; opacity: 0.85; text-transform: uppercase; pointer-events: none; z-index: 20; padding: 6px 12px; border-radius: 6px; background: rgba(255,255,255,0.95); border: 1px solid rgba(0,0,0,0.1); box-shadow: 0 4px 6px rgba(0,0,0,0.05); backdrop-filter: blur(2px); }
         input[type=range] { accent-color: #14b8a6; }
         .canvas-container { cursor: crosshair; }
         .canvas-container.hovering-node { cursor: grab; }
@@ -388,8 +389,8 @@
             <!-- Left: Matrix Visualization -->
             <div class="flex-1 relative bg-slate-100 p-6 flex flex-col justify-center items-center overflow-hidden">
                 
-                <!-- Controls Overlay -->
-                <div class="absolute top-4 left-4 z-10 flex gap-2">
+                <!-- Controls Overlay (Z-Index increased to 30) -->
+                <div class="absolute top-4 left-4 z-30 flex gap-2">
                     <div class="bg-white p-2 rounded shadow border border-slate-200 flex items-center gap-2">
                         <span class="text-xs font-bold text-navy-900" data-i18n="grid_zoom">Zoom</span>
                         <input type="range" id="grid-zoom" min="0.5" max="2.5" step="0.5" value="1" class="w-16" oninput="updateGridDensity(this.value)">
@@ -400,11 +401,11 @@
                     </div>
                 </div>
 
-                <!-- Quadrant Labels -->
-                <div class="quadrant-label top-4 left-1/4 text-amber-600 border-amber-200" id="lbl-tl">Top-Left</div>
-                <div class="quadrant-label top-4 right-1/4 text-red-600 border-red-200" id="lbl-tr">Top-Right</div>
-                <div class="quadrant-label bottom-4 left-1/4 text-slate-500 border-slate-200" id="lbl-bl">Bottom-Left</div>
-                <div class="quadrant-label bottom-4 right-1/4 text-teal-600 border-teal-200" id="lbl-br">Bottom-Right</div>
+                <!-- Quadrant Labels (Positions moved inward: top-8/bottom-8 to avoid clipping) -->
+                <div class="quadrant-label top-8 left-1/4 text-amber-600 border-amber-200" id="lbl-tl">Top-Left</div>
+                <div class="quadrant-label top-8 right-1/4 text-red-600 border-red-200" id="lbl-tr">Top-Right</div>
+                <div class="quadrant-label bottom-8 left-1/4 text-slate-500 border-slate-200" id="lbl-bl">Bottom-Left</div>
+                <div class="quadrant-label bottom-8 right-1/4 text-teal-600 border-teal-200" id="lbl-br">Bottom-Right</div>
                 
                 <div class="absolute bottom-2 left-1/2 transform -translate-x-1/2 text-[10px] text-slate-400 pointer-events-none" data-i18n="hint_drag">
                     Drag nodes to move. Click empty space to add.
@@ -696,6 +697,7 @@
             if(map[tpl]) { x.value = map[tpl][0]; y.value = map[tpl][1]; }
         }
 
+        // UPDATED: Corrected labels based on user definitions
         function updateQuadrantLabels() {
             const tpl = appState.config.template;
             const setLabels = (tl, tr, bl, br) => {
@@ -705,12 +707,12 @@
                 document.getElementById('lbl-br').innerText = br;
             };
 
-            if(tpl === 'impact-prob') setLabels("Wild Cards", "Critical", "Noise", "Tactical");
-            else if(tpl === 'impact-uncertainty') setLabels("Scenarios", "Urgent", "Monitor", "Prepared");
-            else if(tpl === 'urgency-importance') setLabels("Distraction", "Do First", "Drop", "Schedule");
-            else if(tpl === 'influence-interest') setLabels("Satisfy", "Manage", "Monitor", "Inform");
-            else if(tpl === 'novelty-maturity') setLabels("Radical", "Disruptive", "Obsolete", "Incremental");
-            else if(tpl === 'time-impact') setLabels("Black Swan", "Strategy", "Short Term", "Ops");
+            if(tpl === 'impact-prob') setLabels("Black Swans", "Critical Risks", "Routine", "Tactical");
+            else if(tpl === 'impact-uncertainty') setLabels("Planning Realities", "Scenario Candidates", "Monitor", "Prepared");
+            else if(tpl === 'urgency-importance') setLabels("Delegate", "Do First", "Drop", "Schedule");
+            else if(tpl === 'influence-interest') setLabels("Keep Satisfied", "Key Players", "Monitor", "Keep Informed");
+            else if(tpl === 'novelty-maturity') setLabels("Bleeding Edge", "Disruptive", "Obsolete", "Commodity");
+            else if(tpl === 'time-impact') setLabels("Strategic", "Critical", "Operational", "Tactical");
             else setLabels("Top-Left", "Top-Right", "Bottom-Left", "Bottom-Right");
         }
 
@@ -970,7 +972,8 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    layout: { padding: 25 },
+                    // Updated padding to provide more space at top/bottom for labels
+                    layout: { padding: { top: 60, right: 30, bottom: 60, left: 30 } },
                     events: ['mousemove', 'mouseout', 'click', 'touchstart', 'touchmove', 'mousedown', 'mouseup'],
                     scales: {
                         x: { 
