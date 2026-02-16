@@ -90,6 +90,13 @@
             width: 24px;
             border-radius: 4px;
         }
+        
+        /* Analysis Typography Fixes */
+        .prose h1, .prose h2, .prose h3 { color: #0f172a; font-weight: 700; margin-top: 1.5em; margin-bottom: 0.5em; }
+        .prose h2 { font-size: 1.25rem; border-bottom: 2px solid #0d9488; padding-bottom: 0.25em; display: inline-block; }
+        .prose ul { list-style-type: disc; padding-left: 1.5em; margin-bottom: 1em; }
+        .prose li { margin-bottom: 0.25em; }
+        .prose strong { color: #0d9488; }
     </style>
 </head>
 <body class="h-screen flex flex-col overflow-hidden text-sm font-sans">
@@ -112,7 +119,7 @@
                 nav_analysis: "ANALISA AI",
                 ph_apikey: "API Key Gemini",
                 empty_state: "Belum ada data node.",
-                btn_run_ai: "Jalankan Analisa AI",
+                btn_run_ai: "Jalankan Analisa AI Lengkap",
                 btn_add_node: "+ Tambah Manual",
                 modal_add: "Tambah Node",
                 modal_edit: "Edit Node",
@@ -129,8 +136,10 @@
                 analyze_tooltip: "Mulai Analisa AI Sekarang",
                 report_tooltip: "Export Laporan Lengkap",
                 jitter_label: "Spread Overlap",
+                grid_zoom: "Zoom",
+                lbl_connect: "Hubungkan Node (Ctrl+Klik)",
                 
-                // Tutorial Strings - Enhanced
+                // Tutorial Strings
                 tut_step1_title: "Selamat Datang di Horizon Scanning!",
                 tut_step1_desc: "Ini adalah skenario nyata: 'Global Tech & Society 2025-2030'. Perhatikan bagaimana sinyal tersebar berdasarkan Impact vs Probability. Setiap titik adalah tren atau peristiwa yang harus dipantau.",
                 tut_step2_title: "Memahami Kuadran Strategis",
@@ -161,7 +170,7 @@
                 nav_analysis: "AI ANALYSIS",
                 ph_apikey: "Gemini API Key",
                 empty_state: "No data nodes yet.",
-                btn_run_ai: "Run AI Analysis",
+                btn_run_ai: "Run Full AI Analysis",
                 btn_add_node: "+ Manual Add",
                 modal_add: "Add Node",
                 modal_edit: "Edit Node",
@@ -178,8 +187,10 @@
                 analyze_tooltip: "Trigger AI Analysis Now",
                 report_tooltip: "Export Full Report",
                 jitter_label: "Spread Overlap",
+                grid_zoom: "Zoom",
+                lbl_connect: "Connect Nodes (Ctrl+Click)",
 
-                // Tutorial Strings - Enhanced
+                // Tutorial Strings
                 tut_step1_title: "Welcome to Horizon Scanning!",
                 tut_step1_desc: "This is a real-world scenario: 'Global Tech & Society 2025-2030'. Observe how signals are distributed by Impact vs Probability. Each dot represents a trend or event to monitor.",
                 tut_step2_title: "Understanding Strategic Quadrants",
@@ -422,8 +433,8 @@
 
                 <div id="panel-analysis" class="hidden flex-1 flex flex-col overflow-hidden bg-white">
                     <div class="p-4 border-b border-slate-100">
-                        <button onclick="runAnalysis()" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded shadow flex items-center justify-center gap-2 transition-colors">
-                            <i class="fa-solid fa-wand-magic-sparkles"></i> <span data-i18n="btn_run_ai">Run Gemini Analysis</span>
+                        <button onclick="runAnalysis()" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded shadow flex items-center justify-center gap-2 transition-colors text-xs">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> <span data-i18n="btn_run_ai">Run Full AI Analysis</span>
                         </button>
                     </div>
                     <div class="flex-1 overflow-y-auto p-5 prose prose-sm prose-slate max-w-none" id="analysis-output">
@@ -1240,38 +1251,71 @@
         async function runAnalysis() {
             const key = document.getElementById('api-key')?.value;
             if(!key) { 
-                showToast("API Key Missing - Enter Gemini key first", "error"); 
+                showToast(currentLang === 'id' ? "API Key tidak ditemukan" : "API Key Missing", "error"); 
                 return; 
             }
             localStorage.setItem('gemini_api_key', key);
 
             if(appState.nodes.length < 3) {
-                showToast("Add at least 3 nodes for meaningful analysis", "error");
+                showToast(currentLang === 'id' ? "Tambahkan minimal 3 node" : "Add at least 3 nodes", "error");
                 return;
             }
 
             // Open analysis tab
             switchTab('analysis');
 
+            const analyzingText = currentLang === 'id' ? `Menganalisa ${appState.nodes.length} sinyal...` : `Analyzing ${appState.nodes.length} signals...`;
+
             const out = document.getElementById('analysis-output');
             out.innerHTML = `
                 <div class="flex items-center gap-3 text-teal-600">
                     <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600"></div>
-                    <span class="font-bold">Analyzing ${appState.nodes.length} signals...</span>
+                    <span class="font-bold">${analyzingText}</span>
                 </div>
             `;
 
-            // Prepare context for AI
+            // Data sanitization - only send what AI needs to save token space
             const nodeCtx = appState.nodes.map(n => ({
+                id: n.id,
                 title: n.title,
                 desc: n.desc || '',
                 status: n.status,
                 x: n.x,
                 y: n.y,
-                links: n.connections ? n.connections.map(c => appState.nodes.find(x=>x.id===c)?.title).filter(Boolean) : []
+                links: n.connections ? n.connections.map(c => appState.nodes.find(x=>x.id===c)?.title || c) : []
             }));
 
-            const prompt = `You are a strategic foresight analyst. Analyze this Horizon Scan Matrix data.
+            // --- PROMPT ENGINEERING BASED ON LANGUAGE ---
+            let sysInstruction = "";
+            let userPrompt = "";
+
+            if (currentLang === 'id') {
+                sysInstruction = "Anda adalah analis strategi masa depan (foresight analyst) profesional. Tugas Anda adalah memberikan analisa mendalam, komprehensif, dan strategis berdasarkan data matriks yang diberikan.";
+                userPrompt = `Analisa data Matrix Horizon Scan berikut ini.
+                
+**Konfigurasi Matrix:**
+- Sumbu X: ${appState.config.xLabel} (range -10 sampai +10)
+- Sumbu Y: ${appState.config.yLabel} (range -10 sampai +10)
+- Template: ${appState.config.template}
+
+**Data Sinyal:**
+${JSON.stringify(nodeCtx, null, 2)}
+
+**Instruksi Output:**
+Berikan laporan analisis yang SANGAT MENDETAIL (bukan ringkasan pendek). Gunakan format Markdown yang rapi. Bahasa output WAJIB BAHASA INDONESIA.
+
+Struktur Laporan:
+1. **Ringkasan Eksekutif** (Paragraf pembuka yang kuat tentang keadaan sistem saat ini)
+2. **Analisis Kluster & Pola** (Jelaskan pengelompokan sinyal yang terlihat)
+3. **Sinyal Prioritas Utama** (Analisa mendalam 3-5 sinyal di kuadran Kanan Atas/Kritis)
+4. **Wild Cards & Sinyal Lemah** (Analisa sinyal di Kiri Atas yang berdampak besar tapi jarang dibahas)
+5. **Dinamika Sistem** (Analisa koneksi antar node: sebab-akibat dan efek domino)
+6. **Rekomendasi Strategis** (Berikan 3-5 langkah aksi konkret yang detail, bukan poin-poin pendek)
+
+PENTING: Jangan membuat teks yang terlalu singkat. Berikan analisa selayaknya laporan konsultan manajemen profesional.`;
+            } else {
+                sysInstruction = "You are a professional strategic foresight analyst. Your task is to provide a deep, comprehensive, and strategic analysis based on the provided matrix data.";
+                userPrompt = `Analyze the following Horizon Scan Matrix data.
 
 **Matrix Configuration:**
 - X-Axis: ${appState.config.xLabel} (range -10 to +10)
@@ -1281,44 +1325,34 @@
 **Signals Data:**
 ${JSON.stringify(nodeCtx, null, 2)}
 
-**Analysis Framework:**
-Provide a comprehensive strategic analysis with:
+**Output Instructions:**
+Provide a VERY DETAILED analysis report (not a short summary). Use clean Markdown format. Output MUST be in ENGLISH.
 
-1. **Executive Summary** (2-3 sentences of key takeaways)
+Report Structure:
+1. **Executive Summary** (Strong opening paragraph about the current system state)
+2. **Cluster & Pattern Analysis** (Explain visible groupings of signals)
+3. **Top Priority Signals** (Deep analysis of 3-5 signals in the Top-Right/Critical quadrant)
+4. **Wild Cards & Weak Signals** (Analysis of Top-Left signals that are high impact but often overlooked)
+5. **System Dynamics** (Analyze connections between nodes: causality and domino effects)
+6. **Strategic Recommendations** (Provide 3-5 concrete, detailed action steps, not short bullet points)
 
-2. **Cluster Analysis** 
-   - Identify thematic clusters and their strategic significance
-   - Note any geographic, sectoral, or temporal patterns
-
-3. **Priority Signals** 
-   - Highlight 3-5 most critical signals (high X and Y values)
-   - Explain why each demands immediate attention
-
-4. **Weak Signals & Wild Cards**
-   - Identify emerging low-probability, high-impact signals
-   - Assess which could become critical
-
-5. **System Dynamics**
-   - Analyze connections between signals (causal relationships)
-   - Identify potential cascade effects or feedback loops
-
-6. **Strategic Recommendations**
-   - Suggest 3-5 concrete actions based on the analysis
-   - Include both defensive (risk mitigation) and offensive (opportunity capture) moves
-
-Format output in clear Markdown with headers, bullet points, and emphasis where appropriate.`;
+IMPORTANT: Do not generate short text. Provide analysis worthy of a professional management consultant report.`;
+            }
 
             try {
+                // Using gemini-2.5-flash which supports larger context
                 const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({ 
                         contents: [{ 
-                            parts: [{ text: prompt }] 
+                            parts: [
+                                { text: sysInstruction + "\n\n" + userPrompt }
+                            ] 
                         }],
                         generationConfig: {
                             temperature: 0.7,
-                            maxOutputTokens: 2048,
+                            maxOutputTokens: 8192, // Increased from 2048 to allow full report
                         }
                     })
                 });
@@ -1342,7 +1376,7 @@ Format output in clear Markdown with headers, bullet points, and emphasis where 
                 const md = data.candidates[0].content.parts[0].text;
                 appState.analysis = md;
                 out.innerHTML = marked.parse(md);
-                showToast("Analysis Complete!", "info");
+                showToast(currentLang === 'id' ? "Analisa Selesai!" : "Analysis Complete!", "info");
                 
             } catch(e) { 
                 console.error("Analysis error details:", e);
@@ -1352,19 +1386,11 @@ Format output in clear Markdown with headers, bullet points, and emphasis where 
                 if(e.message.includes('Failed to fetch') || e.message.includes('NetworkError')) {
                     troubleshoot = `<strong>Possible causes:</strong>
                     <ul style="margin-top: 10px; padding-left: 20px;">
-                        <li>Network connection issue - check your internet</li>
-                        <li>API key is invalid or expired - get a new one at <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: #0d9488;">ai.google.dev/aistudio</a></li>
-                        <li>API quota exceeded - check your usage limits</li>
-                        <li>CORS/browser restriction - try a different browser</li>
+                        <li>Network connection issue</li>
+                        <li>API key is invalid</li>
                     </ul>`;
-                } else if(e.message.includes('API Error: 400')) {
-                    troubleshoot = 'Invalid request format. Please report this issue.';
-                } else if(e.message.includes('API Error: 401')) {
-                    troubleshoot = 'Invalid API key. Get a free key at <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: #0d9488;">ai.google.dev/aistudio</a>';
-                } else if(e.message.includes('API Error: 429')) {
-                    troubleshoot = 'Rate limit exceeded. Wait a few minutes and try again.';
-                } else {
-                    troubleshoot = 'Unexpected error. Check browser console (F12) for details.';
+                } else if(e.message.includes('429')) {
+                    troubleshoot = 'Rate limit exceeded. Wait a moment.';
                 }
                 
                 out.innerHTML = `<div class="bg-red-50 border border-red-200 rounded p-4 text-red-800" style="font-size: 0.9em;">
@@ -1442,7 +1468,7 @@ Format output in clear Markdown with headers, bullet points, and emphasis where 
             if (!appState.analysis || appState.analysis.trim() === "") {
                 const key = document.getElementById('api-key')?.value || localStorage.getItem('gemini_api_key');
                 if (key && appState.nodes.length >= 3) {
-                    showToast("Auto-running AI Analysis for report...", "info");
+                    showToast(currentLang === 'id' ? "Menjalankan Analisa AI untuk laporan..." : "Auto-running AI Analysis for report...", "info");
                     await runAnalysis();
                     await new Promise(r => setTimeout(r, 2000)); // Wait for analysis
                 } else {
