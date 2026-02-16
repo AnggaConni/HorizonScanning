@@ -202,7 +202,7 @@ Delete image
 
 get your own API, as Gemini API was limited, so use your own token
 
-#🛠️ System Requirements
+# System Requirements 🛠️
 Browser: Modern browsers (Chrome, Edge, Firefox, Brave).
 
 Internet: Required only for calling Gemini AI. The tool works offline for manual editing.
