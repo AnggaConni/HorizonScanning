@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Horizon Scan AI | Professional Edition</title>
-    <link rel="icon" type="image/png" href="favicon.png" sizes="32x32">
-    <link rel="apple-touch-icon" href="favicon.png">
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -159,7 +157,7 @@
             },
             en: {
                 app_title: "Horizon Scan AI",
-                setup_title: "Professional Foresight Platform by angga_conni",
+                setup_title: "Professional Foresight Platform",
                 lbl_template: "Select Matrix Template",
                 btn_load: "Open File",
                 btn_init: "Start New",
@@ -1442,8 +1440,18 @@ IMPORTANT: Do not generate short text. Provide analysis worthy of a professional
                     if(data.nodes && Array.isArray(data.nodes)) {
                         
                         // 1. Restore State
-                        appState.config = data.config || appState.config;
-                        appState.nodes = data.nodes;
+                        appState = data; // Restore config and nodes
+
+                        // --- BUG FIX START ---
+                        // Update the Setup UI inputs to match the loaded config
+                        // So that initializeAppCommon doesn't overwrite them with defaults
+                        if(appState.config) {
+                             document.getElementById('axis-x-label').value = appState.config.xLabel || 'Probability';
+                             document.getElementById('axis-y-label').value = appState.config.yLabel || 'Impact';
+                             document.getElementById('matrix-template').value = appState.config.template || 'impact-prob';
+                        }
+                        // --- BUG FIX END ---
+
                         appState.analysis = data.analysis || null;
 
                         // 2. Restore API Key if present (Securely into input field)
@@ -1454,7 +1462,7 @@ IMPORTANT: Do not generate short text. Provide analysis worthy of a professional
                         }
 
                         // 3. Re-initialize UI
-                        startApp();
+                        initializeAppCommon(); 
                         showToast("JSON Data Loaded Successfully", "info");
                     } else {
                         // Fallback check for old structure or wrong file
