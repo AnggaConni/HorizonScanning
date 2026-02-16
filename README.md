@@ -81,7 +81,7 @@ How it Works (Jittering): This feature applies a "visual jitter"—slightly scat
 Important Note: This is purely visual. It does not change the underlying X/Y data values of your signals. Unchecking the box returns them to their precise coordinates.
 
 
-#🎓 Horizon Scanning Masterclass: The Complete Guide
+# Horizon Scanning Masterclass: The Complete Guide 🎓 
 Welcome to the comprehensive guide on Strategic Foresight. This section covers everything from basic definitions to advanced frameworks used in this tool.
 
 Module 1: The Core Philosophy
