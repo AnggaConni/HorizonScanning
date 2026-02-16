@@ -51,7 +51,7 @@ Portable Project File: Designed for flexibility and privacy. Your entire project
 
 Tutorial Mode: An immersive, built-in interactive guide that walks new users through the horizon scanning methodology. It explains the significance of each quadrant, how to interpret signal statuses, and how to effectively utilize the platform's features from day one.
 
- Quick Start Guide
+# Quick Start Guide
 Open the App: Simply open the link (Click this URL) in any modern browser like Chrome, Edge, Firefox, or Safari. The application runs entirely in your browser with no server installation required.
 
 Initial Setup: Upon launching, select a Matrix Template that aligns with your analysis goal (e.g., Impact vs. Probability for risk, Novelty vs. Maturity for innovation). You can explicitly rename the X and Y axes to match your specific methodology before clicking "Start New".
@@ -70,7 +70,7 @@ Minimize image
 Edit image
 Delete image
 
-Spread Overlap
+# Spread Overlap
 💡 Pro Tip: Managing Cluttered Grids
 The Problem: In a detailed scan, multiple signals often share the exact same or very similar coordinates (e.g., several risks with Impact: 9 and Probability: 9). This causes nodes to stack on top of each other, making them difficult to click or distinguish.
 
@@ -81,7 +81,7 @@ How it Works (Jittering): This feature applies a "visual jitter"—slightly scat
 Important Note: This is purely visual. It does not change the underlying X/Y data values of your signals. Unchecking the box returns them to their precise coordinates.
 
 
-🎓 Horizon Scanning Masterclass: The Complete Guide
+#🎓 Horizon Scanning Masterclass: The Complete Guide
 Welcome to the comprehensive guide on Strategic Foresight. This section covers everything from basic definitions to advanced frameworks used in this tool.
 
 Module 1: The Core Philosophy
@@ -179,7 +179,7 @@ Availability Heuristic: Overestimating the importance of information that is rea
 Groupthink: Agreeing with the consensus to avoid conflict during a workshop. Fix: Use the "Spread" feature in the app to visualize where opinions diverge before discussing.
 
 
-🔑 How to Get Your Google Gemini API Key
+# 🔑 How to Get Your Google Gemini API Key
 To unlock the "AI Analysis" features, you need a free API key from Google.
 
 Visit Google AI Studio: Go to: https://aistudio.google.com/
@@ -201,7 +201,8 @@ Edit image
 Delete image
 
 get your own API, as Gemini API was limited, so use your own token
-🛠️ System Requirements
+
+#🛠️ System Requirements
 Browser: Modern browsers (Chrome, Edge, Firefox, Brave).
 
 Internet: Required only for calling Gemini AI. The tool works offline for manual editing.
