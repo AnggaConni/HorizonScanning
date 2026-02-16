@@ -102,11 +102,6 @@
 </head>
 <body class="h-screen flex flex-col overflow-hidden text-sm font-sans">
 
-    <!-- DATA INJECTION POINT FOR SAVE/LOAD -->
-    <script id="embedded-data">
-        const embeddedData = null; // PLACEHOLDER
-    </script>
-
     <script>
         const i18n = {
             id: {
@@ -132,8 +127,8 @@
                 status_critical: "🔴 Critical (Kritis)",
                 status_structural: "🔵 Structural Trend (Tren)",
                 hint_drag: "Tarik node untuk geser. Klik kosong untuk tambah.",
-                save_tooltip: "Simpan Project (HTML)",
-                load_tooltip: "Buka Project (HTML/JSON)",
+                save_tooltip: "Simpan Project (JSON)",
+                load_tooltip: "Buka Project (JSON)",
                 analyze_tooltip: "Mulai Analisa AI Sekarang",
                 report_tooltip: "Export Laporan Lengkap",
                 jitter_label: "Spread Overlap",
@@ -154,7 +149,7 @@
                 tut_step6_title: "Koneksi & Dependensi",
                 tut_step6_desc: "Beberapa node terhubung dengan garis putus-putus - ini menunjukkan dependensi atau hubungan sebab-akibat. Edit node untuk tambah koneksi dan lihat sistem kompleks Anda.",
                 tut_step7_title: "Analisa Instan & Export",
-                tut_step7_desc: "Tombol petir: analisa AI instan. Tombol Report: export PDF lengkap dengan visualisasi + insight AI. Save/Load: simpan project sebagai file HTML yang self-contained. Selamat menggunakan!",
+                tut_step7_desc: "Tombol petir: analisa AI instan. Tombol Report: export PDF lengkap dengan visualisasi + insight AI. Save/Load: simpan project sebagai file JSON ringan. Selamat menggunakan!",
                 btn_next: "Lanjut",
                 btn_prev: "Kembali",
                 btn_finish: "Selesai",
@@ -183,8 +178,8 @@
                 status_critical: "🔴 Critical",
                 status_structural: "🔵 Structural Trend",
                 hint_drag: "Drag nodes to move. Click empty space to add.",
-                save_tooltip: "Save Project (HTML)",
-                load_tooltip: "Open Project (HTML/JSON)",
+                save_tooltip: "Save Project (JSON)",
+                load_tooltip: "Open Project (JSON)",
                 analyze_tooltip: "Trigger AI Analysis Now",
                 report_tooltip: "Export Full Report",
                 jitter_label: "Spread Overlap",
@@ -205,7 +200,7 @@
                 tut_step6_title: "Connections & Dependencies",
                 tut_step6_desc: "Some nodes are connected by dashed lines - these show dependencies or causal relationships. Edit nodes to add connections and see your complex system emerge.",
                 tut_step7_title: "Instant Analysis & Export",
-                tut_step7_desc: "Lightning button: instant AI analysis. Report button: export full PDF with visualization + AI insights. Save/Load: save project as self-contained HTML file. Happy scanning!",
+                tut_step7_desc: "Lightning button: instant AI analysis. Report button: export full PDF with visualization + AI insights. Save/Load: save project as lightweight JSON file. Happy scanning!",
                 btn_next: "Next",
                 btn_prev: "Back",
                 btn_finish: "Finish",
@@ -321,7 +316,7 @@
 
                 <div class="pt-6 border-t border-slate-200 flex justify-between items-center mt-4">
                     <label class="flex items-center gap-2 cursor-pointer text-slate-500 hover:text-teal-600 transition-colors text-xs">
-                        <input type="file" id="load-json-setup" accept=".json,.html" class="hidden" onchange="loadProjectFromFile(this)">
+                        <input type="file" id="load-json-setup" accept=".json" class="hidden" onchange="loadProjectFromFile(this)">
                         <i class="fa-solid fa-folder-open"></i> <span data-i18n="btn_load">Open File</span>
                     </label>
                     
@@ -368,11 +363,11 @@
                 <div class="h-4 w-[1px] bg-slate-700 mx-1"></div>
 
                 <!-- Icons Only Actions -->
-                <button id="btn-save-header" onclick="saveProjectAsHTML()" class="text-slate-400 hover:text-white transition-colors p-2 rounded hover:bg-slate-700" title="Save Project (HTML)">
+                <button id="btn-save-header" onclick="saveProjectAsJSON()" class="text-slate-400 hover:text-white transition-colors p-2 rounded hover:bg-slate-700" title="Save Project (JSON)">
                     <i class="fa-solid fa-floppy-disk text-lg"></i>
                 </button>
                 <label id="btn-load-header" class="text-slate-400 hover:text-white transition-colors cursor-pointer p-2 rounded hover:bg-slate-700" title="Open Project">
-                    <input type="file" id="load-json-main" accept=".json,.html" class="hidden" onchange="loadProjectFromFile(this)">
+                    <input type="file" id="load-json-main" accept=".json" class="hidden" onchange="loadProjectFromFile(this)">
                     <i class="fa-solid fa-folder-open text-lg"></i>
                 </label>
                 
@@ -656,13 +651,6 @@
 
         // INIT
         window.onload = function() {
-            // Check for embedded data (Self-contained HTML)
-            if(typeof embeddedData !== 'undefined' && embeddedData !== null) {
-                appState = embeddedData;
-                startApp();
-                showToast("Project Restored from File");
-            }
-
             // Check API Key
             const savedKey = localStorage.getItem('gemini_api_key');
             if(savedKey) {
@@ -718,7 +706,7 @@
 
         function startApp() {
             // Normal Start
-            appState.nodes = [];
+            if(appState.nodes.length === 0) appState.nodes = [];
             initializeAppCommon();
         }
 
@@ -1405,27 +1393,39 @@ IMPORTANT: Do not generate short text. Provide analysis worthy of a professional
             }
         }
 
-        function saveProjectAsHTML() {
+        // --- NEW: SAVE AS JSON ---
+        function saveProjectAsJSON() {
             try {
-                let source = document.documentElement.outerHTML;
-                const stateString = JSON.stringify(appState);
-                const scriptRegex = /<script id="embedded-data">([\s\S]*?)<\/script>/;
-                const newScript = `<script id="embedded-data">
-        const embeddedData = ${stateString}; 
-    <\/script>`;
-                const newSource = source.replace(scriptRegex, newScript);
-                const blob = new Blob([newSource], {type: "text/html"});
-                const link = document.createElement("a");
-                link.href = URL.createObjectURL(blob);
+                // Get current API key (if any) to save inside JSON
+                const currentKey = document.getElementById('api-key').value;
+                
+                const exportObject = {
+                    _info: "this is a save files, not export report, please use the apps and import this",
+                    _url: "please go to 'https://anggaconni.github.io/HorizonScanning/' to open the apps",
+                    version: "1.0",
+                    timestamp: new Date().toISOString(),
+                    apiKey: currentKey, // Saved here, will be hidden in app input
+                    config: appState.config,
+                    nodes: appState.nodes,
+                    analysis: appState.analysis
+                };
+
+                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObject, null, 2));
+                const downloadAnchorNode = document.createElement('a');
+                downloadAnchorNode.setAttribute("href", dataStr);
                 const timestamp = new Date().toISOString().slice(0, 10);
-                link.download = `horizon_project_${timestamp}.html`;
-                link.click();
-                showToast("Project Saved (HTML)", "info");
+                downloadAnchorNode.setAttribute("download", `horizon_scan_data_${timestamp}.json`);
+                document.body.appendChild(downloadAnchorNode);
+                downloadAnchorNode.click();
+                downloadAnchorNode.remove();
+                
+                showToast("Project Saved (JSON)", "info");
             } catch(e) {
                 showToast("Save Failed: " + e.message, "error");
             }
         }
 
+        // --- NEW: LOAD FROM JSON ---
         function loadProjectFromFile(input) {
             const file = input.files[0];
             if(!file) return;
@@ -1434,34 +1434,34 @@ IMPORTANT: Do not generate short text. Provide analysis worthy of a professional
             reader.onload = function(e) {
                 const content = e.target.result;
                 try {
-                    // Try JSON first
-                    let data = JSON.parse(content);
-                    if(data.nodes && Array.isArray(data.nodes)) { 
-                        appState = data; 
-                        startApp(); 
-                        showToast("JSON Project Loaded", "info"); 
-                        return; 
+                    const data = JSON.parse(content);
+                    
+                    // Validation
+                    if(data.nodes && Array.isArray(data.nodes)) {
+                        
+                        // 1. Restore State
+                        appState.config = data.config || appState.config;
+                        appState.nodes = data.nodes;
+                        appState.analysis = data.analysis || null;
+
+                        // 2. Restore API Key if present (Securely into input field)
+                        if(data.apiKey) {
+                            localStorage.setItem('gemini_api_key', data.apiKey);
+                            document.getElementById('api-key').value = data.apiKey;
+                            document.getElementById('api-status')?.classList.remove('hidden');
+                        }
+
+                        // 3. Re-initialize UI
+                        startApp();
+                        showToast("JSON Data Loaded Successfully", "info");
+                    } else {
+                        // Fallback check for old structure or wrong file
+                        throw new Error("Invalid Horizon Scan JSON format");
                     }
                 } catch(e) {
-                    // Try HTML extraction
-                    try {
-                        const parser = new DOMParser();
-                        const doc = parser.parseFromString(content, "text/html");
-                        const script = doc.getElementById('embedded-data');
-                        if(script) {
-                            const match = script.innerHTML.match(/const embeddedData = (\{[\s\S]*?\});/);
-                            if(match && match[1]) { 
-                                appState = JSON.parse(match[1]); 
-                                startApp(); 
-                                showToast("HTML Project Loaded", "info"); 
-                                return; 
-                            }
-                        }
-                    } catch(htmlErr) {
-                        console.error("HTML parsing error:", htmlErr);
-                    }
+                    console.error("JSON parsing error:", e);
+                    showToast("Error loading file: Invalid JSON", "error");
                 }
-                showToast("Invalid File Format", "error");
             };
             reader.readAsText(file);
         }
