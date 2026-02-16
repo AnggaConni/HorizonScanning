@@ -856,8 +856,8 @@
                     box.style.left = (rect.left - 420) + 'px'; // Show to left of panel
                     if(parseFloat(box.style.left) < 20) box.style.left = '20px';
                 } else if (placement === 'right') {
-                    box.style.top = (rect.top + 100) + 'px';
-                    box.style.left = (rect.right - 450) + 'px';
+                    box.style.top = (rect.top + 80) + 'px';
+                    box.style.left = (rect.right + 20) + 'px';
                 } else if (placement === 'bottom-center') {
                     // Position below the chart, centered
                     const viewportHeight = window.innerHeight;
@@ -1032,7 +1032,7 @@
                 
                 appState.nodes[draggedNodeIndex].x = Math.max(-10, Math.min(10, xVal));
                 appState.nodes[draggedNodeIndex].y = Math.max(-10, Math.min(10, yVal));
-                chartInstance.update('none');
+                updateChart();
             });
 
             window.addEventListener('mouseup', () => {
@@ -1440,7 +1440,9 @@ IMPORTANT: Do not generate short text. Provide analysis worthy of a professional
                     if(data.nodes && Array.isArray(data.nodes)) {
                         
                         // 1. Restore State
-                        appState = data; // Restore config and nodes
+                        appState.config = { ...data.config };
+                        appState.nodes = JSON.parse(JSON.stringify(data.nodes)); // Deep copy
+                        appState.analysis = data.analysis || null;
 
                         // --- BUG FIX START ---
                         // Update the Setup UI inputs to match the loaded config
@@ -1451,8 +1453,6 @@ IMPORTANT: Do not generate short text. Provide analysis worthy of a professional
                              document.getElementById('matrix-template').value = appState.config.template || 'impact-prob';
                         }
                         // --- BUG FIX END ---
-
-                        appState.analysis = data.analysis || null;
 
                         // 2. Restore API Key if present (Securely into input field)
                         if(data.apiKey) {
