@@ -1286,51 +1286,62 @@
                
                
            // Ambil teks label kuadran yang sedang aktif di layar
-const lblTL = document.getElementById('lbl-tl').innerText;
-const lblTR = document.getElementById('lbl-tr').innerText;
-const lblBL = document.getElementById('lbl-bl').innerText;
-const lblBR = document.getElementById('lbl-br').innerText;
+            const lblTL = document.getElementById('lbl-tl').innerText;
+            const lblTR = document.getElementById('lbl-tr').innerText;
+            const lblBL = document.getElementById('lbl-bl').innerText;
+            const lblBR = document.getElementById('lbl-br').innerText;
 
-sysInstruction = `You are a professional strategic foresight analyst. Your task is to provide a deep, comprehensive, and strategic analysis based on the provided matrix data. 
+            sysInstruction = `You are a professional strategic foresight analyst. Your task is to provide a deep, comprehensive, and strategic analysis based on the provided matrix data. 
 
-Here is the classification glossary for the signal 'status' to help you prioritize your analysis:
-- 'critical' (Red): High impact, highly likely, immediate action required.
-- 'escalating' (Orange): Rapidly accelerating, needs proactive management.
-- 'structural' (Blue): Long-term mega-trend, foundational shift.
-- 'watchlist' (Yellow): Monitor closely for changes.
-- 'emerging' (Green): Just appeared, weak signal, low priority for now.
+            Here is the classification glossary for the signal 'status' to help you prioritize your analysis:
+            - 'critical' (Red): High impact, highly likely, immediate action required.
+            - 'escalating' (Orange): Rapidly accelerating, needs proactive management.
+            - 'structural' (Blue): Long-term mega-trend, foundational shift.
+            - 'watchlist' (Yellow): Monitor closely for changes.
+            - 'emerging' (Green): Just appeared, weak signal, low priority for now.
 
-MASTER RULE: You MUST write your entire analysis report in the EXACT SAME LANGUAGE as the dominant language used in the 'Signals Data' titles and descriptions. If the input data is in Japanese, output the entire report in Japanese. If Indonesian, output in Indonesian. If English, output in English.`;
+            MASTER RULE: You MUST write your entire analysis report in the EXACT SAME LANGUAGE as the dominant language used in the 'Signals Data' titles and descriptions. If the input data is in Japanese, output the entire report in Japanese. If Indonesian, output in Indonesian. If English, output in English.`;
 
-// ... (userPrompt tetap sama seperti yang sudah Anda buat)
+        // ... (userPrompt tetap sama seperti yang sudah Anda buat)
 
-userPrompt = `Analyze the following Horizon Scan Matrix data.
+            userPrompt = `Analyze the following Horizon Scan Matrix data.
 
-**Matrix Configuration:**
-- X-Axis: ${appState.config.xLabel} (range -10 to +10)
-- Y-Axis: ${appState.config.yLabel} (range -10 to +10)
-- Template: ${appState.config.template}
-- Top-Left Quadrant (-X, +Y): ${lblTL}
-- Top-Right Quadrant (+X, +Y): ${lblTR}
-- Bottom-Left Quadrant (-X, -Y): ${lblBL}
-- Bottom-Right Quadrant (+X, -Y): ${lblBR}
+            **Matrix Configuration:**
+            - X-Axis: ${appState.config.xLabel} (range -10 to +10)
+            - Y-Axis: ${appState.config.yLabel} (range -10 to +10)
+            - Template: ${appState.config.template}
+            - Top-Left Quadrant (-X, +Y): ${lblTL}
+            - Top-Right Quadrant (+X, +Y): ${lblTR}
+            - Bottom-Left Quadrant (-X, -Y): ${lblBL}
+            - Bottom-Right Quadrant (+X, -Y): ${lblBR}
 
-**Signals Data:**
-${JSON.stringify(nodeCtx, null, 2)}
+            **Signals Data:**
+            ${JSON.stringify(nodeCtx, null, 2)}
 
-**Output Instructions:**
-Provide a VERY DETAILED analysis report. Use clean Markdown format. 
-Translate the following section headers into the detected language of the report before writing the content:
+            **Output Instructions:**
+            Provide a VERY DETAILED analysis report. Use clean Markdown format. 
+            Translate the following section headers into the detected language of the report before writing the content:
 
-Report Structure:
-1. **Executive Summary** (Strong opening paragraph about the current system state)
-2. **Cluster & Pattern Analysis** (Explain visible groupings of signals across the 4 quadrants)
-3. **Primary Focus: ${lblTR}** (Deep analysis of the signals in the Top-Right quadrant)
-4. **Alternative Focus: ${lblTL}** (Analysis of Top-Left signals and their hidden impacts)
-5. **System Dynamics & Causality** (Analyze the 'links' parameter between nodes: explain causality and domino effects)
-6. **Strategic Recommendations** (Provide 3-5 concrete, detailed action steps based on their quadrant positions, not short bullet points)
+            Report Structure:
+            # 📊 Executive Summary
+            (Strong opening paragraph about the current system state)
 
-IMPORTANT: Do not generate short text. Provide a comprehensive analysis worthy of a professional management consultant report. REMEMBER TO MATCH THE LANGUAGE OF THE SIGNALS DATA.`;
+            # 🧩 Cluster & Pattern Analysis
+            (Explain visible groupings of signals across the 4 quadrants)
+
+            # 🔥 Primary Focus: ${lblTR}
+            (Deep analysis of the signals in the Top-Right quadrant. Highlight them in **bold**)
+
+            # 👁️ Alternative Focus: ${lblTL}
+            (Analysis of Top-Left signals and their hidden impacts)
+
+            # 🔗 System Dynamics & Causality
+            (Analyze the 'links' parameter between nodes: explain causality and domino effects. Use bullet points for clear pathways, e.g., A -> B -> C)
+
+            # ⚡ Strategic Recommendations
+            (Provide 3-5 concrete, detailed action steps based on their quadrant positions. Format each as a numbered list with a clear title)
+
+            IMPORTANT: Do not generate short text. Provide a comprehensive analysis worthy of a professional management consultant report. Use emojis in headers to make it visually engaging. REMEMBER TO MATCH THE LANGUAGE OF THE SIGNALS DATA.`;
             }
 
             try {
