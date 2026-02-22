@@ -184,7 +184,11 @@
                 btn_next: "Lanjut",
                 btn_prev: "Kembali",
                 btn_finish: "Selesai",
-                tut_skip: "Lewati Tutorial"
+                tut_skip: "Lewati Tutorial",
+                help_title: "Bantuan API Key",
+                help_desc: "Aplikasi ini membutuhkan API Key Gemini (gratis) untuk melakukan analisa AI. Privasi terjamin: API Key Anda 100% aman dan hanya disimpan secara lokal di dalam browser Anda (Client-side).",
+                help_link: "Dapatkan API Key Gratis di sini",
+                btn_close: "Tutup"
             },
             en: {
                 app_title: "Horizon Scan AI",
@@ -235,7 +239,11 @@
                 btn_next: "Next",
                 btn_prev: "Back",
                 btn_finish: "Finish",
-                tut_skip: "Skip Tutorial"
+                tut_skip: "Skip Tutorial",
+                help_title: "API Key Help",
+                help_desc: "This app requires a free Gemini API Key to run AI analysis. Privacy guaranteed: Your API Key is 100% safe and is only stored locally in your browser (Client-side).",
+                help_link: "Get your Free API Key here",
+                btn_close: "Close"
             }
         };
 
@@ -380,20 +388,22 @@
             </div>
 
             <div class="flex items-center gap-3">
+                <button onclick="openHelpModal()" class="text-slate-400 hover:text-teal-400 transition-colors w-6 h-6 flex items-center justify-center border border-slate-600 rounded-full text-xs font-bold" title="Help">
+                    ?
+                </button>
+
                 <div id="header-api-wrapper" class="relative group">
                     <i class="fa-solid fa-key absolute left-3 top-2 text-slate-500 text-xs z-10"></i>
                     <input type="password" id="api-key" data-i18n="ph_apikey" placeholder="Gemini API Key" class="bg-navy-800 border border-slate-600 rounded pl-8 pr-3 py-1 text-xs w-32 focus:w-64 transition-all focus:border-teal-500 focus:outline-none text-white placeholder-slate-500" onchange="saveApiKey()">
                     <div id="api-status" class="hidden absolute right-2 top-1.5 text-teal-400 text-[10px] font-bold"><i class="fa-solid fa-check-circle"></i></div>
                 </div>
                 
-                <!-- Quick Analyze Button -->
                 <button id="btn-analyze-header" onclick="runAnalysis()" class="bg-teal-600 hover:bg-teal-500 text-white w-8 h-8 rounded-full flex items-center justify-center transition-all shadow-lg hover:shadow-teal-500/50 ml-2" title="Run AI Analysis Now">
                     <i class="fa-solid fa-bolt"></i>
                 </button>
 
                 <div class="h-4 w-[1px] bg-slate-700 mx-1"></div>
 
-                <!-- Icons Only Actions -->
                 <button id="btn-save-header" onclick="saveProjectAsJSON()" class="text-slate-400 hover:text-white transition-colors p-2 rounded hover:bg-slate-700" title="Save Project (JSON)">
                     <i class="fa-solid fa-floppy-disk text-lg"></i>
                 </button>
@@ -523,12 +533,35 @@
                     <select id="node-connections" multiple class="w-full bg-slate-50 border border-slate-300 rounded p-2 text-xs text-navy-900 h-24 focus:border-teal-500 focus:outline-none"></select>
                 </div>
             </div>
-            <div class="mt-6 flex justify-between border-t border-slate-100 pt-4">
+
+                <div class="mt-6 flex justify-between border-t border-slate-100 pt-4">
                 <button onclick="deleteNode()" id="btn-delete" class="text-red-500 hover:text-red-700 px-3 py-2 text-xs font-bold">Delete</button>
                 <div class="flex gap-2">
                     <button onclick="closeModal()" class="text-slate-500 hover:text-navy-900 px-3 py-2 text-xs font-bold">Cancel</button>
                     <button onclick="saveNodeFromModal()" class="bg-navy-900 text-white hover:bg-navy-800 px-4 py-2 rounded shadow text-xs font-bold">Save</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="help-modal" class="hidden fixed inset-0 z-[100] bg-navy-900/80 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
+        <div class="bg-white w-full max-w-md p-6 rounded-xl shadow-2xl border border-teal-500 relative">
+            <button onclick="closeHelpModal()" class="absolute top-4 right-4 text-slate-400 hover:text-red-500 transition-colors">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <h3 class="text-lg font-bold text-navy-900 mb-3 flex items-center gap-2 border-b border-slate-100 pb-2">
+                <i class="fa-solid fa-circle-question text-teal-500"></i> <span data-i18n="help_title">API Key Help</span>
+            </h3>
+            <p class="text-slate-600 text-sm mb-6 leading-relaxed" data-i18n="help_desc">
+                This app requires a free Gemini API Key to run AI analysis. Privacy guaranteed: Your API Key is 100% safe and is only stored locally in your browser (Client-side).
+            </p>
+            <div class="bg-slate-50 p-5 rounded-lg border border-slate-200 text-center">
+                <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 bg-navy-900 hover:bg-teal-600 text-white font-bold py-2.5 px-5 rounded shadow transition-colors text-sm">
+                    <i class="fa-solid fa-external-link-alt"></i> <span data-i18n="help_link">Get your Free API Key here</span>
+                </a>
+            </div>
+            <div class="mt-5 text-right">
+                <button onclick="closeHelpModal()" class="text-slate-500 hover:text-navy-900 font-bold text-xs uppercase tracking-wider transition-colors px-2 py-1" data-i18n="btn_close">Close</button>
             </div>
         </div>
     </div>
@@ -933,7 +966,7 @@
             document.getElementById('tutorial-overlay').classList.add('hidden');
             document.querySelectorAll('.tutorial-highlight').forEach(el => el.classList.remove('tutorial-highlight'));
             tutorialStep = 0;
-            showToast("Tutorial completed! Start exploring.", "info");
+            showToast("Tutorial completed! Start exploring, and drag to move the nodes", "info");
         }
 
         // CHART LOGIC
@@ -1165,6 +1198,14 @@
 
         function closeModal() { 
             document.getElementById('node-modal')?.classList.add('hidden'); 
+        }
+        
+        function openHelpModal() {
+            document.getElementById('help-modal').classList.remove('hidden');
+        }
+
+        function closeHelpModal() {
+            document.getElementById('help-modal').classList.add('hidden');
         }
         
         function updateRangeVal(id, val) { 
