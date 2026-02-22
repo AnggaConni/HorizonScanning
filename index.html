@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Horizon Scan AI | Professional Edition</title>
     
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='none' stroke='%230d9488' stroke-width='8'/><circle cx='50' cy='50' r='25' fill='none' stroke='%230d9488' stroke-width='6' opacity='0.6'/><line x1='50' y1='10' x2='50' y2='90' stroke='%230d9488' stroke-width='4' opacity='0.5'/><line x1='10' y1='50' x2='90' y2='50' stroke='%230d9488' stroke-width='4' opacity='0.5'/><circle cx='70' cy='30' r='6' fill='%23f59e0b'/><circle cx='35' cy='70' r='8' fill='%23ef4444'/></svg>" type="image/svg+xml">
+    
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -1281,53 +1283,54 @@
             let userPrompt = "";
 
             if (currentLang === 'id') {
-                sysInstruction = "Anda adalah analis strategi masa depan (foresight analyst) profesional. Tugas Anda adalah memberikan analisa mendalam, komprehensif, dan strategis berdasarkan data matriks yang diberikan.";
-                userPrompt = `Analisa data Matrix Horizon Scan berikut ini.
-                
-**Konfigurasi Matrix:**
-- Sumbu X: ${appState.config.xLabel} (range -10 sampai +10)
-- Sumbu Y: ${appState.config.yLabel} (range -10 sampai +10)
-- Template: ${appState.config.template}
+               
+               
+           // Ambil teks label kuadran yang sedang aktif di layar
+const lblTL = document.getElementById('lbl-tl').innerText;
+const lblTR = document.getElementById('lbl-tr').innerText;
+const lblBL = document.getElementById('lbl-bl').innerText;
+const lblBR = document.getElementById('lbl-br').innerText;
 
-**Data Sinyal:**
-${JSON.stringify(nodeCtx, null, 2)}
+sysInstruction = `You are a professional strategic foresight analyst. Your task is to provide a deep, comprehensive, and strategic analysis based on the provided matrix data. 
 
-**Instruksi Output:**
-Berikan laporan analisis yang SANGAT MENDETAIL (bukan ringkasan pendek). Gunakan format Markdown yang rapi. Bahasa output WAJIB BAHASA INDONESIA.
+Here is the classification glossary for the signal 'status' to help you prioritize your analysis:
+- 'critical' (Red): High impact, highly likely, immediate action required.
+- 'escalating' (Orange): Rapidly accelerating, needs proactive management.
+- 'structural' (Blue): Long-term mega-trend, foundational shift.
+- 'watchlist' (Yellow): Monitor closely for changes.
+- 'emerging' (Green): Just appeared, weak signal, low priority for now.
 
-Struktur Laporan:
-1. **Ringkasan Eksekutif** (Paragraf pembuka yang kuat tentang keadaan sistem saat ini)
-2. **Analisis Kluster & Pola** (Jelaskan pengelompokan sinyal yang terlihat)
-3. **Sinyal Prioritas Utama** (Analisa mendalam 3-5 sinyal di kuadran Kanan Atas/Kritis)
-4. **Wild Cards & Sinyal Lemah** (Analisa sinyal di Kiri Atas yang berdampak besar tapi jarang dibahas)
-5. **Dinamika Sistem** (Analisa koneksi antar node: sebab-akibat dan efek domino)
-6. **Rekomendasi Strategis** (Berikan 3-5 langkah aksi konkret yang detail, bukan poin-poin pendek)
+MASTER RULE: You MUST write your entire analysis report in the EXACT SAME LANGUAGE as the dominant language used in the 'Signals Data' titles and descriptions. If the input data is in Japanese, output the entire report in Japanese. If Indonesian, output in Indonesian. If English, output in English.`;
 
-PENTING: Jangan membuat teks yang terlalu singkat. Berikan analisa selayaknya laporan konsultan manajemen profesional.`;
-            } else {
-                sysInstruction = "You are a professional strategic foresight analyst. Your task is to provide a deep, comprehensive, and strategic analysis based on the provided matrix data.";
-                userPrompt = `Analyze the following Horizon Scan Matrix data.
+// ... (userPrompt tetap sama seperti yang sudah Anda buat)
+
+userPrompt = `Analyze the following Horizon Scan Matrix data.
 
 **Matrix Configuration:**
 - X-Axis: ${appState.config.xLabel} (range -10 to +10)
 - Y-Axis: ${appState.config.yLabel} (range -10 to +10)
 - Template: ${appState.config.template}
+- Top-Left Quadrant (-X, +Y): ${lblTL}
+- Top-Right Quadrant (+X, +Y): ${lblTR}
+- Bottom-Left Quadrant (-X, -Y): ${lblBL}
+- Bottom-Right Quadrant (+X, -Y): ${lblBR}
 
 **Signals Data:**
 ${JSON.stringify(nodeCtx, null, 2)}
 
 **Output Instructions:**
-Provide a VERY DETAILED analysis report (not a short summary). Use clean Markdown format. Output MUST be in ENGLISH.
+Provide a VERY DETAILED analysis report. Use clean Markdown format. 
+Translate the following section headers into the detected language of the report before writing the content:
 
 Report Structure:
 1. **Executive Summary** (Strong opening paragraph about the current system state)
-2. **Cluster & Pattern Analysis** (Explain visible groupings of signals)
-3. **Top Priority Signals** (Deep analysis of 3-5 signals in the Top-Right/Critical quadrant)
-4. **Wild Cards & Weak Signals** (Analysis of Top-Left signals that are high impact but often overlooked)
-5. **System Dynamics** (Analyze connections between nodes: causality and domino effects)
-6. **Strategic Recommendations** (Provide 3-5 concrete, detailed action steps, not short bullet points)
+2. **Cluster & Pattern Analysis** (Explain visible groupings of signals across the 4 quadrants)
+3. **Primary Focus: ${lblTR}** (Deep analysis of the signals in the Top-Right quadrant)
+4. **Alternative Focus: ${lblTL}** (Analysis of Top-Left signals and their hidden impacts)
+5. **System Dynamics & Causality** (Analyze the 'links' parameter between nodes: explain causality and domino effects)
+6. **Strategic Recommendations** (Provide 3-5 concrete, detailed action steps based on their quadrant positions, not short bullet points)
 
-IMPORTANT: Do not generate short text. Provide analysis worthy of a professional management consultant report.`;
+IMPORTANT: Do not generate short text. Provide a comprehensive analysis worthy of a professional management consultant report. REMEMBER TO MATCH THE LANGUAGE OF THE SIGNALS DATA.`;
             }
 
             try {
