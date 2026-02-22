@@ -20,6 +20,9 @@
     <!-- Marked for Markdown Parsing -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
+    <!-- Security -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
+
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -1385,7 +1388,7 @@
                 
                 const md = data.candidates[0].content.parts[0].text;
                 appState.analysis = md;
-                out.innerHTML = marked.parse(md);
+                out.innerHTML = DOMPurify.sanitize(marked.parse(md));
                 showToast(currentLang === 'id' ? "Analisa Selesai!" : "Analysis Complete!", "info");
                 
             } catch(e) { 
