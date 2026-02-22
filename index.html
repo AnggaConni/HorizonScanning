@@ -188,6 +188,7 @@
                 help_title: "Bantuan API Key",
                 help_desc: "Aplikasi ini membutuhkan API Key Gemini (gratis) untuk melakukan analisa AI. Privasi terjamin: API Key Anda 100% aman dan hanya disimpan secara lokal di dalam browser Anda (Client-side).",
                 help_link: "Dapatkan API Key Gratis di sini",
+                help_howto: "Baca Panduan Penggunaan lengkap (LinkedIn)", // <-- TAMBAHKAN BARIS INI
                 btn_close: "Tutup"
             },
             en: {
@@ -243,6 +244,7 @@
                 help_title: "API Key Help",
                 help_desc: "This app requires a free Gemini API Key to run AI analysis. Privacy guaranteed: Your API Key is 100% safe and is only stored locally in your browser (Client-side).",
                 help_link: "Get your Free API Key here",
+                help_howto: "Read Complete How-to Guide (LinkedIn)", // <-- TAMBAHKAN BARIS INI
                 btn_close: "Close"
             }
         };
@@ -555,10 +557,14 @@
             <p class="text-slate-600 text-sm mb-6 leading-relaxed" data-i18n="help_desc">
                 This app requires a free Gemini API Key to run AI analysis. Privacy guaranteed: Your API Key is 100% safe and is only stored locally in your browser (Client-side).
             </p>
-            <div class="bg-slate-50 p-5 rounded-lg border border-slate-200 text-center">
-                <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 bg-navy-900 hover:bg-teal-600 text-white font-bold py-2.5 px-5 rounded shadow transition-colors text-sm">
-                    <i class="fa-solid fa-external-link-alt"></i> <span data-i18n="help_link">Get your Free API Key here</span>
-                </a>
+            <div class="bg-slate-50 p-5 rounded-lg border border-slate-200 flex flex-col gap-3">
+            <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-2 bg-navy-900 hover:bg-teal-600 text-white font-bold py-2.5 px-5 rounded shadow transition-colors text-sm w-full">
+                <i class="fa-solid fa-external-link-alt"></i> <span data-i18n="help_link">Get your Free API Key here</span>
+            </a>
+    
+            <a href="https://www.linkedin.com/pulse/from-manual-horizon-scanning-ai-powered-strategic-angga-conni-saputra-xn6ec" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-2 bg-white hover:bg-slate-100 text-[#0a66c2] border border-slate-300 font-bold py-2.5 px-5 rounded shadow-sm transition-colors text-sm w-full">
+            <i class="fa-brands fa-linkedin text-lg"></i> <span data-i18n="help_howto">Read Complete How-to Guide</span>
+            </a>
             </div>
             <div class="mt-5 text-right">
                 <button onclick="closeHelpModal()" class="text-slate-500 hover:text-navy-900 font-bold text-xs uppercase tracking-wider transition-colors px-2 py-1" data-i18n="btn_close">Close</button>
