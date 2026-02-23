@@ -133,6 +133,101 @@
 </head>
 <body class="h-screen flex flex-col overflow-hidden text-sm font-sans">
 
+    <!-- ELEMENT CANVAS UNTUK MATRIX -->
+    <canvas id="matrix-canvas" style="display: block; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; pointer-events: none;"></canvas>
+    
+    <!-- SCRIPT LOGIKA MATRIX -->
+    <script>
+        let matrixInterval; // Variabel penting untuk mematikan animasi nanti
+
+        function initMatrix() {
+            const canvas = document.getElementById('matrix-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const messages = [
+                "Ini aplikasi foresight gratis",
+                "Dipersembahkan untuk orang-orang yang membutuhkan",
+                "Bisa untuk probability dan lain-lain",
+                "Bisa juga untuk memprediksi apakah crush saya mem-friendzone saya?",
+                "Tertanda owner dan developer: Angga Conni Saputra",
+                "Free foresight app dedicated to those in need",
+                "Can it predict if my crush will friendzone me?",
+                "Owner & Developer: Angga Conni Saputra",
+                "この無料アプリは必要な人のためのものです",
+                "好きな人が私を友達扱いするか予測できる？",
+                "開発者：Angga Conni Saputra",
+                "1010101001",
+                "MATRIX"
+            ];
+
+            const fontSize = 16;
+            const columns = canvas.width / fontSize;
+            const drops = [];
+
+            for (let x = 0; x < columns; x++) {
+                drops[x] = {
+                    y: Math.random() * (canvas.height / fontSize),
+                    text: messages[Math.floor(Math.random() * messages.length)].toUpperCase(),
+                    charIndex: 0
+                };
+            }
+
+            function draw() {
+                // Warna background navy-900 dengan sedikit transparansi untuk efek ekor
+                ctx.fillStyle = 'rgba(15, 23, 42, 0.1)'; 
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // Warna font teal-600 sesuai tema aplikasimu
+                ctx.fillStyle = '#0d9488'; 
+                ctx.font = fontSize + 'px monospace';
+
+                for (let i = 0; i < drops.length; i++) {
+                    let drop = drops[i];
+                    let textChar = drop.text.charAt(drop.charIndex);
+                    
+                    if (textChar !== " ") {
+                        ctx.fillText(textChar, i * fontSize, drop.y * fontSize);
+                    }
+
+                    if (drop.y * fontSize > canvas.height && Math.random() > 0.98) {
+                        drop.y = 0;
+                        drop.text = messages[Math.floor(Math.random() * messages.length)].toUpperCase();
+                        drop.charIndex = 0;
+                    } else {
+                        drop.y++;
+                        drop.charIndex++;
+                        if (drop.charIndex >= drop.text.length) drop.charIndex = 0;
+                    }
+                }
+            }
+
+            // Jalankan animasi dan simpan ke variabel
+            matrixInterval = setInterval(draw, 50);
+
+            // Supaya ukurannya tidak rusak kalau layar di-resize
+            window.addEventListener('resize', () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                drops.length = 0;
+                const newColumns = canvas.width / fontSize;
+                for (let x = 0; x < newColumns; x++) {
+                    drops[x] = {
+                        y: Math.random() * (canvas.height / fontSize),
+                        text: messages[Math.floor(Math.random() * messages.length)].toUpperCase(),
+                        charIndex: 0
+                    };
+                }
+            });
+        }
+
+        // Jalankan script saat pertama kali dimuat
+        initMatrix();
+    </script>
+
     <script>
         const i18n = {
             id: {
@@ -323,7 +418,7 @@
     </div>
 
     <!-- 1. SETUP MODAL -->
-    <div id="setup-screen" class="fixed inset-0 z-50 bg-navy-900 flex items-center justify-center p-4">
+    <div id="setup-screen" class="fixed inset-0 z-50 bg-navy-900/40 flex items-center justify-center p-4">
         <div class="bg-white p-8 rounded-xl w-full max-w-lg shadow-2xl border border-slate-200 relative">
             <div class="absolute top-4 right-4 flex gap-2">
                 <button onclick="toggleLang()" id="lang-btn" class="text-xs font-bold bg-slate-100 text-navy-900 px-2 py-1 rounded border border-slate-300 hover:bg-teal-100">EN</button>
@@ -792,11 +887,17 @@
             }, 800);
         }
 
-        function initializeAppCommon() {
+            function initializeAppCommon() {
+            
+            // --- 2 BARIS INI YANG DITAMBAHKAN ---
+            if (typeof matrixInterval !== 'undefined') clearInterval(matrixInterval);
+            document.getElementById('matrix-canvas').style.display = 'none';
+            // ------------------------------------
+
             appState.config.xLabel = document.getElementById('axis-x-label').value;
             appState.config.yLabel = document.getElementById('axis-y-label').value;
             appState.config.template = document.getElementById('matrix-template').value;
-
+            
             document.getElementById('display-x-label').innerText = appState.config.xLabel;
             document.getElementById('display-y-label').innerText = appState.config.yLabel;
             
