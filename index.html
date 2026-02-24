@@ -260,6 +260,9 @@
                 jitter_label: "Spread Overlap",
                 grid_zoom: "Zoom",
                 lbl_connect: "Hubungkan Node (Ctrl+Klik)",
+                lbl_z: "Sumbu Z",
+                tooltip_z: "Dimensi ketiga matriks (misal: Kecepatan/Skala)",
+                btn_3d: "Visual 3D",
                 
                 // Tutorial Strings
                 tut_step1_title: "Selamat Datang di Horizon Scanning!",
@@ -316,6 +319,9 @@
                 jitter_label: "Spread Overlap",
                 grid_zoom: "Zoom",
                 lbl_connect: "Connect Nodes (Ctrl+Click)",
+                lbl_z: "Z Axis",
+                tooltip_z: "Third matrix dimension (e.g., Velocity/Scale)",
+                btn_3d: "3D Radar",
 
                 // Tutorial Strings
                 tut_step1_title: "Welcome to Horizon Scanning!",
@@ -474,6 +480,7 @@
         
         <!-- Navbar -->
         <header class="h-14 dark-panel flex items-center justify-between px-6 shadow-md z-20 transition-colors duration-300">
+            
             <div class="flex items-center gap-4">
                 <div class="font-bold text-lg text-white"><i class="fa-solid fa-radar text-teal-400 mr-2"></i>Horizon <span class="text-xs opacity-50 font-normal border border-slate-600 px-1 rounded">PRO</span></div>
                 <div class="h-4 w-[1px] bg-slate-700"></div>
@@ -482,6 +489,11 @@
                     <span class="text-slate-500">|</span>
                     <span class="text-amber-400">Y: <span id="display-y-label">Impact</span></span>
                 </div>
+                
+                <div class="h-4 w-[1px] bg-slate-700 mx-2"></div>
+                <button onclick="goTo3D()" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded flex items-center gap-2 text-xs font-bold transition-all shadow-[0_0_10px_rgba(59,130,246,0.3)] hover:shadow-[0_0_15px_rgba(59,130,246,0.6)]">
+                    <i class="fa-solid fa-cube"></i> <span data-i18n="btn_3d">3D Radar</span>
+                </button>
             </div>
 
             <div class="flex items-center gap-3">
@@ -611,8 +623,9 @@
                     <label class="block text-xs font-bold text-slate-500 mb-1" data-i18n="lbl_desc">Description</label>
                     <textarea id="node-desc" rows="2" class="w-full bg-slate-50 border border-slate-300 rounded p-2 text-navy-900 text-xs focus:border-teal-500 focus:outline-none"></textarea>
                 </div>
+
                 <div class="bg-slate-50 p-3 rounded border border-slate-200">
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-2 gap-4 mb-4">
                         <div>
                             <label class="block text-xs font-bold text-teal-600 mb-1">X Axis</label>
                             <input type="range" id="node-x" min="-10" max="10" step="0.5" class="w-full accent-teal-500" oninput="updateRangeVal('val-x', this.value)">
@@ -624,12 +637,20 @@
                             <div class="flex justify-between text-[10px] text-slate-400 font-mono mt-1"><span>-10</span><span id="val-y" class="text-navy-900 font-bold">0.0</span><span>+10</span></div>
                         </div>
                     </div>
+                    <div class="pt-3 border-t border-slate-200">
+                        <label class="block text-xs font-bold text-blue-500 mb-1 flex justify-between items-center">
+                            <span data-i18n="lbl_z">Z Axis</span>
+                            <button type="button" data-i18n="tooltip_z" title="Dimensi ketiga" class="text-[10px] bg-white border border-slate-300 text-slate-500 px-1.5 py-0.5 rounded-full cursor-help">?</button>
+                        </label>
+                        <input type="range" id="node-z" min="-10" max="10" step="0.5" class="w-full accent-blue-500" oninput="updateRangeVal('val-z', this.value)">
+                        <div class="flex justify-between text-[10px] text-slate-400 font-mono mt-1"><span>-10</span><span id="val-z" class="text-navy-900 font-bold">0.0</span><span>+10</span></div>
+                    </div>
                 </div>
-                <div>
+                    <div>
                     <label class="block text-xs font-bold text-slate-500 mb-1" data-i18n="lbl_connect">Connect Nodes (Ctrl+Click)</label>
                     <select id="node-connections" multiple class="w-full bg-slate-50 border border-slate-300 rounded p-2 text-xs text-navy-900 h-24 focus:border-teal-500 focus:outline-none"></select>
                 </div>
-            </div>
+                </div>
 
                 <div class="mt-6 flex justify-between border-t border-slate-100 pt-4">
                 <button onclick="deleteNode()" id="btn-delete" class="text-red-500 hover:text-red-700 px-3 py-2 text-xs font-bold">Delete</button>
@@ -1122,8 +1143,15 @@
                         label: 'Nodes',
                         data: appState.nodes,
                         backgroundColor: (ctx) => ctx.raw ? (STATUS_COLORS[ctx.raw.status] || '#94a3b8') : '#94a3b8',
-                        pointRadius: 7, 
-                        pointHoverRadius: 11,
+                        // Radius dinamis: Minimal 4px, ditambah porsi dari nilai Z (agar tidak terlalu raksasa)
+                        pointRadius: (ctx) => {
+                            const zVal = ctx.raw && ctx.raw.z !== undefined ? ctx.raw.z : 0;
+                            return Math.max(4, 7 + (zVal * 0.8)); 
+                        }, 
+                        pointHoverRadius: (ctx) => {
+                            const zVal = ctx.raw && ctx.raw.z !== undefined ? ctx.raw.z : 0;
+                            return Math.max(6, 11 + (zVal * 0.8)); 
+                        },
                         pointBorderColor: '#fff',
                         pointBorderWidth: 2,
                     }]
@@ -1289,6 +1317,7 @@
                 document.getElementById('node-y').value = node.y;
                 document.getElementById('btn-delete')?.classList.remove('hidden');
                 document.getElementById('modal-title').innerText = t('modal_edit');
+                document.getElementById('node-z').value = node.z !== undefined ? node.z : 0;
             } else {
                 document.getElementById('node-id').value = '';
                 document.getElementById('node-title').value = '';
@@ -1298,11 +1327,13 @@
                 document.getElementById('node-y').value = y;
                 document.getElementById('btn-delete')?.classList.add('hidden');
                 document.getElementById('modal-title').innerText = t('modal_add');
+                document.getElementById('node-z').value = 0;
             }
             updateRangeVal('val-x', document.getElementById('node-x').value);
             updateRangeVal('val-y', document.getElementById('node-y').value);
+            updateRangeVal('val-z', document.getElementById('node-z').value);
         }
-
+ 
         function closeModal() { 
             document.getElementById('node-modal')?.classList.add('hidden'); 
         }
@@ -1335,6 +1366,7 @@
                 status: document.getElementById('node-status')?.value || 'emerging',
                 x: parseFloat(document.getElementById('node-x')?.value || 0),
                 y: parseFloat(document.getElementById('node-y')?.value || 0),
+                z: parseFloat(document.getElementById('node-z')?.value || 0), // <--- TAMBAHKAN BARIS INI
                 connections: Array.from(document.getElementById('node-connections')?.selectedOptions || []).map(o => o.value)
             };
 
@@ -1445,6 +1477,7 @@
             `;
 
             // Data sanitization - only send what AI needs to save token space
+            
             const nodeCtx = appState.nodes.map(n => ({
                 id: n.id,
                 title: n.title,
@@ -1452,6 +1485,7 @@
                 status: n.status,
                 x: n.x,
                 y: n.y,
+                z: n.z || 0, 
                 links: n.connections ? n.connections.map(c => appState.nodes.find(x=>x.id===c)?.title || c) : []
             }));
 
@@ -1485,6 +1519,7 @@
             **Matrix Configuration:**
             - X-Axis: ${appState.config.xLabel} (range -10 to +10)
             - Y-Axis: ${appState.config.yLabel} (range -10 to +10)
+            - Z-Axis: Velocity / Scale / Impact Magnitude (range -10 to +10)
             - Template: ${appState.config.template}
             - Top-Left Quadrant (-X, +Y): ${lblTL}
             - Top-Right Quadrant (+X, +Y): ${lblTR}
@@ -1913,6 +1948,25 @@
             nodesTab.className = tabName === 'nodes' ? activeClass : inactiveClass;
             analysisTab.className = tabName === 'analysis' ? activeClass : inactiveClass;
         }
+
+        function goTo3D() {
+            // 1. Simpan data saat ini ke memori lokal browser
+            localStorage.setItem('horizon_3d_nodes', JSON.stringify(appState.nodes));
+            localStorage.setItem('horizon_3d_config', JSON.stringify(appState.config));
+
+            // BARU: Tangkap nama label kuadran yang sedang aktif dan simpan
+            const quadrantLabels = {
+                tl: document.getElementById('lbl-tl').innerText, // Top-Left
+                tr: document.getElementById('lbl-tr').innerText, // Top-Right
+                bl: document.getElementById('lbl-bl').innerText, // Bottom-Left
+                br: document.getElementById('lbl-br').innerText  // Bottom-Right
+            };
+            localStorage.setItem('horizon_3d_labels', JSON.stringify(quadrantLabels));
+
+            // 2. Buka halaman 3D di tab baru sebagai "export visual"
+            window.open('3d-visual/index.html', '_blank');
+        }
+
     </script>
 </body>
 </html>
