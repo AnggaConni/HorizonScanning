@@ -276,9 +276,34 @@
                 objectsArray.push(sphere);
                 nodePositions[data.id] = sphere.position;
 
-                // Stalk
-                const stalkGeo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(posX, 0, posZ), new THREE.Vector3(posX, posY, posZ)]);
-                scene.add(new THREE.Line(stalkGeo, new THREE.LineBasicMaterial({ color: 0x94a3b8, transparent: true, opacity: 0.4 })));
+               // --- MULAI KODE STALK BARU ---
+                // Menggunakan Cylinder (Tabung) agar ketebalan bisa diatur, karena WebGL membatasi ketebalan Line biasa.
+
+                // 1. Atur Ketebalan di sini. Semakin besar angkanya, semakin tebal tiangnya (default sebelumnya setara 0.05).
+                const stalkThickness = 0.2; 
+
+                // 2. Buat bentuk tabung: (radiusAtas, radiusBawah, tinggi, jumlahSisi)
+                // Tingginya mengambil dari variabel posY (tinggi bola dari lantai)
+                const stalkGeo = new THREE.CylinderGeometry(stalkThickness, stalkThickness, posY, 8);
+
+                // 3. Buat material/warna tiangnya
+                const stalkMat = new THREE.MeshBasicMaterial({ 
+                    color: 0x94a3b8,       // Warna abu-abu kebiruan
+                    transparent: true,     // Mengaktifkan transparansi
+                    opacity: 0.6           // Ketebalan warna (naikkan ke 0.8 atau 1.0 jika ingin lebih solid/tidak tembus pandang)
+                });
+
+                // 4. Gabungkan bentuk dan warna menjadi objek 3D
+                const stalk = new THREE.Mesh(stalkGeo, stalkMat);
+
+                // 5. Posisikan tiang. 
+                // Karena titik tengah (origin) tabung ada di tengah-tengah badannya, 
+                // maka posisi Y-nya harus ditaruh di pertengahan antara lantai (0) dan posisi bola (posY).
+                stalk.position.set(posX, posY / 2, posZ);
+
+                // 6. Masukkan ke dalam scene (layar)
+                scene.add(stalk);
+                // --- AKHIR KODE STALK BARU ---
             });
 
             // Quadratic Bezier Connections with Interactivity
