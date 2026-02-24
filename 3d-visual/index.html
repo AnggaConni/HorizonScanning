@@ -110,11 +110,11 @@
         <p>3D Visualization of Future Signals</p>
         
         <div class="legend">
-            <div class="legend-title">Radar Guide</div>
-            <div class="legend-item"><div class="icon-box">📌</div> <div>Floor: X & Y Position</div></div>
-            <div class="legend-item"><div class="icon-box">🚀</div> <div>Altitude: Urgency (Z-Axis)</div></div>
-            <div class="legend-item"><div class="icon-box">🟢</div> <div>Size: Signal Impact Magnitude</div></div>
-        </div>
+        <div class="legend-title">Radar Guide</div>
+        <div class="legend-item"><div class="icon-box">📌</div> <div><strong>Floor:</strong> X & Y Position</div></div>
+        <div class="legend-item"><div class="icon-box">🚀</div> <div><strong>Altitude:</strong> Urgency (Z-Axis)</div></div>
+        <div class="legend-item"><div class="icon-box">🟢</div> <div><strong>Size:</strong> Signal Impact Magnitude</div></div>
+    </div>
     </div>
 
     <div id="settings-panel">
@@ -173,6 +173,7 @@
         const controls = new THREE.OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
         controls.autoRotate = true;
+        controls.autoRotateSpeed = 0.5; // Tambahkan ini. Semakin kecil nilainya (misal 0.2), semakin lambat.
 
         const objectsArray = [];
         const connectionsArray = [];
@@ -308,21 +309,42 @@
                 }
             });
 
-            // Quadrant Labels
-            const loader = new THREE.FontLoader();
-            loader.load('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/fonts/helvetiker_bold.typeface.json', (font) => {
-                const labelMat = new THREE.MeshBasicMaterial({ color: 0x1e40af, transparent: true, opacity: 0.5 });
-                const createLabel = (text, x, z) => {
-                    const geo = new THREE.TextGeometry(text, { font, size: 2, height: 0.1 });
-                    const mesh = new THREE.Mesh(geo, labelMat);
-                    mesh.rotation.x = -Math.PI / 2;
-                    mesh.position.set(x, 0.1, z);
-                    scene.add(mesh);
-                };
-                createLabel(labelData.tr, 25, -25);
-                createLabel(labelData.tl, -45, -25);
-                createLabel(labelData.br, 25, 35);
-                createLabel(labelData.bl, -45, 35);
+        // Quadrant Labels
+        const loader = new THREE.FontLoader();
+        loader.load('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/fonts/helvetiker_bold.typeface.json', (font) => {
+        // Material biru untuk nama kuadran
+        const labelMat = new THREE.MeshBasicMaterial({ color: 0x1e40af, transparent: true, opacity: 0.5 });
+        
+        // Material merah muda untuk tulisan Axis
+        const axisMat = new THREE.MeshBasicMaterial({ color: 0xef4444, transparent: true, opacity: 0.8 });
+
+        // Tambahkan parameter material dan size ke fungsi createLabel
+        const createLabel = (text, x, z, material = labelMat, size = 2) => {
+        const geo = new THREE.TextGeometry(text, { font, size: size, height: 0.1 });
+        
+        // Membaca bounding box agar posisi teks bisa center-aligned
+        geo.computeBoundingBox();
+        const xOffset = -0.5 * (geo.boundingBox.max.x - geo.boundingBox.min.x);
+        
+        const mesh = new THREE.Mesh(geo, material);
+        mesh.rotation.x = -Math.PI / 2;
+        mesh.position.set(x + xOffset, 0.1, z); // Ditambah xOffset agar teks posisinya pas di tengah garis
+        scene.add(mesh);
+    };
+
+            // Render Label Kuadran (Biru, Ukuran Default)
+            createLabel(labelData.tr, 25, -25);  // Kanan Atas (CRITICAL RISKS)
+            createLabel(labelData.tl, -25, -25); // Kiri Atas (BLACK SWANS) -> Ubah dari -45 jadi -25
+            createLabel(labelData.br, 25, 30);   // Kanan Bawah (TACTICAL) -> Saya sesuaikan jadi 30 agar jarak atas-bawah juga seimbang
+            createLabel(labelData.bl, -25, 30);  // Kiri Bawah (ROUTINE) -> Ubah dari -45 jadi -25
+
+            // Render Label Axis (Merah, Ukuran Lebih Besar = 3)
+            // Posisinya diletakkan di ujung garis terluar (65 dan -65)
+            createLabel("X-Axis", 66, 1, axisMat, 2); 
+            createLabel("Y-Axis", 0, -62, axisMat, 2);
+            
+            // Opsional: Kalau mau pakai nama sumbu otomatis dari config (Probability/Impact), 
+            // ganti "X-Axis" jadi configData.xLabel dan "Y-Axis" jadi configData.yLabel
             });
         }
 
