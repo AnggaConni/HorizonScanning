@@ -224,9 +224,9 @@
     <div style="margin-bottom: 12px;">
         <span id="tt-badge" class="status-badge">STATUS</span>
     </div>
-    <div class="tooltip-data"><span>Axis X:</span> <strong id="tt-x"></strong></div>
-    <div class="tooltip-data"><span>Axis Y:</span> <strong id="tt-y"></strong></div>
-    <div class="tooltip-data"><span>Axis Z (Altitude):</span> <strong id="tt-z"></strong></div>
+        <div class="tooltip-data"><span>Sumbu X:</span> <strong id="tt-x"></strong></div>
+        <div class="tooltip-data"><span>Sumbu Y:</span> <strong id="tt-y"></strong></div>
+        <div class="tooltip-data"><span>Sumbu Z (Urgency):</span> <strong id="tt-z"></strong></div>
     </div>
 
     <div id="canvas-container"></div>
@@ -402,15 +402,21 @@
                 scene.add(textMesh);
             }
 
-             function createAxisMarker(text, x, z, rotY) {
+             // Fungsi marker axis yang sudah diperbaiki
+            function createAxisMarker(text, x, z, rotZ) {
                 const textGeo = new THREE.TextGeometry(text, {
-                    font: font, size: 1.8, height: 0.1, curveSegments: 12
+                    font: font, size: 2.2, height: 0.1, curveSegments: 12
                 });
                 textGeo.computeBoundingBox();
-                const textMesh = new THREE.Mesh(textGeo, new THREE.MeshBasicMaterial({ color: neonGreen, opacity: 0.9, transparent: true })); 
+                const textMesh = new THREE.Mesh(textGeo, new THREE.MeshBasicMaterial({ color: 0xff4444, opacity: 0.9, transparent: true })); 
+                
+                // PERBAIKAN ROTASI:
+                // 1. Putar -90 derajat di X agar teks rebah/sejajar lantai
                 textMesh.rotation.x = -Math.PI / 2;
-                textMesh.rotation.z = rotY; 
-                textMesh.position.set(x, 0.1, z);
+                // 2. Gunakan rotZ untuk menentukan arah hadap teks di lantai
+                textMesh.rotation.z = rotZ; 
+                
+                textMesh.position.set(x, 0.2, z); // Sedikit lebih tinggi dari lantai (0.2) agar tidak flickering
                 scene.add(textMesh);
             }
 
@@ -419,9 +425,12 @@
             createLabel(labelData.br, labelScale, labelScale);  
             createLabel(labelData.bl, -labelScale, labelScale); 
 
-          
-            createAxisMarker("X ➔", maxRadius * 0.7, 5, 0); 
-            createAxisMarker("Y ➔", -5, -maxRadius * 0.7, -Math.PI / 2);
+            // 1. Label X: Digeser lebih ke luar, tanda "?" dihapus, rotasi 0 (horizontal ke kanan)
+            createAxisMarker("X ➔", maxRadius * 1.3, 0, 0); 
+
+            // 2. Label Y: Digeser lebih ke luar, tanda "?" dihapus, rotasi -PI/2 (tegak lurus sumbu)
+            // Sekarang Y akan terlihat horizontal (sejajar lantai) namun mengarah ke sumbu Y visual
+            createAxisMarker("Y ➔", -3, -maxRadius * 1.3, 0);
         });
 
         // --- 4. DATA PROCESSING ---
