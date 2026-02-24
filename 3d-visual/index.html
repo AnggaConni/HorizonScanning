@@ -425,12 +425,8 @@
             createLabel(labelData.br, labelScale, labelScale);  
             createLabel(labelData.bl, -labelScale, labelScale); 
 
-            // 1. Label X: Digeser lebih ke luar, tanda "?" dihapus, rotasi 0 (horizontal ke kanan)
-            createAxisMarker("X ➔", maxRadius * 1.3, 0, 0); 
-
-            // 2. Label Y: Digeser lebih ke luar, tanda "?" dihapus, rotasi -PI/2 (tegak lurus sumbu)
-            // Sekarang Y akan terlihat horizontal (sejajar lantai) namun mengarah ke sumbu Y visual
-            createAxisMarker("Y ➔", -3, -maxRadius * 1.3, 0);
+            createAxisMarker("X-AXIS", maxRadius * 1.3, 0, 0); 
+            createAxisMarker("Y-AXIS", -5, -maxRadius * 1.3, 0);
         });
 
         // --- 4. DATA PROCESSING ---
