@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Horizon Scanning Radar</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #0b1120; /* Deep dark blue */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+        }
+
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            display: block;
+        }
+
+        /* UI Overlay */
+        #ui-layer {
+            position: absolute;
+            top: 25px;
+            left: 25px;
+            pointer-events: none;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 26px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }
+
+        p {
+            margin: 6px 0 0 0;
+            font-size: 14px;
+            color: #94a3b8;
+            max-width: 400px;
+            line-height: 1.4;
+        }
+
+        /* Legend */
+        .legend {
+            margin-top: 25px;
+            background: rgba(15, 23, 42, 0.75);
+            padding: 18px;
+            border-radius: 10px;
+            border: 1px solid #1e293b;
+            backdrop-filter: blur(8px);
+            width: 320px;
+        }
+
+        .legend-title {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #94a3b8;
+            margin-bottom: 12px;
+            font-weight: bold;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            font-size: 13px;
+        }
+
+        .icon-box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            margin-right: 12px;
+        }
+
+        /* Tooltip */
+        #tooltip {
+            position: absolute;
+            display: none;
+            background: rgba(255, 255, 255, 0.98);
+            color: #0f172a;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            pointer-events: none;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+            transform: translate(-50%, -120%);
+            z-index: 100;
+            transition: opacity 0.2s;
+            width: 260px;
+        }
+
+        .tooltip-title {
+            font-weight: 700;
+            font-size: 15px;
+            margin-bottom: 6px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 8px;
+        }
+
+        .tooltip-desc {
+            font-size: 12px;
+            margin-bottom: 12px;
+            color: #475569;
+            font-style: italic;
+            line-height: 1.4;
+        }
+
+        .tooltip-data {
+            font-size: 12px;
+            display: flex;
+            justify-content: space-between;
+            margin-top: 4px;
+            padding-top: 4px;
+            border-top: 1px dashed #e2e8f0;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: bold;
+            color: white;
+            text-transform: uppercase;
+        }
+
+        .ring-label {
+            position: absolute;
+            color: rgba(255,255,255,0.4);
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="ui-layer">
+        <h1>Strategic Foresight Radar</h1>
+        <p>Explore emerging signals and trends. Drag to rotate, scroll to zoom in/out.</p>
+        
+        <div class="legend">
+            <div class="legend-title">How to read this radar:</div>
+            
+            <div class="legend-item">
+                <div class="icon-box">
+                    <div style="width: 20px; height: 20px; border-radius: 50%; border: 2px solid #ef4444;"></div>
+                </div>
+                <div><strong>Distance to Center:</strong> Urgency / Time Horizon (Closer = More Urgent)</div>
+            </div>
+            
+            <div class="legend-item">
+                <div class="icon-box">
+                    <div style="width: 24px; height: 24px; border-radius: 50%; background: #3b82f6;"></div>
+                </div>
+                <div><strong>Sphere Size:</strong> Impact (Larger = Higher Impact)</div>
+            </div>
+            
+            <div class="legend-item">
+                <div class="icon-box">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 20V4M5 11l7-7 7 7"/></svg>
+                </div>
+                <div><strong>Height (Altitude):</strong> Probability (Higher = More Likely)</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SETTINGS PANEL (NEW) -->
+    <div id="settings-panel" style="position: absolute; top: 25px; right: 25px; background: rgba(15, 23, 42, 0.85); padding: 15px 20px; border-radius: 10px; border: 1px solid #334155; backdrop-filter: blur(8px); width: 220px;">
+        <div style="font-size: 13px; font-weight: bold; text-transform: uppercase; color: #cbd5e1; margin-bottom: 12px; border-bottom: 1px solid #334155; padding-bottom: 8px;">
+            Radar Settings
+        </div>
+        
+        <!-- Toggle Auto Rotate -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-size: 13px;">
+            <label for="autoRotateToggle" style="cursor: pointer;">Auto-Rotate</label>
+            <input type="checkbox" id="autoRotateToggle" checked style="cursor: pointer; width: 16px; height: 16px;">
+        </div>
+
+        <!-- Slider Node Size -->
+        <div style="font-size: 13px; margin-bottom: 5px; display: flex; justify-content: space-between;">
+            <span>Node Size</span>
+            <span id="nodeSizeValue" style="color: #3b82f6; font-weight: bold;">100%</span>
+        </div>
+        <input type="range" id="nodeSizeSlider" min="0.2" max="2.0" step="0.1" value="1.0" style="width: 100%; cursor: pointer;">
+    </div>
+
+    <!-- Tooltip -->
+    <div id="tooltip">
+        <div class="tooltip-title" id="tt-name">Signal Name</div>
+        <div class="tooltip-desc" id="tt-desc">Description goes here...</div>
+        <div style="margin-bottom: 8px;">
+            <span id="tt-badge" class="status-badge" style="background: #ef4444;">CRITICAL</span>
+        </div>
+        <div class="tooltip-data"><span style="color:#64748b;">Probability:</span> <strong id="tt-x"></strong></div>
+        <div class="tooltip-data"><span style="color:#64748b;">Impact:</span> <strong id="tt-y"></strong></div>
+        <div class="tooltip-data"><span style="color:#64748b;">Urgency (Z):</span> <strong id="tt-z"></strong></div>
+    </div>
+
+    <div id="canvas-container"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+    <script>
+        // --- 1. SETUP ---
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x0b1120, 0.012); // Deep fog
+
+        // Adjust camera to look down at the radar
+        const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 45, 65); 
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        container.appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.maxPolarAngle = Math.PI / 2 - 0.05; // Don't let camera go below the ground
+
+        // --- 2. LIGHTING ---
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+        scene.add(ambientLight);
+
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        dirLight.position.set(20, 50, 20);
+        scene.add(dirLight);
+        
+        const centerLight = new THREE.PointLight(0x3b82f6, 1.5, 50);
+        centerLight.position.set(0, 5, 0);
+        scene.add(centerLight);
+
+        // --- 3. RADAR FLOOR (8 CONCENTRIC RINGS) ---
+        // Diperbanyak menjadi 8 grid cincin untuk radar yang lebih detail
+        const numRings = 8;
+        const maxRadius = 48; // Radius maksimal grid
+        
+        for (let i = 1; i <= numRings; i++) {
+            const radius = (maxRadius / numRings) * i;
+            
+            // Garis cincin utama
+            const circleGeo = new THREE.RingGeometry(radius - 0.1, radius + 0.1, 64);
+            const circleMat = new THREE.MeshBasicMaterial({ 
+                color: 0x3b82f6, // Warna biru khas radar
+                side: THREE.DoubleSide,
+                transparent: true,
+                opacity: 0.1 + (0.2 * (1 - (i/numRings))) // Semakin ke tengah semakin terang
+            });
+            const ring = new THREE.Mesh(circleGeo, circleMat);
+            ring.rotation.x = -Math.PI / 2; 
+            scene.add(ring);
+
+            // Garis putus-putus tipis di antara cincin
+            if (i < numRings) {
+                const dashRadius = radius + (maxRadius / numRings) / 2;
+                const dashGeo = new THREE.EdgesGeometry(new THREE.CircleGeometry(dashRadius, 64));
+                const dashMat = new THREE.LineDashedMaterial({ color: 0xffffff, dashSize: 0.5, gapSize: 1.5, transparent: true, opacity: 0.05 });
+                const dashLine = new THREE.LineSegments(dashGeo, dashMat);
+                dashLine.rotation.x = -Math.PI / 2;
+                dashLine.computeLineDistances();
+                scene.add(dashLine);
+            }
+        }
+
+        // Add a crosshair / axis lines for the radar
+        const crossMat = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.15 });
+        const crossGeo1 = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-maxRadius, 0, 0), new THREE.Vector3(maxRadius, 0, 0)]);
+        const crossGeo2 = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, -maxRadius), new THREE.Vector3(0, 0, maxRadius)]);
+        scene.add(new THREE.Line(crossGeo1, crossMat));
+        scene.add(new THREE.Line(crossGeo2, crossMat));
+
+        // --- 4. DATA PROCESSING ---
+        const rawData = [
+            { id: "d1", title: "AI Regulation Framework", desc: "EU AI Act & global compliance reshaping tech development.", status: "critical", x: 7.5, y: 8.5, z: 9.5, connections: ["d2", "d9"] },
+            { id: "d2", title: "Enterprise AI Adoption", desc: "70%+ Fortune 500 integrating generative AI across operations.", status: "escalating", x: 8, y: 7.5, z: 8.0, connections: ["d10"] },
+            { id: "d3", title: "Quantum Advantage Breakthrough", desc: "Error-corrected quantum computers solving real-world problems.", status: "emerging", x: 2.5, y: 9, z: 4.0, connections: ["d4"] },
+            { id: "d4", title: "Climate Tipping Point Cascade", desc: "Multiple Earth systems reaching irreversible thresholds.", status: "watchlist", x: 3.5, y: 9.5, z: 3.0, connections: ["d7"] },
+            { id: "d5", title: "Remote-First Economy", desc: "Permanent shift to distributed work models.", status: "structural", x: 8.5, y: 6.5, z: 7.0, connections: ["d6"] },
+            { id: "d6", title: "Demographic Inversion", desc: "More countries with declining populations than growing.", status: "structural", x: 9, y: 7, z: 6.5, connections: [] },
+            { id: "d7", title: "Vertical Farming Scale-Up", desc: "LED-based indoor agriculture reaching price parity.", status: "escalating", x: 6.5, y: 5.5, z: 7.5, connections: ["d8"] },
+            { id: "d8", title: "Synthetic Media Proliferation", desc: "Deepfakes and AI-generated content becoming mainstream.", status: "critical", x: 8.5, y: 6, z: 9.0, connections: [] },
+            { id: "d9", title: "Brain-Computer Interfaces", desc: "Non-invasive BCIs for gaming, accessibility, and productivity.", status: "emerging", x: 4.5, y: 7, z: 5.0, connections: [] },
+            { id: "d10", title: "Decentralized Identity Systems", desc: "Self-sovereign identity replacing centralized authentication.", status: "watchlist", x: 5.5, y: 6, z: 3.5, connections: [] },
+            { id: "d11", title: "Space-Based Solar Power", desc: "First demonstration of orbital solar collection.", status: "emerging", x: 2, y: 8, z: 2.0, connections: [] },
+            { id: "d12", title: "Longevity Medicine", desc: "Anti-aging therapies moving from research to clinical.", status: "watchlist", x: 5, y: 7.5, z: 4.5, connections: [] }
+        ];
+
+        const statusMap = {
+            "critical":   { color: 0xef4444 }, // Red (Core)
+            "escalating": { color: 0xf59e0b }, // Orange
+            "structural": { color: 0x3b82f6 }, // Blue
+            "emerging":   { color: 0x8b5cf6 }, // Purple
+            "watchlist":  { color: 0x10b981 }  // Green (Fringe)
+        };
+
+        const objectsArray = []; 
+        const nodePositions = {}; 
+
+        // --- 5. RENDER SPHERES TO RADAR ---
+        const sphereGeo = new THREE.SphereGeometry(1, 32, 32);
+
+        rawData.forEach((data, index) => {
+            const material = new THREE.MeshStandardMaterial({ 
+                color: statusMap[data.status].color, 
+                roughness: 0.2, 
+                metalness: 0.3,
+                emissive: statusMap[data.status].color,
+                emissiveIntensity: 0.2
+            });
+            const sphere = new THREE.Mesh(sphereGeo, material);
+
+            // RADAR MAPPING LOGIC:
+            // Urgency 10 = close to center, Urgency 1 = edge of radar
+            const distanceFromCenter = 45 - (data.z * 4.2); 
+            
+            const angle = (index / rawData.length) * Math.PI * 2;
+            const posX = Math.cos(angle) * distanceFromCenter;
+            const posZ = Math.sin(angle) * distanceFromCenter;
+
+            // Height = Probability
+            const posY = (data.x / 10) * 20; 
+
+            // Base Size = Impact
+            // Kita simpan baseScale agar bisa di-resize oleh slider nanti
+            const baseScale = Math.max(0.6, (data.y / 10) * 3.0);
+
+            sphere.scale.set(baseScale, baseScale, baseScale);
+            sphere.position.set(posX, posY, posZ);
+            
+            scene.add(sphere);
+            objectsArray.push(sphere);
+            nodePositions[data.id] = sphere.position;
+
+            // Garis bayangan ke lantai
+            const lineMat = new THREE.LineBasicMaterial({ color: statusMap[data.status].color, transparent: true, opacity: 0.3 });
+            const lineGeo = new THREE.BufferGeometry().setFromPoints([
+                new THREE.Vector3(posX, 0, posZ),
+                new THREE.Vector3(posX, posY, posZ)
+            ]);
+            scene.add(new THREE.Line(lineGeo, lineMat));
+            
+            // Cincin di lantai (bayangan)
+            const floorRing = new THREE.Mesh(
+                new THREE.RingGeometry(baseScale + 0.3, baseScale + 0.6, 32),
+                new THREE.MeshBasicMaterial({ color: statusMap[data.status].color, side: THREE.DoubleSide, transparent: true, opacity: 0.25 })
+            );
+            floorRing.position.set(posX, 0.1, posZ);
+            floorRing.rotation.x = -Math.PI / 2;
+            scene.add(floorRing);
+
+            // Simpan data & referensi elemen terkait ke userData
+            sphere.userData = { 
+                ...data, 
+                color: statusMap[data.status].color,
+                baseScale: baseScale,
+                floorRing: floorRing 
+            };
+        });
+
+        // --- 5.1 UI EVENT LISTENERS (NEW) ---
+        let nodeSizeMultiplier = 1.0;
+
+        // Listener Slider Ukuran Node
+        document.getElementById('nodeSizeSlider').addEventListener('input', (e) => {
+            nodeSizeMultiplier = parseFloat(e.target.value);
+            document.getElementById('nodeSizeValue').innerText = Math.round(nodeSizeMultiplier * 100) + '%';
+            
+            // Update ukuran semua bola secara real-time
+            objectsArray.forEach(sphere => {
+                const base = sphere.userData.baseScale;
+                const newScale = base * nodeSizeMultiplier;
+                // Ubah ukuran bola
+                sphere.scale.set(newScale, newScale, newScale);
+                
+                // Ubah ukuran cincin bayangan di lantai
+                if (sphere.userData.floorRing) {
+                    // Karena ring bentuknya datar 2D, kita scale X dan Y (radiusnya)
+                    sphere.userData.floorRing.scale.set(nodeSizeMultiplier, nodeSizeMultiplier, 1);
+                }
+            });
+        });
+
+        // Listener Toggle Auto Rotate
+        document.getElementById('autoRotateToggle').addEventListener('change', (e) => {
+            controls.autoRotate = e.target.checked;
+        });
+
+        // --- 6. DRAW CONNECTIONS ---
+        // Use curved lines (Bezier) for a more organic, futuristic network look
+        const curveMaterial = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.15 });
+        
+        rawData.forEach(data => {
+            if (data.connections && data.connections.length > 0) {
+                data.connections.forEach(targetId => {
+                    const p1 = nodePositions[data.id];
+                    const p2 = nodePositions[targetId];
+                    if (p1 && p2) {
+                        // Create a control point in the middle but slightly lower/higher to make an arc
+                        const distance = p1.distanceTo(p2);
+                        const midPoint = new THREE.Vector3().addVectors(p1, p2).multiplyScalar(0.5);
+                        midPoint.y = Math.min(p1.y, p2.y) - (distance * 0.2); // arc downwards slightly
+                        
+                        const curve = new THREE.QuadraticBezierCurve3(p1, midPoint, p2);
+                        const points = curve.getPoints(20);
+                        const curveGeo = new THREE.BufferGeometry().setFromPoints(points);
+                        scene.add(new THREE.Line(curveGeo, curveMaterial));
+                    }
+                });
+            }
+        });
+
+        // --- 7. MOUSE INTERACTION (RAYCASTER) ---
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        const tooltip = document.getElementById('tooltip');
+        let hoveredObj = null;
+        let originalScale = new THREE.Vector3();
+
+        window.addEventListener('mousemove', (event) => {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(objectsArray);
+
+            if (intersects.length > 0) {
+                document.body.style.cursor = 'pointer';
+                const object = intersects[0].object;
+                
+                if (hoveredObj !== object) {
+                    if (hoveredObj) hoveredObj.scale.copy(originalScale);
+                    hoveredObj = object;
+                    originalScale.copy(object.scale);
+                    
+                    // Enlarge 30% on hover
+                    object.scale.multiplyScalar(1.3);
+
+                    // Update UI Tooltip
+                    const data = object.userData;
+                    document.getElementById('tt-name').innerText = data.title;
+                    document.getElementById('tt-desc').innerText = data.desc;
+                    document.getElementById('tt-x').innerText = data.x + " / 10";
+                    document.getElementById('tt-y').innerText = data.y + " / 10";
+                    document.getElementById('tt-z').innerText = data.z + " / 10";
+                    
+                    const badge = document.getElementById('tt-badge');
+                    badge.innerText = data.status;
+                    badge.style.background = "#" + data.color.toString(16).padStart(6, '0');
+                }
+
+                tooltip.style.display = 'block';
+                tooltip.style.left = event.clientX + 'px';
+                tooltip.style.top = event.clientY + 'px';
+
+            } else {
+                document.body.style.cursor = 'default';
+                if (hoveredObj) {
+                    hoveredObj.scale.copy(originalScale);
+                    hoveredObj = null;
+                }
+                tooltip.style.display = 'none';
+            }
+        });
+
+        // --- 8. RESIZE LOGIC ---
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // --- 9. ANIMATION LOOP ---
+        // Slowly rotate the entire scene for a "Scanning Radar" effect
+        const sceneGroup = new THREE.Group();
+        // Move all current children (except lights/camera) into the group if we wanted to rotate them
+        // For simplicity, let's just rotate the camera controls automatically if user isn't interacting
+        controls.autoRotate = true;
+        controls.autoRotateSpeed = 0.5;
+
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update(); // Required for autoRotate and damping
+            renderer.render(scene, camera);
+        }
+
+        animate();
+    </script>
+</body>
+</html>
