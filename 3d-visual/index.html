@@ -111,9 +111,9 @@
         
         <div class="legend">
         <div class="legend-title">Radar Guide</div>
-        <div class="legend-item"><div class="icon-box">📌</div> <div><strong>Floor:</strong> X & Y Position</div></div>
-        <div class="legend-item"><div class="icon-box">🚀</div> <div><strong>Altitude:</strong> Urgency (Z-Axis)</div></div>
-        <div class="legend-item"><div class="icon-box">🟢</div> <div><strong>Size:</strong> Signal Impact Magnitude</div></div>
+        <div class="legend-item"><div class="icon-box">📌</div> <div><strong>Floor:</strong> Position (X & Y Axis)</div></div>
+        <div class="legend-item"><div class="icon-box">🚀</div> <div><strong>Altitude:</strong> Urgency Level (Z-Axis)</div></div>
+        <div class="legend-item"><div class="icon-box">🟢</div> <div><strong>Size:</strong> Scale / Magnitude</div></div>
     </div>
     </div>
 
@@ -266,7 +266,15 @@
                 const posX = (parseFloat(data.x) || 0) * scaleFactor;
                 const posZ = -(parseFloat(data.y) || 0) * scaleFactor;
                 const posY = 2 + ((parseFloat(data.z) || 0) * 4);
-                const scale = Math.max(0.8, (Math.abs(data.y) / 10) * 3.5);
+
+                // 1. Ambil nilai Z (Urgency)
+                const zVal = parseFloat(data.z) || 0;
+
+                // 2. Normalisasi rasio (-10 s/d +10 menjadi 0.0 s/d 1.0)
+                const zRatio = (zVal + 10) / 20; 
+
+                // 3. Skala eksponensial berdasarkan tinggi tiang
+                const scale = 0.5 + (Math.pow(zRatio, 2.0) * 5.0);
 
                 sphere.position.set(posX, posY, posZ);
                 sphere.scale.set(scale, scale, scale);
