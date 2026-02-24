@@ -174,9 +174,9 @@
                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><path d="M12 3l4 4-4 4M12 3v18M12 21l-4-4 4 4M3 12l4-4-4 4M3 12h18M21 12l-4-4 4 4"/></svg>
                 </div>
                 <div>
-                    <strong>Floor Position (X & Z):</strong>
-                    <br><span style="color:#64748b; font-size: 12px;">Location based on<span id="legend-x-label">Probability</span> and <span id="legend-y-label">Impact</span>.</span>
-                </div>
+                <strong>Floor Position (X & Y):</strong>
+                <br><span style="color:#64748b; font-size: 12px;">Location based on X-Axis and Y-Axis.</span>
+            </div>
             </div>
 
             <div class="legend-item">
@@ -218,15 +218,15 @@
         <input type="range" id="nodeSizeSlider" min="0.2" max="2.0" step="0.1" value="1.0" style="width: 100%; cursor: pointer; accent-color: #10b981;">
     </div>
 
-    <div id="tooltip">
-        <div class="tooltip-title" id="tt-name">Signal Name</div>
-        <div class="tooltip-desc" id="tt-desc">Description goes here...</div>
-        <div style="margin-bottom: 12px;">
-            <span id="tt-badge" class="status-badge">STATUS</span>
-        </div>
-        <div class="tooltip-data"><span id="lbl-tt-x">X:</span> <strong id="tt-x"></strong></div>
-        <div class="tooltip-data"><span id="lbl-tt-y">Y:</span> <strong id="tt-y"></strong></div>
-        <div class="tooltip-data"><span>Z (Altitude):</span> <strong id="tt-z"></strong></div>
+   <div id="tooltip">
+    <div class="tooltip-title" id="tt-name">Signal Name</div>
+    <div class="tooltip-desc" id="tt-desc">Description</div>
+    <div style="margin-bottom: 12px;">
+        <span id="tt-badge" class="status-badge">STATUS</span>
+    </div>
+    <div class="tooltip-data"><span>Axis X:</span> <strong id="tt-x"></strong></div>
+    <div class="tooltip-data"><span>Axis Y:</span> <strong id="tt-y"></strong></div>
+    <div class="tooltip-data"><span>Axis Z (Altitude):</span> <strong id="tt-z"></strong></div>
     </div>
 
     <div id="canvas-container"></div>
@@ -294,7 +294,7 @@
         const floorMat = new THREE.ShadowMaterial({ opacity: 0.1 });
         const floor = new THREE.Mesh(floorGeo, floorMat);
         floor.rotation.x = -Math.PI / 2;
-        floor.position.y = -0.05;
+        floor.position.y = 0.05;
         floor.receiveShadow = true;
         scene.add(floor);
 
@@ -419,8 +419,9 @@
             createLabel(labelData.br, labelScale, labelScale);  
             createLabel(labelData.bl, -labelScale, labelScale); 
 
-            createAxisMarker(configData.xLabel + " ➔", maxRadius * 1.15, 0, 0);
-            createAxisMarker("➔ " + configData.yLabel, 0, -maxRadius * 1.15, -Math.PI / 2);
+          
+            createAxisMarker("X ➔", maxRadius * 0.7, 5, 0); 
+            createAxisMarker("Y ➔", -5, -maxRadius * 0.7, -Math.PI / 2);
         });
 
         // --- 4. DATA PROCESSING ---
@@ -437,17 +438,16 @@
             if (savedConfig) configData = JSON.parse(savedConfig);
             if (savedLabels) labelData = JSON.parse(savedLabels); 
             
-            const labelX = document.getElementById('legend-x-label');
-            const labelY = document.getElementById('legend-y-label');
-            const ttX = document.getElementById('lbl-tt-x');
-            const ttY = document.getElementById('lbl-tt-y');
+            //const labelX = document.getElementById('legend-x-label');
+            //const labelY = document.getElementById('legend-y-label');
+            // Ganti baris ini di dalam event listener mousemove
+            //const ttX = document.getElementById('lbl-tt-x');
+            //const ttY = document.getElementById('lbl-tt-y');
 
-            if(labelX) labelX.innerText = configData.xLabel || "Probability";
-            if(labelY) labelY.innerText = configData.yLabel || "Impact";
-            if(ttX) ttX.innerText = (configData.xLabel || "Probability") + ":";
-            if(ttY) ttY.innerText = (configData.yLabel || "Impact") + ":";
+           // if(ttX) ttX.innerText = (configData.xLabel || "Probability") + ":";
+            //if(ttY) ttY.innerText = (configData.yLabel || "Impact") + ":";
             
-        } catch (e) { console.error("Gagal memuat data:", e); }
+        } catch (e) { console.error("Gagal memuat data:", e);}
 
         if (rawData.length === 0) {
              rawData = [{ id: "d1", title: "Contoh Data Radar Aktif", desc: "Data placeholder.", status: "critical", x: 7.5, y: 8.5, z: 6.5, connections: [] }];
