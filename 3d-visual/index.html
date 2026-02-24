@@ -84,7 +84,8 @@
         }
 
         .tt-title { font-weight: 700; color: #0f172a; margin-bottom: 4px; }
-        .status-badge { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 800; color: white; text-transform: uppercase; margin-top: 8px; }
+        .tt-desc { font-size: 12px; color: #64748b; line-height: 1.4; margin-bottom: 8px; }
+        .status-badge { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 800; color: white; text-transform: uppercase; }
 
         #exportBtn {
             width: 100%;
@@ -133,7 +134,7 @@
 
     <div id="tooltip">
         <div class="tt-title" id="tt-name">Signal</div>
-        <div id="tt-desc" style="font-size:12px; color:#64748b; line-height:1.4;">Description</div>
+        <div class="tt-desc" id="tt-desc">Description</div>
         <div id="tt-badge" class="status-badge">STATUS</div>
     </div>
 
@@ -146,7 +147,7 @@
 
     <script>
         // --- 1. CONFIG & DATA ---
-        let rawData = [{"id":"d1","title":"Main Signal","desc":"Welcome to your Strategic 3D Radar.","status":"emerging","x":5,"y":5,"z":5,"connections":[]}];
+        let rawData = [{"id":"d1","title":"Main Signal","desc":"Welcome to your Strategic 3D Radar. Hover over nodes to see details.","status":"emerging","x":5,"y":5,"z":5,"connections":[]}];
         let configData = {"xLabel":"Probability","yLabel":"Impact"};
         let labelData = {"tl":"BLACK SWANS","tr":"CRITICAL RISKS","bl":"ROUTINE","br":"TACTICAL"};
 
@@ -253,7 +254,12 @@
 
             rawData.forEach(data => {
                 const color = statusMap[data.status] ? statusMap[data.status].color : 0xcccccc;
-                const mat = new THREE.MeshStandardMaterial({ color: color, roughness: 0.3, metalness: 0.2 });
+                const mat = new THREE.MeshStandardMaterial({ 
+                    color: color, 
+                    roughness: 0.3, 
+                    metalness: 0.2,
+                    emissive: new THREE.Color(0x000000) // Initialize emissive for glow effect
+                });
                 const sphere = new THREE.Mesh(sphereGeo, mat);
                 
                 const posX = (parseFloat(data.x) || 0) * scaleFactor;
@@ -361,23 +367,46 @@
             });
         });
 
+        // Interaction Logic with Glow and Tooltip Description
+        let intersectedNode = null;
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2();
         window.addEventListener('mousemove', (e) => {
             mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
             raycaster.setFromCamera(mouse, camera);
             const hits = raycaster.intersectObjects(objectsArray);
             const tt = document.getElementById('tooltip');
+            
             if (hits.length > 0) {
-                const d = hits[0].object.userData;
+                const obj = hits[0].object;
+                const d = obj.userData;
+                
+                // Glow effect on material
+                if (intersectedNode !== obj) {
+                    if (intersectedNode) intersectedNode.material.emissive.setHex(0x000000);
+                    intersectedNode = obj;
+                    intersectedNode.material.emissive.setHex(0x333333); // Subtle glow intensity
+                }
+
                 document.getElementById('tt-name').innerText = d.title;
-                document.getElementById('tt-badge').innerText = d.status;
-                document.getElementById('tt-badge').style.background = "#" + d.color.toString(16).padStart(6, '0');
+                document.getElementById('tt-desc').innerText = d.desc || "No description provided.";
+                const badge = document.getElementById('tt-badge');
+                badge.innerText = d.status.toUpperCase();
+                badge.style.background = "#" + d.color.toString(16).padStart(6, '0');
+                
                 tt.style.display = 'block';
                 tt.style.left = (e.clientX + 15) + 'px';
                 tt.style.top = (e.clientY + 15) + 'px';
-            } else { tt.style.display = 'none'; }
+                document.body.style.cursor = 'pointer';
+            } else {
+                if (intersectedNode) {
+                    intersectedNode.material.emissive.setHex(0x000000);
+                    intersectedNode = null;
+                }
+                tt.style.display = 'none';
+                document.body.style.cursor = 'default';
+            }
         });
 
         const clock = new THREE.Clock();
