@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Horizon Scanning Radar - Active Scan Mode</title>
+    <title>3D Horizon Scanning Radar - Standalone Edition</title>
     <style>
-        /* --- BRIGHT THEME CSS --- */
+        /* --- CSS FIX: Prevents radar from shifting downwards --- */
         body {
             margin: 0;
             overflow: hidden;
@@ -15,221 +15,127 @@
         }
 
         #canvas-container {
+            position: fixed; /* Locks position on screen */
+            top: 0;
+            left: 0;
             width: 100vw;
             height: 100vh;
-            display: block;
+            z-index: 1; 
             background: radial-gradient(circle at center, #ffffff 0%, #e2e8f0 100%); 
         }
 
-        /* UI Overlay */
+        /* UI Layer stays above radar */
         #ui-layer {
             position: absolute;
             top: 25px;
             left: 25px;
             pointer-events: none;
+            z-index: 10;
         }
 
-        h1 {
-            margin: 0;
-            font-size: 26px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            color: #0f172a;
-        }
+        h1 { margin: 0; font-size: 24px; font-weight: 700; color: #0f172a; }
+        p { margin: 4px 0 0 0; font-size: 13px; color: #64748b; }
 
-        p {
-            margin: 6px 0 0 0;
-            font-size: 14px;
-            color: #475569;
-            max-width: 400px;
-            line-height: 1.4;
-        }
-
-        /* Legend */
         .legend {
-            margin-top: 25px;
-            background: rgba(255, 255, 255, 0.85);
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid rgba(203, 213, 225, 0.5);
+            backdrop-filter: blur(10px);
+            width: 300px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            pointer-events: auto;
+        }
+
+        .legend-title { font-size: 11px; text-transform: uppercase; font-weight: 800; color: #10b981; margin-bottom: 10px; }
+        .legend-item { display: flex; align-items: center; margin-bottom: 8px; font-size: 12px; color: #334155; }
+        .icon-box { width: 24px; margin-right: 10px; display: flex; justify-content: center; }
+
+        #settings-panel {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            background: rgba(255, 255, 255, 0.9);
             padding: 20px;
             border-radius: 12px;
-            border: 1px solid rgba(203, 213, 225, 0.6);
-            backdrop-filter: blur(12px);
-            width: 340px;
+            border: 1px solid rgba(203, 213, 225, 0.5);
+            backdrop-filter: blur(10px);
+            width: 220px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            z-index: 20;
         }
 
-        .legend-title {
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #10b981; 
-            margin-bottom: 15px;
-            font-weight: 800;
-        }
+        #settings-title { font-size: 11px; font-weight: 800; text-transform: uppercase; margin-bottom: 15px; color: #10b981; border-bottom: 1px solid #f1f5f9; padding-bottom: 8px; }
+        .settings-label { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 10px; color: #334155; }
 
-        .legend-item {
-            display: flex;
-            align-items: flex-start;
-            margin-bottom: 15px;
-            font-size: 13px;
-            line-height: 1.4;
-            color: #334155;
-        }
-
-        .icon-box {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 30px;
-            height: 24px;
-            margin-right: 12px;
-            flex-shrink: 0;
-        }
-
-        /* Tooltip */
         #tooltip {
             position: absolute;
             display: none;
-            background: rgba(255, 255, 255, 0.98);
-            border: 1px solid rgba(203, 213, 225, 0.8);
-            color: #1e293b;
-            padding: 15px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            padding: 12px;
             border-radius: 8px;
-            font-size: 14px;
-            pointer-events: none;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            transform: translate(-50%, -120%);
-            z-index: 100;
-            transition: opacity 0.2s;
-            width: 280px;
-            backdrop-filter: blur(8px);
-        }
-
-        .tooltip-title {
-            font-weight: 700;
-            font-size: 16px;
-            margin-bottom: 6px;
-            border-bottom: 2px solid #f1f5f9;
-            padding-bottom: 8px;
-            color: #0f172a;
-        }
-
-        .tooltip-desc {
             font-size: 13px;
-            margin-bottom: 12px;
-            color: #64748b;
-            line-height: 1.4;
+            pointer-events: none;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            z-index: 100;
+            width: 250px;
         }
 
-        .tooltip-data {
-            font-size: 12px;
-            display: flex;
-            justify-content: space-between;
-            margin-top: 4px;
-            padding-top: 4px;
-            border-top: 1px dashed #e2e8f0;
-            color: #64748b;
-        }
-        
-        .tooltip-data strong {
-            color: #0f172a;
-            font-family: monospace;
-            font-weight: 700;
-        }
+        .tt-title { font-weight: 700; color: #0f172a; margin-bottom: 4px; }
+        .status-badge { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 800; color: white; text-transform: uppercase; margin-top: 8px; }
 
-        .status-badge {
-            display: inline-block;
-            padding: 3px 8px;
-            border-radius: 20px;
-            font-size: 10px;
-            font-weight: 800;
+        #exportBtn {
+            width: 100%;
+            margin-top: 15px;
+            padding: 10px;
+            background: #10b981;
             color: white;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border: none;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 11px;
+            cursor: pointer;
+            transition: 0.2s;
         }
-
-        /* Settings Panel */
-        #settings-panel {
-            background: rgba(255, 255, 255, 0.85) !important;
-            border: 1px solid rgba(203, 213, 225, 0.6) !important;
-            color: #1e293b !important;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05) !important;
-        }
-        #settings-title { color: #10b981 !important; border-bottom-color: #f1f5f9 !important; }
-        .settings-label { color: #334155 !important; }
-        #nodeSizeValue { color: #10b981 !important; }
+        #exportBtn:hover { background: #059669; }
     </style>
 </head>
 <body>
 
     <div id="ui-layer">
         <h1>Strategic Foresight Radar</h1>
-        <p>3D Visualize your signals.</p>
+        <p>3D Visualization of Future Signals</p>
         
-        <div class="legend" style="pointer-events: auto;">
-            <div class="legend-title">Radar Guide:</div>
-            
-            <div class="legend-item">
-                <div class="icon-box">
-                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><path d="M12 3l4 4-4 4M12 3v18M12 21l-4-4 4 4M3 12l4-4-4 4M3 12h18M21 12l-4-4 4 4"/></svg>
-                </div>
-                <div>
-                <strong>Floor Position (X & Y):</strong>
-                <br><span style="color:#64748b; font-size: 12px;">Location based on X-Axis and Y-Axis.</span>
-            </div>
-            </div>
-
-            <div class="legend-item">
-                <div class="icon-box">
-                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><path d="M12 20V4M5 11l7-7 7 7"/></svg>
-                </div>
-                <div>
-                    <strong>Altitude (Height):</strong> Z Axis / Urgency.
-                    <br><span style="color:#64748b; font-size: 12px;">Higher = More URGENCY (Data Z).</span>
-                </div>
-            </div>
-            
-            <div class="legend-item">
-                <div class="icon-box">
-                    <div style="width: 22px; height: 22px; border-radius: 50%; background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 2px 5px rgba(0,0,0,0.1);"></div>
-                </div>
-                <div>
-                    <strong>Sphere Size:</strong> Impact Magnitude.
-                    <br><span style="color:#64748b; font-size: 12px;">Based on absolute value of Impact (Y).</span>
-                </div>
-            </div>
+        <div class="legend">
+            <div class="legend-title">Radar Guide</div>
+            <div class="legend-item"><div class="icon-box">📌</div> <div>Floor: Probability & Impact Position</div></div>
+            <div class="legend-item"><div class="icon-box">🚀</div> <div>Altitude: Urgency (Z-Axis)</div></div>
+            <div class="legend-item"><div class="icon-box">🟢</div> <div>Size: Signal Impact Magnitude</div></div>
         </div>
     </div>
 
-    <div id="settings-panel" style="position: absolute; top: 25px; right: 25px; padding: 20px; border-radius: 12px; backdrop-filter: blur(12px); width: 220px;">
-        <div id="settings-title" style="font-size: 12px; font-weight: 800; text-transform: uppercase; margin-bottom: 15px; border-bottom: 1px solid; padding-bottom: 8px; letter-spacing: 1px;">
-            Radar Controls
+    <div id="settings-panel">
+        <div id="settings-title">Control Panel</div>
+        <div class="settings-label">
+            <label for="autoRotateToggle" style="cursor:pointer">Auto-Rotate</label>
+            <input type="checkbox" id="autoRotateToggle" checked style="cursor:pointer">
         </div>
-        
-        <div class="settings-label" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-size: 13px;">
-            <label for="autoRotateToggle" style="cursor: pointer;">Auto-Rotate</label>
-            <input type="checkbox" id="autoRotateToggle" checked style="cursor: pointer; accent-color: #10b981;">
-        </div>
-
-        <div class="settings-label" style="font-size: 13px; margin-bottom: 8px; display: flex; justify-content: space-between;">
+        <div class="settings-label">
             <span>Node Scale</span>
-            <span id="nodeSizeValue" style="font-weight: bold; font-family: monospace;">100%</span>
+            <span id="nodeSizeValue">100%</span>
         </div>
-        <input type="range" id="nodeSizeSlider" min="0.2" max="2.0" step="0.1" value="1.0" style="width: 100%; cursor: pointer; accent-color: #10b981;">
+        <input type="range" id="nodeSizeSlider" min="0.2" max="2.0" step="0.1" value="1.0" style="width:100%; accent-color:#10b981; cursor:pointer">
+        
+        <button id="exportBtn">DOWNLOAD STANDALONE (.HTML)</button>
     </div>
 
-   <div id="tooltip">
-    <div class="tooltip-title" id="tt-name">Signal Name</div>
-    <div class="tooltip-desc" id="tt-desc">Description</div>
-    <div style="margin-bottom: 12px;">
-        <span id="tt-badge" class="status-badge">STATUS</span>
+    <div id="tooltip">
+        <div class="tt-title" id="tt-name">Signal</div>
+        <div id="tt-desc" style="font-size:12px; color:#64748b; line-height:1.4;">Description</div>
+        <div id="tt-badge" class="status-badge">STATUS</div>
     </div>
-    <div id="tt-coords-area">
-        <div class="tooltip-data"><span>Sumbu X:</span> <strong id="tt-x"></strong></div>
-        <div class="tooltip-data"><span>Sumbu Y:</span> <strong id="tt-y"></strong></div>
-        <div class="tooltip-data"><span>Sumbu Z (Urgency):</span> <strong id="tt-z"></strong></div>
-    </div>
-</div>
 
     <div id="canvas-container"></div>
 
@@ -239,226 +145,10 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/geometries/TextGeometry.js"></script>
 
     <script>
-        // --- 1. SETUP (BRIGHT MODE) ---
-        const container = document.getElementById('canvas-container');
-        const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0xffffff); 
-
-        const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 70, 80); 
-
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(window.devicePixelRatio);
-        renderer.shadowMap.enabled = true;
-        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        renderer.outputEncoding = THREE.sRGBEncoding;
-        renderer.toneMapping = THREE.ReinhardToneMapping; 
-        renderer.toneMappingExposure = 1.1; 
-
-        container.appendChild(renderer.domElement);
-
-        const controls = new THREE.OrbitControls(camera, renderer.domElement);
-        controls.enableDamping = true;
-        controls.dampingFactor = 0.05;
-        controls.maxPolarAngle = Math.PI / 2 - 0.05;
-        controls.minDistance = 20;
-        controls.maxDistance = 180;
-        controls.autoRotate = true;
-        controls.autoRotateSpeed = 0.5;
-
-        // --- 2. LIGHTING ---
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
-        scene.add(ambientLight);
-
-        const hemiLight = new THREE.HemisphereLight(0xffffff, 0xe2e8f0, 0.5);
-        hemiLight.position.set(0, 50, 0);
-        scene.add(hemiLight);
-
-        const dirLight = new THREE.DirectionalLight(0xffffff, 1.0);
-        dirLight.position.set(50, 80, 50);
-        dirLight.castShadow = true;
-        dirLight.shadow.mapSize.width = 4096; 
-        dirLight.shadow.mapSize.height = 4096;
-        dirLight.shadow.camera.left = -60;
-        dirLight.shadow.camera.right = 60;
-        dirLight.shadow.camera.top = 60;
-        dirLight.shadow.camera.bottom = -60;
-        dirLight.shadow.bias = -0.0005; 
-        scene.add(dirLight);
-
-        // --- 3. RADAR FLOOR & GLOWING GRID ---
-        const numRings = 5;
-        const maxRadius = 55;
-        const neonGreen = 0x10b981; 
-        
-        const floorGeo = new THREE.PlaneGeometry(maxRadius * 2.8, maxRadius * 2.8);
-        const floorMat = new THREE.ShadowMaterial({ opacity: 0.1 });
-        const floor = new THREE.Mesh(floorGeo, floorMat);
-        floor.rotation.x = -Math.PI / 2;
-        floor.position.y = 0.05;
-        floor.receiveShadow = true;
-        scene.add(floor);
-
-        // Grid Rings
-        for (let i = 1; i <= numRings; i++) {
-            const radius = (maxRadius / numRings) * i;
-            const ringGeo = new THREE.RingGeometry(radius - 0.15, radius + 0.15, 128);
-            const ringMat = new THREE.MeshBasicMaterial({ 
-                color: neonGreen,     
-                side: THREE.DoubleSide,
-                transparent: true,
-                opacity: 0.8, // Opacity ditebalkan karena tanpa additive blending
-                depthWrite: false     
-            });
-            const ring = new THREE.Mesh(ringGeo, ringMat);
-            ring.rotation.x = -Math.PI / 2;
-            scene.add(ring);
-        }
-
-        // Crosshair
-        const crossMat = new THREE.LineBasicMaterial({ 
-            color: neonGreen, 
-            transparent: true, 
-            opacity: 0.8, // Opacity ditebalkan
-            linewidth: 2
-        });
-        const crossGeo1 = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-maxRadius * 1.2, 0, 0), new THREE.Vector3(maxRadius * 1.2, 0, 0)]);
-        const crossGeo2 = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, -maxRadius * 1.2), new THREE.Vector3(0, 0, maxRadius * 1.2)]);
-        scene.add(new THREE.Line(crossGeo1, crossMat));
-        scene.add(new THREE.Line(crossGeo2, crossMat));
-
-        // --- 3.5 RADAR SWEEP SCANNER ---
-        const radarVertexShader = `
-            varying vec2 vUv;
-            void main() {
-                vUv = uv;
-                gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-            }
-        `;
-
-        const radarFragmentShader = `
-            uniform float uTime;
-            uniform vec3 uColor;
-            varying vec2 vUv;
-
-            #define PI 3.14159265359
-
-            void main() {
-                vec2 center = vec2(0.5, 0.5);
-                vec2 toCenter = vUv - center;
-                float dist = length(toCenter);
-
-                if (dist > 0.49 || dist < 0.01) discard;
-
-                float angle = atan(toCenter.y, toCenter.x);
-                float normalizedAngle = (angle + PI) / (2.0 * PI);
-                float rotation = mod(-uTime * 0.3, 1.0);
-                float diff = rotation - normalizedAngle;
-                if (diff < 0.0) diff += 1.0;
-
-                float alpha = smoothstep(0.0, 0.35, diff); 
-                alpha = 1.0 - alpha;
-                alpha = pow(alpha, 3.0);
-
-                gl_FragColor = vec4(uColor, alpha * 0.4); 
-            }
-        `;
-
-        const sweepGeo = new THREE.PlaneGeometry(maxRadius * 2.1, maxRadius * 2.1);
-        window.sweepMat = new THREE.ShaderMaterial({
-            uniforms: {
-                uTime: { value: 0 },
-                uColor: { value: new THREE.Color(neonGreen) } 
-            },
-            vertexShader: radarVertexShader,
-            fragmentShader: radarFragmentShader,
-            transparent: true,
-            depthWrite: false,
-            side: THREE.DoubleSide
-        });
-
-        const sweepMesh = new THREE.Mesh(sweepGeo, window.sweepMat);
-        sweepMesh.rotation.x = -Math.PI / 2;
-        sweepMesh.position.y = 0.02; 
-        scene.add(sweepMesh);
-
-        // --- ADD QUADRANT LABELS & AXIS MARKERS ---
-        const fontLoader = new THREE.FontLoader();
-        let scaleFactor = 5.0; 
-
-        fontLoader.load('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/fonts/helvetiker_bold.typeface.json', function (font) {
-            
-            const textMaterial = new THREE.MeshBasicMaterial({ color: 0x1e40af, transparent: true, opacity: 0.7 });
-            const labelScale = scaleFactor * 6; 
-
-            function createLabel(text, x, z) {
-                const textGeo = new THREE.TextGeometry(text, {
-                    font: font, size: 2.5, height: 0.1, curveSegments: 12,
-                });
-                textGeo.computeBoundingBox();
-                const centerOffset = -0.5 * (textGeo.boundingBox.max.x - textGeo.boundingBox.min.x);
-                const textMesh = new THREE.Mesh(textGeo, textMaterial);
-                textMesh.rotation.x = -Math.PI / 2; 
-                textMesh.position.set(x + centerOffset, 0.1, z); 
-                scene.add(textMesh);
-            }
-
-             // Fungsi marker axis yang sudah diperbaiki
-            function createAxisMarker(text, x, z, rotZ) {
-                const textGeo = new THREE.TextGeometry(text, {
-                    font: font, size: 2.2, height: 0.1, curveSegments: 12
-                });
-                textGeo.computeBoundingBox();
-                const textMesh = new THREE.Mesh(textGeo, new THREE.MeshBasicMaterial({ color: 0xff4444, opacity: 0.9, transparent: true })); 
-                
-                // PERBAIKAN ROTASI:
-                // 1. Putar -90 derajat di X agar teks rebah/sejajar lantai
-                textMesh.rotation.x = -Math.PI / 2;
-                // 2. Gunakan rotZ untuk menentukan arah hadap teks di lantai
-                textMesh.rotation.z = rotZ; 
-                
-                textMesh.position.set(x, 0.2, z); // Sedikit lebih tinggi dari lantai (0.2) agar tidak flickering
-                scene.add(textMesh);
-            }
-
-            createLabel(labelData.tr, labelScale, -labelScale); 
-            createLabel(labelData.tl, -labelScale, -labelScale); 
-            createLabel(labelData.br, labelScale, labelScale);  
-            createLabel(labelData.bl, -labelScale, labelScale); 
-
-            createAxisMarker("X-AXIS", maxRadius * 1.3, 1, 0); 
-            createAxisMarker("Y-AXIS", -5, -maxRadius * 1.3, 0);
-        });
-
-        // --- 4. DATA PROCESSING ---
-        let rawData = [];
-        let configData = { xLabel: "Probability", yLabel: "Impact" };
-        let labelData = { tl: "BLACK SWANS", tr: "CRITICAL RISKS", bl: "ROUTINE", br: "TACTICAL" };
-
-        try {
-            const savedNodes = localStorage.getItem('horizon_3d_nodes');
-            const savedConfig = localStorage.getItem('horizon_3d_config');
-            const savedLabels = localStorage.getItem('horizon_3d_labels'); 
-            
-            if (savedNodes) rawData = JSON.parse(savedNodes);
-            if (savedConfig) configData = JSON.parse(savedConfig);
-            if (savedLabels) labelData = JSON.parse(savedLabels); 
-            
-            //const labelX = document.getElementById('legend-x-label');
-            //const labelY = document.getElementById('legend-y-label');
-            // Ganti baris ini di dalam event listener mousemove
-            //const ttX = document.getElementById('lbl-tt-x');
-            //const ttY = document.getElementById('lbl-tt-y');
-
-           // if(ttX) ttX.innerText = (configData.xLabel || "Probability") + ":";
-            //if(ttY) ttY.innerText = (configData.yLabel || "Impact") + ":";
-            
-        } catch (e) { console.error("Gagal memuat data:", e);}
-
-        if (rawData.length === 0) {
-             rawData = [{ id: "d1", title: "Contoh Data Radar Aktif", desc: "Data placeholder.", status: "critical", x: 7.5, y: 8.5, z: 6.5, connections: [] }];
-        }
+        // --- 1. CONFIG & DATA ---
+        let rawData = [{"id":"d1","title":"Main Signal","desc":"Welcome to your Strategic 3D Radar.","status":"emerging","x":5,"y":5,"z":5,"connections":[]}];
+        let configData = {"xLabel":"Probability","yLabel":"Impact"};
+        let labelData = {"tl":"BLACK SWANS","tr":"CRITICAL RISKS","bl":"ROUTINE","br":"TACTICAL"};
 
         const statusMap = {
             "critical":   { color: 0xdc2626 }, 
@@ -468,226 +158,242 @@
             "watchlist":  { color: 0xd97706 }  
         };
 
-        const objectsArray = []; 
-        const nodePositions = {}; 
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0xffffff);
+        const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 70, 80);
+        
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.shadowMap.enabled = true;
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
 
-        // --- 5. RENDER NODES ---
-        const sphereGeo = new THREE.SphereGeometry(1, 32, 32); 
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.autoRotate = true;
 
-        rawData.forEach((data, index) => {
-            data.x = parseFloat(data.x) || 0;
-            data.y = parseFloat(data.y) || 0;
-            data.z = parseFloat(data.z) || 0; 
-            if (!statusMap[data.status]) data.status = 'emerging'; 
+        const objectsArray = [];
+        const connectionsArray = [];
+        const scaleFactor = 5.0;
 
-            const material = new THREE.MeshStandardMaterial({ 
-                color: statusMap[data.status].color, 
-                roughness: 0.4, 
-                metalness: 0.1, 
+        // --- 2. RENDER ENGINE ---
+        function initRadar() {
+            // Cleanup Scene
+            while(scene.children.length > 0){ scene.remove(scene.children[0]); }
+            objectsArray.length = 0;
+            connectionsArray.length = 0;
+
+            // Lighting
+            scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+            const dl = new THREE.DirectionalLight(0xffffff, 0.8);
+            dl.position.set(50, 80, 50);
+            scene.add(dl);
+
+            const neonGreen = 0x10b981;
+
+            // Floor Grid Rings
+            for (let i = 1; i <= 5; i++) {
+                const radius = (55 / 5) * i;
+                const ringGeo = new THREE.RingGeometry(radius - 0.1, radius + 0.1, 64);
+                const ringMat = new THREE.MeshBasicMaterial({ color: neonGreen, transparent: true, opacity: 0.3, side: THREE.DoubleSide });
+                const ring = new THREE.Mesh(ringGeo, ringMat);
+                ring.rotation.x = -Math.PI / 2;
+                scene.add(ring);
+            }
+
+            // X & Y Axis Lines
+            const axisMat = new THREE.LineBasicMaterial({ color: neonGreen, transparent: true, opacity: 0.4 });
+            const lineX = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-60, 0.01, 0), new THREE.Vector3(60, 0.01, 0)]);
+            const lineY = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0.01, -60), new THREE.Vector3(0, 0.01, 60)]);
+            scene.add(new THREE.Line(lineX, axisMat));
+            scene.add(new THREE.Line(lineY, axisMat));
+
+            // Radar Sweep Scanner
+            const sweepGeo = new THREE.PlaneGeometry(110, 110);
+            const sweepMat = new THREE.ShaderMaterial({
+                uniforms: { uTime: { value: 0 }, uColor: { value: new THREE.Color(neonGreen) } },
+                vertexShader: `
+                    varying vec2 vUv; 
+                    void main() { 
+                        vUv = uv; 
+                        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); 
+                    }
+                `,
+                fragmentShader: `
+                    varying vec2 vUv; 
+                    uniform float uTime; 
+                    uniform vec3 uColor; 
+                    #define PI 3.14159265 
+                    void main() { 
+                        vec2 center = vec2(0.5, 0.5); 
+                        vec2 toCenter = vUv - center; 
+                        float dist = length(toCenter); 
+                        if (dist > 0.49 || dist < 0.01) discard; 
+                        float angle = atan(toCenter.y, toCenter.x); 
+                        float normalizedAngle = (angle + PI) / (2.0 * PI); 
+                        float rotation = mod(-uTime * 0.3, 1.0); 
+                        float diff = rotation - normalizedAngle; 
+                        if (diff < 0.0) diff += 1.0; 
+                        float alpha = pow(1.0 - smoothstep(0.0, 0.35, diff), 3.0); 
+                        gl_FragColor = vec4(uColor, alpha * 0.4); 
+                    }
+                `,
+                transparent: true, depthWrite: false, side: THREE.DoubleSide
             });
-            const sphere = new THREE.Mesh(sphereGeo, material);
-            sphere.castShadow = true;
-            sphere.receiveShadow = true;
+            const sweepMesh = new THREE.Mesh(sweepGeo, sweepMat);
+            sweepMesh.rotation.x = -Math.PI / 2;
+            sweepMesh.position.y = 0.02;
+            scene.add(sweepMesh);
+            window.activeSweepMat = sweepMat;
 
-            const posX = data.x * scaleFactor;
-            const posZ = -data.y * scaleFactor;
-            let altitude = 2.0 + (data.z * 4.0); 
-            const posY = altitude;
-            const baseScale = Math.max(0.8, (Math.abs(data.y) / 10) * 4.0);
+            // Render Nodes
+            const sphereGeo = new THREE.SphereGeometry(1, 32, 32);
+            const nodePositions = {};
 
-            sphere.scale.set(baseScale, baseScale, baseScale);
-            sphere.position.set(posX, posY, posZ);
+            rawData.forEach(data => {
+                const color = statusMap[data.status] ? statusMap[data.status].color : 0xcccccc;
+                const mat = new THREE.MeshStandardMaterial({ color: color, roughness: 0.3, metalness: 0.2 });
+                const sphere = new THREE.Mesh(sphereGeo, mat);
+                
+                const posX = (parseFloat(data.x) || 0) * scaleFactor;
+                const posZ = -(parseFloat(data.y) || 0) * scaleFactor;
+                const posY = 2 + ((parseFloat(data.z) || 0) * 4);
+                const scale = Math.max(0.8, (Math.abs(data.y) / 10) * 3.5);
+
+                sphere.position.set(posX, posY, posZ);
+                sphere.scale.set(scale, scale, scale);
+                sphere.userData = { ...data, color, baseScale: scale };
+                
+                scene.add(sphere);
+                objectsArray.push(sphere);
+                nodePositions[data.id] = sphere.position;
+
+                // Stalk
+                const stalkGeo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(posX, 0, posZ), new THREE.Vector3(posX, posY, posZ)]);
+                scene.add(new THREE.Line(stalkGeo, new THREE.LineBasicMaterial({ color: 0x94a3b8, transparent: true, opacity: 0.4 })));
+            });
+
+            // Quadratic Bezier Connections
+            const curveMat = new THREE.LineDashedMaterial({ color: 0x94a3b8, dashSize: 0.5, gapSize: 0.3, transparent: true, opacity: 0.5 });
+            rawData.forEach(data => {
+                if (data.connections) {
+                    data.connections.forEach(targetId => {
+                        const p1 = nodePositions[data.id];
+                        const p2 = nodePositions[targetId];
+                        if (p1 && p2) {
+                            const mid = new THREE.Vector3((p1.x + p2.x)/2, Math.max(p1.y, p2.y) + 5, (p1.z + p2.z)/2);
+                            const curve = new THREE.QuadraticBezierCurve3(p1, mid, p2);
+                            const pts = curve.getPoints(24);
+                            const geo = new THREE.BufferGeometry().setFromPoints(pts);
+                            const line = new THREE.Line(geo, curveMat.clone());
+                            line.computeLineDistances();
+                            scene.add(line);
+                        }
+                    });
+                }
+            });
+
+            // Quadrant Labels
+            const loader = new THREE.FontLoader();
+            loader.load('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/fonts/helvetiker_bold.typeface.json', (font) => {
+                const labelMat = new THREE.MeshBasicMaterial({ color: 0x1e40af, transparent: true, opacity: 0.5 });
+                const createLabel = (text, x, z) => {
+                    const geo = new THREE.TextGeometry(text, { font, size: 2, height: 0.1 });
+                    const mesh = new THREE.Mesh(geo, labelMat);
+                    mesh.rotation.x = -Math.PI / 2;
+                    mesh.position.set(x, 0.1, z);
+                    scene.add(mesh);
+                };
+                createLabel(labelData.tr, 25, -25);
+                createLabel(labelData.tl, -45, -25);
+                createLabel(labelData.br, 25, 35);
+                createLabel(labelData.bl, -45, 35);
+            });
+        }
+
+        // --- 3. DATA LOADING ---
+        function loadRadarData() {
+            try {
+                const saved = localStorage.getItem('horizon_3d_nodes');
+                if (saved && rawData.length <= 1) {
+                    rawData = JSON.parse(saved);
+                    const sc = localStorage.getItem('horizon_3d_config');
+                    const sl = localStorage.getItem('horizon_3d_labels');
+                    if (sc) configData = JSON.parse(sc);
+                    if (sl) labelData = JSON.parse(sl);
+                    console.log("Loaded from Browser Storage.");
+                } else {
+                    console.log("Loaded Standalone Mode (Internal Data).");
+                }
+            } catch (e) { console.log("Standalone mode active."); }
+            initRadar();
+        }
+        loadRadarData();
+
+        // --- 4. EXPORT FUNCTION ---
+        document.getElementById('exportBtn').addEventListener('click', () => {
+            const clean = (obj) => JSON.stringify(obj).replace(/\\n/g, " ").replace(/\\r/g, " ");
+            let html = document.documentElement.outerHTML;
+            html = html.replace(/<canvas.*?>.*?<\/canvas>/g, "");
             
-            scene.add(sphere);
-            objectsArray.push(sphere);
-            nodePositions[data.id] = sphere.position;
+            html = html.replace(/let rawData\s*=\s*\[[\s\S]*?\];/, `let rawData = ${clean(rawData)};`);
+            html = html.replace(/let configData\s*=\s*\{[\s\S]*?\};/, `let configData = ${clean(configData)};`);
+            html = html.replace(/let labelData\s*=\s*\{[\s\S]*?\};/, `let labelData = ${clean(labelData)};`);
 
-            const stalkMat = new THREE.LineBasicMaterial({ color: 0x334155, transparent: true, opacity: 0.9 });
-            const stalkGeo = new THREE.BufferGeometry().setFromPoints([
-                new THREE.Vector3(posX, 0, posZ),
-                new THREE.Vector3(posX, posY, posZ)
-            ]);
-            scene.add(new THREE.Line(stalkGeo, stalkMat));
-            
-            const floorRingGeo = new THREE.RingGeometry(baseScale * 0.5, baseScale * 0.7, 32);
-            // Hapus AdditiveBlending di sini juga
-            const floorRingMat = new THREE.MeshBasicMaterial({ color: neonGreen, side: THREE.DoubleSide, transparent: true, opacity: 0.7 });
-            const floorRing = new THREE.Mesh(floorRingGeo, floorRingMat);
-            floorRing.position.set(posX, 0.03, posZ);
-            floorRing.rotation.x = -Math.PI / 2;
-            scene.add(floorRing);
-
-            sphere.userData = { ...data, color: statusMap[data.status].color, baseScale: baseScale, floorRing: floorRing };
+            const blob = new Blob([html], { type: 'text/html' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `Strategic_Radar_Export_${new Date().getTime()}.html`;
+            a.click();
         });
 
-        // --- UI EVENTS ---
-        let nodeSizeMultiplier = 1.0;
-        document.getElementById('nodeSizeSlider').addEventListener('input', (e) => {
-            nodeSizeMultiplier = parseFloat(e.target.value);
-            document.getElementById('nodeSizeValue').innerText = Math.round(nodeSizeMultiplier * 100) + '%';
-            objectsArray.forEach(sphere => {
-                const newScale = sphere.userData.baseScale * nodeSizeMultiplier;
-                sphere.scale.set(newScale, newScale, newScale);
-                if (sphere.userData.floorRing) sphere.userData.floorRing.scale.set(nodeSizeMultiplier * 0.7, nodeSizeMultiplier * 0.9, 1);
-            });
-        });
-
+        // --- 5. UI & ANIMATION ---
         document.getElementById('autoRotateToggle').addEventListener('change', (e) => {
             controls.autoRotate = e.target.checked;
         });
 
-        // --- 6. CONNECTIONS ---
-        const connectionsArray = [];
-        const curveMaterial = new THREE.LineDashedMaterial({ 
-            color: 0x475569, 
-            transparent: true, 
-            opacity: 0.6, 
-            dashSize: 0.8, 
-            gapSize: 0.4,
-        });
-        
-        rawData.forEach(data => {
-            if (data.connections && data.connections.length > 0) {
-                data.connections.forEach(targetId => {
-                    const p1 = nodePositions[data.id];
-                    const p2 = nodePositions[targetId];
-                    const targetData = rawData.find(d => d.id === targetId); // Cari data node tujuan
-
-            if (p1 && p2 && targetData) {
-                const distance = p1.distanceTo(p2);
-                const midPoint = new THREE.Vector3().addVectors(p1, p2).multiplyScalar(0.5);
-                midPoint.y = Math.max(p1.y, p2.y) + (distance * 0.15); 
-                
-                const curve = new THREE.QuadraticBezierCurve3(p1, midPoint, p2);
-                const points = curve.getPoints(32);
-                const curveGeo = new THREE.BufferGeometry().setFromPoints(points);
-                
-                // Gunakan MeshBasicMaterial agar bisa terlihat tebal/glowing nantinya
-                const curvedLine = new THREE.Line(curveGeo, curveMaterial.clone());
-                curvedLine.computeLineDistances();
-
-                // SIMPAN DATA DISINI
-                curvedLine.userData = {
-                    isConnection: true,
-                    sourceName: data.title,
-                    targetName: targetData.title
-                };
-
-                scene.add(curvedLine);
-                connectionsArray.push(curvedLine);
-                    }
-                });
-            }
+        document.getElementById('nodeSizeSlider').addEventListener('input', (e) => {
+            const val = parseFloat(e.target.value);
+            document.getElementById('nodeSizeValue').innerText = Math.round(val * 100) + '%';
+            objectsArray.forEach(s => { 
+                s.scale.set(s.userData.baseScale * val, s.userData.baseScale * val, s.userData.baseScale * val); 
+            });
         });
 
-        // --- 7. MOUSE INTERACTION ---
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2();
-        const tooltip = document.getElementById('tooltip');
-        let hoveredObj = null;
-        let originalScale = new THREE.Vector3();
-        let originalColor = new THREE.Color(); 
-
-        window.addEventListener('mousemove', (event) => {
-            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
             mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
             raycaster.setFromCamera(mouse, camera);
-            raycaster.params.Line.threshold = 0.5; 
-
-            const intersectsNodes = raycaster.intersectObjects(objectsArray);
-            const intersectsLines = raycaster.intersectObjects(connectionsArray);
-            const coordsArea = document.getElementById('tt-coords-area'); // Ambil area sumbu
-
-            if (hoveredObj) {
-                if (hoveredObj.userData.isConnection) {
-                    hoveredObj.material.color.setHex(0x475569);
-                    hoveredObj.material.opacity = 0.6;
-                } else {
-                    hoveredObj.scale.copy(originalScale);
-                    hoveredObj.material.color.copy(originalColor);
-                }
-                hoveredObj = null;
-                tooltip.style.display = 'none';
-            }
-
-            if (intersectsNodes.length > 0) {
-                document.body.style.cursor = 'pointer';
-                const object = intersectsNodes[0].object;
-                hoveredObj = object;
-                originalScale.copy(object.scale);
-                originalColor.copy(object.material.color);
-
-                object.scale.multiplyScalar(1.15);
-                object.material.color.lerp(new THREE.Color(0xffffff), 0.3);
-
-                const data = object.userData;
-                document.getElementById('tt-name').innerText = data.title;
-                document.getElementById('tt-desc').innerText = data.desc || "";
-                
-                // TAMPILKAN koordinat karena ini adalah Node
-                coordsArea.style.display = 'block';
-                document.getElementById('tt-x').innerText = data.x.toFixed(1);
-                document.getElementById('tt-y').innerText = data.y.toFixed(1);
-                document.getElementById('tt-z').innerText = data.z.toFixed(1);
-                
-                const badge = document.getElementById('tt-badge');
-                badge.innerText = data.status;
-                badge.style.background = "#" + data.color.toString(16).padStart(6, '0');
-                
-                tooltip.style.display = 'block';
-
-            } else if (intersectsLines.length > 0) {
-                document.body.style.cursor = 'pointer';
-                const line = intersectsLines[0].object;
-                hoveredObj = line;
-
-                line.material.color.setHex(0x10b981);
-                line.material.opacity = 1.0;
-
-                const data = line.userData;
-                document.getElementById('tt-name').innerText = "Connection Link";
-                document.getElementById('tt-desc').innerHTML = `Connecting:<br><strong>${data.sourceName}</strong> → <strong>${data.targetName}</strong>`;
-                
-                // SEMBUNYIKAN koordinat karena garis tidak punya data X, Y, Z tunggal
-                coordsArea.style.display = 'none';
-                
-                const badge = document.getElementById('tt-badge');
-                badge.innerText = "ACTIVE LINK";
-                badge.style.background = "#10b981";
-                
-                tooltip.style.display = 'block';
-            }
-
-            if (tooltip.style.display === 'block') {
-                tooltip.style.left = (event.clientX + 15) + 'px';
-                tooltip.style.top = (event.clientY + 15) + 'px';
-            }
+            const hits = raycaster.intersectObjects(objectsArray);
+            const tt = document.getElementById('tooltip');
+            if (hits.length > 0) {
+                const d = hits[0].object.userData;
+                document.getElementById('tt-name').innerText = d.title;
+                document.getElementById('tt-badge').innerText = d.status;
+                document.getElementById('tt-badge').style.background = "#" + d.color.toString(16).padStart(6, '0');
+                tt.style.display = 'block';
+                tt.style.left = (e.clientX + 15) + 'px';
+                tt.style.top = (e.clientY + 15) + 'px';
+            } else { tt.style.display = 'none'; }
         });
+
+        const clock = new THREE.Clock();
+        function animate() {
+            requestAnimationFrame(animate);
+            if(window.activeSweepMat) window.activeSweepMat.uniforms.uTime.value = clock.getElapsedTime();
+            controls.update();
+            renderer.render(scene, camera);
+        }
+        animate();
 
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
-
-        // --- 8. ANIMATION LOOP ---
-        const clock = new THREE.Clock();
-
-        function animate() {
-            requestAnimationFrame(animate);
-            
-            const time = clock.getElapsedTime();
-            
-            if (window.sweepMat) {
-                window.sweepMat.uniforms.uTime.value = time;
-            }
-
-            controls.update(); 
-            renderer.render(scene, camera);
-        }
-
-        animate();
     </script>
 </body>
 </html>
