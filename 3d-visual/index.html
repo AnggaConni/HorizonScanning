@@ -224,10 +224,12 @@
     <div style="margin-bottom: 12px;">
         <span id="tt-badge" class="status-badge">STATUS</span>
     </div>
+    <div id="tt-coords-area">
         <div class="tooltip-data"><span>Sumbu X:</span> <strong id="tt-x"></strong></div>
         <div class="tooltip-data"><span>Sumbu Y:</span> <strong id="tt-y"></strong></div>
         <div class="tooltip-data"><span>Sumbu Z (Urgency):</span> <strong id="tt-z"></strong></div>
     </div>
+</div>
 
     <div id="canvas-container"></div>
 
@@ -425,7 +427,7 @@
             createLabel(labelData.br, labelScale, labelScale);  
             createLabel(labelData.bl, -labelScale, labelScale); 
 
-            createAxisMarker("X-AXIS", maxRadius * 1.3, 0, 0); 
+            createAxisMarker("X-AXIS", maxRadius * 1.3, 1, 0); 
             createAxisMarker("Y-AXIS", -5, -maxRadius * 1.3, 0);
         });
 
@@ -535,6 +537,7 @@
         });
 
         // --- 6. CONNECTIONS ---
+        const connectionsArray = [];
         const curveMaterial = new THREE.LineDashedMaterial({ 
             color: 0x475569, 
             transparent: true, 
@@ -548,16 +551,30 @@
                 data.connections.forEach(targetId => {
                     const p1 = nodePositions[data.id];
                     const p2 = nodePositions[targetId];
-                    if (p1 && p2) {
-                        const distance = p1.distanceTo(p2);
-                        const midPoint = new THREE.Vector3().addVectors(p1, p2).multiplyScalar(0.5);
-                        midPoint.y = Math.max(p1.y, p2.y) + (distance * 0.15); 
-                        const curve = new THREE.QuadraticBezierCurve3(p1, midPoint, p2);
-                        const points = curve.getPoints(32);
-                        const curveGeo = new THREE.BufferGeometry().setFromPoints(points);
-                        const curvedLine = new THREE.Line(curveGeo, curveMaterial);
-                        curvedLine.computeLineDistances();
-                        scene.add(curvedLine);
+                    const targetData = rawData.find(d => d.id === targetId); // Cari data node tujuan
+
+            if (p1 && p2 && targetData) {
+                const distance = p1.distanceTo(p2);
+                const midPoint = new THREE.Vector3().addVectors(p1, p2).multiplyScalar(0.5);
+                midPoint.y = Math.max(p1.y, p2.y) + (distance * 0.15); 
+                
+                const curve = new THREE.QuadraticBezierCurve3(p1, midPoint, p2);
+                const points = curve.getPoints(32);
+                const curveGeo = new THREE.BufferGeometry().setFromPoints(points);
+                
+                // Gunakan MeshBasicMaterial agar bisa terlihat tebal/glowing nantinya
+                const curvedLine = new THREE.Line(curveGeo, curveMaterial.clone());
+                curvedLine.computeLineDistances();
+
+                // SIMPAN DATA DISINI
+                curvedLine.userData = {
+                    isConnection: true,
+                    sourceName: data.title,
+                    targetName: targetData.title
+                };
+
+                scene.add(curvedLine);
+                connectionsArray.push(curvedLine);
                     }
                 });
             }
@@ -576,46 +593,75 @@
             mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
             raycaster.setFromCamera(mouse, camera);
-            const intersects = raycaster.intersectObjects(objectsArray);
+            raycaster.params.Line.threshold = 0.5; 
 
-            if (intersects.length > 0) {
-                document.body.style.cursor = 'pointer';
-                const object = intersects[0].object;
-                
-                if (hoveredObj !== object) {
-                    if (hoveredObj) {
-                         hoveredObj.scale.copy(originalScale);
-                         hoveredObj.material.color.copy(originalColor); 
-                    }
-                    hoveredObj = object;
-                    originalScale.copy(object.scale);
-                    originalColor.copy(object.material.color); 
-                    
-                    object.scale.multiplyScalar(1.15);
-                    object.material.color.lerp(new THREE.Color(0xffffff), 0.3);
+            const intersectsNodes = raycaster.intersectObjects(objectsArray);
+            const intersectsLines = raycaster.intersectObjects(connectionsArray);
+            const coordsArea = document.getElementById('tt-coords-area'); // Ambil area sumbu
 
-                    const data = object.userData;
-                    document.getElementById('tt-name').innerText = data.title;
-                    document.getElementById('tt-desc').innerText = data.desc || "";
-                    document.getElementById('tt-x').innerText = data.x.toFixed(1);
-                    document.getElementById('tt-y').innerText = data.y.toFixed(1);
-                    document.getElementById('tt-z').innerText = data.z.toFixed(1);
-                    
-                    const badge = document.getElementById('tt-badge');
-                    badge.innerText = data.status;
-                    badge.style.background = "#" + data.color.toString(16).padStart(6, '0');
-                }
-                tooltip.style.display = 'block';
-                tooltip.style.left = (event.clientX + 15) + 'px';
-                tooltip.style.top = (event.clientY + 15) + 'px';
-            } else {
-                document.body.style.cursor = 'default';
-                if (hoveredObj) {
+            if (hoveredObj) {
+                if (hoveredObj.userData.isConnection) {
+                    hoveredObj.material.color.setHex(0x475569);
+                    hoveredObj.material.opacity = 0.6;
+                } else {
                     hoveredObj.scale.copy(originalScale);
                     hoveredObj.material.color.copy(originalColor);
-                    hoveredObj = null;
                 }
+                hoveredObj = null;
                 tooltip.style.display = 'none';
+            }
+
+            if (intersectsNodes.length > 0) {
+                document.body.style.cursor = 'pointer';
+                const object = intersectsNodes[0].object;
+                hoveredObj = object;
+                originalScale.copy(object.scale);
+                originalColor.copy(object.material.color);
+
+                object.scale.multiplyScalar(1.15);
+                object.material.color.lerp(new THREE.Color(0xffffff), 0.3);
+
+                const data = object.userData;
+                document.getElementById('tt-name').innerText = data.title;
+                document.getElementById('tt-desc').innerText = data.desc || "";
+                
+                // TAMPILKAN koordinat karena ini adalah Node
+                coordsArea.style.display = 'block';
+                document.getElementById('tt-x').innerText = data.x.toFixed(1);
+                document.getElementById('tt-y').innerText = data.y.toFixed(1);
+                document.getElementById('tt-z').innerText = data.z.toFixed(1);
+                
+                const badge = document.getElementById('tt-badge');
+                badge.innerText = data.status;
+                badge.style.background = "#" + data.color.toString(16).padStart(6, '0');
+                
+                tooltip.style.display = 'block';
+
+            } else if (intersectsLines.length > 0) {
+                document.body.style.cursor = 'pointer';
+                const line = intersectsLines[0].object;
+                hoveredObj = line;
+
+                line.material.color.setHex(0x10b981);
+                line.material.opacity = 1.0;
+
+                const data = line.userData;
+                document.getElementById('tt-name').innerText = "Connection Link";
+                document.getElementById('tt-desc').innerHTML = `Connecting:<br><strong>${data.sourceName}</strong> → <strong>${data.targetName}</strong>`;
+                
+                // SEMBUNYIKAN koordinat karena garis tidak punya data X, Y, Z tunggal
+                coordsArea.style.display = 'none';
+                
+                const badge = document.getElementById('tt-badge');
+                badge.innerText = "ACTIVE LINK";
+                badge.style.background = "#10b981";
+                
+                tooltip.style.display = 'block';
+            }
+
+            if (tooltip.style.display === 'block') {
+                tooltip.style.left = (event.clientX + 15) + 'px';
+                tooltip.style.top = (event.clientY + 15) + 'px';
             }
         });
 
