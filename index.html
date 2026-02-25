@@ -637,14 +637,16 @@
                             <div class="flex justify-between text-[10px] text-slate-400 font-mono mt-1"><span>-10</span><span id="val-y" class="text-navy-900 font-bold">0.0</span><span>+10</span></div>
                         </div>
                     </div>
-                    <div class="pt-3 border-t border-slate-200">
-                        <label class="block text-xs font-bold text-blue-500 mb-1 flex justify-between items-center">
-                            <span data-i18n="lbl_z">Z Axis</span>
-                            <button type="button" data-i18n="tooltip_z" title="Dimensi ketiga" class="text-[10px] bg-white border border-slate-300 text-slate-500 px-1.5 py-0.5 rounded-full cursor-help">?</button>
-                        </label>
-                        <input type="range" id="node-z" min="-10" max="10" step="0.5" class="w-full accent-blue-500" oninput="updateRangeVal('val-z', this.value)">
-                        <div class="flex justify-between text-[10px] text-slate-400 font-mono mt-1"><span>-10</span><span id="val-z" class="text-navy-900 font-bold">0.0</span><span>+10</span></div>
-                    </div>
+                   <div class="pt-3 border-t border-slate-200">
+                    <label class="block text-xs font-bold text-blue-500 mb-1 flex justify-between items-center">
+                        <span>Z Axis (Behavioral Magnitude)</span>
+                        <button type="button" onclick="autoDetectZ()" id="btn-auto-z" class="bg-teal-100 text-teal-700 border border-teal-300 px-2 py-0.5 rounded text-[10px] font-bold hover:bg-teal-200 transition-colors flex items-center gap-1">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> Auto-Detect
+                        </button>
+                    </label>
+                    <input type="range" id="node-z" min="-10" max="10" step="0.5" class="w-full accent-blue-500" oninput="updateRangeVal('val-z', this.value)">
+                    <div class="flex justify-between text-[10px] text-slate-400 font-mono mt-1"><span>-10</span><span id="val-z" class="text-navy-900 font-bold">0.0</span><span>+10</span></div>
+                </div>
                 </div>
                     <div>
                     <label class="block text-xs font-bold text-slate-500 mb-1" data-i18n="lbl_connect">Connect Nodes (Ctrl+Click)</label>
@@ -1511,6 +1513,75 @@
             });
         }
 
+
+        async function autoDetectZ() {
+    const title = document.getElementById('node-title').value;
+    const desc = document.getElementById('node-desc').value;
+    const key = document.getElementById('api-key')?.value || localStorage.getItem('gemini_api_key');
+
+    if (!key) {
+        showToast("Masukkan API Key Gemini di atas kanan dulu!", "error");
+        return;
+    }
+    if (!title) {
+        showToast("Isi Title dan Description terlebih dahulu.", "error");
+        return;
+    }
+
+    const btn = document.getElementById('btn-auto-z');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Detecting...';
+    btn.disabled = true;
+
+    // Prompt khusus untuk mendeteksi besaran Behavioral / Z-Axis
+    const prompt = `You are a behavioral systems analyst. Evaluate the following event or signal:
+    Title: "${title}"
+    Description: "${desc}"
+    
+    Task: Calculate the Z-Axis value (Behavioral Magnitude & Scale). 
+    A high positive value (+7 to +10) indicates high institutional signaling risk, high norm elasticity (shifting moral norms to market norms), and massive stakeholder amplification potential (cascading effect).
+    A zero (0) indicates standard structural risk with no secondary behavioral cascade.
+    A negative value (-1 to -10) indicates negligible behavioral impact or a highly isolated tactical event.
+
+    Return ONLY a single number between -10 and 10 (you can use decimals like 5.5 or -3.0). Do not output any other text, explanation, or markdown.`;
+
+    try {
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ 
+                contents: [{ parts: [{ text: prompt }] }],
+                generationConfig: { temperature: 0.1, maxOutputTokens: 10 } // Temperature rendah agar tidak ngawur
+            })
+        });
+
+        const data = await res.json();
+        if (data.error) throw new Error(data.error.message);
+
+        let resultText = data.candidates[0].content.parts[0].text.trim();
+        // Bersihkan hasil jika AI membandel memberi teks tambahan
+        let zValue = parseFloat(resultText.replace(/[^0-9.-]/g, '')); 
+
+        if (!isNaN(zValue)) {
+            // Pastikan nilai tidak keluar dari batas -10 hingga 10
+            zValue = Math.max(-10, Math.min(10, zValue));
+            
+            // Update UI Slider
+            document.getElementById('node-z').value = zValue;
+            updateRangeVal('val-z', zValue);
+            showToast(`Z-Axis dideteksi: ${zValue}`, "info");
+        } else {
+            throw new Error("AI tidak mengembalikan angka yang valid.");
+        }
+    } catch (error) {
+        console.error("Auto-Detect Z Error:", error);
+        showToast("Gagal mendeteksi Z-Axis", "error");
+    } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }
+}
+
         async function runAnalysis() {
             const key = document.getElementById('api-key')?.value;
             if(!key) { 
@@ -1550,19 +1621,19 @@
                 links: n.connections ? n.connections.map(c => appState.nodes.find(x=>x.id===c)?.title || c) : []
             }));
 
-            // --- PROMPT ENGINEERING BASED ON LANGUAGE ---
+           // --- PROMPT ENGINEERING BASED ON LANGUAGE ---
             let sysInstruction = "";
             let userPrompt = "";
 
            {
                              
-           // Ambil teks label kuadran yang sedang aktif di layar
+            // Ambil teks label kuadran yang sedang aktif di layar
             const lblTL = document.getElementById('lbl-tl').innerText;
             const lblTR = document.getElementById('lbl-tr').innerText;
             const lblBL = document.getElementById('lbl-bl').innerText;
             const lblBR = document.getElementById('lbl-br').innerText;
 
-            sysInstruction = `You are a professional strategic foresight analyst. Your task is to provide a deep, comprehensive, and strategic analysis based on the provided matrix data. 
+            sysInstruction = `You are a professional strategic foresight analyst and a behavioral systems expert. Your task is to provide a deep, comprehensive, and strategic analysis based on the provided matrix data, moving beyond simple risk mapping to evaluate institutional signaling and behavioral cascades. 
 
             Here is the classification glossary for the signal 'status' to help you prioritize your analysis:
             - 'critical' (Red): High impact, highly likely, immediate action required.
@@ -1573,14 +1644,12 @@
 
             MASTER RULE: You MUST write your entire analysis report in the EXACT SAME LANGUAGE as the dominant language used in the 'Signals Data' titles and descriptions. If the input data is in Japanese, output the entire report in Japanese. If Indonesian, output in Indonesian. If English, output in English.`;
 
-        // ... (userPrompt tetap sama seperti yang sudah Anda buat)
-
             userPrompt = `Analyze the following Horizon Scan Matrix data.
 
             **Matrix Configuration:**
             - X-Axis: ${appState.config.xLabel} (range -10 to +10)
             - Y-Axis: ${appState.config.yLabel} (range -10 to +10)
-            - Z-Axis: Velocity / Scale / Impact Magnitude (range -10 to +10)
+            - Z-Axis: Behavioral Magnitude & Scale (range -10 to +10). A high positive Z-value (+7 to +10) indicates high institutional signaling risk, high norm elasticity (e.g., shifting moral norms to market norms), and massive stakeholder amplification potential. A value near 0 indicates standard structural risk. A negative Z-value (-1 to -10) indicates highly isolated tactical events with negligible behavioral cascading effects.
             - Template: ${appState.config.template}
             - Top-Left Quadrant (-X, +Y): ${lblTL}
             - Top-Right Quadrant (+X, +Y): ${lblTR}
@@ -1599,22 +1668,19 @@
 
             Report Structure:
             # 📊 Executive Summary
-            (Strong opening paragraph about the current system state)
+            (Strong opening paragraph about the current system state, focusing on the most disruptive signals and shifting norms)
 
             # 🧩 Cluster & Pattern Analysis
-            (Explain visible groupings of signals across the 4 quadrants)
+            (Explain visible groupings of signals across the 4 quadrants based strictly on their X and Y positions. Identify any dominant risk clusters)
 
             # 🔥 Primary Focus: ${lblTR}
             (Deep analysis of the signals in the Top-Right quadrant. Highlight them in **bold**)
 
-            # 👁️ Alternative Focus: ${lblTL}
-            (Analysis of Top-Left signals and their hidden impacts)
+            # 🌊 Behavioral Cascades & Z-Axis Dynamics
+            (Focus entirely on the Z-Axis values and the 'links' parameter. Do not just map events; map behavioral cascades. Evaluate norm elasticity, trust erosion probability, and second-order signaling effects triggered by nodes with high positive Z-values. Conversely, identify which low/negative Z-value nodes are safe to deprioritize. Use bullet points to map specific causal pathways, e.g., A -> B -> C)
 
-            # 🔗 System Dynamics & Causality
-            (Analyze the 'links' parameter between nodes: explain causality and domino effects. Use bullet points for clear pathways, e.g., A -> B -> C)
-
-            # ⚡ Strategic Recommendations
-            (Provide 3-5 concrete, detailed action steps based on their quadrant positions. Format each as a numbered list with a clear title)
+            # ⚡ Strategic Interventions
+            (Provide 3-5 concrete, detailed action steps. These must address both traditional risk management AND institutional meaning/signaling management to prevent systemic collapse. Format each as a numbered list with a clear, actionable title)
 
             IMPORTANT: Do not generate short text. Provide a comprehensive analysis worthy of a professional management consultant report. Use emojis in headers to make it visually engaging. REMEMBER TO MATCH THE LANGUAGE OF THE SIGNALS DATA.`;
             }
