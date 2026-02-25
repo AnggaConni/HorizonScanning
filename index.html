@@ -260,8 +260,8 @@
                 jitter_label: "Spread Overlap",
                 grid_zoom: "Zoom",
                 lbl_connect: "Hubungkan Node (Ctrl+Klik)",
-                lbl_z: "Sumbu Z (Urgensi)",
-                tooltip_z: "Dimensi ketiga matriks (misal: Kecepatan/Skala)",
+                lbl_z: "Sumbu Z - Urgensi (Skala, Dampak Tambahan)",
+                tooltip_z: "Dimensi ketiga matriks (Mode Lanjutan).\nDigunakan untuk pendalaman dan prioritisasi sistemik.\nJika analisis sederhana, cukup gunakan X dan Y dan biarkan Z di 0.\nNilai 0 menonaktifkan evaluasi AI pada sumbu ini.",
                 btn_3d: "Visual 3D",
                 
                 // Tutorial Strings
@@ -319,8 +319,8 @@
                 jitter_label: "Spread Overlap",
                 grid_zoom: "Zoom",
                 lbl_connect: "Connect Nodes (Ctrl+Click)",
-                lbl_z: "Z Axis (Urgency)",
-                tooltip_z: "Third matrix dimension (e.g., Velocity/Scale)",
+                lbl_z: "Z Axis - Urgency (Scale and Impact Priority)",
+                tooltip_z: "Third matrix dimension (Advanced Mode).\nDesigned for deeper systemic prioritization.\nFor basic analysis, use X and Y only and keep Z at 0.\nZ = 0 disables AI evaluation on this axis.",
                 btn_3d: "3D Radar",
 
                 // Tutorial Strings
@@ -1155,7 +1155,7 @@
             document.getElementById('tutorial-overlay').classList.add('hidden');
             document.querySelectorAll('.tutorial-highlight').forEach(el => el.classList.remove('tutorial-highlight'));
             tutorialStep = 0;
-            showToast("Tutorial completed! Start exploring, and drag to move the nodes", "info");
+            showToast("Tutorial completed! \nStart exploring \ndrag to move the nodes", "info");
         }
 
         // CHART LOGIC
