@@ -1520,11 +1520,11 @@
                 const key = document.getElementById('api-key')?.value || localStorage.getItem('gemini_api_key');
 
                 if (!key) {
-                    showToast("Masukkan API Key Gemini di atas kanan dulu!", "error");
+                    showToast("Input Gemini Key API!", "error");
                     return;
                 }
                 if (!title) {
-                    showToast("Isi Title dan Description terlebih dahulu.", "error");
+                    showToast("Fill the Title and Description first.", "error");
                     return;
                 }
 
@@ -1535,15 +1535,35 @@
 
                 // Prompt diperjelas dan diminta mengembalikan JSON murni
                 const prompt = `Evaluate the behavioral magnitude of this signal.
-            Title: "${title}"
-            Description: "${desc}"
 
-            Rules for Z-Axis (Behavioral Magnitude):
-            +7 to +10: High institutional signaling risk, norm elasticity, massive amplification.
-            0: Standard structural risk.
-            -1 to -10: Highly isolated tactical event, no behavioral cascade.
+                    Z measures how strong the signal can shift norms, trust, or public behavior.
 
-            Output a valid JSON object with a single key "z" containing the float value.`;
+                    Score from -10 to +10.
+
+                    Use these 4 factors equally:
+
+                    1. Impact scale  
+                    - Is this local, sectoral, national, or global?
+                    2. Speed of amplification  
+                    - Can this spread quickly through media or networks?
+                    3. Norm shift potential  
+                    - Can this change what people think is acceptable or normal?
+                    4. Power involvement  
+                    - Does it involve elites, institutions, or powerful actors?
+
+                    Title: "${title}"
+                    Description: "${desc}"
+
+                    Rules for Z-Axis (Behavioral Magnitude):
+                    +8 to +10 → Systemic impact, major narrative shift
+                    +5 to +7  → Strong cross-sector impact
+                    +2 to +4  → Noticeable but limited impact
+                    -1 to +1  → Neutral / minor signal
+                    -2 to -4  → Stabilizing effect
+                    -5 to -10 → Strong stabilizing or calming force
+
+
+                    Output a valid JSON object with a single key "z" containing the float value.`;
 
                 try {
                     const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`, {
@@ -1559,9 +1579,9 @@
                     });
 
                     if (!res.ok) {
-                        if (res.status === 429) throw new Error("Terlalu cepat! Tunggu beberapa saat (Rate Limit).");
-                        if (res.status === 503) throw new Error("Server Google sedang sibuk/down.");
-                        throw new Error(`Koneksi API Gagal (Status: ${res.status})`);
+                        if (res.status === 429) throw new Error("Too fast! wait a moment (Rate Limit).");
+                        if (res.status === 503) throw new Error("Google Server is busy/down.");
+                        throw new Error(`API Connection Failed (Status: ${res.status})`);
                     }
 
                     const data = await res.json();
@@ -1569,11 +1589,11 @@
                     if (data.error) throw new Error(data.error.message);
 
                     if (data.promptFeedback && data.promptFeedback.blockReason) {
-                        throw new Error("Diblokir oleh aturan keamanan (Safety Policy) Google.");
+                        throw new Error("Blocked by Google's Safety Policy.");
                     }
                     
                     if (!data.candidates || data.candidates.length === 0 || !data.candidates[0].content) {
-                        throw new Error("Respons AI kosong atau diblokir.");
+                        throw new Error("AI response is empty or blocked.");
                     }
 
                     let resultText = data.candidates[0].content.parts[0].text;
@@ -1588,18 +1608,18 @@
                         // Update UI Slider
                         document.getElementById('node-z').value = zValue;
                         updateRangeVal('val-z', zValue);
-                        showToast(`Z-Axis terdeteksi: ${zValue}`, "info");
+                        showToast(`Z-Axis detected: ${zValue}`, "info");
                     } else {
-                        throw new Error("Format AI tidak sesuai.");
+                        throw new Error("AI response format is not valid.");
                     }
                     
                 } catch (error) {
                     console.error("Auto-Detect Z Error:", error);
-                    let msg = "Gagal mendeteksi Z-Axis.";
-                    if (error.message.includes("Terlalu cepat") || 
+                    let msg = "Failed to detect Z-Axis.";
+                    if (error.message.includes("Too fast") || 
                         error.message.includes("Server") || 
-                        error.message.includes("Koneksi") || 
-                        error.message.includes("Diblokir") ||
+                        error.message.includes("Connection") || 
+                        error.message.includes("Blocked") ||
                         error.message.includes("Format")) {
                         msg = error.message;
                     }
