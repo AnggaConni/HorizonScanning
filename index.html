@@ -1597,8 +1597,8 @@
                     }
 
                     let resultText = data.candidates[0].content.parts[0].text;
-                    
-                    // Eksekusi JSON (Aman dari halusinasi teks)
+                    // Hapus markdown wrapper jika AI masih ngeyel
+                    resultText = resultText.replace(/```json\n?/g, '').replace(/```/g, '').trim(); 
                     let parsedData = JSON.parse(resultText);
                     
                     if (parsedData && parsedData.z !== undefined) {
@@ -1712,22 +1712,22 @@
                 Translate the following section headers into the detected language of the report before writing the content:
 
                 Report Structure:
-                ## **📊 Executive Summary**
+                # **📊 Executive Summary**
                 (Strong opening paragraph about the current system state, focusing on the most disruptive signals and shifting norms)
 
-                ## **🧩 Cluster & Pattern Analysis**
+                # **🧩 Cluster & Pattern Analysis**
                 (Explain visible groupings of signals across the 4 quadrants based strictly on their X and Y positions. Identify any dominant risk clusters)
 
-                ## **🔥 Primary Focus: ${lblTR}**
+                # **🔥 Primary Focus: ${lblTR}**
                 (Deep analysis of the signals in the Top-Right quadrant. Highlight the signal names in **bold**)
 
-                ## **🌊 Behavioral Cascades & Z-Axis Dynamics**
-                (Focus entirely on the Z-Axis values and the 'links' parameter. Map behavioral cascades using bullet pathways such as A -> B -> C)
-
-                ## **⚡ Strategic Interventions**
+                # **🌊 Behavioral Cascades & Z-Axis Dynamics**
+                (Focus entirely on the Z-Axis values and the 'links' parameter. Map behavioral cascades using bullet pathways such as: A ➔ B ➔ C. CRITICAL: Do NOT use < or > symbols anywhere in the report to prevent HTML rendering errors)
+                
+                # **⚡ Strategic Interventions**
                 (Provide 3–5 concrete action steps formatted as a numbered list with bold titles)
 
-                IMPORTANT: Do not generate short text. Provide a comprehensive analysis worthy of a professional management consultant report. Use emojis in headers to make it visually engaging. REMEMBER TO MATCH THE LANGUAGE OF THE SIGNALS DATA.`;
+                IMPORTANT: Do not generate short text. Provide a comprehensive analysis worthy of a professional management consultant report (minimum 800 words). Use emojis in headers to make it visually engaging. REMEMBER TO MATCH THE LANGUAGE OF THE SIGNALS DATA.`;
 
     try {
         const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`, {
@@ -1751,8 +1751,10 @@
         const data = await res.json();
         
         if(data.error) throw new Error(data.error.message);
-        if(!data.candidates || !data.candidates[0]) throw new Error("No response from AI");
-        
+        if(!data.candidates || !data.candidates[0] || !data.candidates[0].content) {
+        const blockReason = data.candidates?.[0]?.finishReason || "Unknown restriction";
+        throw new Error(`AI blocked the response. Reason: ${blockReason}`);
+    }
         const md = data.candidates[0].content.parts[0].text;
         appState.analysis = md;
         out.innerHTML = DOMPurify.sanitize(marked.parse(md));
