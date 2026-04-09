@@ -143,39 +143,53 @@
     <!-- Section: The Problem & Introduction -->
     <section id="about" class="py-20 bg-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-                <div>
-                    <h2 class="text-3xl font-bold text-navy-900 mb-6">The Origin of Horizon Scanning</h2>
-                    <div class="prose prose-slate prose-lg">
-                        <p>Before establishing a baseline or formulating any major strategy, global strategic teams rarely jump straight into execution planning; instead, they conduct Horizon Scanning.</p>
-                        <p>Historically, this method wasn't born in corporate boardrooms. It has its roots in the post-WWII defense and military sectors. The term was originally adapted from the literal concept of radar—scanning the horizon to detect enemy aircraft long before they were visible to the naked eye. In the 1950s, think-tanks like the RAND Corporation began converting this tactical concept into systematic foresight methodologies.</p>
-                        <p>The next major evolution occurred in the 1970s when Royal Dutch Shell utilized environmental scanning to anticipate global oil crises. They proved that identifying "weak signals" could save an organization from fatal structural shocks.</p>
-                    </div>
+            <!-- RESTRUCTURED: Single Column Layout -->
+            <div class="max-w-4xl mx-auto flex flex-col gap-10">
+                <div class="text-center">
+                    <h2 class="text-3xl md:text-4xl font-extrabold text-navy-900 mb-2">The Origin of Horizon Scanning</h2>
+                    <p class="text-slate-500 font-medium">From Military Radar to Strategic Corporate Foresight</p>
                 </div>
-                <div class="bg-slate-50 p-8 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden">
-                    <div class="absolute top-0 right-0 w-32 h-32 bg-red-100 rounded-bl-full -mr-16 -mt-16 transition-transform group-hover:scale-110"></div>
+                
+                <!-- 1. Origin Image added here -->
+                <div class="rounded-2xl overflow-hidden shadow-lg border border-slate-200">
+                     <img src="thum/or.png" alt="Historical Origin of Horizon Scanning Radar" class="w-full h-auto object-cover max-h-[450px]" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'w-full h-48 flex items-center justify-center bg-slate-100 text-slate-400\'>[Image: thum/or.png not found]</div>'">
+                </div>
+
+                <!-- 2. Narrative text -->
+                <div class="prose prose-slate prose-lg max-w-none text-justify md:text-left">
+                    <p>Before establishing a baseline or formulating any major strategy, global strategic teams rarely jump straight into execution planning; instead, they conduct Horizon Scanning.</p>
+                    <p>Historically, this method wasn't born in corporate boardrooms. It has its roots in the post-WWII defense and military sectors. The term was originally adapted from the literal concept of radar—scanning the horizon to detect enemy aircraft long before they were visible to the naked eye. In the 1950s, think-tanks like the RAND Corporation began converting this tactical concept into systematic foresight methodologies.</p>
+                    <p>The next major evolution occurred in the 1970s when Royal Dutch Shell utilized environmental scanning to anticipate global oil crises. They proved that identifying "weak signals" could save an organization from fatal structural shocks.</p>
+                </div>
+                
+                <!-- 3. Textbox Problem Today -->
+                <div class="bg-slate-50 p-8 md:p-10 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden h-fit transition-transform hover:shadow-md">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-red-100 rounded-bl-full -mr-16 -mt-16 transition-transform hover:scale-110"></div>
                     <i class="ph-fill ph-warning-circle text-4xl text-red-500 mb-4 relative z-10"></i>
                     <h3 class="text-2xl font-bold text-navy-900 mb-4 relative z-10">The Problem Today</h3>
                     <p class="text-slate-600 mb-4 relative z-10">In practice, horizon scanning is still done manually:</p>
                     <ul class="space-y-3 mb-6 relative z-10">
-                        <li class="flex items-center text-slate-700"><i class="ph ph-x-circle text-red-400 mr-2"></i> Sticky notes and static Spreadsheets</li>
-                        <li class="flex items-center text-slate-700"><i class="ph ph-x-circle text-red-400 mr-2"></i> Lengthy workshops and static PowerPoints</li>
-                        <li class="flex items-center text-slate-700"><i class="ph ph-x-circle text-red-400 mr-2"></i> Bias creeps in easily when mapping signals</li>
+                        <li class="flex items-center text-slate-700"><i class="ph ph-x-circle text-red-400 mr-2 text-xl"></i> Sticky notes and static Spreadsheets</li>
+                        <li class="flex items-center text-slate-700"><i class="ph ph-x-circle text-red-400 mr-2 text-xl"></i> Lengthy workshops and static PowerPoints</li>
+                        <li class="flex items-center text-slate-700"><i class="ph ph-x-circle text-red-400 mr-2 text-xl"></i> Bias creeps in easily when mapping signals</li>
                     </ul>
-                    <p class="text-slate-700 font-medium relative z-10 border-l-4 border-teal-500 pl-4">
-                        And when AI discussion happens, it is often detached from structured foresight frameworks. So I built something to bridge that gap.
-                    </p>
+                    <div class="relative z-10 border-l-4 border-teal-500 bg-white p-5 rounded-r-xl shadow-sm mt-4">
+                        <p class="text-slate-700 font-medium m-0">
+                            And when AI discussion happens, it is often detached from structured foresight frameworks. <br class="hidden sm:block"> <span class="text-teal-600 font-bold">So I built something to bridge that gap.</span>
+                        </p>
+                    </div>
                 </div>
             </div>
             
-            <div class="mt-20 border-t border-slate-100 pt-10">
+            <!-- Trusted By / Used By Section -->
+            <div class="mt-24 border-t border-slate-100 pt-10">
                 <p class="text-center text-sm font-semibold text-slate-400 uppercase tracking-wider mb-8">This foresight methodology is widely used by global institutions</p>
                 <div class="flex flex-wrap justify-center gap-6 md:gap-12 text-slate-500">
-                    <a href="https://www.undp.org/publications/foresight-manual" target="_blank" class="hover:text-teal-600 flex items-center gap-2"><i class="ph-fill ph-globe-hemisphere-west text-2xl"></i> <span class="font-medium text-sm">UNDP</span></a>
-                    <a href="https://www.undrr.org/gar" target="_blank" class="hover:text-teal-600 flex items-center gap-2"><i class="ph-fill ph-shield-warning text-2xl"></i> <span class="font-medium text-sm">UNDRR</span></a>
-                    <a href="https://www.gov.uk/government/publications/futures-toolkit-for-policy-makers-and-analysts" target="_blank" class="hover:text-teal-600 flex items-center gap-2"><i class="ph-fill ph-bank text-2xl"></i> <span class="font-medium text-sm">UK Gov Office for Science</span></a>
-                    <a href="https://www.oecd.org/en/publications/building-anticipatory-capacity-with-strategic-foresight-in-government_d7eb0bb6-en.html" target="_blank" class="hover:text-teal-600 flex items-center gap-2"><i class="ph-fill ph-chart-line-up text-2xl"></i> <span class="font-medium text-sm">OECD</span></a>
-                    <a href="https://commission.europa.eu/strategy-and-policy/strategic-foresight_en" target="_blank" class="hover:text-teal-600 flex items-center gap-2"><i class="ph-fill ph-flag text-2xl"></i> <span class="font-medium text-sm">European Commission</span></a>
+                    <a href="https://www.undp.org/publications/foresight-manual" target="_blank" class="hover:text-teal-600 flex items-center gap-2 transition-colors"><i class="ph-fill ph-globe-hemisphere-west text-2xl"></i> <span class="font-medium text-sm">UNDP</span></a>
+                    <a href="https://www.undrr.org/gar" target="_blank" class="hover:text-teal-600 flex items-center gap-2 transition-colors"><i class="ph-fill ph-shield-warning text-2xl"></i> <span class="font-medium text-sm">UNDRR</span></a>
+                    <a href="https://www.gov.uk/government/publications/futures-toolkit-for-policy-makers-and-analysts" target="_blank" class="hover:text-teal-600 flex items-center gap-2 transition-colors"><i class="ph-fill ph-bank text-2xl"></i> <span class="font-medium text-sm">UK Gov Office for Science</span></a>
+                    <a href="https://www.oecd.org/en/publications/building-anticipatory-capacity-with-strategic-foresight-in-government_d7eb0bb6-en.html" target="_blank" class="hover:text-teal-600 flex items-center gap-2 transition-colors"><i class="ph-fill ph-chart-line-up text-2xl"></i> <span class="font-medium text-sm">OECD</span></a>
+                    <a href="https://commission.europa.eu/strategy-and-policy/strategic-foresight_en" target="_blank" class="hover:text-teal-600 flex items-center gap-2 transition-colors"><i class="ph-fill ph-flag text-2xl"></i> <span class="font-medium text-sm">European Commission</span></a>
                 </div>
             </div>
         </div>
