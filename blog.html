@@ -4,8 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <title>Publications | Horizon Scan AI</title>
-    <meta name="description" content="Read articles, case studies, and methodologies on Strategic Foresight and Horizon Scanning.">
+    <!-- Default Meta Tags (Will be updated dynamically by JS) -->
+    <title id="page-title">Publications | Horizon Scan AI</title>
+    <meta id="meta-description" name="description" content="Read articles, case studies, and methodologies on Strategic Foresight and Horizon Scanning.">
+    
+    <!-- Open Graph (Basic Setup) -->
+    <meta property="og:type" content="article">
+    <meta id="og-title" property="og:title" content="Publications | Horizon Scan AI">
+    <meta id="og-description" property="og:description" content="Read articles, case studies, and methodologies on Strategic Foresight and Horizon Scanning.">
     
     <!-- Tailwind CSS & Typography -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -40,7 +46,7 @@
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans antialiased selection:bg-teal-200 selection:text-teal-900 flex flex-col min-h-screen">
 
-    <!-- Navigation (Modified links to point back to index.html) -->
+    <!-- Navigation -->
     <nav class="fixed w-full z-50 glass-nav transition-all duration-300">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
@@ -98,12 +104,16 @@
     <!-- Logic to Fetch and Render JSON -->
     <script>
         const appContainer = document.getElementById('app-container');
-        const loadingState = document.getElementById('loading-state');
+        
+        // Elemen Meta Tags yang akan diupdate
+        const pageTitle = document.getElementById('page-title');
+        const metaDesc = document.getElementById('meta-description');
+        const ogTitle = document.getElementById('og-title');
+        const ogDesc = document.getElementById('og-description');
 
         // Fetch Data from JSON
         async function fetchArticles() {
             try {
-                // If running locally without a server, fetch might fail due to CORS.
                 const response = await fetch('blog/data.json');
                 if (!response.ok) throw new Error('Network response was not ok');
                 const articles = await response.json();
@@ -124,12 +134,16 @@
                 }
             } catch (error) {
                 console.error("Error loading articles:", error);
-                renderError("Unable to load articles. Make sure you are viewing this via a local web server (like VS Code Live Server) so the JSON file can be fetched.");
+                renderError("Unable to load articles. Make sure you are viewing this via a local web server.");
             }
         }
 
         // Render List of Articles (Grid)
         function renderArticleList(articles) {
+            // Reset Meta Tags to Default for the Main Blog Page
+            pageTitle.innerText = "Publications | Horizon Scan AI";
+            metaDesc.setAttribute("content", "Read articles, case studies, and methodologies on Strategic Foresight and Horizon Scanning.");
+            
             let html = `
                 <div class="text-center mb-16 mt-8">
                     <h1 class="text-4xl md:text-5xl font-extrabold text-navy-900 mb-4 tracking-tight">Strategic Insights</h1>
@@ -169,6 +183,17 @@
 
         // Render Single Article Detail
         function renderSingleArticle(article) {
+            // --- SEO FIX: UPDATE META TAGS DYNAMICALLY ---
+            const dynamicTitle = `${article.title} | Horizon Scan AI`;
+            pageTitle.innerText = dynamicTitle;
+            ogTitle.setAttribute("content", dynamicTitle);
+            
+            if (article.excerpt) {
+                metaDesc.setAttribute("content", article.excerpt);
+                ogDesc.setAttribute("content", article.excerpt);
+            }
+            // ---------------------------------------------
+
             const html = `
                 <div class="max-w-3xl mx-auto mt-8">
                     <!-- Back Button -->
@@ -194,7 +219,7 @@
                         <img src="${article.imageUrl}" alt="${article.title}" class="w-full h-full object-cover" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23f1f5f9%22/></svg>'">
                     </div>
 
-                    <!-- Article Body (Tailwind Typography plugin handles the styling) -->
+                    <!-- Article Body -->
                     <article class="prose prose-slate prose-lg max-w-none prose-headings:text-navy-900 prose-a:text-teal-600 hover:prose-a:text-teal-500">
                         ${article.content}
                     </article>
@@ -203,10 +228,10 @@
                     <div class="mt-16 pt-8 border-t border-slate-200 text-center">
                         <h4 class="font-bold text-navy-900 mb-4">Share this article</h4>
                         <div class="flex justify-center gap-4">
-                            <button onclick="navigator.clipboard.writeText(window.location.href); alert('Link copied to clipboard!');" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-teal-500 hover:text-white transition-colors">
+                            <button onclick="navigator.clipboard.writeText(window.location.href); alert('Link copied to clipboard!');" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-teal-500 hover:text-white transition-colors" title="Copy Link">
                                 <i class="ph-fill ph-link text-xl"></i>
                             </button>
-                            <a href="https://www.linkedin.com/sharing/share-offsite/?url=" target="_blank" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-[#0a66c2] hover:text-white transition-colors">
+                            <a href="https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}" target="_blank" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-[#0a66c2] hover:text-white transition-colors" title="Share on LinkedIn">
                                 <i class="ph-fill ph-linkedin-logo text-xl"></i>
                             </a>
                         </div>
