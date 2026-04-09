@@ -201,6 +201,15 @@
         .timeline-item.dot-rose   .timeline-dot { background: var(--rose-500);   box-shadow: 0 0 0 2px var(--rose-500); }
         .timeline-item.dot-amber  .timeline-dot { background: var(--amber-400);  box-shadow: 0 0 0 2px var(--amber-400); }
 
+        /* ─── Hide Scrollbar for Carousel ───────────────────── */
+        .hide-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+        .hide-scrollbar {
+          -ms-overflow-style: none;  /* IE and Edge */
+          scrollbar-width: none;  /* Firefox */
+        }
+
 /* ─── Comparison Table (PERBAIKAN FINAL) ──────────────────────────────── */
         .compare-table {
           width: 100%; 
@@ -399,15 +408,120 @@
                     Before building long-term strategy, leading organizations conduct <strong>horizon scanning</strong> to map uncertainty, detect emerging trends, and anticipate systemic risks. In the field of <strong>foresight</strong> and <strong>anticipatory governance</strong>, this process enables decision-makers to move from reactive planning to proactive strategy.
                 </p>
                 
-                <h3>The Origin of Horizon Scanning</h3>
+            <!-- History -->
 
-                <p>
-                    The concept of horizon scanning originated in post-World War II military strategy. Early-warning radar systems were designed to scan the horizon and detect incoming threats before they became visible. This concept was later formalized by institutions such as the RAND Corporation, transforming it into structured foresight methodologies.
-                </p>
+            <div itemscope itemtype="https://schema.org/Article" class="mt-16 mb-8 overflow-hidden">
+                    
+                    <div class="flex items-end justify-between mb-8 gap-4">
+                        <div>
+                            <h3 class="text-2xl font-bold text-navy-900 m-0" itemprop="headline">The Historical Evolution</h3>
+                            <p class="text-slate-500 m-0 text-sm mt-1">From tactical defense to anticipatory governance.</p>
+                        </div>
+                        
+                        <div class="flex items-center gap-2 shrink-0">
+                            <button id="btnPrevEra" class="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-600 hover:text-teal-600 hover:border-teal-400 hover:bg-teal-50 shadow-sm transition-all focus:outline-none cursor-pointer">
+                                <i class="ph-bold ph-caret-left text-lg"></i>
+                            </button>
+                            <button id="btnNextEra" class="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-600 hover:text-teal-600 hover:border-teal-400 hover:bg-teal-50 shadow-sm transition-all focus:outline-none cursor-pointer">
+                                <i class="ph-bold ph-caret-right text-lg"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="relative w-full">
+                        <div class="hidden md:block absolute top-1/2 left-0 right-0 h-1 bg-gradient-to-r from-teal-200 via-slate-300 to-purple-200 -translate-y-1/2 z-0"></div>
+
+                        <div id="historyCarousel" class="flex overflow-x-auto gap-6 pb-8 pt-4 px-4 sm:px-0 snap-x snap-mandatory hide-scrollbar scroll-smooth relative z-10" role="list">
+
+                            <div class="snap-center shrink-0 w-[280px] md:w-[320px] bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow relative group" role="listitem">
+                                <div class="absolute -top-5 left-6 w-10 h-10 rounded-full border-4 border-white bg-slate-100 text-slate-500 flex items-center justify-center shadow-sm group-hover:bg-teal-500 group-hover:text-white transition-colors">
+                                    <i class="ph-fill ph-radar"></i>
+                                </div>
+                                <div class="mt-4">
+                                    <span class="text-xs font-bold text-teal-600 bg-teal-50 px-3 py-1 rounded-full border border-teal-100 mb-3 inline-block">1950s</span>
+                                    <h4 class="font-bold text-navy-900 text-md leading-tight mb-2">Early Foresight in Defense & Tech</h4>
+                                    <p class="text-sm text-slate-600 leading-relaxed m-0">
+                                        Born from Cold War military intelligence (e.g., RAND Corp). The primary goal was to detect early signals of technological and geopolitical threats before they could materialize.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="snap-center shrink-0 w-[280px] md:w-[320px] bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow relative group" role="listitem">
+                                <div class="absolute -top-5 left-6 w-10 h-10 rounded-full border-4 border-white bg-slate-100 text-slate-500 flex items-center justify-center shadow-sm group-hover:bg-amber-500 group-hover:text-white transition-colors">
+                                    <i class="ph-fill ph-student"></i>
+                                </div>
+                                <div class="mt-4">
+                                    <span class="text-xs font-bold text-amber-600 bg-amber-50 px-3 py-1 rounded-full border border-amber-100 mb-3 inline-block">1970s–1980s</span>
+                                    <h4 class="font-bold text-navy-900 text-md leading-tight mb-2">Academic & Strategic Foresight</h4>
+                                    <p class="text-sm text-slate-600 leading-relaxed m-0">
+                                        Moved into academia, think tanks, and corporate strategy (notably Royal Dutch Shell). Focus shifted to anticipating massive revolutions like computing and global energy shifts.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="snap-center shrink-0 w-[280px] md:w-[320px] bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow relative group" role="listitem">
+                                <div class="absolute -top-5 left-6 w-10 h-10 rounded-full border-4 border-white bg-slate-100 text-slate-500 flex items-center justify-center shadow-sm group-hover:bg-blue-500 group-hover:text-white transition-colors">
+                                    <i class="ph-fill ph-buildings"></i>
+                                </div>
+                                <div class="mt-4">
+                                    <span class="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full border border-blue-100 mb-3 inline-block">1990s</span>
+                                    <h4 class="font-bold text-navy-900 text-md leading-tight mb-2">Institutionalization</h4>
+                                    <p class="text-sm text-slate-600 leading-relaxed m-0">
+                                        Foresight entered the bureaucratic mainstream. Governments formally integrated environmental scanning and structured trend analysis into their Science & Technology (S&T) policies.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="snap-center shrink-0 w-[280px] md:w-[320px] bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow relative group" role="listitem">
+                                <div class="absolute -top-5 left-6 w-10 h-10 rounded-full border-4 border-white bg-slate-100 text-slate-500 flex items-center justify-center shadow-sm group-hover:bg-red-500 group-hover:text-white transition-colors">
+                                    <i class="ph-fill ph-flag"></i>
+                                </div>
+                                <div class="mt-4">
+                                    <span class="text-xs font-bold text-red-600 bg-red-50 px-3 py-1 rounded-full border border-red-100 mb-3 inline-block">2002</span>
+                                    <h4 class="font-bold text-navy-900 text-md leading-tight mb-2">UK Horizon Scanning Centre</h4>
+                                    <p class="text-sm text-slate-600 leading-relaxed m-0">
+                                        The UK became a global pioneer by establishing a dedicated centre. The methodology pivoted to provide 'early warnings' for complex, cross-sector governmental challenges.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="snap-center shrink-0 w-[280px] md:w-[320px] bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow relative group" role="listitem">
+                                <div class="absolute -top-5 left-6 w-10 h-10 rounded-full border-4 border-white bg-slate-100 text-slate-500 flex items-center justify-center shadow-sm group-hover:bg-indigo-500 group-hover:text-white transition-colors">
+                                    <i class="ph-fill ph-globe-hemisphere-west"></i>
+                                </div>
+                                <div class="mt-4">
+                                    <span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full border border-indigo-100 mb-3 inline-block">2010s</span>
+                                    <h4 class="font-bold text-navy-900 text-md leading-tight mb-2">Global Adoption</h4>
+                                    <p class="text-sm text-slate-600 leading-relaxed m-0">
+                                        The methodology went truly global. Institutions like the OECD, EU, and UN adopted horizon scanning to anticipate transnational crises such as climate change and health security.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="snap-center shrink-0 w-[280px] md:w-[320px] bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow relative group" role="listitem">
+                                <div class="absolute -top-5 left-6 w-10 h-10 rounded-full border-4 border-white bg-slate-100 text-slate-500 flex items-center justify-center shadow-sm group-hover:bg-purple-600 group-hover:text-white transition-colors">
+                                    <i class="ph-fill ph-cpu"></i>
+                                </div>
+                                <div class="mt-4">
+                                    <span class="text-xs font-bold text-purple-600 bg-purple-50 px-3 py-1 rounded-full border border-purple-100 mb-3 inline-block">2020s</span>
+                                    <h4 class="font-bold text-navy-900 text-md leading-tight mb-2">The Policy Intelligence Era</h4>
+                                    <p class="text-sm text-slate-600 leading-relaxed m-0">
+                                        An investigative and anticipatory paradigm. Integrating AI, big data, and participatory scanning for the early detection of disinformation, pandemics, and rapid social change.
+                                    </p>
+                                </div>
+                            </div>
+
+                        </div>
+                        
+                        <div class="mt-4 bg-slate-50 rounded-xl p-4 border border-slate-100 flex items-center gap-3">
+                            <i class="ph-fill ph-trend-up text-teal-500 text-xl shrink-0"></i>
+                            <p class="text-xs text-slate-600 font-medium m-0">
+                                <strong>Trajectory:</strong> Continuous expansion in scope & purpose, evolving from tactical defense ➔ strategic foresight ➔ government policy ➔ investigative intelligence ➔ anticipatory governance.
+                            </p>
+                        </div>
+                    </div>
+                </div>
                 
-                <p>
-                    By the 1970s, organizations like <strong>Royal Dutch Shell</strong> applied environmental scanning techniques to anticipate global oil crises. Their approach demonstrated that identifying <strong>weak signals</strong>—early indicators of change—can provide a critical strategic advantage and prevent large-scale disruption.
-                </p>
             </div>
             
             <!-- Problem Section -->
@@ -1595,5 +1709,27 @@
         // Draw initial state before starting
         draw();
     </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const carousel = document.getElementById('historyCarousel');
+            const btnPrev = document.getElementById('btnPrevEra');
+            const btnNext = document.getElementById('btnNextEra');
+
+            if(carousel && btnPrev && btnNext) {
+                // Lebar scroll = ukuran 1 kartu (320px) + gap (24px)
+                const scrollAmount = 344; 
+
+                btnPrev.addEventListener('click', () => {
+                    carousel.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+                });
+
+                btnNext.addEventListener('click', () => {
+                    carousel.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+                });
+            }
+        });
+    </script>
+
 </body>
 </html>
