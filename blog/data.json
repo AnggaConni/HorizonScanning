@@ -1,5 +1,32 @@
 [
-
-
-  
+  {
+    "id": "1",
+    "title": "Anticipatory Governance: Moving Beyond Crisis Management",
+    "excerpt": "Why traditional risk management fails in complex environments and how anticipatory governance provides a structural advantage for policy makers.",
+    "content": "<p>In an era defined by cascading crises—from global pandemics to rapid technological shifts—traditional risk management frameworks are increasingly proving inadequate. They are inherently reactive, designed to mitigate known risks based on historical data.</p><h3>The Shift to Anticipation</h3><p>Anticipatory governance, however, flips this paradigm. It is a system of institutions, rules, and norms that provides a way to use foresight to reduce risk, and to increase capacity to respond to events at early stages of their development.</p><p>By institutionalizing Horizon Scanning, organizations shift their posture from 'fire-fighting' to 'fire-proofing'. It requires embedding foresight into the very DNA of decision-making processes, ensuring that 'weak signals' are not just detected, but acted upon before they escalate into structural shocks.</p>",
+    "category": "Foresight Strategy",
+    "author": "Angga Conni Saputra",
+    "date": "Oct 12, 2023",
+    "imageUrl": "thum/or.png"
+  },
+  {
+    "id": "2",
+    "title": "The STEEP Framework: Beating Tunnel Vision",
+    "excerpt": "A deep dive into how the STEEP framework forces strategists to look beyond their industry bubbles and spot intersectional trends.",
+    "content": "<p>When asked to predict the future, most industry experts look linearly at their own field. A tech leader looks at computing power; an economist looks at interest rates. This creates massive blind spots.</p><h3>Holistic Scanning</h3><p>The STEEP framework (Social, Technological, Economic, Environmental, Political) acts as a cognitive forcing function. It mandates that analysts scan the periphery. For example, the disruption of the taxi industry by Uber wasn't just a <strong>Technological</strong> shift (smartphones/GPS). It was deeply <strong>Social</strong> (willingness to get into a stranger's car) and <strong>Economic</strong> (the rise of the gig economy post-2008 crash).</p><p>Using a tool like Horizon Scan AI with a strict STEEP methodology ensures that your strategy doesn't suffer from this fatal tunnel vision.</p>",
+    "category": "Methodology",
+    "author": "Angga Conni Saputra",
+    "date": "Nov 05, 2023",
+    "imageUrl": "thum/rd.png"
+  },
+  {
+    "id": "3",
+    "title": "Cognitive Biases in Horizon Scanning",
+    "excerpt": "Even the best AI and tools cannot save a strategy if the human operators fall victim to groupthink and confirmation bias.",
+    "content": "<p>Foresight is a profoundly human endeavor, which means it is fundamentally flawed by human psychology. The two most dangerous biases in Horizon Scanning are Confirmation Bias and the Availability Heuristic.</p><h3>Guarding the Gates</h3><p>Analysts tend to subconsciously filter out 'weak signals' that contradict their established worldviews. If leadership believes AI is a passing fad, the scanning team will organically highlight signals of AI failure and ignore signals of AI acceleration.</p><p>To combat this, foresight teams must deliberately play Devil's Advocate. For every major trend mapped on the matrix, analysts must be required to log at least one 'counter-signal'—data that proves the exact opposite is happening. This structured friction is essential for true strategic clarity.</p>",
+    "category": "Behavioral Science",
+    "author": "Angga Conni Saputra",
+    "date": "Jan 18, 2024",
+    "imageUrl": "thum/db.png"
+  }
 ]
