@@ -70,7 +70,6 @@
     "date": "Apr 01, 2026",
     "imageUrl": "thum/gsi.png"
   },
-  [
   {
     "id": "8",
     "title": "Horizon Scanning vs. Bayesian Analysis: Radar vs. Detective",
@@ -81,5 +80,4 @@
     "date": "Apr 05, 2026",
     "imageUrl": "thum/bayes.png"
   }
-]
 ]
