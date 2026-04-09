@@ -1,5 +1,4 @@
 [
-[
   {
     "id": "1",
     "title": "Anticipatory Governance: Moving Beyond Crisis Management",
@@ -10,7 +9,7 @@
     "date": "Oct 12, 2023",
     "imageUrl": "thum/or.png"
   }
-],
+,
   {
     "id": "2",
     "title": "The STEEP Framework: Beating Tunnel Vision",
@@ -19,7 +18,7 @@
     "category": "Methodology",
     "author": "Angga Conni Saputra",
     "date": "Nov 05, 2023",
-    "imageUrl": "thum/rd.png"
+    "imageUrl": "thum/steep.png"
   },
   {
     "id": "3",
