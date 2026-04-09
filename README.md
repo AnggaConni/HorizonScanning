@@ -58,7 +58,7 @@ Horizon Scan AI bridges:
 ## 🖼️ Preview
 
 <p align="center">
-  <img src="https://github.com/AnggaConni/HorizonScanning/blob/main/blob/main/docs/matrix.png" width="800"/>
+  <img src="https://github.com/AnggaConni/HorizonScanning/blob/main/thumbnail.png" width="800"/>
 </p>
 
 <p align="center">
