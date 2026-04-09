@@ -84,6 +84,44 @@
             -webkit-backdrop-filter: blur(10px);
             border-bottom: 1px solid rgba(0, 0, 0, 0.05);
         }
+
+        /* Ganti .masterclass-text-element dengan kelas CSS yang sebenarnya
+   yang Anda gunakan untuk teks di dalam modul masterclass. */
+        .masterclass-module p,
+        .masterclass-module span,
+        .masterclass-module h3,
+        .masterclass-module h4,
+        .masterclass-module li strong {
+        background-color: transparent; /* Ubah latar belakang menjadi transparan */
+        color: inherit; /* Gunakan warna teks yang diwarisi dari induknya */
+        }
+
+        /* Opsional: Untuk mengatur ulang gaya saat teks dipilih oleh pengguna */
+        ::selection {
+        background-color: transparent;
+        color: inherit;
+        }
+
+        .portable-json-files-icon {
+        /* Hapus latar belakang placeholder warna solid */
+        background-color: transparent;
+
+        /* Muat gambar ikon yang sebenarnya */
+        background-image: url('/path/to/your/json_icon.png'); /* Ganti jalur ini */
+        background-size: contain; /* Pastikan gambar muat di dalam wadah ikon */
+        background-repeat: no-repeat; /* Jangan mengulang gambar */
+        background-position: center; /* Tempatkan ikon di tengah */
+
+        /* Atur lebar dan tinggi yang sesuai, misalnya: */
+        width: 48px;
+        height: 48px;
+
+        /* Tambahkan border, shadow, atau padding agar terlihat senada dengan ikon lainnya */
+        border: 1px solid rgba(0,0,0,0.1); /* Contoh */
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Contoh */
+        padding: 10px; /* Contoh */
+        }
+
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans antialiased selection:bg-teal-200 selection:text-teal-900">
@@ -153,40 +191,64 @@
     <!-- Section: The Problem & Introduction -->
     <section id="about" class="py-20 bg-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <!-- RESTRUCTURED: Single Column Layout -->
             <div class="max-w-4xl mx-auto flex flex-col gap-10">
                 <div class="text-center">
-                    <h2 class="text-3xl md:text-4xl font-extrabold text-navy-900 mb-2">The Origin of Horizon Scanning</h2>
-                    <p class="text-slate-500 font-medium">From Military Radar to Strategic Corporate Foresight</p>
+                    <h2 class="text-3xl md:text-4xl font-extrabold text-navy-900 mb-2">The Evolution of Foresight</h2>
+                    <p class="text-slate-500 font-medium">From Military Radar to Anticipatory Governance & Corporate Strategy</p>
                 </div>
                 
-                <!-- 1. Origin Image added here -->
                 <div class="rounded-2xl overflow-hidden shadow-lg border border-slate-200">
                      <img src="thum/or.png" alt="Historical Origin of Horizon Scanning Radar" class="w-full h-auto object-cover max-h-[450px]" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'w-full h-48 flex items-center justify-center bg-slate-100 text-slate-400\'>[Image: thum/or.png not found]</div>'">
                 </div>
 
-                <!-- 2. Narrative text -->
                 <div class="prose prose-slate prose-lg max-w-none text-justify md:text-left">
-                    <p>Before establishing a baseline or formulating any major strategy, global strategic teams rarely jump straight into execution planning; instead, they conduct Horizon Scanning.</p>
-                    <p>Historically, this method wasn't born in corporate boardrooms. It has its roots in the post-WWII defense and military sectors. The term was originally adapted from the literal concept of radar—scanning the horizon to detect enemy aircraft long before they were visible to the naked eye. In the 1950s, think-tanks like the RAND Corporation began converting this tactical concept into systematic foresight methodologies.</p>
-                    <p>The next major evolution occurred in the 1970s when Royal Dutch Shell utilized environmental scanning to anticipate global oil crises. They proved that identifying "weak signals" could save an organization from fatal structural shocks.</p>
+                    <p class="lead text-xl text-slate-700 font-medium">Before establishing a baseline or formulating any major strategy, global strategic teams and public policy administrators rarely jump straight into execution planning. Instead, they must first conduct rigorous Horizon Scanning to navigate an increasingly complex environment.</p>
+                    
+                    <p>Historically, this methodology wasn't born in corporate boardrooms—it emerged from the absolute necessity of survival in the post-WWII defense and military sectors. The term itself was adapted from the literal function of early-warning radar: scanning the horizon to detect incoming enemy aircraft long before they became visible to the naked eye. In the 1950s, pioneering think-tanks like the RAND Corporation began converting this tactical military concept into structured, systematic foresight methodologies aimed at preventing strategic surprise.</p>
+                    
+                    <p>The next major paradigm shift occurred in the 1970s. Royal Dutch Shell revolutionized strategic planning by utilizing environmental scanning to anticipate global oil crises before they paralyzed the market. They conclusively proved that actively identifying and analyzing "weak signals"—fragmented, early indicators of change—could save an organization from fatal structural shocks and secure a profound operational advantage.</p>
                 </div>
                 
-                <!-- 3. Textbox Problem Today -->
                 <div class="bg-slate-50 p-8 md:p-10 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden h-fit transition-transform hover:shadow-md">
                     <div class="absolute top-0 right-0 w-32 h-32 bg-red-100 rounded-bl-full -mr-16 -mt-16 transition-transform hover:scale-110"></div>
                     <i class="ph-fill ph-warning-circle text-4xl text-red-500 mb-4 relative z-10"></i>
-                    <h3 class="text-2xl font-bold text-navy-900 mb-4 relative z-10">The Problem Today</h3>
-                    <p class="text-slate-600 mb-4 relative z-10">In practice, horizon scanning is still done manually:</p>
-                    <ul class="space-y-3 mb-6 relative z-10">
-                        <li class="flex items-center text-slate-700"><i class="ph ph-x-circle text-red-400 mr-2 text-xl"></i> Sticky notes and static Spreadsheets</li>
-                        <li class="flex items-center text-slate-700"><i class="ph ph-x-circle text-red-400 mr-2 text-xl"></i> Lengthy workshops and static PowerPoints</li>
-                        <li class="flex items-center text-slate-700"><i class="ph ph-x-circle text-red-400 mr-2 text-xl"></i> Bias creeps in easily when mapping signals</li>
-                    </ul>
-                    <div class="relative z-10 border-l-4 border-teal-500 bg-white p-5 rounded-r-xl shadow-sm mt-4">
-                        <p class="text-slate-700 font-medium m-0">
-                            And when AI discussion happens, it is often detached from structured foresight frameworks. <br class="hidden sm:block"> <span class="text-teal-600 font-bold">So I built something to bridge that gap.</span>
-                        </p>
+                    <h3 class="text-2xl font-bold text-navy-900 mb-4 relative z-10">The Architecture of the Modern Problem</h3>
+                    <p class="text-slate-600 mb-6 relative z-10">Despite living in an era of unprecedented data, practical horizon scanning often remains trapped in antiquated, manual processes:</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 relative z-10">
+                        <div class="flex items-start bg-white p-4 rounded-lg border border-slate-100 shadow-sm">
+                            <i class="ph-fill ph-push-pin text-red-400 mt-1 mr-3 text-xl"></i>
+                            <div>
+                                <h4 class="font-bold text-slate-800 text-sm">Static Tooling</h4>
+                                <p class="text-sm text-slate-600">Heavy reliance on sticky notes, rigid spreadsheets, and lengthy workshops that become outdated the moment they end.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start bg-white p-4 rounded-lg border border-slate-100 shadow-sm">
+                            <i class="ph-fill ph-brain text-red-400 mt-1 mr-3 text-xl"></i>
+                            <div>
+                                <h4 class="font-bold text-slate-800 text-sm">Cognitive Biases</h4>
+                                <p class="text-sm text-slate-600">Groupthink and confirmation bias easily creep in when mapping signals without a neutral, analytical framework.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start bg-white p-4 rounded-lg border border-slate-100 shadow-sm md:col-span-2">
+                            <i class="ph-fill ph-robot text-red-400 mt-1 mr-3 text-xl"></i>
+                            <div>
+                                <h4 class="font-bold text-slate-800 text-sm">Detached Automation</h4>
+                                <p class="text-sm text-slate-600">When AI is introduced, it is typically deployed as a generic chatbot, completely detached from the structured foresight frameworks required by professional planners.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="relative z-10 border-l-4 border-teal-500 bg-white p-6 rounded-r-xl shadow-sm mt-6">
+                        <div class="flex items-center gap-5">
+                            <div class="flex-shrink-0 w-12 h-12 bg-teal-100 rounded-full flex items-center justify-center hidden sm:flex">
+                                <i class="ph-fill ph-bridge text-teal-600 text-2xl"></i>
+                            </div>
+                            <p class="text-slate-700 font-medium m-0 leading-relaxed">
+                                Strategy requires more than just gathering data; it requires architectural synthesis. <br>
+                                <span class="text-teal-600 font-bold text-lg">I built Horizon Scan AI to bridge that exact gap.</span>
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -241,9 +303,10 @@
                     <h4 class="text-xl font-bold text-navy-900 mb-3">Signal Classification</h4>
                     <p class="text-slate-600">A robust categorization system organizing trends into: Emerging, Watchlist, Escalating, Critical, and Structural with color-coded visual cues.</p>
                 </div>
+
                 <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
                     <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-6">
-                        <i class="ph ph-file-json text-2xl text-blue-600"></i>
+                        <i class="ph ph-file-code text-2xl text-blue-600"></i>
                     </div>
                     <h4 class="text-xl font-bold text-navy-900 mb-3">Portable JSON Files</h4>
                     <p class="text-slate-600">Your entire project state is saved as a lightweight, standalone JSON file. 100% private, easy sharing, with no complex database setup required.</p>
@@ -252,12 +315,13 @@
                     <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mb-6">
                         <i class="ph ph-student text-2xl text-green-600"></i>
                     </div>
+
                     <h4 class="text-xl font-bold text-navy-900 mb-3">Tutorial Mode</h4>
                     <p class="text-slate-600">An immersive, built-in interactive guide that walks new users through the methodology, explaining the significance of each quadrant.</p>
                 </div>
                 <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
                     <div class="w-12 h-12 bg-pink-100 rounded-xl flex items-center justify-center mb-6">
-                        <i class="ph ph-arrows-out-line-height text-2xl text-pink-600"></i>
+                        <i class="ph ph-arrows-out text-2xl text-pink-600"></i>
                     </div>
                     <h4 class="text-xl font-bold text-navy-900 mb-3">Spread Overlap</h4>
                     <p class="text-slate-600">Applies a visual "jitter" slightly scattering clustered dots sharing exact coordinates so you can interact with nodes that would otherwise be hidden.</p>
@@ -300,57 +364,215 @@
 
             <article class="prose prose-slate prose-lg max-w-none">
                 
-                <div class="bg-slate-50 p-6 rounded-xl border-l-4 border-navy-900 mb-10">
-                    <h3 class="mt-0">Module 1: The Core Philosophy</h3>
-                    <p>Horizon Scanning is not about predicting the future. Instead, it is the systematic detection of early warning signs—often called "weak signals"—to help organizations prepare for multiple possible futures.</p>
-                    <blockquote class="italic font-semibold text-slate-700">"The future is not a destination, but a direction."</blockquote>
-                    <ul>
-                        <li><strong>The Shift:</strong> Move from "fire-fighting" (reacting to disruption) to "fire-proofing" (anticipating disruption).</li>
-                        <li><strong>The Goal:</strong> It is better to be vaguely right than precisely wrong. We scan to identify threats before they become obvious.</li>
-                        <li><strong>Key Concept:</strong> Trends start as outliers (edges of the matrix) before moving to the center (mainstream).</li>
+                <div class="bg-slate-50 p-6 rounded-xl border-l-4 border-navy-900 mb-12">
+                    <h3 class="mt-0 text-2xl font-bold text-navy-900">Module 1: The Core Philosophy</h3>
+                    <p class="text-slate-700">Horizon Scanning is not about predicting the future. Instead, it is the systematic detection of early warning signs—often called "weak signals"—to help organizations prepare for multiple possible futures.</p>
+                    <blockquote class="italic font-semibold text-slate-700 border-teal-500 bg-white p-4 rounded-r-lg shadow-sm">
+                        "The future is not a destination, but a direction."
+                    </blockquote>
+                    <ul class="text-slate-700 mt-4 space-y-2">
+                        <li><strong class="text-teal-600">The Shift:</strong> Move from "fire-fighting" (reacting to disruption) to "fire-proofing" (anticipating disruption).</li>
+                        <li><strong class="text-teal-600">The Goal:</strong> It is better to be vaguely right than precisely wrong. We scan to identify threats and opportunities before they become obvious to everyone else.</li>
+                        <li><strong class="text-teal-600">Key Concept:</strong> Trends start as outliers (the edges of your matrix) before moving to the center (mainstream). Your job is to catch them at the edge.</li>
                     </ul>
                 </div>
 
-                <h3>Module 3: The STEEP Framework</h3>
-                <p>To ensure your scanning is holistic and doesn't suffer from "tunnel vision", use the STEEP framework when adding new nodes.</p>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 not-prose mb-12">
-                    <div class="bg-white border p-4 rounded-lg"><strong class="text-teal-600">S - Social:</strong> Demographics, lifestyle shifts, cultural changes.</div>
-                    <div class="bg-white border p-4 rounded-lg"><strong class="text-teal-600">T - Technological:</strong> R&D, digital adoption, automation.</div>
-                    <div class="bg-white border p-4 rounded-lg"><strong class="text-teal-600">E - Economic:</strong> Markets, inflation, labor shifts.</div>
-                    <div class="bg-white border p-4 rounded-lg"><strong class="text-teal-600">E - Environmental:</strong> Climate, resources, sustainability.</div>
-                    <div class="bg-white border p-4 rounded-lg md:col-span-2"><strong class="text-teal-600">P - Political:</strong> Government policy, geopolitics, regulations.</div>
+<div class="mb-12">
+                    <h3 class="text-2xl font-bold text-navy-900 mb-4">Module 2: The Anatomy of a Signal</h3>
+                    <p class="text-slate-700 mb-6">In this tool, every "Node" represents a signal. Understanding the type of signal is crucial:</p>
+                    
+                    <div class="overflow-x-auto rounded-xl border border-slate-200 shadow-sm not-prose">
+                        <table class="min-w-full text-left text-sm text-slate-600">
+                            <thead class="bg-navy-900 text-white">
+                                <tr>
+                                    <th scope="col" class="px-6 py-4 font-semibold w-1/4">Signal Type</th>
+                                    <th scope="col" class="px-6 py-4 font-semibold w-2/4">Definition</th>
+                                    <th scope="col" class="px-6 py-4 font-semibold w-1/4">Strategic Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200 bg-white">
+                                <tr class="hover:bg-slate-50 transition-colors">
+                                    <td class="px-6 py-4 font-bold text-slate-800 whitespace-nowrap">
+                                        <span class="inline-flex items-center gap-1.5 py-1 px-2.5 rounded-md bg-slate-100 border border-slate-200 text-slate-700">
+                                            <i class="ph-fill ph-wifi-low text-slate-500"></i> Weak Signal
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 leading-relaxed">A piece of information that is ambiguous, new, or weird. Low frequency, potentially high impact.</td>
+                                    <td class="px-6 py-4 font-bold text-teal-600">Scan & Monitor</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50 transition-colors">
+                                    <td class="px-6 py-4 font-bold text-slate-800 whitespace-nowrap">
+                                        <span class="inline-flex items-center gap-1.5 py-1 px-2.5 rounded-md bg-blue-50 border border-blue-100 text-blue-700">
+                                            <i class="ph-fill ph-trend-up text-blue-500"></i> Emerging Issue
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 leading-relaxed">A signal that is gaining traction and volume. The direction of change is becoming visible.</td>
+                                    <td class="px-6 py-4 font-bold text-teal-600">Analyze & Assess</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50 transition-colors">
+                                    <td class="px-6 py-4 font-bold text-slate-800 whitespace-nowrap">
+                                        <span class="inline-flex items-center gap-1.5 py-1 px-2.5 rounded-md bg-emerald-50 border border-emerald-100 text-emerald-700">
+                                            <i class="ph-fill ph-arrows-merge text-emerald-500"></i> Trend
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 leading-relaxed">A change that has a clear direction and momentum (e.g., Aging Population).</td>
+                                    <td class="px-6 py-4 font-bold text-teal-600">Adapt & Align</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50 transition-colors">
+                                    <td class="px-6 py-4 font-bold text-slate-800 whitespace-nowrap">
+                                        <span class="inline-flex items-center gap-1.5 py-1 px-2.5 rounded-md bg-red-50 border border-red-100 text-red-700">
+                                            <i class="ph-fill ph-warning-octagon text-red-500"></i> Wild Card
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 leading-relaxed">Low probability, extremely high impact events (e.g., Global Pandemic, Solar Flare).</td>
+                                    <td class="px-6 py-4 font-bold text-teal-600">Contingency Planning</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="mb-12">
+                    <h3 class="text-2xl font-bold text-navy-900 mb-4">Module 3: The STEEP Framework</h3>
+                    <p class="text-slate-700 mb-6">To ensure your scanning is holistic and doesn't suffer from "tunnel vision" (e.g., focusing only on Technology), use the STEEP framework when adding new nodes. This ensures you cover the full spectrum of the external environment.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 not-prose">
+                        <div class="bg-white border border-slate-200 p-5 rounded-xl shadow-sm hover:border-teal-300 transition-colors">
+                            <strong class="text-teal-600 text-lg flex items-center gap-2 mb-2"><i class="ph-fill ph-users"></i> S - Social</strong>
+                            <p class="text-sm text-slate-600">Values, demographics, lifestyle shifts, education trends, and cultural changes.</p>
+                        </div>
+                        <div class="bg-white border border-slate-200 p-5 rounded-xl shadow-sm hover:border-teal-300 transition-colors">
+                            <strong class="text-teal-600 text-lg flex items-center gap-2 mb-2"><i class="ph-fill ph-cpu"></i> T - Technological</strong>
+                            <p class="text-sm text-slate-600">Innovation, R&D, digital adoption, automation, and cybersecurity.</p>
+                        </div>
+                        <div class="bg-white border border-slate-200 p-5 rounded-xl shadow-sm hover:border-teal-300 transition-colors">
+                            <strong class="text-teal-600 text-lg flex items-center gap-2 mb-2"><i class="ph-fill ph-chart-line-up"></i> E - Economic</strong>
+                            <p class="text-sm text-slate-600">Markets, trade, currency fluctuations, inflation, and labor shifts.</p>
+                        </div>
+                        <div class="bg-white border border-slate-200 p-5 rounded-xl shadow-sm hover:border-teal-300 transition-colors">
+                            <strong class="text-teal-600 text-lg flex items-center gap-2 mb-2"><i class="ph-fill ph-leaf"></i> E - Environmental</strong>
+                            <p class="text-sm text-slate-600">Climate change, resource scarcity, biodiversity, and sustainability regulations.</p>
+                        </div>
+                        <div class="bg-white border border-slate-200 p-5 rounded-xl shadow-sm hover:border-teal-300 transition-colors md:col-span-2">
+                            <strong class="text-teal-600 text-lg flex items-center gap-2 mb-2"><i class="ph-fill ph-bank"></i> P - Political</strong>
+                            <p class="text-sm text-slate-600">Government policy, geopolitical stability, trade regulations, and elections.</p>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="mb-12 border-t border-slate-200 pt-10">
-                    <h3 class="mt-0">Module 4: The 6 Analytical Matrices</h3>
-                    <p>Choosing the right template determines the strategic output of your session. Below is the platform interface where you select your baseline strategy.</p>
-                    
-                    <div class="not-prose my-8">
-                        <img src="thum/LP.png" alt="Horizon Scan Tool Start Screen" class="w-full rounded-xl shadow-md border border-slate-200" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'w-full h-40 flex items-center justify-center bg-slate-100 rounded-lg text-slate-400\'>[Image: thum/LP.png not found]</div>'">
-                        <p class="text-center text-sm text-slate-500 mt-3">Initial Setup: Selecting Matrix Templates</p>
+                    <h3 class="text-2xl font-bold text-navy-900 mb-4">Module 4: The 6 Analytical Matrices</h3>
+                    <p class="text-slate-700 mb-6">Your application includes 6 built-in templates. Choosing the right one determines the strategic output of your session.</p>
+
+                    <div class="bg-yellow-50 border border-yellow-200 p-6 rounded-xl mb-8 not-prose shadow-sm">
+                        <h4 class="text-yellow-800 flex items-center gap-2 font-bold text-lg mb-3"><i class="ph-fill ph-warning"></i> About the Z-Axis (Optional – Advanced Mode)</h4>
+                        <p class="text-sm text-yellow-900 mb-3 font-medium">All matrices primarily operate in two dimensions (X and Y). The Z-Axis is optional and designed for advanced analysis only.</p>
+                        <ul class="text-sm text-yellow-900 list-disc list-inside space-y-2 mb-4 ml-2">
+                            <li>For simple mapping, use X and Y only.</li>
+                            <li>Leave <strong>Z = 0</strong> if additional depth is not required.</li>
+                            <li>When Z remains at 0, AI analysis will not apply weighting or evaluation to this third dimension.</li>
+                            <li>Activate Z only when urgency, velocity, scale, or systemic escalation meaningfully affects prioritisation.</li>
+                        </ul>
+                        <div class="bg-white/60 px-4 py-2 rounded text-center">
+                            <p class="text-sm text-yellow-800 font-bold uppercase tracking-widest">Clarity first. Depth second.</p>
+                        </div>
                     </div>
 
-                    <ol>
-                        <li><strong>Impact vs. Probability (Risk Matrix):</strong> For traditional risk management. Spot Critical Risks and Black Swans.</li>
-                        <li><strong>Impact vs. Uncertainty (Foresight Matrix):</strong> The most strategic view for Scenario Planning. Identifies "Future Scenarios" vs "Planning Realities".</li>
-                        <li><strong>Urgency vs. Importance (Priority Matrix):</strong> Action Planning (Eisenhower Matrix).</li>
-                        <li><strong>Influence vs. Interest (Stakeholder Mapping):</strong> Managing actors in an ecosystem.</li>
-                        <li><strong>Novelty vs. Maturity (Innovation Radar):</strong> Technology tracking and R&D portfolio management.</li>
-                        <li><strong>Time Horizon vs. Impact:</strong> Roadmap alignment.</li>
-                    </ol>
-                </div>
-                
-                <div class="bg-yellow-50 border border-yellow-200 p-5 rounded-lg mt-6">
-                    <h4 class="text-yellow-800 mt-0 flex items-center gap-2"><i class="ph-fill ph-warning"></i> About the Z-Axis (Advanced)</h4>
-                    <p class="text-sm text-yellow-900 mb-0">Leave Z = 0 if additional depth is not required. Activate Z only when urgency, velocity, or systemic escalation meaningfully affects prioritisation. <em>Clarity first. Depth second.</em></p>
+                    <p class="font-medium text-slate-700 mb-6">Here is how to use them effectively:</p>
+                    
+                    <div class="space-y-6 not-prose">
+                        <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+                            <h4 class="text-xl font-bold text-navy-900 mb-2">1. Impact vs. Probability <span class="text-slate-400 font-normal text-base">(Risk Matrix)</span></h4>
+                            <p class="text-sm text-slate-500 mb-4 bg-slate-50 inline-block px-3 py-1 rounded-md"><span class="font-bold text-slate-700">Purpose:</span> Traditional Risk Management.</p>
+                            <ul class="space-y-3 text-sm text-slate-700">
+                                <li class="flex items-start gap-3"><i class="ph-fill ph-warning-circle text-red-500 text-xl mt-0.5"></i> <div><strong class="text-red-500">Top-Right (High/High): Critical Risks.</strong> These are dangers that are likely to happen and will hurt. Mitigation plans are mandatory immediately.</div></li>
+                                <li class="flex items-start gap-3"><i class="ph-fill ph-bird text-orange-500 text-xl mt-0.5"></i> <div><strong class="text-orange-500">Top-Left (High Imp/Low Prob): Black Swans.</strong> Events that are unlikely but catastrophic. Requires insurance or emergency contingency drills.</div></li>
+                            </ul>
+                        </div>
+                        
+                        <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+                            <h4 class="text-xl font-bold text-navy-900 mb-2">2. Impact vs. Uncertainty <span class="text-slate-400 font-normal text-base">(Foresight Matrix)</span></h4>
+                            <p class="text-sm text-slate-500 mb-4 bg-slate-50 inline-block px-3 py-1 rounded-md"><span class="font-bold text-slate-700">Purpose:</span> Scenario Planning (The most strategic view).</p>
+                            <ul class="space-y-3 text-sm text-slate-700">
+                                <li class="flex items-start gap-3"><i class="ph-fill ph-git-merge text-purple-600 text-xl mt-0.5"></i> <div><strong class="text-purple-600">Top-Right (High/High): Scenario Candidates.</strong> These are critical uncertainties. Because the outcome is unsure but the impact is high, these define your different "Future Scenarios."</div></li>
+                                <li class="flex items-start gap-3"><i class="ph-fill ph-calendar-check text-blue-600 text-xl mt-0.5"></i> <div><strong class="text-blue-600">Top-Left (High Imp/Low Unc): Planning Realities.</strong> These are "inevitable futures" (e.g., aging population). Since uncertainty is low, do not plan for them, plan around them.</div></li>
+                            </ul>
+                        </div>
+
+                        <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+                            <h4 class="text-xl font-bold text-navy-900 mb-2">3. Urgency vs. Importance <span class="text-slate-400 font-normal text-base">(Priority Matrix)</span></h4>
+                            <p class="text-sm text-slate-500 mb-4 bg-slate-50 inline-block px-3 py-1 rounded-md"><span class="font-bold text-slate-700">Purpose:</span> Action Planning & Eisenhower Matrix.</p>
+                            <ul class="space-y-3 text-sm text-slate-700 grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <li class="bg-slate-50 p-3 rounded border border-slate-100"><strong class="text-teal-600 block mb-1">Top-Right:</strong> Do First. Tasks that are both urgent and important.</li>
+                                <li class="bg-slate-50 p-3 rounded border border-slate-100"><strong class="text-teal-600 block mb-1">Bottom-Right:</strong> Schedule. Important but not urgent.</li>
+                                <li class="bg-slate-50 p-3 rounded border border-slate-100"><strong class="text-teal-600 block mb-1">Top-Left:</strong> Delegate. Urgent but less important strategically.</li>
+                            </ul>
+                        </div>
+
+                        <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+                            <h4 class="text-xl font-bold text-navy-900 mb-2">4. Influence vs. Interest <span class="text-slate-400 font-normal text-base">(Stakeholder Mapping)</span></h4>
+                            <p class="text-sm text-slate-500 mb-4 bg-slate-50 inline-block px-3 py-1 rounded-md"><span class="font-bold text-slate-700">Purpose:</span> Managing actors in an ecosystem.</p>
+                            <ul class="space-y-3 text-sm text-slate-700">
+                                <li class="flex items-start gap-3"><i class="ph-fill ph-crown text-indigo-600 text-xl mt-0.5"></i> <div><strong class="text-indigo-600">Top-Right: Key Players.</strong> Stakeholders with high power and high interest. Manage closely and engage daily.</div></li>
+                                <li class="flex items-start gap-3"><i class="ph-fill ph-envelope-open text-indigo-400 text-xl mt-0.5"></i> <div><strong class="text-indigo-600">Bottom-Right: Keep Informed.</strong> High interest but low power. They can be allies; keep them updated.</div></li>
+                            </ul>
+                        </div>
+
+                        <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+                            <h4 class="text-xl font-bold text-navy-900 mb-2">5. Novelty vs. Maturity <span class="text-slate-400 font-normal text-base">(Innovation Radar)</span></h4>
+                            <p class="text-sm text-slate-500 mb-4 bg-slate-50 inline-block px-3 py-1 rounded-md"><span class="font-bold text-slate-700">Purpose:</span> Technology tracking and R&D portfolio management.</p>
+                            <ul class="space-y-3 text-sm text-slate-700">
+                                <li class="flex items-start gap-3"><i class="ph-fill ph-rocket text-pink-600 text-xl mt-0.5"></i> <div><strong class="text-pink-600">Top-Left (High Nov/Low Mat): Bleeding Edge/R&D.</strong> High risk, potential high reward. "Moonshot" projects.</div></li>
+                                <li class="flex items-start gap-3"><i class="ph-fill ph-package text-slate-600 text-xl mt-0.5"></i> <div><strong class="text-pink-600">Bottom-Right: Commodity.</strong> Standard technologies that are mature and common. Focus on efficiency here.</div></li>
+                            </ul>
+                        </div>
+
+                        <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+                            <h4 class="text-xl font-bold text-navy-900 mb-2">6. Time Horizon vs. Impact</h4>
+                            <p class="text-sm text-slate-500 mb-4 bg-slate-50 inline-block px-3 py-1 rounded-md"><span class="font-bold text-slate-700">Purpose:</span> Roadmap alignment.</p>
+                            <div class="flex flex-col sm:flex-row gap-4 text-sm text-slate-700">
+                                <div class="flex-1 bg-emerald-50 border border-emerald-100 p-4 rounded-lg">
+                                    <strong class="text-emerald-700 flex items-center gap-2 mb-1"><i class="ph-fill ph-clock"></i> X-Axis: Timing</strong> 
+                                    How soon will this hit? (Short / Medium / Long Term).
+                                </div>
+                                <div class="flex-1 bg-emerald-50 border border-emerald-100 p-4 rounded-lg">
+                                    <strong class="text-emerald-700 flex items-center gap-2 mb-1"><i class="ph-fill ph-chart-bar"></i> Y-Axis: Magnitude</strong> 
+                                    How hard will it hit? Use this to map out when to allocate resources.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <h3 class="mt-12">Module 5: Avoiding Cognitive Biases</h3>
-                <ul>
-                    <li><strong>Confirmation Bias:</strong> Deliberately search for one "counter-signal" for every major trend.</li>
-                    <li><strong>Availability Heuristic:</strong> Use STEEP to force yourself to look at slow-moving, "boring" data, not just breaking news.</li>
-                    <li><strong>Groupthink:</strong> Use the <strong>"Spread Overlap"</strong> feature in the app to visualize where opinions diverge before discussing.</li>
-                </ul>
+                <div class="border-t border-slate-200 pt-10">
+                    <h3 class="text-2xl font-bold text-navy-900 mb-4">Module 5: Avoiding Cognitive Biases</h3>
+                    <p class="text-slate-700 mb-6">A scanning tool is only as good as the analyst using it. When performing a scan or interpreting the AI analysis, be aware of these mental traps:</p>
+                    
+                    <div class="space-y-6 not-prose">
+                        <div class="bg-slate-50 p-6 rounded-xl border-l-4 border-red-400 shadow-sm">
+                            <h4 class="text-lg font-bold text-navy-900 mb-2 flex items-center gap-2"><i class="ph-fill ph-brain text-red-500"></i> Confirmation Bias</h4>
+                            <p class="text-sm text-slate-600 mb-3">The tendency to only input signals that confirm what you already believe, while ignoring contradictory data.</p>
+                            <div class="bg-white p-3 rounded border border-slate-200 text-sm">
+                                <span class="font-bold text-teal-600 mr-2">Fix:</span> Deliberately search for one "counter-signal" for every major trend.
+                            </div>
+                        </div>
+                        
+                        <div class="bg-slate-50 p-6 rounded-xl border-l-4 border-orange-400 shadow-sm">
+                            <h4 class="text-lg font-bold text-navy-900 mb-2 flex items-center gap-2"><i class="ph-fill ph-lightning text-orange-500"></i> Availability Heuristic</h4>
+                            <p class="text-sm text-slate-600 mb-3">Overestimating the importance of information that is readily available (e.g., breaking news or recent disasters) while ignoring slow-moving trends.</p>
+                            <div class="bg-white p-3 rounded border border-slate-200 text-sm">
+                                <span class="font-bold text-teal-600 mr-2">Fix:</span> Use the STEEP framework to force yourself to look at boring, slow data.
+                            </div>
+                        </div>
+                        
+                        <div class="bg-slate-50 p-6 rounded-xl border-l-4 border-blue-400 shadow-sm">
+                            <h4 class="text-lg font-bold text-navy-900 mb-2 flex items-center gap-2"><i class="ph-fill ph-users-three text-blue-500"></i> Groupthink</h4>
+                            <p class="text-sm text-slate-600 mb-3">Agreeing with the consensus to avoid conflict during a workshop.</p>
+                            <div class="bg-white p-3 rounded border border-slate-200 text-sm">
+                                <span class="font-bold text-teal-600 mr-2">Fix:</span> Use the <strong>"Spread Overlap"</strong> feature in the app to visualize where opinions diverge before discussing.
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
             </article>
         </div>
