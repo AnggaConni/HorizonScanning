@@ -310,7 +310,8 @@
                     <a href="#about" class="text-slate-600 hover:text-teal-600 text-sm font-medium transition-colors">About</a>
                     <a href="#features" class="text-slate-600 hover:text-teal-600 text-sm font-medium transition-colors">Features</a>
                     <a href="#guide" class="text-slate-600 hover:text-teal-600 text-sm font-medium transition-colors">Masterclass</a>
-                    
+                    <a href="#faq" class="text-slate-600 hover:text-teal-600 text-sm font-medium transition-colors">FAQ</a>
+
                     <a href="blog.html" class="inline-flex items-center text-slate-700 hover:text-teal-600 text-sm font-bold transition-all px-3 py-2 rounded-lg hover:bg-slate-50">
                         <i class="ph ph-newspaper mr-1.5 text-lg"></i> Articles
                     </a>
@@ -410,7 +411,7 @@
                 
             <!-- History -->
 
-            <div itemscope itemtype="https://schema.org/Article" class="mt-16 mb-8 overflow-hidden">
+<div itemscope itemtype="https://schema.org/Article" class="mt-16 mb-8 overflow-hidden">
                     
                     <div class="flex items-end justify-between mb-8 gap-4">
                         <div>
@@ -420,10 +421,10 @@
                         
                         <div class="flex items-center gap-2 shrink-0">
                             <button id="btnPrevEra" class="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-600 hover:text-teal-600 hover:border-teal-400 hover:bg-teal-50 shadow-sm transition-all focus:outline-none cursor-pointer">
-                                <i class="ph-bold ph-caret-left text-lg"></i>
+                                <i class="ph-bold ph-caret-left text-xl"></i>
                             </button>
                             <button id="btnNextEra" class="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-600 hover:text-teal-600 hover:border-teal-400 hover:bg-teal-50 shadow-sm transition-all focus:outline-none cursor-pointer">
-                                <i class="ph-bold ph-caret-right text-lg"></i>
+                                <i class="ph-bold ph-caret-right text-xl"></i>
                             </button>
                         </div>
                     </div>
@@ -431,94 +432,83 @@
                     <div class="relative w-full">
                         <div class="hidden md:block absolute top-1/2 left-0 right-0 h-1 bg-gradient-to-r from-teal-200 via-slate-300 to-purple-200 -translate-y-1/2 z-0"></div>
 
-                        <div id="historyCarousel" class="flex overflow-x-auto gap-6 pb-8 pt-4 px-4 sm:px-0 snap-x snap-mandatory hide-scrollbar scroll-smooth relative z-10" role="list">
+                        <div id="historyCarousel" class="flex overflow-x-auto gap-6 pb-8 pt-6 px-4 sm:px-0 snap-x snap-mandatory hide-scrollbar scroll-smooth relative z-10">
 
-                            <div class="snap-center shrink-0 w-[280px] md:w-[320px] bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow relative group" role="listitem">
+                            <div class="snap-center shrink-0 w-[280px] md:w-[320px] bg-white border border-slate-200 rounded-2xl p-6 shadow-sm relative group hover:shadow-md transition-shadow mt-4">
                                 <div class="absolute -top-5 left-6 w-10 h-10 rounded-full border-4 border-white bg-slate-100 text-slate-500 flex items-center justify-center shadow-sm group-hover:bg-teal-500 group-hover:text-white transition-colors">
-                                    <i class="ph-fill ph-radar"></i>
+                                    <i class="ph-bold ph-radar text-xl"></i>
                                 </div>
-                                <div class="mt-4">
-                                    <span class="text-xs font-bold text-teal-600 bg-teal-50 px-3 py-1 rounded-full border border-teal-100 mb-3 inline-block">1950s</span>
-                                    <h4 class="font-bold text-navy-900 text-md leading-tight mb-2">Early Foresight in Defense & Tech</h4>
-                                    <p class="text-sm text-slate-600 leading-relaxed m-0">
-                                        Born from Cold War military intelligence (e.g., RAND Corp). The primary goal was to detect early signals of technological and geopolitical threats before they could materialize.
-                                    </p>
-                                </div>
+                                <span class="text-xs font-bold text-teal-600 bg-teal-50 px-3 py-1 rounded-full border border-teal-100 mb-3 inline-block mt-2">1950s</span>
+                                <h4 class="font-bold text-navy-900 mb-2 leading-tight">Cold War & Early Foresight</h4>
+                                <p class="text-sm text-slate-600 leading-relaxed m-0">
+                                    Strategic foresight was formalized during the Cold War. Institutions like the <strong>RAND Corporation</strong> developed methods to anticipate technological and geopolitical threats before they materialized.
+                                </p>
                             </div>
 
-                            <div class="snap-center shrink-0 w-[280px] md:w-[320px] bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow relative group" role="listitem">
+                            <div class="snap-center shrink-0 w-[280px] md:w-[320px] bg-white border border-slate-200 rounded-2xl p-6 shadow-sm relative group hover:shadow-md transition-shadow mt-4">
                                 <div class="absolute -top-5 left-6 w-10 h-10 rounded-full border-4 border-white bg-slate-100 text-slate-500 flex items-center justify-center shadow-sm group-hover:bg-amber-500 group-hover:text-white transition-colors">
-                                    <i class="ph-fill ph-student"></i>
+                                    <i class="ph-bold ph-graduation-cap text-xl"></i>
                                 </div>
-                                <div class="mt-4">
-                                    <span class="text-xs font-bold text-amber-600 bg-amber-50 px-3 py-1 rounded-full border border-amber-100 mb-3 inline-block">1970s–1980s</span>
-                                    <h4 class="font-bold text-navy-900 text-md leading-tight mb-2">Academic & Strategic Foresight</h4>
-                                    <p class="text-sm text-slate-600 leading-relaxed m-0">
-                                        Moved into academia, think tanks, and corporate strategy (notably Royal Dutch Shell). Focus shifted to anticipating massive revolutions like computing and global energy shifts.
-                                    </p>
-                                </div>
+                                <span class="text-xs font-bold text-amber-600 bg-amber-50 px-3 py-1 rounded-full border border-amber-100 mb-3 inline-block mt-2">1970s–1980s</span>
+                                <h4 class="font-bold text-navy-900 mb-2 leading-tight">Academic & Corporate Foresight</h4>
+                                <p class="text-sm text-slate-600 leading-relaxed m-0">
+                                    Pioneers like Herman Kahn structured scenario planning. It moved to corporate strategy when <strong>Royal Dutch Shell</strong> successfully applied environmental scanning to anticipate global oil crises.
+                                </p>
                             </div>
 
-                            <div class="snap-center shrink-0 w-[280px] md:w-[320px] bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow relative group" role="listitem">
+                            <div class="snap-center shrink-0 w-[280px] md:w-[320px] bg-white border border-slate-200 rounded-2xl p-6 shadow-sm relative group hover:shadow-md transition-shadow mt-4">
                                 <div class="absolute -top-5 left-6 w-10 h-10 rounded-full border-4 border-white bg-slate-100 text-slate-500 flex items-center justify-center shadow-sm group-hover:bg-blue-500 group-hover:text-white transition-colors">
-                                    <i class="ph-fill ph-buildings"></i>
+                                    <i class="ph-bold ph-buildings text-xl"></i>
                                 </div>
-                                <div class="mt-4">
-                                    <span class="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full border border-blue-100 mb-3 inline-block">1990s</span>
-                                    <h4 class="font-bold text-navy-900 text-md leading-tight mb-2">Institutionalization</h4>
-                                    <p class="text-sm text-slate-600 leading-relaxed m-0">
-                                        Foresight entered the bureaucratic mainstream. Governments formally integrated environmental scanning and structured trend analysis into their Science & Technology (S&T) policies.
-                                    </p>
-                                </div>
+                                <span class="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full border border-blue-100 mb-3 inline-block mt-2">1990s</span>
+                                <h4 class="font-bold text-navy-900 mb-2 leading-tight">Institutionalization</h4>
+                                <p class="text-sm text-slate-600 leading-relaxed m-0">
+                                    Foresight entered the bureaucratic mainstream. Governments formally integrated environmental scanning and structured trend analysis into their Science & Technology (S&T) policies.
+                                </p>
                             </div>
 
-                            <div class="snap-center shrink-0 w-[280px] md:w-[320px] bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow relative group" role="listitem">
+                            <div class="snap-center shrink-0 w-[280px] md:w-[320px] bg-white border border-slate-200 rounded-2xl p-6 shadow-sm relative group hover:shadow-md transition-shadow mt-4">
                                 <div class="absolute -top-5 left-6 w-10 h-10 rounded-full border-4 border-white bg-slate-100 text-slate-500 flex items-center justify-center shadow-sm group-hover:bg-red-500 group-hover:text-white transition-colors">
-                                    <i class="ph-fill ph-flag"></i>
+                                    <i class="ph-bold ph-flag text-xl"></i>
                                 </div>
-                                <div class="mt-4">
-                                    <span class="text-xs font-bold text-red-600 bg-red-50 px-3 py-1 rounded-full border border-red-100 mb-3 inline-block">2002</span>
-                                    <h4 class="font-bold text-navy-900 text-md leading-tight mb-2">UK Horizon Scanning Centre</h4>
-                                    <p class="text-sm text-slate-600 leading-relaxed m-0">
-                                        The UK became a global pioneer by establishing a dedicated centre. The methodology pivoted to provide 'early warnings' for complex, cross-sector governmental challenges.
-                                    </p>
-                                </div>
+                                <span class="text-xs font-bold text-red-600 bg-red-50 px-3 py-1 rounded-full border border-red-100 mb-3 inline-block mt-2">2002</span>
+                                <h4 class="font-bold text-navy-900 mb-2 leading-tight">UK Horizon Scanning Centre</h4>
+                                <p class="text-sm text-slate-600 leading-relaxed m-0">
+                                    The UK became a global pioneer by establishing a dedicated centre, embedding foresight into policymaking to provide 'early warnings' for complex, cross-sector challenges.
+                                </p>
                             </div>
 
-                            <div class="snap-center shrink-0 w-[280px] md:w-[320px] bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow relative group" role="listitem">
+                            <div class="snap-center shrink-0 w-[280px] md:w-[320px] bg-white border border-slate-200 rounded-2xl p-6 shadow-sm relative group hover:shadow-md transition-shadow mt-4">
                                 <div class="absolute -top-5 left-6 w-10 h-10 rounded-full border-4 border-white bg-slate-100 text-slate-500 flex items-center justify-center shadow-sm group-hover:bg-indigo-500 group-hover:text-white transition-colors">
-                                    <i class="ph-fill ph-globe-hemisphere-west"></i>
+                                    <i class="ph-bold ph-globe-hemisphere-west text-xl"></i>
                                 </div>
-                                <div class="mt-4">
-                                    <span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full border border-indigo-100 mb-3 inline-block">2010s</span>
-                                    <h4 class="font-bold text-navy-900 text-md leading-tight mb-2">Global Adoption</h4>
-                                    <p class="text-sm text-slate-600 leading-relaxed m-0">
-                                        The methodology went truly global. Institutions like the OECD, EU, and UN adopted horizon scanning to anticipate transnational crises such as climate change and health security.
-                                    </p>
-                                </div>
+                                <span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full border border-indigo-100 mb-3 inline-block mt-2">2010s</span>
+                                <h4 class="font-bold text-navy-900 mb-2 leading-tight">Global Adoption</h4>
+                                <p class="text-sm text-slate-600 leading-relaxed m-0">
+                                    The methodology went truly global. Organizations like the <strong>OECD, EU, and UN</strong> adopted horizon scanning to anticipate transnational crises like climate change and health security.
+                                </p>
                             </div>
 
-                            <div class="snap-center shrink-0 w-[280px] md:w-[320px] bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow relative group" role="listitem">
+                            <div class="snap-center shrink-0 w-[280px] md:w-[320px] bg-white border border-slate-200 rounded-2xl p-6 shadow-sm relative group hover:shadow-md transition-shadow mt-4">
                                 <div class="absolute -top-5 left-6 w-10 h-10 rounded-full border-4 border-white bg-slate-100 text-slate-500 flex items-center justify-center shadow-sm group-hover:bg-purple-600 group-hover:text-white transition-colors">
-                                    <i class="ph-fill ph-cpu"></i>
+                                    <i class="ph-bold ph-cpu text-xl"></i>
                                 </div>
-                                <div class="mt-4">
-                                    <span class="text-xs font-bold text-purple-600 bg-purple-50 px-3 py-1 rounded-full border border-purple-100 mb-3 inline-block">2020s</span>
-                                    <h4 class="font-bold text-navy-900 text-md leading-tight mb-2">The Policy Intelligence Era</h4>
-                                    <p class="text-sm text-slate-600 leading-relaxed m-0">
-                                        An investigative and anticipatory paradigm. Integrating AI, big data, and participatory scanning for the early detection of disinformation, pandemics, and rapid social change.
-                                    </p>
-                                </div>
+                                <span class="text-xs font-bold text-purple-600 bg-purple-50 px-3 py-1 rounded-full border border-purple-100 mb-3 inline-block mt-2">2020s</span>
+                                <h4 class="font-bold text-navy-900 mb-2 leading-tight">The Policy Intelligence Era</h4>
+                                <p class="text-sm text-slate-600 leading-relaxed m-0">
+                                    An investigative & anticipatory paradigm. Integrating AI and big data to transform horizon scanning into an adaptive system for detecting disinformation and rapid social change.
+                                </p>
                             </div>
 
                         </div>
                         
                         <div class="mt-4 bg-slate-50 rounded-xl p-4 border border-slate-100 flex items-center gap-3">
-                            <i class="ph-fill ph-trend-up text-teal-500 text-xl shrink-0"></i>
-                            <p class="text-xs text-slate-600 font-medium m-0">
+                            <i class="ph-bold ph-trend-up text-teal-500 text-2xl shrink-0"></i>
+                            <p class="text-xs text-slate-600 font-medium m-0 leading-relaxed">
                                 <strong>Trajectory:</strong> Continuous expansion in scope & purpose, evolving from tactical defense ➔ strategic foresight ➔ government policy ➔ investigative intelligence ➔ anticipatory governance.
                             </p>
                         </div>
+
                     </div>
                 </div>
                 
