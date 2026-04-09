@@ -121,26 +121,32 @@
         const twitterTitle = document.getElementById('twitter-title');
         const twitterImage = document.getElementById('twitter-image');
 
+        // State Global untuk Filter & Sort
+        let allArticles = [];
+        let searchQuery = '';
+        let currentCategory = 'All';
+        let sortOrder = 'latest'; // 'latest' or 'older'
+
         // Fetch Data from JSON
         async function fetchArticles() {
             try {
                 const response = await fetch('blog/data.json');
                 if (!response.ok) throw new Error('Network response was not ok');
-                const articles = await response.json();
+                allArticles = await response.json(); // Simpan semua data ke variabel global
                 
                 // Route checking based on URL parameter (?id=1)
                 const urlParams = new URLSearchParams(window.location.search);
                 const articleId = urlParams.get('id');
 
                 if (articleId) {
-                    const article = articles.find(a => a.id === articleId);
+                    const article = allArticles.find(a => a.id === articleId);
                     if (article) {
                         renderSingleArticle(article);
                     } else {
                         renderError("Article not found.");
                     }
                 } else {
-                    renderArticleList(articles);
+                    renderArticleList();
                 }
             } catch (error) {
                 console.error("Error loading articles:", error);
@@ -148,8 +154,8 @@
             }
         }
 
-        // Render List of Articles (Grid)
-        function renderArticleList(articles) {
+        // Fungsi untuk Merender Struktur Header dan Filter Controls
+        function renderArticleList() {
             // Reset Meta Tags to Default for the Main Blog Page
             pageTitle.innerText = "Publications | Horizon Scan AI";
             metaDesc.setAttribute("content", "Read articles, case studies, and methodologies on Strategic Foresight and Horizon Scanning.");
@@ -159,19 +165,109 @@
             twitterTitle.setAttribute("content", "Publications | Horizon Scan AI");
             twitterImage.setAttribute("content", "thumbnail.png");
             
+            // Mengambil kategori unik dari file JSON
+            const categories = ['All', ...new Set(allArticles.map(a => a.category))];
+            const categoryOptions = categories.map(c => `<option value="${c}">${c}</option>`).join('');
+
             let html = `
-                <div class="text-center mb-16 mt-8">
+                <div class="text-center mb-10 mt-8">
                     <h1 class="text-4xl md:text-5xl font-extrabold text-navy-900 mb-4 tracking-tight">Strategic Insights</h1>
                     <p class="text-lg text-slate-500 max-w-2xl mx-auto">Publications, methodologies, and case studies on navigating uncertainty and mastering horizon scanning.</p>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+                <!-- Controls: Search, Filter, Sort -->
+                <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-8 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                    <!-- Search Bar -->
+                    <div class="relative w-full md:w-1/3">
+                        <i class="ph ph-magnifying-glass absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-lg"></i>
+                        <input type="text" id="searchInput" placeholder="Search articles..." class="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-shadow">
+                    </div>
+                    
+                    <!-- Filters & Sort -->
+                    <div class="flex flex-col sm:flex-row w-full md:w-auto gap-4">
+                        <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-3 py-1">
+                            <i class="ph ph-funnel text-slate-400 text-lg"></i>
+                            <select id="categoryFilter" class="w-full sm:w-auto bg-transparent border-none text-sm text-slate-700 py-1 focus:outline-none focus:ring-0 cursor-pointer">
+                                ${categoryOptions}
+                            </select>
+                        </div>
+                        <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-3 py-1">
+                            <i class="ph ph-sort-descending text-slate-400 text-lg"></i>
+                            <select id="sortFilter" class="w-full sm:w-auto bg-transparent border-none text-sm text-slate-700 py-1 focus:outline-none focus:ring-0 cursor-pointer">
+                                <option value="latest">Latest</option>
+                                <option value="older">Older</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Grid Container (Akan diupdate isinya lewat updateGrid) -->
+                <div id="articleGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 min-h-[400px] content-start">
+                    <!-- Cards will be injected here -->
+                </div>
             `;
 
-            articles.forEach(article => {
+            appContainer.innerHTML = html;
+
+            // Tambahkan Event Listeners untuk interaksi Search/Filter
+            document.getElementById('searchInput').addEventListener('input', (e) => {
+                searchQuery = e.target.value.toLowerCase();
+                updateGrid();
+            });
+
+            document.getElementById('categoryFilter').addEventListener('change', (e) => {
+                currentCategory = e.target.value;
+                updateGrid();
+            });
+
+            document.getElementById('sortFilter').addEventListener('change', (e) => {
+                sortOrder = e.target.value;
+                updateGrid();
+            });
+
+            // Jalankan render grid pertama kali
+            updateGrid();
+        }
+
+        // Fungsi Khusus untuk memfilter, menyortir, dan merender artikel dalam grid
+        function updateGrid() {
+            const grid = document.getElementById('articleGrid');
+            if (!grid) return;
+
+            // 1. Filter Artikel (Berdasarkan Search dan Category)
+            let filtered = allArticles.filter(article => {
+                const matchesSearch = article.title.toLowerCase().includes(searchQuery) || article.excerpt.toLowerCase().includes(searchQuery);
+                const matchesCategory = currentCategory === 'All' || article.category === currentCategory;
+                return matchesSearch && matchesCategory;
+            });
+
+            // 2. Sort Artikel (Berdasarkan Tanggal)
+            filtered.sort((a, b) => {
+                const dateA = new Date(a.date);
+                const dateB = new Date(b.date);
+                
+                if (sortOrder === 'latest') return dateB - dateA;
+                if (sortOrder === 'older') return dateA - dateB;
+                return 0;
+            });
+
+            // 3. Render Hasil
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full flex flex-col items-center justify-center py-16 text-slate-500 border-2 border-dashed border-slate-200 rounded-2xl">
+                        <i class="ph ph-magnifying-glass text-4xl mb-3 text-slate-300"></i>
+                        <p class="font-medium text-lg">No articles found.</p>
+                        <p class="text-sm">Try adjusting your search or filter criteria.</p>
+                    </div>`;
+                return;
+            }
+
+            let html = '';
+            filtered.forEach(article => {
                 html += `
                     <article class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col transform hover:-translate-y-1">
-                        <div class="h-48 bg-slate-200 relative overflow-hidden">
-                            <img src="${article.imageUrl}" alt="${article.title}" class="w-full h-full object-cover" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23f1f5f9%22/><text x=%2250%22 y=%2250%22 font-family=%22sans-serif%22 font-size=%2210%22 text-anchor=%22middle%22 fill=%22%2394a3b8%22>No Image</text></svg>'">
+                        <div class="h-48 bg-slate-200 relative overflow-hidden group">
+                            <img src="${article.imageUrl}" alt="${article.title}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23f1f5f9%22/><text x=%2250%22 y=%2250%22 font-family=%22sans-serif%22 font-size=%2210%22 text-anchor=%22middle%22 fill=%22%2394a3b8%22>No Image</text></svg>'">
                             <div class="absolute top-4 left-4 bg-teal-500/90 backdrop-blur text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
                                 ${article.category}
                             </div>
@@ -192,15 +288,12 @@
                 `;
             });
 
-            html += `</div>`;
-            appContainer.innerHTML = html;
+            grid.innerHTML = html;
         }
 
         // Render Single Article Detail
         function renderSingleArticle(article) {
             // --- SEO FIX: UPDATE META TAGS DYNAMICALLY ---
-            // Catatan: Ini mengubah tampilan di tab browser, tapi bot social media (LinkedIn/WA) 
-            // umumnya tidak menjalankan JS, jadi mereka akan membaca meta tag default di atas.
             const dynamicTitle = `${article.title} | Horizon Scan AI`;
             pageTitle.innerText = dynamicTitle;
             ogTitle.setAttribute("content", dynamicTitle);
@@ -212,8 +305,6 @@
             }
 
             if (article.imageUrl) {
-                // Konversi path relatif ke absolut (opsional, disarankan untuk OG tags)
-                // Anggap gambar ada di folder thum/
                 const absoluteImageUrl = new URL(article.imageUrl, window.location.href).href;
                 ogImage.setAttribute("content", absoluteImageUrl);
                 twitterImage.setAttribute("content", absoluteImageUrl);
