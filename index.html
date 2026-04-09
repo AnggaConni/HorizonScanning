@@ -122,6 +122,471 @@
         padding: 10px; /* Contoh */
         }
 
+            /* ─── Design Tokens ─────────────────────────────────── */
+    :root {
+      --navy-950: #040c1a;
+      --navy-900: #0a1628;
+      --navy-800: #102040;
+      --teal-600: #0d9488;
+      --teal-500: #14b8a6;
+      --teal-400: #2dd4bf;
+      --teal-100: #ccfbf1;
+      --teal-50:  #f0fdfa;
+      --amber-400: #fbbf24;
+      --amber-50:  #fffbeb;
+      --rose-500: #f43f5e;
+      --rose-50:  #fff1f2;
+      --purple-600: #7c3aed;
+      --purple-50:  #f5f3ff;
+      --blue-600: #2563eb;
+      --blue-50:  #eff6ff;
+      --slate-700: #334155;
+      --slate-600: #475569;
+      --slate-500: #64748b;
+      --slate-400: #94a3b8;
+      --slate-200: #e2e8f0;
+      --slate-100: #f1f5f9;
+      --slate-50:  #f8fafc;
+      --white:     #ffffff;
+ 
+      --font-display: 'Syne', sans-serif;
+      --font-body:    'DM Sans', sans-serif;
+      --font-mono:    'DM Mono', monospace;
+ 
+      --radius-lg: 1rem;
+      --radius-xl: 1.5rem;
+      --radius-2xl: 2rem;
+ 
+      --shadow-sm: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+      --shadow-md: 0 4px 16px rgba(0,0,0,.08), 0 2px 6px rgba(0,0,0,.05);
+      --shadow-lg: 0 10px 40px rgba(0,0,0,.12), 0 4px 12px rgba(0,0,0,.07);
+    }
+ 
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+ 
+    body {
+      font-family: var(--font-body);
+      color: var(--slate-700);
+      background: var(--white);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+ 
+    /* ─── Typography ────────────────────────────────────── */
+    h1,h2,h3,h4,h5 { font-family: var(--font-display); line-height: 1.25; }
+ 
+    .page-title {
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 800;
+      color: var(--navy-900);
+      letter-spacing: -0.02em;
+    }
+    .section-label {
+      font-family: var(--font-mono);
+      font-size: .75rem;
+      font-weight: 500;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--teal-600);
+    }
+    .lead {
+      font-size: 1.2rem;
+      font-weight: 400;
+      color: var(--slate-600);
+      line-height: 1.75;
+    }
+    p { margin-bottom: 1rem; color: var(--slate-600); }
+ 
+    /* ─── Layout Helpers ─────────────────────────────────── */
+    .container   { max-width: 68rem; margin-inline: auto; padding-inline: 1.5rem; }
+    .container-sm{ max-width: 52rem; margin-inline: auto; padding-inline: 1.5rem; }
+ 
+    .section        { padding-block: 5rem; }
+    .section-white  { background: var(--white); }
+    .section-light  { background: var(--slate-50); }
+    .section-navy   { background: var(--navy-900); }
+ 
+    /* ─── Divider accent ─────────────────────────────────── */
+    .teal-rule {
+      display: inline-block; width: 3rem; height: 3px;
+      background: var(--teal-500); border-radius: 9px; margin-bottom: 1rem;
+    }
+ 
+    /* ─── Hero Banner ───────────────────────────────────── */
+    .hero-band {
+      background: linear-gradient(135deg, var(--navy-950) 0%, #0f2d4a 60%, #0a3340 100%);
+      padding-block: 5rem 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-band::before {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 60% 60% at 80% 50%, rgba(20,184,166,.12) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 60% at 10% 80%, rgba(7,89,133,.18) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-grid-lines {
+      position: absolute; inset: 0; pointer-events: none; opacity: .07;
+      background-image:
+        linear-gradient(rgba(255,255,255,.6) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.6) 1px, transparent 1px);
+      background-size: 48px 48px;
+    }
+    .hero-content { position: relative; z-index: 1; }
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: .5rem;
+      background: rgba(20,184,166,.15); border: 1px solid rgba(45,212,191,.25);
+      color: var(--teal-400); font-family: var(--font-mono);
+      font-size: .75rem; letter-spacing: .1em; text-transform: uppercase;
+      padding: .35rem .85rem; border-radius: 9999px; margin-bottom: 1.25rem;
+    }
+    .hero-title { color: var(--white); }
+    .hero-sub   { color: rgba(255,255,255,.6); font-size: 1.1rem; margin-top: .75rem; }
+    .hero-meta-row {
+      display: flex; flex-wrap: wrap; gap: 1.5rem; margin-top: 2rem;
+    }
+    .hero-meta-item {
+      display: flex; align-items: center; gap: .5rem;
+      color: rgba(255,255,255,.55); font-size: .85rem;
+    }
+    .hero-meta-item i { color: var(--teal-400); font-size: 1rem; }
+ 
+    /* ─── Table of Contents ─────────────────────────────── */
+    .toc-card {
+      background: var(--white);
+      border: 1px solid var(--slate-200);
+      border-radius: var(--radius-xl);
+      padding: 2rem 2.5rem;
+      box-shadow: var(--shadow-md);
+    }
+    .toc-title {
+      font-size: 1rem; font-weight: 700; color: var(--navy-900);
+      font-family: var(--font-display);
+      margin-bottom: 1.25rem;
+      display: flex; align-items: center; gap: .6rem;
+    }
+    .toc-list { list-style: none; display: flex; flex-direction: column; gap: .45rem; }
+    .toc-list li a {
+      display: flex; align-items: center; gap: .75rem;
+      color: var(--slate-600); text-decoration: none;
+      font-size: .9rem; padding: .4rem .6rem;
+      border-radius: .5rem;
+      transition: background .15s, color .15s;
+    }
+    .toc-list li a:hover { background: var(--teal-50); color: var(--teal-600); }
+    .toc-num {
+      font-family: var(--font-mono); font-size: .72rem;
+      background: var(--slate-100); color: var(--slate-500);
+      padding: .2rem .4rem; border-radius: .3rem; min-width: 2rem; text-align: center;
+    }
+ 
+    /* ─── Module Section Header ─────────────────────────── */
+    .module-header {
+      display: flex; align-items: flex-start; gap: 1.25rem;
+      margin-bottom: 2rem;
+    }
+    .module-icon {
+      flex-shrink: 0;
+      width: 3rem; height: 3rem;
+      border-radius: .75rem;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+    }
+    .module-num {
+      font-family: var(--font-mono); font-size: .7rem; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--teal-600); display: block;
+      margin-bottom: .2rem;
+    }
+    .module-title { font-size: 1.75rem; font-weight: 800; color: var(--navy-900); }
+ 
+    /* ─── Card Styles ───────────────────────────────────── */
+    .card {
+      background: var(--white);
+      border: 1px solid var(--slate-200);
+      border-radius: var(--radius-xl);
+      padding: 1.75rem;
+      box-shadow: var(--shadow-sm);
+      transition: box-shadow .2s, transform .2s;
+    }
+    .card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+ 
+    .card-teal  { border-top: 3px solid var(--teal-500); }
+    .card-amber { border-top: 3px solid var(--amber-400); }
+    .card-rose  { border-top: 3px solid var(--rose-500); }
+    .card-purple{ border-top: 3px solid var(--purple-600); }
+    .card-blue  { border-top: 3px solid var(--blue-600); }
+ 
+    .icon-badge {
+      width: 2.75rem; height: 2.75rem; border-radius: .6rem;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.25rem; margin-bottom: 1rem;
+      flex-shrink: 0;
+    }
+ 
+    /* ─── Grid helpers ──────────────────────────────────── */
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 1.25rem; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: 1.25rem; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: 1rem; }
+ 
+    /* ─── Highlight Quote ───────────────────────────────── */
+    .pullquote {
+      border-left: 4px solid var(--teal-500);
+      background: var(--teal-50);
+      border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+      padding: 1.25rem 1.5rem;
+      margin-block: 2rem;
+      font-style: italic;
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: var(--navy-900);
+    }
+ 
+    /* ─── Callout Boxes ─────────────────────────────────── */
+    .callout {
+      border-radius: var(--radius-lg);
+      padding: 1.25rem 1.5rem;
+      display: flex; gap: 1rem;
+      margin-block: 1.5rem;
+    }
+    .callout-icon { font-size: 1.4rem; flex-shrink: 0; margin-top: .1rem; }
+    .callout-teal   { background: var(--teal-50);   border: 1px solid #99f6e4; }
+    .callout-amber  { background: var(--amber-50);  border: 1px solid #fde68a; }
+    .callout-rose   { background: var(--rose-50);   border: 1px solid #fecdd3; }
+    .callout-purple { background: var(--purple-50); border: 1px solid #ddd6fe; }
+ 
+    /* ─── Step Tracker ──────────────────────────────────── */
+    .step-list { display: flex; flex-direction: column; gap: 0; }
+    .step-item {
+      display: flex; gap: 1.25rem; position: relative;
+      padding-bottom: 2rem;
+    }
+    .step-item:last-child { padding-bottom: 0; }
+    .step-spine {
+      display: flex; flex-direction: column; align-items: center;
+    }
+    .step-circle {
+      width: 2.5rem; height: 2.5rem; border-radius: 9999px;
+      background: var(--teal-500); color: var(--white);
+      font-family: var(--font-mono); font-weight: 600; font-size: .85rem;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; position: relative; z-index: 1;
+    }
+    .step-line {
+      flex: 1; width: 2px;
+      background: linear-gradient(to bottom, var(--teal-400), var(--teal-100));
+      margin-top: .3rem;
+    }
+    .step-item:last-child .step-line { display: none; }
+    .step-body { padding-top: .35rem; }
+    .step-body h5 { font-size: 1rem; font-weight: 700; color: var(--navy-900); margin-bottom: .35rem; }
+    .step-body p  { font-size: .9rem; margin-bottom: 0; }
+ 
+    /* ─── Futures Cone ──────────────────────────────────── */
+    .cone-wrap { display: flex; flex-direction: column; align-items: center; gap: 2.5rem; margin-block: 2rem; }
+    .cone-svg-area { width: 100%; max-width: 40rem; }
+ 
+    /* ─── Signal Timeline ───────────────────────────────── */
+    .timeline {
+      position: relative;
+      padding-left: 2.5rem;
+      display: flex; flex-direction: column; gap: 1.75rem;
+    }
+    .timeline::before {
+      content: '';
+      position: absolute; left: .75rem; top: 0; bottom: 0;
+      width: 2px;
+      background: linear-gradient(to bottom, var(--teal-400), var(--purple-600), var(--rose-500));
+    }
+    .timeline-item { position: relative; }
+    .timeline-dot {
+      position: absolute; left: -1.75rem; top: .35rem;
+      width: .875rem; height: .875rem; border-radius: 9999px;
+      border: 2px solid var(--white);
+      box-shadow: 0 0 0 2px var(--teal-500);
+      background: var(--teal-500);
+    }
+    .timeline-item.dot-purple .timeline-dot { background: var(--purple-600); box-shadow: 0 0 0 2px var(--purple-600); }
+    .timeline-item.dot-rose   .timeline-dot { background: var(--rose-500);   box-shadow: 0 0 0 2px var(--rose-500); }
+    .timeline-item.dot-amber  .timeline-dot { background: var(--amber-400);  box-shadow: 0 0 0 2px var(--amber-400); }
+ 
+    /* ─── Comparison Table ──────────────────────────────── */
+    .compare-table {
+      width: 100%; border-collapse: collapse; font-size: .9rem;
+      border-radius: var(--radius-lg); overflow: hidden;
+      box-shadow: var(--shadow-sm); border: 1px solid var(--slate-200);
+    }
+    .compare-table thead { background: var(--navy-900); color: var(--white); }
+    .compare-table th,
+    .compare-table td { padding: .85rem 1.1rem; text-align: left; }
+    .compare-table tbody tr { background: var(--white); border-top: 1px solid var(--slate-100); }
+    .compare-table tbody tr:hover { background: var(--slate-50); }
+    .compare-table .tag {
+      display: inline-flex; align-items: center; gap: .35rem;
+      padding: .25rem .65rem; border-radius: 9999px;
+      font-size: .75rem; font-weight: 600;
+    }
+ 
+    /* ─── Matrix Grid ───────────────────────────────────── */
+    .quadrant-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: .75rem;
+      aspect-ratio: 1 / 1;
+      max-width: 36rem;
+      margin: 0 auto;
+    }
+    .quad {
+      border-radius: var(--radius-lg); padding: 1.1rem;
+      display: flex; flex-direction: column; justify-content: center;
+    }
+    .quad-title { font-family: var(--font-display); font-size: .9rem; font-weight: 700; margin-bottom: .35rem; }
+    .quad-body  { font-size: .78rem; line-height: 1.5; }
+    .quad-tl { background: #eff6ff; border: 1.5px solid #bfdbfe; }
+    .quad-tr { background: #f0fdfa; border: 1.5px solid #99f6e4; }
+    .quad-bl { background: #f5f3ff; border: 1.5px solid #ddd6fe; }
+    .quad-br { background: #fff1f2; border: 1.5px solid #fecdd3; }
+ 
+    .quad-axis-x {
+      text-align: center; font-family: var(--font-mono);
+      font-size: .7rem; color: var(--slate-500); letter-spacing: .08em;
+      text-transform: uppercase; padding-top: .5rem;
+    }
+    .quad-axis-y {
+      display: flex; align-items: center; justify-content: center;
+      writing-mode: vertical-rl; transform: rotate(180deg);
+      font-family: var(--font-mono); font-size: .7rem;
+      color: var(--slate-500); letter-spacing: .08em;
+      text-transform: uppercase; padding-right: .5rem;
+    }
+ 
+    /* ─── Method Pills ──────────────────────────────────── */
+    .method-pill {
+      display: inline-flex; align-items: center; gap: .5rem;
+      background: var(--slate-100); border: 1px solid var(--slate-200);
+      border-radius: 9999px; padding: .4rem .9rem;
+      font-size: .82rem; font-weight: 600; color: var(--slate-700);
+      transition: background .15s, color .15s;
+    }
+    .method-pill:hover { background: var(--teal-50); color: var(--teal-600); border-color: #99f6e4; }
+ 
+    /* ─── Key Term Glossary ─────────────────────────────── */
+    .glossary-item {
+      padding: 1.25rem 1.5rem;
+      border-radius: var(--radius-lg);
+      background: var(--white);
+      border: 1px solid var(--slate-200);
+      box-shadow: var(--shadow-sm);
+    }
+    .glossary-term {
+      font-family: var(--font-mono); font-size: .8rem;
+      background: var(--teal-100); color: var(--teal-600);
+      padding: .2rem .55rem; border-radius: .3rem; font-weight: 600;
+      display: inline-block; margin-bottom: .6rem;
+    }
+    .glossary-item h5 { font-size: 1rem; font-weight: 700; color: var(--navy-900); margin-bottom: .4rem; }
+    .glossary-item p  { font-size: .88rem; margin: 0; }
+ 
+    /* ─── Bias Card ─────────────────────────────────────── */
+    .bias-card {
+      border-radius: var(--radius-xl); overflow: hidden;
+      box-shadow: var(--shadow-sm); border: 1px solid var(--slate-200);
+    }
+    .bias-card-head {
+      padding: 1.1rem 1.5rem;
+      display: flex; align-items: center; gap: .75rem;
+      font-family: var(--font-display); font-weight: 700;
+      font-size: 1rem; color: var(--white);
+    }
+    .bias-card-body { padding: 1.25rem 1.5rem; background: var(--white); }
+    .bias-card-body p { font-size: .88rem; margin-bottom: .75rem; }
+    .bias-fix {
+      background: var(--slate-50); border: 1px solid var(--slate-200);
+      border-radius: .5rem; padding: .75rem 1rem; font-size: .85rem;
+    }
+    .bias-fix strong { color: var(--teal-600); }
+ 
+    /* ─── Trusted By ────────────────────────────────────── */
+    .trusted-strip {
+      display: flex; flex-wrap: wrap; justify-content: center;
+      gap: 1.5rem 3rem; align-items: center;
+    }
+    .trusted-link {
+      display: flex; align-items: center; gap: .6rem;
+      color: var(--slate-400); font-size: .82rem; font-weight: 600;
+      text-decoration: none; transition: color .15s;
+    }
+    .trusted-link:hover { color: var(--teal-600); }
+ 
+    /* ─── Scenario Card ─────────────────────────────────── */
+    .scenario-card {
+      border-radius: var(--radius-xl); padding: 1.5rem;
+      border: 2px dashed var(--slate-200);
+      background: var(--white); position: relative; overflow: hidden;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .scenario-card:hover { border-color: var(--teal-400); box-shadow: var(--shadow-md); }
+    .scenario-card::before {
+      content: attr(data-label);
+      position: absolute; top: .75rem; right: .75rem;
+      font-family: var(--font-mono); font-size: .65rem;
+      letter-spacing: .1em; text-transform: uppercase;
+      background: var(--slate-100); color: var(--slate-500);
+      padding: .2rem .55rem; border-radius: .3rem;
+    }
+    .scenario-card h5 { font-size: 1.05rem; font-weight: 700; color: var(--navy-900); margin-bottom: .5rem; }
+    .scenario-card p  { font-size: .88rem; margin: 0; }
+ 
+    /* ─── FAQ Accordion ─────────────────────────────────── */
+    details.faq-item {
+      border: 1px solid var(--slate-200);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      background: var(--white);
+      transition: box-shadow .2s;
+    }
+    details.faq-item[open] { box-shadow: var(--shadow-md); }
+    details.faq-item summary {
+      list-style: none; cursor: pointer;
+      padding: 1.1rem 1.5rem;
+      font-family: var(--font-display); font-weight: 700;
+      font-size: 1rem; color: var(--navy-900);
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 1rem;
+    }
+    details.faq-item summary::-webkit-details-marker { display: none; }
+    details.faq-item summary::after {
+      content: '+'; font-size: 1.3rem; color: var(--teal-500);
+      transition: transform .2s; display: inline-block;
+    }
+    details.faq-item[open] summary::after { transform: rotate(45deg); }
+    .faq-body { padding: 0 1.5rem 1.25rem; font-size: .9rem; }
+ 
+    /* ─── Progress Indicator (reading) ─────────────────── */
+    .reading-bar {
+      position: fixed; top: 0; left: 0; height: 3px;
+      background: linear-gradient(to right, var(--teal-500), var(--teal-400));
+      width: 0%; z-index: 999; transition: width .1s;
+    }
+ 
+    /* ─── Responsive ────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .section { padding-block: 3rem; }
+      .module-title { font-size: 1.4rem; }
+      .quadrant-grid { max-width: 100%; }
+    }
+ 
+    /* ─── Print / reduced motion ───────────────────────── */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+ 
+    /* ─── Anchor offset (sticky nav) ───────────────────── */
+    [id] { scroll-margin-top: 5rem; }
+
+
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans antialiased selection:bg-teal-200 selection:text-teal-900">
@@ -442,60 +907,102 @@
 
 <div class="mb-12">
                     <h3 class="text-2xl font-bold text-navy-900 mb-4">Module 2: The Anatomy of a Signal</h3>
-                    <p class="text-slate-700 mb-6">In this tool, every "Node" represents a signal. Understanding the type of signal is crucial:</p>
-                    
-                    <div class="overflow-x-auto rounded-xl border border-slate-200 shadow-sm not-prose">
-                        <table class="min-w-full text-left text-sm text-slate-600">
-                            <thead class="bg-navy-900 text-white">
-                                <tr>
-                                    <th scope="col" class="px-6 py-4 font-semibold w-1/4">Signal Type</th>
-                                    <th scope="col" class="px-6 py-4 font-semibold w-2/4">Definition</th>
-                                    <th scope="col" class="px-6 py-4 font-semibold w-1/4">Strategic Action</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-slate-200 bg-white">
-                                <tr class="hover:bg-slate-50 transition-colors">
-                                    <td class="px-6 py-4 font-bold text-slate-800 whitespace-nowrap">
-                                        <span class="inline-flex items-center gap-1.5 py-1 px-2.5 rounded-md bg-slate-100 border border-slate-200 text-slate-700">
-                                            <i class="ph-fill ph-wifi-low text-slate-500"></i> Weak Signal
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 leading-relaxed">A piece of information that is ambiguous, new, or weird. Low frequency, potentially high impact.</td>
-                                    <td class="px-6 py-4 font-bold text-teal-600">Scan & Monitor</td>
-                                </tr>
-                                <tr class="hover:bg-slate-50 transition-colors">
-                                    <td class="px-6 py-4 font-bold text-slate-800 whitespace-nowrap">
-                                        <span class="inline-flex items-center gap-1.5 py-1 px-2.5 rounded-md bg-blue-50 border border-blue-100 text-blue-700">
-                                            <i class="ph-fill ph-trend-up text-blue-500"></i> Emerging Issue
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 leading-relaxed">A signal that is gaining traction and volume. The direction of change is becoming visible.</td>
-                                    <td class="px-6 py-4 font-bold text-teal-600">Analyze & Assess</td>
-                                </tr>
-                                <tr class="hover:bg-slate-50 transition-colors">
-                                    <td class="px-6 py-4 font-bold text-slate-800 whitespace-nowrap">
-                                        <span class="inline-flex items-center gap-1.5 py-1 px-2.5 rounded-md bg-emerald-50 border border-emerald-100 text-emerald-700">
-                                            <i class="ph-fill ph-arrows-merge text-emerald-500"></i> Trend
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 leading-relaxed">A change that has a clear direction and momentum (e.g., Aging Population).</td>
-                                    <td class="px-6 py-4 font-bold text-teal-600">Adapt & Align</td>
-                                </tr>
-                                <tr class="hover:bg-slate-50 transition-colors">
-                                    <td class="px-6 py-4 font-bold text-slate-800 whitespace-nowrap">
-                                        <span class="inline-flex items-center gap-1.5 py-1 px-2.5 rounded-md bg-red-50 border border-red-100 text-red-700">
-                                            <i class="ph-fill ph-warning-octagon text-red-500"></i> Wild Card
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 leading-relaxed">Low probability, extremely high impact events (e.g., Global Pandemic, Solar Flare).</td>
-                                    <td class="px-6 py-4 font-bold text-teal-600">Contingency Planning</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+
+                        <p class="lead">In horizon scanning, every data point is called a <strong>signal</strong>. Knowing <em>what type</em> of signal you're looking at determines the correct strategic response.</p>
+ 
+    <div style="overflow-x:auto;margin-bottom:2rem">
+      <table class="compare-table" role="table" aria-label="Signal types in horizon scanning">
+        <thead>
+          <tr>
+            <th>Signal Type</th>
+            <th>Definition</th>
+            <th>Typical Source</th>
+            <th>Strategic Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="tag" style="background:#f1f5f9;color:#475569"><i class="ph-fill ph-wifi-low"></i> Weak Signal</span></td>
+            <td>Ambiguous, rare, or unexpected fragments of emerging change</td>
+            <td>Fringe media, niche research, anomalous data</td>
+            <td style="font-weight:600;color:var(--teal-600)">Scan &amp; Monitor</td>
+          </tr>
+          <tr>
+            <td><span class="tag" style="background:#eff6ff;color:#2563eb"><i class="ph-fill ph-trend-up"></i> Emerging Issue</span></td>
+            <td>A signal gaining traction; direction becoming clearer</td>
+            <td>Academic papers, specialist press, early adopters</td>
+            <td style="font-weight:600;color:var(--teal-600)">Analyze &amp; Assess</td>
+          </tr>
+          <tr>
+            <td><span class="tag" style="background:#f0fdfa;color:#0d9488"><i class="ph-fill ph-arrows-merge"></i> Trend</span></td>
+            <td>Measurable direction of change with observable momentum</td>
+            <td>Industry reports, government data, mainstream media</td>
+            <td style="font-weight:600;color:var(--teal-600)">Adapt &amp; Align</td>
+          </tr>
+          <tr>
+            <td><span class="tag" style="background:#f5f3ff;color:#7c3aed"><i class="ph-fill ph-arrows-out"></i> Megatrend</span></td>
+            <td>Multi-decade global transformation (e.g., digitalization, climate)</td>
+            <td>UN, World Bank, OECD long-range reports</td>
+            <td style="font-weight:600;color:var(--teal-600)">Reframe Strategy</td>
+          </tr>
+          <tr>
+            <td><span class="tag" style="background:#fff1f2;color:#f43f5e"><i class="ph-fill ph-warning-octagon"></i> Wild Card</span></td>
+            <td>Low-probability, extremely high-impact events</td>
+            <td>Tail-risk analysis, black swan literature</td>
+            <td style="font-weight:600;color:var(--teal-600)">Contingency Plan</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
 <div class="mb-12" itemscope itemtype="https://schema.org/Article">
+
+
+     <h3 style="font-size:1.25rem;font-weight:700;color:var(--navy-900);margin-bottom:1.25rem;font-family:var(--font-display)">The Signal Lifecycle: How Weak Signals Become Megatrends</h3>
+ 
+    <div class="timeline" role="list">
+      <div class="timeline-item" role="listitem">
+        <div class="timeline-dot"></div>
+        <div>
+          <h5 style="font-family:var(--font-display);font-weight:700;color:var(--navy-900);margin-bottom:.3rem">Stage 1 — Noise</h5>
+          <p style="font-size:.88rem">A single unusual data point appears. Easy to dismiss as an anomaly or coincidence. Most organizations miss this entirely.</p>
+        </div>
+      </div>
+      <div class="timeline-item dot-purple" role="listitem">
+        <div class="timeline-dot"></div>
+        <div>
+          <h5 style="font-family:var(--font-display);font-weight:700;color:var(--navy-900);margin-bottom:.3rem">Stage 2 — Weak Signal</h5>
+          <p style="font-size:.88rem">Pattern recognition kicks in. Similar signals appear across different domains. Only skilled scanners pick this up.</p>
+        </div>
+      </div>
+      <div class="timeline-item dot-amber" role="listitem">
+        <div class="timeline-dot"></div>
+        <div>
+          <h5 style="font-family:var(--font-display);font-weight:700;color:var(--navy-900);margin-bottom:.3rem">Stage 3 — Emerging Issue</h5>
+          <p style="font-size:.88rem">Researchers, journalists, and specialists begin covering the issue. Momentum is building but mainstream awareness is still low.</p>
+        </div>
+      </div>
+      <div class="timeline-item dot-rose" role="listitem">
+        <div class="timeline-dot"></div>
+        <div>
+          <h5 style="font-family:var(--font-display);font-weight:700;color:var(--navy-900);margin-bottom:.3rem">Stage 4 — Established Trend</h5>
+          <p style="font-size:.88rem">Mainstream adoption. Measurable data. Most organizations are now aware — first-mover advantage is gone.</p>
+        </div>
+      </div>
+      <div class="timeline-item" style="padding-bottom:0" role="listitem">
+        <div class="timeline-dot" style="background:#6b21a8;box-shadow:0 0 0 2px #6b21a8"></div>
+        <div>
+          <h5 style="font-family:var(--font-display);font-weight:700;color:var(--navy-900);margin-bottom:.3rem">Stage 5 — Megatrend / Paradigm Shift</h5>
+          <p style="font-size:.88rem">Structural transformation of society, markets, or governance. Everyone plans around it. The opportunity for disruption has passed.</p>
+        </div>
+      </div>
+    </div>
+ 
+    <div class="callout callout-amber" style="margin-top:2rem">
+      <i class="ph-fill ph-star callout-icon" style="color:#d97706"></i>
+      <div><strong style="color:var(--navy-900)">The Foresight Advantage:</strong> Organizations that detect signals at Stage 1–2 have 3–5 years to respond. Those who react at Stage 4 are already behind. This time gap is the strategic value of horizon scanning.</div>
+    </div>
+  </div>
     
     <!-- Title -->
     <h3 class="text-2xl font-bold text-navy-900 mb-4" itemprop="headline">
@@ -945,6 +1452,63 @@
             </article>
         </div>
     </section>
+
+    <!-- ═══════════════════════════════════════════════════════
+     FAQ (SEO-FRIENDLY)
+═══════════════════════════════════════════════════════ -->
+<section id="faq" class="section section-white" itemscope itemtype="https://schema.org/FAQPage">
+  <div class="container-sm">
+    <div class="teal-rule"></div>
+    <h2 style="font-family:var(--font-display);font-size:2rem;font-weight:800;color:var(--navy-900);margin-bottom:.5rem">Frequently Asked Questions</h2>
+    <p style="margin-bottom:2rem;color:var(--slate-500)">Common questions about horizon scanning and strategic foresight.</p>
+ 
+    <div style="display:flex;flex-direction:column;gap:.75rem" role="list">
+ 
+      <details class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <summary itemprop="name">What is the difference between horizon scanning and strategic foresight?</summary>
+        <div class="faq-body" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+          <p itemprop="text"><strong>Horizon scanning</strong> is the <em>input</em> process — the systematic gathering and monitoring of signals across multiple domains. <strong>Strategic foresight</strong> is the broader <em>discipline</em> that includes horizon scanning, plus scenario planning, causal analysis, backcasting, and the translation of insights into strategic decisions. Think of horizon scanning as the radar, and strategic foresight as the entire navigation system.</p>
+        </div>
+      </details>
+ 
+      <details class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <summary itemprop="name">How is horizon scanning different from traditional market research?</summary>
+        <div class="faq-body" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+          <p itemprop="text">Market research focuses on present customer behavior and near-term market conditions. Horizon scanning deliberately looks further out — 5, 10, 20 years — at signals that have not yet become mainstream. It is explicitly designed to surface <strong>discontinuities</strong>: moments when the future diverges fundamentally from past trends. Market research tells you what is; horizon scanning explores what could be.</p>
+        </div>
+      </details>
+ 
+      <details class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <summary itemprop="name">Who uses horizon scanning in practice?</summary>
+        <div class="faq-body" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+          <p itemprop="text">Horizon scanning is used by national governments (Singapore, UK, Finland, UAE), international organizations (OECD, UN, EU Commission), corporations (Shell, McKinsey, Deloitte), military and intelligence agencies, central banks, public health agencies (WHO), and increasingly by NGOs, universities, and city governments. It is a core competency in any organization dealing with long-range planning under uncertainty.</p>
+        </div>
+      </details>
+ 
+      <details class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <summary itemprop="name">How long does a horizon scanning exercise take?</summary>
+        <div class="faq-body" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+          <p itemprop="text">A focused single-day workshop can produce useful results, but a rigorous scan typically takes 2–8 weeks: 1–2 weeks of distributed signal gathering, a 1–2 day synthesis workshop, and 1–2 weeks to write up findings and scenario narratives. Ongoing monitoring programs run continuously. The Singapore Centre for Strategic Futures, for example, runs continuous scanning with periodic deep-dive synthesis reports every 6 months.</p>
+        </div>
+      </details>
+ 
+      <details class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <summary itemprop="name">What is a "weak signal" in foresight, and how do you find one?</summary>
+        <div class="faq-body" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+          <p itemprop="text">A weak signal is an early, ambiguous indicator of possible change — often found in fringe academic journals, niche online communities, patent filings, startup activity, regulatory edge cases, or surprising behavior in small groups. To find them: read widely outside your domain, monitor cross-domain databases (e.g., arXiv, patent offices, startup funding data), follow unconventional thinkers, and pay attention to things that seem "weird" or "don't fit" your current mental model — those are often the most valuable signals.</p>
+        </div>
+      </details>
+ 
+      <details class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <summary itemprop="name">Can AI tools replace human foresight analysts?</summary>
+        <div class="faq-body" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+          <p itemprop="text">Not entirely — but AI significantly augments foresight work. AI excels at <strong>signal volume processing</strong>, pattern detection across large datasets, cross-domain synthesis, and first-pass scenario drafting. However, <strong>interpretation, normative judgment, systems thinking, and stakeholder communication</strong> still require human expertise. The most effective foresight practices combine AI-powered scanning tools with experienced human analysts who bring contextual judgment, domain knowledge, and ethical reasoning that AI cannot replicate.</p>
+        </div>
+      </details>
+ 
+    </div>
+  </div>
+</section>
 
     <!-- Technical & API Section -->
     <section class="py-20 bg-navy-900 text-slate-300">
