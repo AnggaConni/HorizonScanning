@@ -112,34 +112,38 @@ Color-coded lifecycle:
 
 ## ⚡ Quick Workflow
 
-```text
 1. Choose Matrix Template
 2. Add Signals
 3. Input Gemini API Key
 4. Run AI Analysis
 5. Export / Generate Report
 
-🧩 Example Use Cases
+## 🧩 Example Use Cases
 Use Case	Description
 📉 Risk Management	Identify and prioritize threats
 🔮 Scenario Planning	Build future scenarios
 🧠 Policy Design	Evidence-based decision making
 🚀 Innovation Radar	Track emerging tech
 👥 Stakeholder Mapping	Analyze ecosystem actors
-🧠 Core Framework: STEEP
+
+## 🧠 Core Framework: STEEP
 Factor	Description
 S	Social
 T	Technological
 E	Economic
 E	Environmental
 P	Political
-🧠 Avoid Cognitive Bias
+
+## 🧠 Avoid Cognitive Bias
+
 <details> <summary>Click to expand</summary>
 ❌ Confirmation Bias → Add counter-signals
 ❌ Availability Bias → Look beyond trends
 ❌ Groupthink → Visualize divergence
 </details>
+
 🧪 Power Feature: Spread Overlap
+
 <details> <summary>Click to expand</summary>
 
 When signals overlap:
@@ -148,6 +152,7 @@ When signals overlap:
 ✔️ Nodes visually separate
 ✔️ Data remains unchanged
 </details>
+
 🔑 Gemini API Setup
 1. Go to https://aistudio.google.com/
 2. Click "Get API Key"
