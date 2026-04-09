@@ -12,6 +12,13 @@
     <meta property="og:type" content="article">
     <meta id="og-title" property="og:title" content="Publications | Horizon Scan AI">
     <meta id="og-description" property="og:description" content="Read articles, case studies, and methodologies on Strategic Foresight and Horizon Scanning.">
+    <!-- Tambahan: Fallback image untuk Social Media Share -->
+    <meta id="og-image" property="og:image" content="thumbnail.png">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta id="twitter-title" property="twitter:title" content="Publications | Horizon Scan AI">
+    <meta id="twitter-image" property="twitter:image" content="thumbnail.png">
     
     <!-- Tailwind CSS & Typography -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -110,6 +117,9 @@
         const metaDesc = document.getElementById('meta-description');
         const ogTitle = document.getElementById('og-title');
         const ogDesc = document.getElementById('og-description');
+        const ogImage = document.getElementById('og-image');
+        const twitterTitle = document.getElementById('twitter-title');
+        const twitterImage = document.getElementById('twitter-image');
 
         // Fetch Data from JSON
         async function fetchArticles() {
@@ -143,6 +153,11 @@
             // Reset Meta Tags to Default for the Main Blog Page
             pageTitle.innerText = "Publications | Horizon Scan AI";
             metaDesc.setAttribute("content", "Read articles, case studies, and methodologies on Strategic Foresight and Horizon Scanning.");
+            ogTitle.setAttribute("content", "Publications | Horizon Scan AI");
+            ogDesc.setAttribute("content", "Read articles, case studies, and methodologies on Strategic Foresight and Horizon Scanning.");
+            ogImage.setAttribute("content", "thumbnail.png");
+            twitterTitle.setAttribute("content", "Publications | Horizon Scan AI");
+            twitterImage.setAttribute("content", "thumbnail.png");
             
             let html = `
                 <div class="text-center mb-16 mt-8">
@@ -184,13 +199,24 @@
         // Render Single Article Detail
         function renderSingleArticle(article) {
             // --- SEO FIX: UPDATE META TAGS DYNAMICALLY ---
+            // Catatan: Ini mengubah tampilan di tab browser, tapi bot social media (LinkedIn/WA) 
+            // umumnya tidak menjalankan JS, jadi mereka akan membaca meta tag default di atas.
             const dynamicTitle = `${article.title} | Horizon Scan AI`;
             pageTitle.innerText = dynamicTitle;
             ogTitle.setAttribute("content", dynamicTitle);
+            twitterTitle.setAttribute("content", dynamicTitle);
             
             if (article.excerpt) {
                 metaDesc.setAttribute("content", article.excerpt);
                 ogDesc.setAttribute("content", article.excerpt);
+            }
+
+            if (article.imageUrl) {
+                // Konversi path relatif ke absolut (opsional, disarankan untuk OG tags)
+                // Anggap gambar ada di folder thum/
+                const absoluteImageUrl = new URL(article.imageUrl, window.location.href).href;
+                ogImage.setAttribute("content", absoluteImageUrl);
+                twitterImage.setAttribute("content", absoluteImageUrl);
             }
             // ---------------------------------------------
 
