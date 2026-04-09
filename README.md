@@ -59,10 +59,11 @@ Horizon Scan AI bridges:
 
 <p align="center">
   <img src="https://github.com/AnggaConni/HorizonScanning/blob/main/thumbnail.png" width="800"/>
+  <img src="https://github.com/AnggaConni/HorizonScanning/blob/main/blob/main/docs/nodes.png" width="400"/>
 </p>
 
 <p align="center">
-  <img src="https://github.com/AnggaConni/HorizonScanning/blob/main/blob/main/docs/nodes.png" width="400"/>
+  
   <img src="https://github.com/AnggaConni/HorizonScanning/blob/main/blob/main/docs/ai-result.png" width="400"/>
 </p>
 
