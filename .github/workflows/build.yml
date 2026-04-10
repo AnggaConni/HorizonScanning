@@ -1,0 +1,32 @@
+name: Build Blog
+
+on:
+  push:
+    paths:
+      - 'blog/data.json'
+      - 'scripts/generate-blog.js'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Run generator
+        run: node scripts/generate-blog.js
+
+      - name: Commit generated HTML
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add blog.html
+          git add blog/article/
+          git commit -m "Auto-generate blog.html and individual article pages" || echo "No changes"
+          git push
