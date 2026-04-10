@@ -25,8 +25,17 @@ function slugify(text) {
 // 3. Baca data dari JSON
 const articles = JSON.parse(fs.readFileSync(dataPath, 'utf-8'));
 
-// TAMBAHKAN INI: Urutkan artikel dari yang paling baru (Newest) ke yang lama (Oldest)
+// Urutkan artikel dari yang paling baru (Newest) ke yang lama (Oldest)
 articles.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+// ==========================================
+// TWEAK: Ambil Kategori Unik untuk Filter
+// ==========================================
+const uniqueCategories = [...new Set(articles.map(article => article.category))];
+let categoryOptions = `<option value="all">All Categories</option>`;
+uniqueCategories.forEach(cat => {
+    categoryOptions += `<option value="${cat}">${cat}</option>`;
+});
 
 // Variabel penampung untuk daftar artikel di blog.html
 let articleCards = '';
@@ -180,6 +189,25 @@ const blogIndexHtml = `
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans antialiased">
 
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <a href="index.html" class="flex items-center gap-2">
+                    <i class="ph ph-radar text-teal-600 text-3xl"></i>
+                    <span class="font-bold text-xl text-navy-900 tracking-tight">HorizonScan<span class="text-teal-600">AI</span></span>
+                </a>
+                <a href="index.html" class="text-sm font-bold text-slate-600 hover:text-teal-600 flex items-center gap-1">
+                    <i class="ph-bold ph-house"></i> Back to Home
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <section class="pt-16 pb-10 bg-gradient-to-b from-white to-slate-50 text-center px-4">
+        <h1 class="text-4xl md:text-5xl font-extrabold text-navy-900 mb-4 tracking-tight">Strategic Insights</h1>
+        <p class="text-slate-500 max-w-2xl mx-auto text-lg">Publications, methodologies, and case studies on navigating uncertainty and mastering horizon scanning.</p>
+    </section>
+
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8 mt-8">
         <div class="flex flex-col md:flex-row justify-between items-center gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
             <div class="relative w-full md:w-96">
@@ -188,9 +216,7 @@ const blogIndexHtml = `
             </div>
             <div class="flex gap-3 w-full md:w-auto">
                 <select id="categoryFilter" class="w-full md:w-auto px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-600 focus:outline-none focus:border-teal-500">
-                    <option value="all">All Categories</option>
-                    <option value="Foresight Strategy">Foresight Strategy</option>
-                    <option value="Methodology">Methodology</option>
+                    ${categoryOptions}
                 </select>
                 <select id="sortFilter" class="w-full md:w-auto px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-600 focus:outline-none focus:border-teal-500">
                     <option value="newest">Newest First</option>
