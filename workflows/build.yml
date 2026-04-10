@@ -27,5 +27,6 @@ jobs:
           git config user.name "github-actions"
           git config user.email "actions@github.com"
           git add blog.html
-          git commit -m "Auto-generate blog.html" || echo "No changes"
+          git add blog/article/
+          git commit -m "Auto-generate blog.html and individual article pages" || echo "No changes"
           git push
