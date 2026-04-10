@@ -5,6 +5,7 @@ on:
     paths:
       - 'blog/data.json'
       - 'scripts/generate-blog.js'
+  workflow_dispatch: # <--- INI ADALAH KUNCI UNTUK TOMBOL MANUAL BUILD
 
 permissions:
   contents: write
