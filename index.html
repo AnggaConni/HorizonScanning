@@ -654,6 +654,70 @@
                 </div>
             </div>
 
+            <!-- Quick Start -->
+<div class="mb-16 bg-white rounded-3xl p-8 lg:p-12 shadow-sm border border-slate-200">
+                <div class="text-center mb-10">
+                    <h3 class="text-3xl font-extrabold text-navy-900 mb-4">How to Use HorizonScan AI</h3>
+                    <p class="text-slate-600 max-w-2xl mx-auto">Master the platform's core workflow in just a few clicks.</p>
+                </div>
+
+                <div class="flex flex-col gap-10 items-center">
+                    <div class="w-full max-w-4xl mx-auto">
+                        <div class="rounded-xl overflow-hidden shadow-lg border border-slate-200 bg-slate-50 p-2 transform transition-transform hover:scale-[1.01] duration-300">
+                            <img src="thum/LP.png" alt="Horizon Scan App Interface" class="w-full rounded-lg object-cover border border-slate-100" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'w-full h-64 flex items-center justify-center bg-slate-100 text-slate-400\'>[Image: thum/LP.png not found]</div>'">
+                        </div>
+                        <p class="text-sm text-slate-500 mt-4 text-center font-medium flex items-center justify-center gap-2">
+                            <i class="ph-fill ph-info text-teal-500 text-lg"></i> Data Nodes (Big/Small Nodes are depends on Z Axis)
+                        </p>
+                    </div>
+
+                    <div class="w-full max-w-4xl mx-auto space-y-6">
+                        <ul class="space-y-5 text-slate-600 text-sm md:text-base">
+                            <li class="flex items-start gap-4">
+                                <div class="w-8 h-8 rounded-full bg-teal-100 text-teal-600 flex items-center justify-center font-bold shrink-0 mt-0.5 border border-teal-200">1</div>
+                                <div><strong class="text-navy-900">Open the App:</strong> Simply click <span class="font-semibold text-teal-600">Open Tool</span> in the header.</div>
+                            </li>
+                            <li class="flex items-start gap-4">
+                                <div class="w-8 h-8 rounded-full bg-teal-100 text-teal-600 flex items-center justify-center font-bold shrink-0 mt-0.5 border border-teal-200">2</div>
+                                <div><strong class="text-navy-900">Initial Setup:</strong> Upon launching, select a Matrix Template that aligns with your analysis goal (e.g., Impact vs. Probability for risk, Novelty vs. Maturity for innovation). You can explicitly rename the X and Y axes to match your specific methodology. Note that the platform also natively supports a Z-Axis (representing Velocity, Urgency, or Scale automatically) to add depth to your signals.</div>
+                            </li>
+                            <li class="flex items-start gap-4">
+                                <div class="w-8 h-8 rounded-full bg-teal-100 text-teal-600 flex items-center justify-center font-bold shrink-0 mt-0.5 border border-teal-200">3</div>
+                                <div><strong class="text-navy-900">Input Data:</strong> Populate your radar by clicking any empty space on the grid to add a node instantly, or use the <span class="font-semibold text-navy-900 bg-slate-100 px-2 py-0.5 rounded text-xs">+ Manual Add</span> button for more control.</div>
+                            </li>
+                            <li class="flex items-start gap-4">
+                                <div class="w-8 h-8 rounded-full bg-teal-100 text-teal-600 flex items-center justify-center font-bold shrink-0 mt-0.5 border border-teal-200">4</div>
+                                <div><strong class="text-navy-900">AI Analysis:</strong> To activate intelligence features, enter your Gemini API Key in the top navigation bar. (see below instructions)</div>
+                            </li>
+                            <li class="flex items-start gap-4">
+                                <div class="w-8 h-8 rounded-full bg-teal-100 text-teal-600 flex items-center justify-center font-bold shrink-0 mt-0.5 border border-teal-200">5</div>
+                                <div><strong class="text-navy-900">Connect Nodes:</strong> To visualise dependencies or causal relationships (e.g., how one risk triggers another), click on a node to edit it, then select related signals in the "Connect Nodes" list (or use Ctrl+Click if supported). This draws dashed lines between them to reveal systemic patterns.</div>
+                            </li>
+                            <li class="flex items-start gap-4">
+                                <div class="w-8 h-8 rounded-full bg-teal-100 text-teal-600 flex items-center justify-center font-bold shrink-0 mt-0.5 border border-teal-200">6</div>
+                                <div><strong class="text-navy-900">Save & Load:</strong> For saving, click the <i class="ph-fill ph-floppy-disk text-slate-700"></i> Floppy Disk icon to download your entire workspace as a lightweight `.json` file. This preserves your nodes, configuration, and analysis state for future sessions to import. To load, please click the <i class="ph-fill ph-folder-open text-slate-700"></i> Folder icon to open and import a previously saved `.json` file to instantly restore your session.</div>
+                            </li>
+                            <li class="flex items-start gap-4">
+                                <div class="w-8 h-8 rounded-full bg-teal-100 text-teal-600 flex items-center justify-center font-bold shrink-0 mt-0.5 border border-teal-200">7</div>
+                                <div><strong class="text-navy-900">3D Visualisation:</strong> Click the button to see the visualisation, and click to download the standalone interactive radar to your local computer.</div>
+                            </li>
+                            <li class="flex items-start gap-4">
+                                <div class="w-8 h-8 rounded-full bg-teal-100 text-teal-600 flex items-center justify-center font-bold shrink-0 mt-0.5 border border-teal-200">8</div>
+                                <div><strong class="text-navy-900">Report:</strong> Click the Report button to generate a clean, print-ready view (PDF) that combines your visual matrix with the detailed AI strategic insights.</div>
+                            </li>
+                        </ul>
+
+                        <div class="mt-8 bg-blue-50 border border-blue-200 p-5 rounded-xl flex items-start gap-3 shadow-sm">
+                            <i class="ph-fill ph-info text-blue-600 text-2xl mt-0.5 shrink-0"></i>
+                            <p class="text-sm text-blue-900 m-0 leading-relaxed">
+                                <strong class="block mb-1">Report Function Note:</strong> 
+                                If the window does not appear, check if your browser has blocked a pop-up. Once the report window opens, right-click anywhere and select <strong>"Print"</strong>, then choose <strong>"Save as PDF"</strong> as the destination to export the full document.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- RADAR CHART SHOWCASE (3D RADAR BLOCK) -->
             <div class="bg-navy-950 rounded-3xl overflow-hidden shadow-2xl border border-navy-800">
                 <div class="grid grid-cols-1 lg:grid-cols-2 items-center">
