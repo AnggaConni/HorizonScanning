@@ -1,33 +1,14 @@
+
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strategic Insights | Horizon Scan AI</title>
+    <meta name="description" content="Publications, methodologies, and case studies on navigating uncertainty and mastering horizon scanning.">
     
-    <!-- Default Meta Tags (Will be updated dynamically by JS) -->
-    <title id="page-title">Publications | Horizon Scan AI</title>
-    <meta id="meta-description" name="description" content="Read articles, case studies, and methodologies on Strategic Foresight and Horizon Scanning.">
-    
-    <!-- Open Graph (Basic Setup) -->
-    <meta property="og:type" content="article">
-    <meta id="og-title" property="og:title" content="Publications | Horizon Scan AI">
-    <meta id="og-description" property="og:description" content="Read articles, case studies, and methodologies on Strategic Foresight and Horizon Scanning.">
-    <!-- Tambahan: Fallback image untuk Social Media Share -->
-    <meta id="og-image" property="og:image" content="thumbnail.png">
-    
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta id="twitter-title" property="twitter:title" content="Publications | Horizon Scan AI">
-    <meta id="twitter-image" property="twitter:image" content="thumbnail.png">
-    
-    <!-- Tailwind CSS & Typography -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
-    
-    <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <script>
@@ -43,335 +24,294 @@
             }
         }
     </script>
-    <style>
-        .glass-nav {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-        }
-    </style>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans antialiased selection:bg-teal-200 selection:text-teal-900 flex flex-col min-h-screen">
+<body class="bg-slate-50 text-slate-800 font-sans antialiased">
 
-    <!-- Navigation -->
-    <nav class="fixed w-full z-50 glass-nav transition-all duration-300">
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
-                <a href="index.html" class="flex-shrink-0 flex items-center gap-2 cursor-pointer">
+                <a href="index.html" class="flex items-center gap-2">
                     <i class="ph ph-radar text-teal-600 text-3xl"></i>
                     <span class="font-bold text-xl text-navy-900 tracking-tight">HorizonScan<span class="text-teal-600">AI</span></span>
                 </a>
-                
-                <div class="hidden md:flex space-x-6 items-center">
-                    <a href="index.html#about" class="text-slate-600 hover:text-teal-600 text-sm font-medium transition-colors">About</a>
-                    <a href="index.html#features" class="text-slate-600 hover:text-teal-600 text-sm font-medium transition-colors">Features</a>
-                    <a href="index.html#guide" class="text-slate-600 hover:text-teal-600 text-sm font-medium transition-colors">Masterclass</a>
-                    
-                    <!-- Active State for Articles -->
-                    <a href="blog.html" class="inline-flex items-center text-teal-600 bg-teal-50 text-sm font-bold transition-all px-3 py-2 rounded-lg">
-                        <i class="ph-fill ph-newspaper mr-1.5 text-lg"></i> Articles
-                    </a>
-
-                    <a href="tool.html" class="inline-flex items-center justify-center px-5 py-2.5 border border-transparent text-sm font-bold rounded-lg text-white bg-navy-900 hover:bg-teal-600 shadow-sm transition-all duration-300 transform hover:-translate-y-0.5">
-                        <i class="ph ph-rocket-launch mr-2 text-lg"></i> Open Tool
-                    </a>
-                </div>
-                
-                <!-- Mobile Menu Button -->
-                <div class="md:hidden flex items-center gap-2">
-                    <a href="blog.html" class="px-3 py-2 text-xs font-bold rounded-lg text-teal-700 bg-teal-50 border border-teal-200">Blog</a>
-                    <a href="tool.html" class="px-3 py-2 text-xs font-bold rounded-lg text-white bg-teal-600 shadow-sm">Open Tool</a>
-                </div>
+                <a href="index.html" class="text-sm font-bold text-slate-600 hover:text-teal-600 flex items-center gap-1">
+                    <i class="ph-bold ph-house"></i> Back to Home
+                </a>
             </div>
         </div>
     </nav>
 
-    <!-- Main Content Area -->
-    <main class="flex-grow pt-24 pb-20">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" id="app-container">
-            <!-- Loading Indicator -->
-            <div id="loading-state" class="flex flex-col items-center justify-center py-20">
-                <i class="ph ph-spinner-gap text-4xl text-teal-600 animate-spin mb-4"></i>
-                <p class="text-slate-500 font-medium">Loading publications...</p>
+    <section class="pt-16 pb-10 bg-gradient-to-b from-white to-slate-50 text-center px-4">
+        <h1 class="text-4xl md:text-5xl font-extrabold text-navy-900 mb-4 tracking-tight">Strategic Insights</h1>
+        <p class="text-slate-500 max-w-2xl mx-auto text-lg">Publications, methodologies, and case studies on navigating uncertainty and mastering horizon scanning.</p>
+    </section>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24 mt-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            
+        <a href="blog/article/anticipatory-governance-moving-beyond-crisis-management.html" class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-all duration-300 flex flex-col group transform hover:-translate-y-1">
+            <div class="h-48 overflow-hidden relative border-b border-slate-100">
+                <img src="thum/or.png" alt="Anticipatory Governance: Moving Beyond Crisis Management" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.src='https://via.placeholder.com/1200x600/0f172a/ffffff?text=HorizonScan+AI'">
+                <span class="absolute top-4 left-4 bg-teal-600 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">
+                    Foresight Strategy
+                </span>
             </div>
+            
+            <div class="p-6 flex-1 flex flex-col">
+                <div class="flex items-center gap-2 text-xs text-slate-400 mb-3 font-medium">
+                    <i class="ph-fill ph-calendar-blank"></i> Oct 12, 2025
+                </div>
+                
+                <h3 class="text-xl font-bold text-navy-900 mb-3 leading-snug group-hover:text-teal-600 transition-colors">
+                    Anticipatory Governance: Moving Beyond Crisis Management
+                </h3>
+                
+                <p class="text-sm text-slate-600 mb-6 flex-1 line-clamp-3">
+                    Why traditional risk management fails in complex environments—and how anticipatory governance provides a structural advantage for policy makers.
+                </p>
+                
+                <div class="mt-auto">
+                    <span class="text-teal-600 text-sm font-bold flex items-center gap-1 group-hover:text-teal-500 transition-colors">
+                        Read Article <i class="ph-bold ph-arrow-right"></i>
+                    </span>
+                </div>
+            </div>
+        </a>
+    
+        <a href="blog/article/the-steep-framework-beating-tunnel-vision.html" class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-all duration-300 flex flex-col group transform hover:-translate-y-1">
+            <div class="h-48 overflow-hidden relative border-b border-slate-100">
+                <img src="thum/steep.png" alt="The STEEP Framework: Beating Tunnel Vision" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.src='https://via.placeholder.com/1200x600/0f172a/ffffff?text=HorizonScan+AI'">
+                <span class="absolute top-4 left-4 bg-teal-600 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">
+                    Methodology
+                </span>
+            </div>
+            
+            <div class="p-6 flex-1 flex flex-col">
+                <div class="flex items-center gap-2 text-xs text-slate-400 mb-3 font-medium">
+                    <i class="ph-fill ph-calendar-blank"></i> Nov 05, 2025
+                </div>
+                
+                <h3 class="text-xl font-bold text-navy-900 mb-3 leading-snug group-hover:text-teal-600 transition-colors">
+                    The STEEP Framework: Beating Tunnel Vision
+                </h3>
+                
+                <p class="text-sm text-slate-600 mb-6 flex-1 line-clamp-3">
+                    A deep dive into how the STEEP framework forces strategists to move beyond silos and uncover powerful intersectional trends shaping the future.
+                </p>
+                
+                <div class="mt-auto">
+                    <span class="text-teal-600 text-sm font-bold flex items-center gap-1 group-hover:text-teal-500 transition-colors">
+                        Read Article <i class="ph-bold ph-arrow-right"></i>
+                    </span>
+                </div>
+            </div>
+        </a>
+    
+        <a href="blog/article/cognitive-biases-in-horizon-scanning.html" class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-all duration-300 flex flex-col group transform hover:-translate-y-1">
+            <div class="h-48 overflow-hidden relative border-b border-slate-100">
+                <img src="thum/db.png" alt="Cognitive Biases in Horizon Scanning" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.src='https://via.placeholder.com/1200x600/0f172a/ffffff?text=HorizonScan+AI'">
+                <span class="absolute top-4 left-4 bg-teal-600 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">
+                    Behavioral Science
+                </span>
+            </div>
+            
+            <div class="p-6 flex-1 flex flex-col">
+                <div class="flex items-center gap-2 text-xs text-slate-400 mb-3 font-medium">
+                    <i class="ph-fill ph-calendar-blank"></i> Jan 18, 2024
+                </div>
+                
+                <h3 class="text-xl font-bold text-navy-900 mb-3 leading-snug group-hover:text-teal-600 transition-colors">
+                    Cognitive Biases in Horizon Scanning
+                </h3>
+                
+                <p class="text-sm text-slate-600 mb-6 flex-1 line-clamp-3">
+                    Even the most advanced tools cannot save a strategy if human judgment is compromised by bias. Understanding cognitive traps is essential for effective foresight.
+                </p>
+                
+                <div class="mt-auto">
+                    <span class="text-teal-600 text-sm font-bold flex items-center gap-1 group-hover:text-teal-500 transition-colors">
+                        Read Article <i class="ph-bold ph-arrow-right"></i>
+                    </span>
+                </div>
+            </div>
+        </a>
+    
+        <a href="blog/article/when-foresight-fails-the-cost-of-strategic-blindness.html" class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-all duration-300 flex flex-col group transform hover:-translate-y-1">
+            <div class="h-48 overflow-hidden relative border-b border-slate-100">
+                <img src="thum/cost.png" alt="When Foresight Fails: The Cost of Strategic Blindness" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.src='https://via.placeholder.com/1200x600/0f172a/ffffff?text=HorizonScan+AI'">
+                <span class="absolute top-4 left-4 bg-teal-600 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">
+                    Foresight Strategy
+                </span>
+            </div>
+            
+            <div class="p-6 flex-1 flex flex-col">
+                <div class="flex items-center gap-2 text-xs text-slate-400 mb-3 font-medium">
+                    <i class="ph-fill ph-calendar-blank"></i> Feb 02, 2026
+                </div>
+                
+                <h3 class="text-xl font-bold text-navy-900 mb-3 leading-snug group-hover:text-teal-600 transition-colors">
+                    When Foresight Fails: The Cost of Strategic Blindness
+                </h3>
+                
+                <p class="text-sm text-slate-600 mb-6 flex-1 line-clamp-3">
+                    History shows that major crises are rarely unpredictable. They are often the result of ignored signals, dismissed warnings, and failures of foresight.
+                </p>
+                
+                <div class="mt-auto">
+                    <span class="text-teal-600 text-sm font-bold flex items-center gap-1 group-hover:text-teal-500 transition-colors">
+                        Read Article <i class="ph-bold ph-arrow-right"></i>
+                    </span>
+                </div>
+            </div>
+        </a>
+    
+        <a href="blog/article/from-insight-to-policy-turning-foresight-into-action.html" class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-all duration-300 flex flex-col group transform hover:-translate-y-1">
+            <div class="h-48 overflow-hidden relative border-b border-slate-100">
+                <img src="thum/insight.png" alt="From Insight to Policy: Turning Foresight into Action" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.src='https://via.placeholder.com/1200x600/0f172a/ffffff?text=HorizonScan+AI'">
+                <span class="absolute top-4 left-4 bg-teal-600 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">
+                    Policy & Strategy
+                </span>
+            </div>
+            
+            <div class="p-6 flex-1 flex flex-col">
+                <div class="flex items-center gap-2 text-xs text-slate-400 mb-3 font-medium">
+                    <i class="ph-fill ph-calendar-blank"></i> Mar 01, 2026
+                </div>
+                
+                <h3 class="text-xl font-bold text-navy-900 mb-3 leading-snug group-hover:text-teal-600 transition-colors">
+                    From Insight to Policy: Turning Foresight into Action
+                </h3>
+                
+                <p class="text-sm text-slate-600 mb-6 flex-1 line-clamp-3">
+                    Foresight creates value only when it shapes decisions. The real challenge is not seeing the future, but translating insight into policy and action.
+                </p>
+                
+                <div class="mt-auto">
+                    <span class="text-teal-600 text-sm font-bold flex items-center gap-1 group-hover:text-teal-500 transition-colors">
+                        Read Article <i class="ph-bold ph-arrow-right"></i>
+                    </span>
+                </div>
+            </div>
+        </a>
+    
+        <a href="blog/article/from-signals-to-behavior-turning-horizon-scanning-into-real-world-change.html" class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-all duration-300 flex flex-col group transform hover:-translate-y-1">
+            <div class="h-48 overflow-hidden relative border-b border-slate-100">
+                <img src="thum/toc.png" alt="From Signals to Behavior: Turning Horizon Scanning into Real-World Change" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.src='https://via.placeholder.com/1200x600/0f172a/ffffff?text=HorizonScan+AI'">
+                <span class="absolute top-4 left-4 bg-teal-600 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">
+                    Applied Foresight
+                </span>
+            </div>
+            
+            <div class="p-6 flex-1 flex flex-col">
+                <div class="flex items-center gap-2 text-xs text-slate-400 mb-3 font-medium">
+                    <i class="ph-fill ph-calendar-blank"></i> Mar 20, 2026
+                </div>
+                
+                <h3 class="text-xl font-bold text-navy-900 mb-3 leading-snug group-hover:text-teal-600 transition-colors">
+                    From Signals to Behavior: Turning Horizon Scanning into Real-World Change
+                </h3>
+                
+                <p class="text-sm text-slate-600 mb-6 flex-1 line-clamp-3">
+                    Horizon scanning reveals what may happen—but real impact comes from translating those insights into behavior change using Theory of Change and COM-B.
+                </p>
+                
+                <div class="mt-auto">
+                    <span class="text-teal-600 text-sm font-bold flex items-center gap-1 group-hover:text-teal-500 transition-colors">
+                        Read Article <i class="ph-bold ph-arrow-right"></i>
+                    </span>
+                </div>
+            </div>
+        </a>
+    
+        <a href="blog/article/gsi-radar-turning-invisible-innovation-into-actionable-intelligence.html" class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-all duration-300 flex flex-col group transform hover:-translate-y-1">
+            <div class="h-48 overflow-hidden relative border-b border-slate-100">
+                <img src="thum/gsi.png" alt="GSI Radar: Turning Invisible Innovation into Actionable Intelligence" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.src='https://via.placeholder.com/1200x600/0f172a/ffffff?text=HorizonScan+AI'">
+                <span class="absolute top-4 left-4 bg-teal-600 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">
+                    Innovation Intelligence
+                </span>
+            </div>
+            
+            <div class="p-6 flex-1 flex flex-col">
+                <div class="flex items-center gap-2 text-xs text-slate-400 mb-3 font-medium">
+                    <i class="ph-fill ph-calendar-blank"></i> Apr 01, 2026
+                </div>
+                
+                <h3 class="text-xl font-bold text-navy-900 mb-3 leading-snug group-hover:text-teal-600 transition-colors">
+                    GSI Radar: Turning Invisible Innovation into Actionable Intelligence
+                </h3>
+                
+                <p class="text-sm text-slate-600 mb-6 flex-1 line-clamp-3">
+                    Most innovation happens outside formal systems. GSI Radar captures these unseen signals and transforms them into structured, actionable, and safety-aware intelligence.
+                </p>
+                
+                <div class="mt-auto">
+                    <span class="text-teal-600 text-sm font-bold flex items-center gap-1 group-hover:text-teal-500 transition-colors">
+                        Read Article <i class="ph-bold ph-arrow-right"></i>
+                    </span>
+                </div>
+            </div>
+        </a>
+    
+        <a href="blog/article/horizon-scanning-vs-bayesian-analysis-radar-vs-detective.html" class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-all duration-300 flex flex-col group transform hover:-translate-y-1">
+            <div class="h-48 overflow-hidden relative border-b border-slate-100">
+                <img src="thum/bayes.png" alt="Horizon Scanning vs. Bayesian Analysis: Radar vs. Detective" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.src='https://via.placeholder.com/1200x600/0f172a/ffffff?text=HorizonScan+AI'">
+                <span class="absolute top-4 left-4 bg-teal-600 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">
+                    Methodology
+                </span>
+            </div>
+            
+            <div class="p-6 flex-1 flex flex-col">
+                <div class="flex items-center gap-2 text-xs text-slate-400 mb-3 font-medium">
+                    <i class="ph-fill ph-calendar-blank"></i> Apr 05, 2024
+                </div>
+                
+                <h3 class="text-xl font-bold text-navy-900 mb-3 leading-snug group-hover:text-teal-600 transition-colors">
+                    Horizon Scanning vs. Bayesian Analysis: Radar vs. Detective
+                </h3>
+                
+                <p class="text-sm text-slate-600 mb-6 flex-1 line-clamp-3">
+                    Both methods detect weak signals—but one explores the future, while the other calculates the present. Knowing the difference changes everything.
+                </p>
+                
+                <div class="mt-auto">
+                    <span class="text-teal-600 text-sm font-bold flex items-center gap-1 group-hover:text-teal-500 transition-colors">
+                        Read Article <i class="ph-bold ph-arrow-right"></i>
+                    </span>
+                </div>
+            </div>
+        </a>
+    
+        <a href="blog/article/you-will-never-have-enough-data-decision-making-under-uncertainty.html" class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-all duration-300 flex flex-col group transform hover:-translate-y-1">
+            <div class="h-48 overflow-hidden relative border-b border-slate-100">
+                <img src="thum/uncertainty.png" alt="You Will Never Have Enough Data: Decision-Making Under Uncertainty" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.src='https://via.placeholder.com/1200x600/0f172a/ffffff?text=HorizonScan+AI'">
+                <span class="absolute top-4 left-4 bg-teal-600 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">
+                    Decision Making
+                </span>
+            </div>
+            
+            <div class="p-6 flex-1 flex flex-col">
+                <div class="flex items-center gap-2 text-xs text-slate-400 mb-3 font-medium">
+                    <i class="ph-fill ph-calendar-blank"></i> Apr 10, 2024
+                </div>
+                
+                <h3 class="text-xl font-bold text-navy-900 mb-3 leading-snug group-hover:text-teal-600 transition-colors">
+                    You Will Never Have Enough Data: Decision-Making Under Uncertainty
+                </h3>
+                
+                <p class="text-sm text-slate-600 mb-6 flex-1 line-clamp-3">
+                    In complex systems, waiting for perfect information is the riskiest decision of all. The real skill is learning how to act under uncertainty.
+                </p>
+                
+                <div class="mt-auto">
+                    <span class="text-teal-600 text-sm font-bold flex items-center gap-1 group-hover:text-teal-500 transition-colors">
+                        Read Article <i class="ph-bold ph-arrow-right"></i>
+                    </span>
+                </div>
+            </div>
+        </a>
+    
         </div>
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-navy-950 text-slate-400 py-12 border-t border-slate-900 mt-auto">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <i class="ph ph-radar text-teal-600 text-3xl mb-4"></i>
-            <p class="text-sm max-w-md mx-auto mb-6">Transforming scattered data points into actionable strategic insights.</p>
-            <div class="text-xs text-slate-500">
-                <p>Version 1.2 | Strategic Foresight Platform</p>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Logic to Fetch and Render JSON -->
-    <script>
-        const appContainer = document.getElementById('app-container');
-        
-        // Elemen Meta Tags yang akan diupdate
-        const pageTitle = document.getElementById('page-title');
-        const metaDesc = document.getElementById('meta-description');
-        const ogTitle = document.getElementById('og-title');
-        const ogDesc = document.getElementById('og-description');
-        const ogImage = document.getElementById('og-image');
-        const twitterTitle = document.getElementById('twitter-title');
-        const twitterImage = document.getElementById('twitter-image');
-
-        // State Global untuk Filter & Sort
-        let allArticles = [];
-        let searchQuery = '';
-        let currentCategory = 'All';
-        let sortOrder = 'latest'; // 'latest' or 'older'
-
-        // Fetch Data from JSON
-        async function fetchArticles() {
-            try {
-                const response = await fetch('blog/data.json');
-                if (!response.ok) throw new Error('Network response was not ok');
-                allArticles = await response.json(); // Simpan semua data ke variabel global
-                
-                // Route checking based on URL parameter (?id=1)
-                const urlParams = new URLSearchParams(window.location.search);
-                const articleId = urlParams.get('id');
-
-                if (articleId) {
-                    const article = allArticles.find(a => a.id === articleId);
-                    if (article) {
-                        renderSingleArticle(article);
-                    } else {
-                        renderError("Article not found.");
-                    }
-                } else {
-                    renderArticleList();
-                }
-            } catch (error) {
-                console.error("Error loading articles:", error);
-                renderError("Unable to load articles. Make sure you are viewing this via a local web server.");
-            }
-        }
-
-        // Fungsi untuk Merender Struktur Header dan Filter Controls
-        function renderArticleList() {
-            // Reset Meta Tags to Default for the Main Blog Page
-            pageTitle.innerText = "Publications | Horizon Scan AI";
-            metaDesc.setAttribute("content", "Read articles, case studies, and methodologies on Strategic Foresight and Horizon Scanning.");
-            ogTitle.setAttribute("content", "Publications | Horizon Scan AI");
-            ogDesc.setAttribute("content", "Read articles, case studies, and methodologies on Strategic Foresight and Horizon Scanning.");
-            ogImage.setAttribute("content", "thumbnail.png");
-            twitterTitle.setAttribute("content", "Publications | Horizon Scan AI");
-            twitterImage.setAttribute("content", "thumbnail.png");
-            
-            // Mengambil kategori unik dari file JSON
-            const categories = ['All', ...new Set(allArticles.map(a => a.category))];
-            const categoryOptions = categories.map(c => `<option value="${c}">${c}</option>`).join('');
-
-            let html = `
-                <div class="text-center mb-10 mt-8">
-                    <h1 class="text-4xl md:text-5xl font-extrabold text-navy-900 mb-4 tracking-tight">Strategic Insights</h1>
-                    <p class="text-lg text-slate-500 max-w-2xl mx-auto">Publications, methodologies, and case studies on navigating uncertainty and mastering horizon scanning.</p>
-                </div>
-
-                <!-- Controls: Search, Filter, Sort -->
-                <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-8 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-                    <!-- Search Bar -->
-                    <div class="relative w-full md:w-1/3">
-                        <i class="ph ph-magnifying-glass absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-lg"></i>
-                        <input type="text" id="searchInput" placeholder="Search articles..." class="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-shadow">
-                    </div>
-                    
-                    <!-- Filters & Sort -->
-                    <div class="flex flex-col sm:flex-row w-full md:w-auto gap-4">
-                        <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-3 py-1">
-                            <i class="ph ph-funnel text-slate-400 text-lg"></i>
-                            <select id="categoryFilter" class="w-full sm:w-auto bg-transparent border-none text-sm text-slate-700 py-1 focus:outline-none focus:ring-0 cursor-pointer">
-                                ${categoryOptions}
-                            </select>
-                        </div>
-                        <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-3 py-1">
-                            <i class="ph ph-sort-descending text-slate-400 text-lg"></i>
-                            <select id="sortFilter" class="w-full sm:w-auto bg-transparent border-none text-sm text-slate-700 py-1 focus:outline-none focus:ring-0 cursor-pointer">
-                                <option value="latest">Latest</option>
-                                <option value="older">Older</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Grid Container (Akan diupdate isinya lewat updateGrid) -->
-                <div id="articleGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 min-h-[400px] content-start">
-                    <!-- Cards will be injected here -->
-                </div>
-            `;
-
-            appContainer.innerHTML = html;
-
-            // Tambahkan Event Listeners untuk interaksi Search/Filter
-            document.getElementById('searchInput').addEventListener('input', (e) => {
-                searchQuery = e.target.value.toLowerCase();
-                updateGrid();
-            });
-
-            document.getElementById('categoryFilter').addEventListener('change', (e) => {
-                currentCategory = e.target.value;
-                updateGrid();
-            });
-
-            document.getElementById('sortFilter').addEventListener('change', (e) => {
-                sortOrder = e.target.value;
-                updateGrid();
-            });
-
-            // Jalankan render grid pertama kali
-            updateGrid();
-        }
-
-        // Fungsi Khusus untuk memfilter, menyortir, dan merender artikel dalam grid
-        function updateGrid() {
-            const grid = document.getElementById('articleGrid');
-            if (!grid) return;
-
-            // 1. Filter Artikel (Berdasarkan Search dan Category)
-            let filtered = allArticles.filter(article => {
-                const matchesSearch = article.title.toLowerCase().includes(searchQuery) || article.excerpt.toLowerCase().includes(searchQuery);
-                const matchesCategory = currentCategory === 'All' || article.category === currentCategory;
-                return matchesSearch && matchesCategory;
-            });
-
-            // 2. Sort Artikel (Berdasarkan Tanggal)
-            filtered.sort((a, b) => {
-                const dateA = new Date(a.date);
-                const dateB = new Date(b.date);
-                
-                if (sortOrder === 'latest') return dateB - dateA;
-                if (sortOrder === 'older') return dateA - dateB;
-                return 0;
-            });
-
-            // 3. Render Hasil
-            if (filtered.length === 0) {
-                grid.innerHTML = `
-                    <div class="col-span-full flex flex-col items-center justify-center py-16 text-slate-500 border-2 border-dashed border-slate-200 rounded-2xl">
-                        <i class="ph ph-magnifying-glass text-4xl mb-3 text-slate-300"></i>
-                        <p class="font-medium text-lg">No articles found.</p>
-                        <p class="text-sm">Try adjusting your search or filter criteria.</p>
-                    </div>`;
-                return;
-            }
-
-            let html = '';
-            filtered.forEach(article => {
-                html += `
-                    <article class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col transform hover:-translate-y-1">
-                        <div class="h-48 bg-slate-200 relative overflow-hidden group">
-                            <img src="${article.imageUrl}" alt="${article.title}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23f1f5f9%22/><text x=%2250%22 y=%2250%22 font-family=%22sans-serif%22 font-size=%2210%22 text-anchor=%22middle%22 fill=%22%2394a3b8%22>No Image</text></svg>'">
-                            <div class="absolute top-4 left-4 bg-teal-500/90 backdrop-blur text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
-                                ${article.category}
-                            </div>
-                        </div>
-                        <div class="p-6 flex flex-col flex-grow">
-                            <div class="flex items-center gap-2 text-xs text-slate-400 font-medium mb-3">
-                                <i class="ph ph-calendar-blank"></i> ${article.date}
-                            </div>
-                            <h2 class="text-xl font-bold text-navy-900 mb-3 leading-snug line-clamp-2 hover:text-teal-600 transition-colors">
-                                <a href="?id=${article.id}">${article.title}</a>
-                            </h2>
-                            <p class="text-slate-600 text-sm mb-6 flex-grow line-clamp-3">${article.excerpt}</p>
-                            <a href="?id=${article.id}" class="inline-flex items-center font-bold text-teal-600 hover:text-navy-900 transition-colors mt-auto">
-                                Read Article <i class="ph-bold ph-arrow-right ml-2"></i>
-                            </a>
-                        </div>
-                    </article>
-                `;
-            });
-
-            grid.innerHTML = html;
-        }
-
-        // Render Single Article Detail
-        function renderSingleArticle(article) {
-            // --- SEO FIX: UPDATE META TAGS DYNAMICALLY ---
-            const dynamicTitle = `${article.title} | Horizon Scan AI`;
-            pageTitle.innerText = dynamicTitle;
-            ogTitle.setAttribute("content", dynamicTitle);
-            twitterTitle.setAttribute("content", dynamicTitle);
-            
-            if (article.excerpt) {
-                metaDesc.setAttribute("content", article.excerpt);
-                ogDesc.setAttribute("content", article.excerpt);
-            }
-
-            if (article.imageUrl) {
-                const absoluteImageUrl = new URL(article.imageUrl, window.location.href).href;
-                ogImage.setAttribute("content", absoluteImageUrl);
-                twitterImage.setAttribute("content", absoluteImageUrl);
-            }
-            // ---------------------------------------------
-
-            const html = `
-                <div class="max-w-3xl mx-auto mt-8">
-                    <!-- Back Button -->
-                    <a href="blog.html" class="inline-flex items-center text-sm font-semibold text-slate-500 hover:text-teal-600 mb-8 transition-colors">
-                        <i class="ph-bold ph-arrow-left mr-2"></i> Back to all articles
-                    </a>
-                    
-                    <!-- Article Header -->
-                    <header class="mb-10 text-center">
-                        <div class="inline-block bg-teal-50 text-teal-700 font-bold text-xs px-3 py-1 rounded-full uppercase tracking-widest mb-4 border border-teal-100">
-                            ${article.category}
-                        </div>
-                        <h1 class="text-3xl md:text-5xl font-extrabold text-navy-900 mb-6 leading-tight">${article.title}</h1>
-                        <div class="flex items-center justify-center gap-4 text-sm text-slate-500 font-medium">
-                            <span class="flex items-center gap-1.5"><i class="ph-fill ph-user-circle text-lg"></i> ${article.author}</span>
-                            <span>•</span>
-                            <span class="flex items-center gap-1.5"><i class="ph-fill ph-calendar-blank text-lg"></i> ${article.date}</span>
-                        </div>
-                    </header>
-
-                    <!-- Featured Image -->
-                    <div class="w-full h-64 md:h-96 bg-slate-200 rounded-2xl overflow-hidden mb-12 shadow-md">
-                        <img src="${article.imageUrl}" alt="${article.title}" class="w-full h-full object-cover" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23f1f5f9%22/></svg>'">
-                    </div>
-
-                    <!-- Article Body -->
-                    <article class="prose prose-slate prose-lg max-w-none prose-headings:text-navy-900 prose-a:text-teal-600 hover:prose-a:text-teal-500">
-                        ${article.content}
-                    </article>
-
-                    <!-- Article Footer -->
-                    <div class="mt-16 pt-8 border-t border-slate-200 text-center">
-                        <h4 class="font-bold text-navy-900 mb-4">Share this article</h4>
-                        <div class="flex justify-center gap-4">
-                            <button onclick="navigator.clipboard.writeText(window.location.href); alert('Link copied to clipboard!');" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-teal-500 hover:text-white transition-colors" title="Copy Link">
-                                <i class="ph-fill ph-link text-xl"></i>
-                            </button>
-                            <a href="https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}" target="_blank" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-[#0a66c2] hover:text-white transition-colors" title="Share on LinkedIn">
-                                <i class="ph-fill ph-linkedin-logo text-xl"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            `;
-            appContainer.innerHTML = html;
-        }
-
-        // Render Error State
-        function renderError(message) {
-            appContainer.innerHTML = `
-                <div class="text-center py-20 max-w-lg mx-auto">
-                    <i class="ph-fill ph-warning-circle text-5xl text-red-400 mb-4"></i>
-                    <h2 class="text-2xl font-bold text-navy-900 mb-2">Oops! Something went wrong</h2>
-                    <p class="text-slate-600">${message}</p>
-                    <a href="blog.html" class="inline-block mt-6 px-6 py-2 bg-navy-900 text-white rounded-lg font-bold">Return to Blog</a>
-                </div>
-            `;
-        }
-
-        // Initialize App
-        document.addEventListener('DOMContentLoaded', fetchArticles);
-    </script>
 </body>
 </html>
