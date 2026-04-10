@@ -1,0 +1,15 @@
+# User-agent: * berarti aturan ini berlaku untuk semua robot mesin pencari (Google, Bing, dll.)
+User-agent: *
+
+# Mengizinkan semua halaman publik untuk diindeks
+Allow: /
+Allow: /index.html
+Allow: /blog.html
+Allow: /tool.html
+
+# Opsional: Jika Anda memiliki folder aset internal atau library yang tidak perlu muncul di pencarian
+# Disallow: /assets/js/
+# Disallow: /private/
+
+# Berikan petunjuk lokasi sitemap Anda (penting untuk SEO)
+Sitemap: https://horizon-scanning.org/sitemap.xml
