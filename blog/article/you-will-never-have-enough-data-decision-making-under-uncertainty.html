@@ -6,11 +6,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>You Will Never Have Enough Data: Decision-Making Under Uncertainty | Horizon Scan AI</title>
     <meta name="description" content="In complex systems, waiting for perfect information is the riskiest decision of all. The real skill is learning how to act under uncertainty.">
+    <link rel="canonical" href="https://horizon-scanning.org/blog/article/you-will-never-have-enough-data-decision-making-under-uncertainty.html" />
     
+    <!-- Open Graph / Facebook / LinkedIn / WA -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://horizon-scanning.org/blog/article/you-will-never-have-enough-data-decision-making-under-uncertainty.html">
     <meta property="og:title" content="You Will Never Have Enough Data: Decision-Making Under Uncertainty">
     <meta property="og:description" content="In complex systems, waiting for perfect information is the riskiest decision of all. The real skill is learning how to act under uncertainty.">
-    <meta property="og:image" content="../../thum/uncertainty.png">
-    <meta property="og:type" content="article">
+    <meta property="og:image" content="https://horizon-scanning.org/thum/uncertainty.png">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://horizon-scanning.org/blog/article/you-will-never-have-enough-data-decision-making-under-uncertainty.html">
+    <meta name="twitter:title" content="You Will Never Have Enough Data: Decision-Making Under Uncertainty">
+    <meta name="twitter:description" content="In complex systems, waiting for perfect information is the riskiest decision of all. The real skill is learning how to act under uncertainty.">
+    <meta name="twitter:image" content="https://horizon-scanning.org/thum/uncertainty.png">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
@@ -30,17 +40,44 @@
             }
         }
     </script>
+
+    <!-- CUSTOM CSS UNTUK RICH TEXT (Table, Callout, Diagram) -->
+    <style>
+        /* Styling untuk Tabel agar responsif dan bagus */
+        .prose table { width: 100%; border-collapse: collapse; margin-top: 2rem; margin-bottom: 2rem; }
+        .prose th, .prose td { border: 1px solid #e2e8f0; padding: 1rem; text-align: left; }
+        .prose th { background-color: #f8fafc; color: #0f172a; font-weight: 700; }
+        .prose tr:nth-child(even) { background-color: #f8fafc; }
+        
+        /* Membungkus tabel untuk mobile */
+        .table-responsive { overflow-x: auto; width: 100%; border-radius: 0.5rem; box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1); border: 1px solid #e2e8f0; }
+        .table-responsive table { margin: 0; border: none; }
+
+        /* Styling untuk Box Catatan (Callout / Textbox) */
+        .callout { padding: 1.5rem; border-radius: 0.75rem; margin: 2rem 0; border-left: 4px solid #0d9488; background-color: #f0fdfa; }
+        .callout h4 { margin-top: 0 !important; color: #0f172a !important; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; }
+        .callout p:last-child { margin-bottom: 0 !important; }
+
+        /* Styling Blockquote */
+        .prose blockquote { border-left-color: #0d9488; font-style: normal; background-color: #f8fafc; padding: 1rem 1.5rem; border-radius: 0 0.75rem 0.75rem 0; color: #334155; }
+        .prose blockquote p { margin: 0; }
+
+        /* Styling Container Chart / Workflow */
+        .chart-container { background: white; border: 1px solid #e2e8f0; border-radius: 1rem; padding: 2rem; margin: 2.5rem 0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); text-align: center; }
+        .chart-container img { margin: 0 auto; border-radius: 0.5rem; }
+        .chart-caption { font-size: 0.875rem; color: #64748b; margin-top: 1rem; text-align: center; font-style: italic; }
+    </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans antialiased">
 
-    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50">
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <a href="../../index.html" class="flex items-center gap-2">
                     <i class="ph ph-radar text-teal-600 text-2xl"></i>
                     <span class="font-bold text-lg text-navy-900 tracking-tight">HorizonScan<span class="text-teal-600">AI</span></span>
                 </a>
-                <a href="../../blog.html" class="text-sm font-bold text-slate-600 hover:text-teal-600 flex items-center gap-1">
+                <a href="../../blog.html" class="text-sm font-bold text-slate-600 hover:text-teal-600 flex items-center gap-1 transition-colors">
                     <i class="ph-bold ph-arrow-left"></i> Back to Articles
                 </a>
             </div>
@@ -48,7 +85,7 @@
     </nav>
 
     <header class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-8">
-        <span class="inline-block bg-teal-100 text-teal-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-4">
+        <span class="inline-block bg-teal-100 text-teal-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-4 shadow-sm">
             Decision Making
         </span>
         <h1 class="text-3xl md:text-5xl font-extrabold text-navy-900 mb-6 leading-tight">You Will Never Have Enough Data: Decision-Making Under Uncertainty</h1>
@@ -68,16 +105,22 @@
         <img src="../../thum/uncertainty.png" alt="You Will Never Have Enough Data: Decision-Making Under Uncertainty" class="w-full h-auto max-h-[500px] object-cover rounded-2xl shadow-lg border border-slate-200" onerror="this.src='https://via.placeholder.com/1200x600/0f172a/ffffff?text=HorizonScan+AI'">
     </div>
 
+    <!-- MAIN CONTENT DENGAN TYPOGRAPHY YANG DISEMPURNAKAN -->
     <main class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
-        <article class="prose prose-slate prose-lg max-w-none prose-headings:text-navy-900 prose-a:text-teal-600 hover:prose-a:text-teal-500 prose-img:rounded-xl">
+        <article class="prose prose-slate prose-lg max-w-none 
+            prose-headings:text-navy-900 prose-headings:font-bold 
+            prose-a:text-teal-600 hover:prose-a:text-teal-500 prose-a:font-semibold prose-a:no-underline hover:prose-a:underline
+            prose-img:rounded-xl prose-img:shadow-md
+            prose-li:marker:text-teal-500">
             <p>In an ideal world, decisions would be made with complete information, clear probabilities, and predictable outcomes. But in reality, especially in complex systems, this rarely happens.</p><p>Leaders, analysts, and policymakers are constantly forced to make decisions with incomplete data, conflicting signals, and high uncertainty.</p><p>The uncomfortable truth is this: you will never have enough data.</p><p>And waiting until you do may be the most dangerous decision of all.</p><h3>The Illusion of Certainty</h3><p>Many organizations fall into the trap of seeking perfect information before acting. They delay decisions, commission more studies, and wait for clearer signals.</p><p>But in fast-moving environments, certainty often comes too late. By the time a risk is fully understood, it has already materialized.</p><p>This creates a paradox: the desire for certainty increases the likelihood of failure.</p><h3>Uncertainty is Not the Enemy</h3><p>Uncertainty is often perceived as a problem to eliminate. In reality, it is a condition to navigate.</p><p>Foresight does not remove uncertainty—it helps us understand its structure. It allows us to distinguish between what is known, what is unknown, and what is unknowable.</p><p>The goal is not to predict the future perfectly, but to make better decisions despite uncertainty.</p><h3>Three Types of Decisions</h3><p>Not all decisions require the same level of certainty. Understanding this distinction is critical.</p><p><strong>Reversible Decisions:</strong> Low-risk decisions that can be easily adjusted. These should be made quickly, even with limited data.</p><p><strong>Irreversible Decisions:</strong> High-stakes decisions that are difficult to undo. These require deeper analysis, scenario planning, and stress-testing.</p><p><strong>No-Regret Decisions:</strong> Actions that provide value across multiple possible futures. These are the most powerful tools in uncertain environments.</p><h3>From Analysis to Action</h3><p>The challenge is not just understanding uncertainty, but acting within it.</p><p>This is where your foresight toolkit comes together:</p><p>Horizon Scanning helps identify emerging signals.<br>STEEP expands your perspective.<br>Cognitive Bias awareness reduces blind spots.<br>Bayesian thinking helps interpret current evidence.<br>Theory of Change and COM-B translate insight into action.</p><p>Together, they create a system that allows you to move forward—even without perfect information.</p><h3>The Courage to Decide</h3><p>Ultimately, decision-making under uncertainty is not just a technical skill—it is a leadership trait.</p><p>It requires the courage to act without guarantees, to make informed bets, and to adapt as new information emerges.</p><p>The goal is not to be right all the time. The goal is to be less wrong, faster—and to recover quickly when needed.</p><h3>Conclusion: Action Beats Certainty</h3><p>In complex systems, inaction is not neutral—it is a decision with consequences.</p><p>Waiting for perfect data often means missing the window to act.</p><p>The organizations that thrive are not those that eliminate uncertainty, but those that learn to operate within it.</p><p>Because in the end, the future does not reward certainty—it rewards action.</p>
         </article>
         
         <div class="mt-16 pt-8 border-t border-slate-200 text-center">
             <h3 class="text-xl font-bold text-navy-900 mb-4">Share this insight</h3>
             <div class="flex justify-center gap-4">
-                <a href="#" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-[#0A66C2] hover:text-white transition-colors"><i class="ph-fill ph-linkedin-logo text-xl"></i></a>
-                <a href="#" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-[#1DA1F2] hover:text-white transition-colors"><i class="ph-fill ph-twitter-logo text-xl"></i></a>
+                <a href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fhorizon-scanning.org%2Fblog%2Farticle%2Fyou-will-never-have-enough-data-decision-making-under-uncertainty.html" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-[#0A66C2] hover:text-white transition-all shadow-sm hover:shadow"><i class="ph-fill ph-linkedin-logo text-xl"></i></a>
+                <a href="https://twitter.com/intent/tweet?url=https%3A%2F%2Fhorizon-scanning.org%2Fblog%2Farticle%2Fyou-will-never-have-enough-data-decision-making-under-uncertainty.html&text=You%20Will%20Never%20Have%20Enough%20Data%3A%20Decision-Making%20Under%20Uncertainty" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-[#1DA1F2] hover:text-white transition-all shadow-sm hover:shadow"><i class="ph-fill ph-twitter-logo text-xl"></i></a>
+                <a href="https://api.whatsapp.com/send?text=You%20Will%20Never%20Have%20Enough%20Data%3A%20Decision-Making%20Under%20Uncertainty%20-%20https%3A%2F%2Fhorizon-scanning.org%2Fblog%2Farticle%2Fyou-will-never-have-enough-data-decision-making-under-uncertainty.html" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-[#25D366] hover:text-white transition-all shadow-sm hover:shadow"><i class="ph-fill ph-whatsapp-logo text-xl"></i></a>
             </div>
         </div>
     </main>

@@ -6,11 +6,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>From Signals to Behavior: Turning Horizon Scanning into Real-World Change | Horizon Scan AI</title>
     <meta name="description" content="Horizon scanning reveals what may happen—but real impact comes from translating those insights into behavior change using Theory of Change and COM-B.">
+    <link rel="canonical" href="https://horizon-scanning.org/blog/article/from-signals-to-behavior-turning-horizon-scanning-into-real-world-change.html" />
     
+    <!-- Open Graph / Facebook / LinkedIn / WA -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://horizon-scanning.org/blog/article/from-signals-to-behavior-turning-horizon-scanning-into-real-world-change.html">
     <meta property="og:title" content="From Signals to Behavior: Turning Horizon Scanning into Real-World Change">
     <meta property="og:description" content="Horizon scanning reveals what may happen—but real impact comes from translating those insights into behavior change using Theory of Change and COM-B.">
-    <meta property="og:image" content="../../thum/toc.png">
-    <meta property="og:type" content="article">
+    <meta property="og:image" content="https://horizon-scanning.org/thum/toc.png">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://horizon-scanning.org/blog/article/from-signals-to-behavior-turning-horizon-scanning-into-real-world-change.html">
+    <meta name="twitter:title" content="From Signals to Behavior: Turning Horizon Scanning into Real-World Change">
+    <meta name="twitter:description" content="Horizon scanning reveals what may happen—but real impact comes from translating those insights into behavior change using Theory of Change and COM-B.">
+    <meta name="twitter:image" content="https://horizon-scanning.org/thum/toc.png">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
@@ -30,17 +40,44 @@
             }
         }
     </script>
+
+    <!-- CUSTOM CSS UNTUK RICH TEXT (Table, Callout, Diagram) -->
+    <style>
+        /* Styling untuk Tabel agar responsif dan bagus */
+        .prose table { width: 100%; border-collapse: collapse; margin-top: 2rem; margin-bottom: 2rem; }
+        .prose th, .prose td { border: 1px solid #e2e8f0; padding: 1rem; text-align: left; }
+        .prose th { background-color: #f8fafc; color: #0f172a; font-weight: 700; }
+        .prose tr:nth-child(even) { background-color: #f8fafc; }
+        
+        /* Membungkus tabel untuk mobile */
+        .table-responsive { overflow-x: auto; width: 100%; border-radius: 0.5rem; box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1); border: 1px solid #e2e8f0; }
+        .table-responsive table { margin: 0; border: none; }
+
+        /* Styling untuk Box Catatan (Callout / Textbox) */
+        .callout { padding: 1.5rem; border-radius: 0.75rem; margin: 2rem 0; border-left: 4px solid #0d9488; background-color: #f0fdfa; }
+        .callout h4 { margin-top: 0 !important; color: #0f172a !important; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; }
+        .callout p:last-child { margin-bottom: 0 !important; }
+
+        /* Styling Blockquote */
+        .prose blockquote { border-left-color: #0d9488; font-style: normal; background-color: #f8fafc; padding: 1rem 1.5rem; border-radius: 0 0.75rem 0.75rem 0; color: #334155; }
+        .prose blockquote p { margin: 0; }
+
+        /* Styling Container Chart / Workflow */
+        .chart-container { background: white; border: 1px solid #e2e8f0; border-radius: 1rem; padding: 2rem; margin: 2.5rem 0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); text-align: center; }
+        .chart-container img { margin: 0 auto; border-radius: 0.5rem; }
+        .chart-caption { font-size: 0.875rem; color: #64748b; margin-top: 1rem; text-align: center; font-style: italic; }
+    </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans antialiased">
 
-    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50">
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <a href="../../index.html" class="flex items-center gap-2">
                     <i class="ph ph-radar text-teal-600 text-2xl"></i>
                     <span class="font-bold text-lg text-navy-900 tracking-tight">HorizonScan<span class="text-teal-600">AI</span></span>
                 </a>
-                <a href="../../blog.html" class="text-sm font-bold text-slate-600 hover:text-teal-600 flex items-center gap-1">
+                <a href="../../blog.html" class="text-sm font-bold text-slate-600 hover:text-teal-600 flex items-center gap-1 transition-colors">
                     <i class="ph-bold ph-arrow-left"></i> Back to Articles
                 </a>
             </div>
@@ -48,7 +85,7 @@
     </nav>
 
     <header class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-8">
-        <span class="inline-block bg-teal-100 text-teal-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-4">
+        <span class="inline-block bg-teal-100 text-teal-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-4 shadow-sm">
             Applied Foresight
         </span>
         <h1 class="text-3xl md:text-5xl font-extrabold text-navy-900 mb-6 leading-tight">From Signals to Behavior: Turning Horizon Scanning into Real-World Change</h1>
@@ -68,16 +105,22 @@
         <img src="../../thum/toc.png" alt="From Signals to Behavior: Turning Horizon Scanning into Real-World Change" class="w-full h-auto max-h-[500px] object-cover rounded-2xl shadow-lg border border-slate-200" onerror="this.src='https://via.placeholder.com/1200x600/0f172a/ffffff?text=HorizonScan+AI'">
     </div>
 
+    <!-- MAIN CONTENT DENGAN TYPOGRAPHY YANG DISEMPURNAKAN -->
     <main class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
-        <article class="prose prose-slate prose-lg max-w-none prose-headings:text-navy-900 prose-a:text-teal-600 hover:prose-a:text-teal-500 prose-img:rounded-xl">
+        <article class="prose prose-slate prose-lg max-w-none 
+            prose-headings:text-navy-900 prose-headings:font-bold 
+            prose-a:text-teal-600 hover:prose-a:text-teal-500 prose-a:font-semibold prose-a:no-underline hover:prose-a:underline
+            prose-img:rounded-xl prose-img:shadow-md
+            prose-li:marker:text-teal-500">
             <p>Horizon scanning is powerful. It allows us to detect weak signals, emerging trends, and potential disruptions before they fully materialize. But insight alone is not enough.</p><p>The real question is: what do we do after we see the signals?</p><p>This is where many foresight efforts stop. Signals are mapped, trends are discussed, reports are written—but no concrete change follows. The missing link is translation: turning foresight into action, and action into measurable impact.</p><h3>From Insight to Intervention</h3><p>Once signals are identified through horizon scanning, they must be translated into structured interventions. This is where frameworks like Theory of Change (ToC) and COM-B become essential.</p><p>The Theory of Change helps define the pathway from activities to impact—clarifying what we want to achieve, and how change is expected to happen. Meanwhile, the COM-B model (Capability, Opportunity, Motivation) provides a behavioral diagnosis, helping us understand why people act the way they do.</p><p>Combined, these frameworks transform abstract foresight into practical, actionable strategies.</p><h3>Operationalizing with Tools</h3><p>To make this process easier and more accessible, you can use a simple interactive tool designed to integrate Theory of Change and COM-B into a single workflow:</p><p><a href="https://anggaconni.github.io/TheoryofChange_COM-B/" target="_blank">https://anggaconni.github.io/TheoryofChange_COM-B/</a></p><p>Here is how to use it:</p><p>1. Start with your Horizon Scanning results. Identify a key signal, trend, or issue you want to address.</p><p>2. Input the problem or goal into the application. This becomes the foundation for your Theory of Change.</p><p>3. Let the framework guide you in defining impact, outcomes, and activities.</p><p>4. Use the COM-B analysis to diagnose behavior—what needs to change, and why it is not happening yet.</p><p>From there, the system helps generate structured, actionable interventions.</p><h3>Beyond Policy: Applying It to Real Life</h3><p>What makes these frameworks powerful is their universality. They are not limited to public policy or corporate strategy—they apply seamlessly to everyday life.</p><p>Here are two real-world examples:</p><p><strong>Scenario 1: Escaping Reactive Parenting</strong></p><p>Instead of reacting to a child’s behavior, you can design their environment proactively.</p><p><em>Impact:</em> The child grows into an independent, critical learner.<br><em>Long-term Outcome:</em> The child develops a habit of reading without being told.</p><p><strong>COM-B Diagnosis:</strong><br>Capability: The child already has basic reading ability.<br>Opportunity: The environment needs to support reading behavior.<br>Motivation: Reading must feel enjoyable, not forced.</p><p><strong>Strategic Interventions:</strong><br>1. Place a bookshelf at the child’s eye level (Opportunity/Physical).<br>2. Introduce engaging bedtime storytelling (Motivation/Emotional).</p><p><strong>Scenario 2: The Brutal Truth of Romance</strong></p><p>The same framework can reveal uncomfortable truths in relationships.</p><p><strong>COM-B Diagnosis:</strong><br>Capability: Are they emotionally available?<br>Opportunity: Is there time and space for a relationship?<br>Motivation: If they consistently avoid you despite having Capability and Opportunity, the conclusion is clear—their Motivation is near zero.</p><p><strong>Strategic Insight:</strong><br>If someone avoids you, gives minimal effort, and dodges commitment, no framework can manufacture motivation. The rational decision is to walk away. And if they suddenly return? Proceed with caution—there may be underlying motives.</p><h3>Designing Change, Not Just Predicting It</h3><p>Foresight is often misunderstood as prediction. In reality, its true power lies in design—the ability to shape outcomes before they fully emerge.</p><p>By combining Horizon Scanning with Theory of Change and COM-B, we move from observing the future to actively influencing it.</p><p>We shift from asking “What might happen?” to “What should we do about it?”</p><h3>Conclusion: Behavior is the Final Frontier</h3><p>At the end of every strategy, policy, or decision, there is one constant: human behavior.</p><p>You can have the best insights, the most advanced tools, and the clearest strategies—but if behavior does not change, nothing changes.</p><p>Foresight gives us vision. Frameworks like ToC and COM-B give us direction. But action—real, behavioral change—is what ultimately shapes the future.</p><p>Behavioral science is everywhere. You just have to know where to look.</p>
         </article>
         
         <div class="mt-16 pt-8 border-t border-slate-200 text-center">
             <h3 class="text-xl font-bold text-navy-900 mb-4">Share this insight</h3>
             <div class="flex justify-center gap-4">
-                <a href="#" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-[#0A66C2] hover:text-white transition-colors"><i class="ph-fill ph-linkedin-logo text-xl"></i></a>
-                <a href="#" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-[#1DA1F2] hover:text-white transition-colors"><i class="ph-fill ph-twitter-logo text-xl"></i></a>
+                <a href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fhorizon-scanning.org%2Fblog%2Farticle%2Ffrom-signals-to-behavior-turning-horizon-scanning-into-real-world-change.html" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-[#0A66C2] hover:text-white transition-all shadow-sm hover:shadow"><i class="ph-fill ph-linkedin-logo text-xl"></i></a>
+                <a href="https://twitter.com/intent/tweet?url=https%3A%2F%2Fhorizon-scanning.org%2Fblog%2Farticle%2Ffrom-signals-to-behavior-turning-horizon-scanning-into-real-world-change.html&text=From%20Signals%20to%20Behavior%3A%20Turning%20Horizon%20Scanning%20into%20Real-World%20Change" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-[#1DA1F2] hover:text-white transition-all shadow-sm hover:shadow"><i class="ph-fill ph-twitter-logo text-xl"></i></a>
+                <a href="https://api.whatsapp.com/send?text=From%20Signals%20to%20Behavior%3A%20Turning%20Horizon%20Scanning%20into%20Real-World%20Change%20-%20https%3A%2F%2Fhorizon-scanning.org%2Fblog%2Farticle%2Ffrom-signals-to-behavior-turning-horizon-scanning-into-real-world-change.html" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-[#25D366] hover:text-white transition-all shadow-sm hover:shadow"><i class="ph-fill ph-whatsapp-logo text-xl"></i></a>
             </div>
         </div>
     </main>

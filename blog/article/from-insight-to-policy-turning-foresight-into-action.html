@@ -6,11 +6,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>From Insight to Policy: Turning Foresight into Action | Horizon Scan AI</title>
     <meta name="description" content="Foresight creates value only when it shapes decisions. The real challenge is not seeing the future, but translating insight into policy and action.">
+    <link rel="canonical" href="https://horizon-scanning.org/blog/article/from-insight-to-policy-turning-foresight-into-action.html" />
     
+    <!-- Open Graph / Facebook / LinkedIn / WA -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://horizon-scanning.org/blog/article/from-insight-to-policy-turning-foresight-into-action.html">
     <meta property="og:title" content="From Insight to Policy: Turning Foresight into Action">
     <meta property="og:description" content="Foresight creates value only when it shapes decisions. The real challenge is not seeing the future, but translating insight into policy and action.">
-    <meta property="og:image" content="../../thum/insight.png">
-    <meta property="og:type" content="article">
+    <meta property="og:image" content="https://horizon-scanning.org/thum/insight.png">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://horizon-scanning.org/blog/article/from-insight-to-policy-turning-foresight-into-action.html">
+    <meta name="twitter:title" content="From Insight to Policy: Turning Foresight into Action">
+    <meta name="twitter:description" content="Foresight creates value only when it shapes decisions. The real challenge is not seeing the future, but translating insight into policy and action.">
+    <meta name="twitter:image" content="https://horizon-scanning.org/thum/insight.png">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
@@ -30,17 +40,44 @@
             }
         }
     </script>
+
+    <!-- CUSTOM CSS UNTUK RICH TEXT (Table, Callout, Diagram) -->
+    <style>
+        /* Styling untuk Tabel agar responsif dan bagus */
+        .prose table { width: 100%; border-collapse: collapse; margin-top: 2rem; margin-bottom: 2rem; }
+        .prose th, .prose td { border: 1px solid #e2e8f0; padding: 1rem; text-align: left; }
+        .prose th { background-color: #f8fafc; color: #0f172a; font-weight: 700; }
+        .prose tr:nth-child(even) { background-color: #f8fafc; }
+        
+        /* Membungkus tabel untuk mobile */
+        .table-responsive { overflow-x: auto; width: 100%; border-radius: 0.5rem; box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1); border: 1px solid #e2e8f0; }
+        .table-responsive table { margin: 0; border: none; }
+
+        /* Styling untuk Box Catatan (Callout / Textbox) */
+        .callout { padding: 1.5rem; border-radius: 0.75rem; margin: 2rem 0; border-left: 4px solid #0d9488; background-color: #f0fdfa; }
+        .callout h4 { margin-top: 0 !important; color: #0f172a !important; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; }
+        .callout p:last-child { margin-bottom: 0 !important; }
+
+        /* Styling Blockquote */
+        .prose blockquote { border-left-color: #0d9488; font-style: normal; background-color: #f8fafc; padding: 1rem 1.5rem; border-radius: 0 0.75rem 0.75rem 0; color: #334155; }
+        .prose blockquote p { margin: 0; }
+
+        /* Styling Container Chart / Workflow */
+        .chart-container { background: white; border: 1px solid #e2e8f0; border-radius: 1rem; padding: 2rem; margin: 2.5rem 0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); text-align: center; }
+        .chart-container img { margin: 0 auto; border-radius: 0.5rem; }
+        .chart-caption { font-size: 0.875rem; color: #64748b; margin-top: 1rem; text-align: center; font-style: italic; }
+    </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans antialiased">
 
-    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50">
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <a href="../../index.html" class="flex items-center gap-2">
                     <i class="ph ph-radar text-teal-600 text-2xl"></i>
                     <span class="font-bold text-lg text-navy-900 tracking-tight">HorizonScan<span class="text-teal-600">AI</span></span>
                 </a>
-                <a href="../../blog.html" class="text-sm font-bold text-slate-600 hover:text-teal-600 flex items-center gap-1">
+                <a href="../../blog.html" class="text-sm font-bold text-slate-600 hover:text-teal-600 flex items-center gap-1 transition-colors">
                     <i class="ph-bold ph-arrow-left"></i> Back to Articles
                 </a>
             </div>
@@ -48,7 +85,7 @@
     </nav>
 
     <header class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-8">
-        <span class="inline-block bg-teal-100 text-teal-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-4">
+        <span class="inline-block bg-teal-100 text-teal-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-4 shadow-sm">
             Policy & Strategy
         </span>
         <h1 class="text-3xl md:text-5xl font-extrabold text-navy-900 mb-6 leading-tight">From Insight to Policy: Turning Foresight into Action</h1>
@@ -68,16 +105,22 @@
         <img src="../../thum/insight.png" alt="From Insight to Policy: Turning Foresight into Action" class="w-full h-auto max-h-[500px] object-cover rounded-2xl shadow-lg border border-slate-200" onerror="this.src='https://via.placeholder.com/1200x600/0f172a/ffffff?text=HorizonScan+AI'">
     </div>
 
+    <!-- MAIN CONTENT DENGAN TYPOGRAPHY YANG DISEMPURNAKAN -->
     <main class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
-        <article class="prose prose-slate prose-lg max-w-none prose-headings:text-navy-900 prose-a:text-teal-600 hover:prose-a:text-teal-500 prose-img:rounded-xl">
+        <article class="prose prose-slate prose-lg max-w-none 
+            prose-headings:text-navy-900 prose-headings:font-bold 
+            prose-a:text-teal-600 hover:prose-a:text-teal-500 prose-a:font-semibold prose-a:no-underline hover:prose-a:underline
+            prose-img:rounded-xl prose-img:shadow-md
+            prose-li:marker:text-teal-500">
             <p>Foresight, no matter how sophisticated, holds little value if it remains confined to reports, presentations, or dashboards. The true measure of its effectiveness lies in its ability to influence decisions, shape policies, and drive action.</p><p>This is where many organizations struggle. They successfully generate insights—through horizon scanning, scenario planning, or trend analysis—but fail to integrate those insights into real-world decision-making processes.</p><p>The gap between insight and action is where foresight often loses its impact.</p><h3>The Insight-Action Gap</h3><p>One of the most persistent challenges in foresight is the disconnect between analysts and decision-makers. Foresight outputs are frequently perceived as abstract, speculative, or too long-term to be immediately relevant.</p><p>As a result, strategic insights are acknowledged, but not operationalized. Reports are read, but not acted upon. Signals are identified, but not translated into concrete steps.</p><p>This creates a paradox: organizations invest in understanding the future, yet continue to make decisions as if that understanding does not exist.</p><h3>Making Foresight Actionable</h3><p>To bridge this gap, foresight must be reframed—not as an exploratory exercise, but as a decision-support system. This requires translating insights into formats that are directly usable by policymakers and leaders.</p><p>Instead of presenting trends in isolation, foresight outputs should answer critical questions: What does this mean for us? What are the risks if we do nothing? What opportunities can be captured? What decisions need to be made now?</p><p>Clarity and relevance are essential. The more actionable the insight, the higher the likelihood it will influence decisions.</p><h3>Embedding Foresight into Policy Cycles</h3><p>For foresight to have sustained impact, it must be embedded into institutional processes. This means integrating foresight into policy cycles, planning frameworks, and budgeting decisions.</p><p>Rather than being a one-off exercise, foresight should become a continuous function—informing agenda-setting, policy design, implementation, and evaluation.</p><p>This integration ensures that insights are not only generated, but consistently applied.</p><h3>From Signals to Decisions</h3><p>A critical step in operationalizing foresight is translating signals into decision pathways. Weak signals must be elevated into strategic discussions, where their implications can be assessed and acted upon.</p><p>This often involves developing scenarios, stress-testing policies, and identifying no-regret actions—decisions that provide value across multiple possible futures.</p><p>By doing so, organizations can act under uncertainty without requiring perfect information.</p><h3>Leadership and the Will to Act</h3><p>Ultimately, the success of foresight depends on leadership. Acting on foresight requires courage—the willingness to make decisions based on emerging signals rather than established certainty.</p><p>Leaders must be comfortable navigating ambiguity, balancing short-term pressures with long-term resilience. They must also create environments where foresight is trusted, valued, and integrated into strategic thinking.</p><p>Without this commitment, even the most advanced foresight systems will remain underutilized.</p><h3>Conclusion: From Knowing to Doing</h3><p>Foresight is not about producing knowledge—it is about enabling action.</p><p>The ability to anticipate change is only meaningful if it leads to better decisions. Bridging the gap between insight and policy transforms foresight from an intellectual exercise into a strategic capability.</p><p>In the end, the organizations that succeed will not be those that see the future most clearly, but those that act on it most effectively.</p>
         </article>
         
         <div class="mt-16 pt-8 border-t border-slate-200 text-center">
             <h3 class="text-xl font-bold text-navy-900 mb-4">Share this insight</h3>
             <div class="flex justify-center gap-4">
-                <a href="#" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-[#0A66C2] hover:text-white transition-colors"><i class="ph-fill ph-linkedin-logo text-xl"></i></a>
-                <a href="#" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-[#1DA1F2] hover:text-white transition-colors"><i class="ph-fill ph-twitter-logo text-xl"></i></a>
+                <a href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fhorizon-scanning.org%2Fblog%2Farticle%2Ffrom-insight-to-policy-turning-foresight-into-action.html" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-[#0A66C2] hover:text-white transition-all shadow-sm hover:shadow"><i class="ph-fill ph-linkedin-logo text-xl"></i></a>
+                <a href="https://twitter.com/intent/tweet?url=https%3A%2F%2Fhorizon-scanning.org%2Fblog%2Farticle%2Ffrom-insight-to-policy-turning-foresight-into-action.html&text=From%20Insight%20to%20Policy%3A%20Turning%20Foresight%20into%20Action" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-[#1DA1F2] hover:text-white transition-all shadow-sm hover:shadow"><i class="ph-fill ph-twitter-logo text-xl"></i></a>
+                <a href="https://api.whatsapp.com/send?text=From%20Insight%20to%20Policy%3A%20Turning%20Foresight%20into%20Action%20-%20https%3A%2F%2Fhorizon-scanning.org%2Fblog%2Farticle%2Ffrom-insight-to-policy-turning-foresight-into-action.html" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-[#25D366] hover:text-white transition-all shadow-sm hover:shadow"><i class="ph-fill ph-whatsapp-logo text-xl"></i></a>
             </div>
         </div>
     </main>
