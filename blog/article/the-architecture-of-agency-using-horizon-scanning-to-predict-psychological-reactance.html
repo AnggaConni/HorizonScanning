@@ -1,0 +1,470 @@
+
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Architecture of Agency: Using Horizon Scanning to Predict Psychological Reactance | Horizon Scan AI</title>
+    <meta name="description" content="Why do perfectly logical policies, products, and introductions fail? Humans are wired to protect their autonomy. Learn how to scan for the weak signals of rebellion before they destroy your strategy.">
+    <link rel="canonical" href="https://horizon-scanning.org/blog/article/the-architecture-of-agency-using-horizon-scanning-to-predict-psychological-reactance.html" />
+    
+    <!-- Open Graph / Facebook / LinkedIn / WA -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://horizon-scanning.org/blog/article/the-architecture-of-agency-using-horizon-scanning-to-predict-psychological-reactance.html">
+    <meta property="og:title" content="The Architecture of Agency: Using Horizon Scanning to Predict Psychological Reactance">
+    <meta property="og:description" content="Why do perfectly logical policies, products, and introductions fail? Humans are wired to protect their autonomy. Learn how to scan for the weak signals of rebellion before they destroy your strategy.">
+    <meta property="og:image" content="https://horizon-scanning.org/thum/reactance-foresight.png">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://horizon-scanning.org/blog/article/the-architecture-of-agency-using-horizon-scanning-to-predict-psychological-reactance.html">
+    <meta name="twitter:title" content="The Architecture of Agency: Using Horizon Scanning to Predict Psychological Reactance">
+    <meta name="twitter:description" content="Why do perfectly logical policies, products, and introductions fail? Humans are wired to protect their autonomy. Learn how to scan for the weak signals of rebellion before they destroy your strategy.">
+    <meta name="twitter:image" content="https://horizon-scanning.org/thum/reactance-foresight.png">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        navy: { 800: '#1e293b', 900: '#0f172a', 950: '#020617' },
+                        teal: { 400: '#2dd4bf', 500: '#14b8a6', 600: '#0d9488' }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- CUSTOM CSS UNTUK RICH TEXT (Table, Callout, Diagram) -->
+    <style>
+        /* Styling untuk Tabel agar responsif dan bagus */
+        .prose table { width: 100%; border-collapse: collapse; margin-top: 2rem; margin-bottom: 2rem; }
+        .prose th, .prose td { border: 1px solid #e2e8f0; padding: 1rem; text-align: left; }
+        .prose th { background-color: #f8fafc; color: #0f172a; font-weight: 700; }
+        .prose tr:nth-child(even) { background-color: #f8fafc; }
+        
+        /* Membungkus tabel untuk mobile */
+        .table-responsive { overflow-x: auto; width: 100%; border-radius: 0.5rem; box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1); border: 1px solid #e2e8f0; }
+        .table-responsive table { margin: 0; border: none; }
+
+        /* Styling untuk Box Catatan (Callout / Textbox) */
+        .callout { padding: 1.5rem; border-radius: 0.75rem; margin: 2rem 0; border-left: 4px solid #0d9488; background-color: #f0fdfa; }
+        .callout h4 { margin-top: 0 !important; color: #0f172a !important; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; }
+        .callout p:last-child { margin-bottom: 0 !important; }
+
+        /* Styling Blockquote */
+        .prose blockquote { border-left-color: #0d9488; font-style: normal; background-color: #f8fafc; padding: 1rem 1.5rem; border-radius: 0 0.75rem 0.75rem 0; color: #334155; }
+        .prose blockquote p { margin: 0; }
+
+        /* Styling Container Chart / Workflow */
+        .chart-container { background: white; border: 1px solid #e2e8f0; border-radius: 1rem; padding: 2rem; margin: 2.5rem 0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); text-align: center; }
+        .chart-container img { margin: 0 auto; border-radius: 0.5rem; }
+        .chart-caption { font-size: 0.875rem; color: #64748b; margin-top: 1rem; text-align: center; font-style: italic; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased">
+
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <a href="../../index.html" class="flex items-center gap-2">
+                    <i class="ph ph-radar text-teal-600 text-2xl"></i>
+                    <span class="font-bold text-lg text-navy-900 tracking-tight">HorizonScan<span class="text-teal-600">AI</span></span>
+                </a>
+                <a href="../../blog.html" class="text-sm font-bold text-slate-600 hover:text-teal-600 flex items-center gap-1 transition-colors">
+                    <i class="ph-bold ph-arrow-left"></i> Back to Articles
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <header class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-8">
+        <span class="inline-block bg-teal-100 text-teal-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-4 shadow-sm">
+            Behavioral Foresight & Strategy
+        </span>
+        <h1 class="text-3xl md:text-5xl font-extrabold text-navy-900 mb-6 leading-tight">The Architecture of Agency: Using Horizon Scanning to Predict Psychological Reactance</h1>
+        
+        <div class="flex items-center gap-4 text-sm text-slate-500 font-medium">
+            <div class="flex items-center gap-2">
+                <i class="ph-fill ph-user-circle text-xl text-slate-400"></i> Angga Conni Saputra
+            </div>
+            <span>•</span>
+            <div class="flex items-center gap-2">
+                <i class="ph-fill ph-calendar-blank text-lg text-slate-400"></i> April 13, 2026
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
+        <img src="../../thum/reactance-foresight.png" alt="The Architecture of Agency: Using Horizon Scanning to Predict Psychological Reactance" class="w-full h-auto max-h-[500px] object-cover rounded-2xl shadow-lg border border-slate-200" onerror="this.src='https://via.placeholder.com/1200x600/0f172a/ffffff?text=HorizonScan+AI'">
+    </div>
+
+    <!-- MAIN CONTENT DENGAN TYPOGRAPHY YANG DISEMPURNAKAN -->
+    <main class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
+        <article class="prose prose-slate prose-lg max-w-none 
+            prose-headings:text-navy-900 prose-headings:font-bold 
+            prose-a:text-teal-600 hover:prose-a:text-teal-500 prose-a:font-semibold prose-a:no-underline hover:prose-a:underline
+            prose-img:rounded-xl prose-img:shadow-md
+            prose-li:marker:text-teal-500">
+            <p class="lead text-xl md:text-2xl text-slate-600 font-light leading-relaxed mb-8">Imagine you have two single friends. They share the same values, the same humor, and the same life goals. Logically, they are a perfect match. So, you intervene. You sit them down and say, <em>"You two are perfect for each other. You <strong>have</strong> to date. I am setting you up right now."</em> What happens next defies all logic: they immediately find microscopic flaws in one another, manufacture reasons for incompatibility, and actively resist the very connection that could make them happy. Your interference didn't just fail to help — it poisoned the well.</p>
+
+<p>Now imagine a different scenario. You host a casual dinner party. You invite both of them, along with a few other friends. You introduce them briefly — "Oh, you two both obsess over obscure jazz, you'd have a lot to talk about" — and then you walk away. You let them talk. You let them discover their shared humor, their overlapping references, their chemistry. You let them build the narrative themselves. Two months later, they are in a relationship. They think it was <em>their</em> idea. They are <strong>right</strong>. And that is precisely why it worked.</p>
+
+<p>This isn't just a story about matchmaking. It is a fundamental lesson about power, influence, and the invisible architecture of human decision-making. The first approach failed because it violated a hardwired neurological defense mechanism. The second succeeded because it was engineered — invisibly, elegantly — around that mechanism. In the world of public policy, corporate change management, product adoption, and international diplomacy, mastering this difference separates the strategist from the idealist.</p>
+
+<div class="not-prose my-12 p-8 md:p-10 bg-gradient-to-br from-rose-900 via-slate-900 to-red-950 rounded-[2rem] shadow-2xl relative overflow-hidden group">
+  <div class="absolute top-0 right-0 -mt-10 -mr-10 text-rose-500/10 text-[150px] transform group-hover:scale-110 group-hover:-rotate-12 transition-transform duration-700 pointer-events-none"><i class="fa-solid fa-hand-fist"></i></div>
+  <div class="relative z-10">
+    <h4 class="text-2xl font-extrabold text-white mb-6 mt-0 flex items-center gap-3"><i class="fa-solid fa-fire text-yellow-400"></i> Psychological Reactance (Brehm, 1966)</h4>
+    <p class="text-rose-100 text-lg leading-relaxed mb-6">In 1966, psychologist Jack Brehm formalized <strong>Psychological Reactance Theory</strong>. The premise is devastatingly simple, yet universally ignored by leaders, managers, and policymakers:</p>
+    <ul class="space-y-6">
+      <li class="flex gap-4 items-start">
+        <div class="mt-1 text-rose-400 text-xl"><i class="fa-solid fa-link-slash"></i></div>
+        <div><span class="text-white font-bold block mb-1">The Autonomy Threat:</span><span class="text-slate-300 text-sm leading-relaxed">Whenever humans perceive that their freedom of choice (autonomy) is being threatened, restricted, or manipulated — even with good intentions — they experience a state of aversive motivational arousal. The brain reads control as danger.</span></div>
+      </li>
+      <li class="flex gap-4 items-start">
+        <div class="mt-1 text-yellow-400 text-xl"><i class="fa-solid fa-rotate-left"></i></div>
+        <div><span class="text-white font-bold block mb-1">The Boomerang Effect:</span><span class="text-slate-300 text-sm leading-relaxed">To restore their lost autonomy, humans will actively do the <em>opposite</em> of what is demanded — even when the demanded action is logically beneficial to them. They will sabotage a good policy, reject a good partner, or undermine a good system, simply to prove that they are still the authors of their own choices.</span></div>
+      </li>
+      <li class="flex gap-4 items-start">
+        <div class="mt-1 text-cyan-400 text-xl"><i class="fa-solid fa-brain"></i></div>
+        <div><span class="text-white font-bold block mb-1">The Neurological Basis:</span><span class="text-slate-300 text-sm leading-relaxed">Modern neuroscience has traced reactance to activation in the <strong>medial prefrontal cortex</strong> and the <strong>anterior insula</strong> — regions associated with self-referential processing and visceral threat detection. Perceived loss of autonomy triggers the same neural circuitry as physical threat. The brain does not distinguish between "you must date this person" and "you must run from this predator." The resistance is not emotional weakness — it is survival architecture.</span></div>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<h3 class="text-2xl font-extrabold text-slate-900 mt-16 mb-6">1. The Neuroscience of "No": Why the Brain Resists Before It Reasons</h3>
+
+<p>To truly understand why your matchmaking failed, you need to go one level deeper than Brehm's original theory. The moment you said <em>"you two have to date,"</em> your friends' brains did not weigh the evidence. They did not evaluate the list of shared values you were about to present. Instead, a faster, older system fired first.</p>
+
+<p>The <strong>prefrontal cortex</strong> — the seat of logical reasoning — is evolutionary slow. It takes 200–500 milliseconds to engage. But the <strong>limbic system</strong>, which governs autonomy-threat detection, fires in under 100 milliseconds. By the time your friend consciously heard your argument, the verdict had already been delivered at the neurological level: <em>threat detected, autonomy compromised, resistance activated.</em></p>
+
+<p>This is what psychologist Martin Brehm (2006) later described as the <strong>"freedom salience effect"</strong>: the mere salience of a restricted freedom makes that freedom more desirable than it was before the restriction was imposed. Your two friends didn't just fail to connect — they became psychologically allergic to the idea. The forced introduction made the connection feel like a cage, not an opportunity.</p>
+
+<p>The expert-level insight here is that <strong>reactance is not a bug in human cognition — it is a feature</strong>. Autonomy is the foundational prerequisite of identity. Without it, a person cannot construct a coherent self-narrative. Brehm's theory, extended by Dillard &amp; Shen (2005), shows that reactance operates on two distinct dimensions simultaneously: <em>cognitive</em> (counterarguing, generating reasons to resist) and <em>affective</em> (anger, defiance, resentment). Effective influence strategy must disarm <em>both</em> simultaneously — logic alone is insufficient.</p>
+
+<div class="callout bg-amber-50 border-l-4 border-amber-500 p-6 rounded-r-2xl my-10">
+  <h4 class="font-extrabold text-amber-900 flex items-center gap-2 mb-3"><i class="fa-solid fa-flask"></i> Empirical Signal: The Forbidden Fruit Effect</h4>
+  <p class="text-amber-800 text-sm leading-relaxed m-0">A meta-analysis by Rains (2013), synthesizing data from 20 independent studies, found that messages framed as <strong>commands or restrictions</strong> produced significantly higher reactance than identical messages framed as <strong>invitations or observations</strong>. The content was identical. The framing alone determined whether the brain filed it under "opportunity" or "threat." This is the entire game.</p>
+</div>
+
+<h3 class="text-2xl font-extrabold text-slate-900 mt-16 mb-6">2. The Tipping Point of Intervention: Where Force Becomes Friction</h3>
+
+<p>If forcing your friends to date creates rebellion, forcing a population to adopt a new digital system — or forcing a foreign nation to sign a treaty — will trigger the exact same neurological defense mechanism, at civilizational scale.</p>
+
+<p>This is where <strong>Horizon Scanning</strong> intersects with behavioral science in a uniquely powerful way. As an intervention (a policy, a mandate, a product rollout) increases in intensity, adoption initially rises. People respond to encouragement, to incentives, to gentle pushes. But there is a hidden, invisible threshold — what we can call the <strong>Autonomy Threat Inflection Point</strong>. The moment the target audience collectively perceives the intervention as a threat to their agency, adoption doesn't just plateau — it crashes, and reactance skyrockets in inverse proportion.</p>
+
+<div class="not-prose my-16 p-8 md:p-10 bg-white border border-slate-200 rounded-[1.5rem] shadow-sm flex flex-col items-center">
+  <h4 class="text-slate-900 font-extrabold mb-2 text-xl text-center">The Reactance Curve</h4>
+  <p class="text-center text-slate-500 text-sm mb-10">The paradox of influence: Pushing harder eventually destroys compliance. The inflection point is invisible until it has already been crossed.</p>
+  <div class="w-full max-w-2xl relative">
+    <svg viewBox="0 0 600 370" class="w-full h-auto overflow-visible">
+      <defs>
+        <linearGradient id="gradAdoption" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#10b981" stop-opacity="0.2"/>
+          <stop offset="100%" stop-color="#10b981" stop-opacity="0"/>
+        </linearGradient>
+        <linearGradient id="gradReactance" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#f43f5e" stop-opacity="0.2"/>
+          <stop offset="100%" stop-color="#f43f5e" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <line x1="50" y1="300" x2="570" y2="300" stroke="#cbd5e1" stroke-width="2"/>
+      <line x1="50" y1="300" x2="50" y2="40" stroke="#cbd5e1" stroke-width="2"/>
+      <line x1="300" y1="300" x2="300" y2="40" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="5,5"/>
+      <text x="300" y="32" font-family="sans-serif" font-size="11" font-weight="bold" fill="#64748b" text-anchor="middle">AUTONOMY THREAT INFLECTION POINT</text>
+      <text x="300" y="345" font-family="sans-serif" font-size="12" font-weight="bold" fill="#64748b" text-anchor="middle">Level of Force / Intervention Intensity →</text>
+      <text x="20" y="175" font-family="sans-serif" font-size="12" font-weight="bold" fill="#64748b" text-anchor="middle" transform="rotate(-90 20,175)">Behavioral Output</text>
+      <!-- Adoption curve: rises then falls sharply after inflection -->
+      <path d="M 50,285 C 130,260 230,95 300,92 C 355,92 430,200 570,290" fill="url(#gradAdoption)" stroke="#10b981" stroke-width="3.5" stroke-linecap="round"/>
+      <!-- Reactance curve: flat then rises sharply after inflection -->
+      <path d="M 50,298 C 200,298 275,285 300,260 C 325,230 400,110 570,55" fill="url(#gradReactance)" stroke="#f43f5e" stroke-width="3.5" stroke-linecap="round"/>
+      <!-- Inflection point markers -->
+      <circle cx="300" cy="92" r="6" fill="#10b981"/>
+      <circle cx="300" cy="260" r="6" fill="#f43f5e"/>
+      <!-- Labels -->
+      <rect x="380" y="75" width="12" height="12" fill="#10b981" rx="2"/>
+      <text x="400" y="85" font-family="sans-serif" font-size="12" font-weight="bold" fill="#334155" alignment-baseline="middle">Adoption Rate</text>
+      <rect x="380" y="105" width="12" height="12" fill="#f43f5e" rx="2"/>
+      <text x="400" y="115" font-family="sans-serif" font-size="12" font-weight="bold" fill="#334155" alignment-baseline="middle">Psychological Reactance</text>
+      <!-- Zone labels -->
+      <text x="175" y="320" font-family="sans-serif" font-size="11" font-weight="bold" fill="#10b981" text-anchor="middle">The Nudge Zone (Safe)</text>
+      <text x="435" y="320" font-family="sans-serif" font-size="11" font-weight="bold" fill="#f43f5e" text-anchor="middle">The Mandate Zone (Danger)</text>
+      <!-- Phase annotations -->
+      <text x="110" y="240" font-family="sans-serif" font-size="10" fill="#94a3b8" text-anchor="middle">Invitation &amp;</text>
+      <text x="110" y="253" font-family="sans-serif" font-size="10" fill="#94a3b8" text-anchor="middle">Suggestion</text>
+      <text x="435" y="195" font-family="sans-serif" font-size="10" fill="#94a3b8" text-anchor="middle">Mandate &amp;</text>
+      <text x="435" y="208" font-family="sans-serif" font-size="10" fill="#94a3b8" text-anchor="middle">Enforcement</text>
+    </svg>
+  </div>
+  <p class="chart-caption mt-8 m-0">Figure 1: The Reactance Curve — the inverse correlation between intervention intensity and human compliance. Past the inflection point, every additional unit of force generates more resistance than compliance.</p>
+</div>
+
+<p>The critical insight for strategists: <strong>the inflection point is not visible in real-time outcome data</strong>. By the time adoption metrics begin to fall, reactance has already been building for weeks. This is precisely why Horizon Scanning — the systematic detection of weak signals — is the indispensable companion tool to any behavioral intervention strategy.</p>
+
+<h3 class="text-2xl font-extrabold text-slate-900 mt-16 mb-6">3. Horizon Scanning for Impending Rebellion: Reading the Early Signals</h3>
+
+<p>If you launch a program and people protest in the streets, you don't need Horizon Scanning. The crisis has already materialized, crossed the threshold, and become irreversible. The purpose of Horizon Scanning is to detect the <strong>weak signals of reactance</strong> — the behavioral micro-anomalies — <em>weeks or months before</em> the rebellion becomes visible and costly.</p>
+
+<p>Humans rarely rebel loudly at first. Drawing on Hirschman's (1970) foundational model of <strong>Exit, Voice, and Loyalty</strong>, populations move through a predictable sequence when autonomy is eroded: they begin with <em>loyalty</em> (compliance with silent resentment), shift to <em>voice</em> (indirect, deniable dissent), and finally choose <em>exit</em> (active rebellion, disengagement, or subversion). A skilled foresight analyst intercepts this sequence at the Voice stage — before Exit becomes the only remaining option.</p>
+
+<div class="not-prose my-10">
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="p-6 bg-slate-50 border border-slate-200 rounded-2xl shadow-sm hover:shadow-md hover:border-amber-400 transition-all">
+      <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center text-xl mb-4"><i class="fa-solid fa-masks-theater"></i></div>
+      <h5 class="font-bold text-slate-900 text-base mb-2">Signal 1 — Malicious Compliance</h5>
+      <p class="text-xs text-slate-500 leading-relaxed mb-3">The target population follows the <em>exact letter</em> of the new rule, but intentionally violates its spirit — causing the system to slow down or collapse under the weight of its own mandates. <strong>Example:</strong> "You want me to report every error? I will report 500 minor typos today." This is not incompetence; it is precision-targeted subversion.</p>
+      <p class="text-xs text-indigo-600 font-semibold">Hirschman Stage: Voice (early)</p>
+    </div>
+    <div class="p-6 bg-slate-50 border border-slate-200 rounded-2xl shadow-sm hover:shadow-md hover:border-rose-400 transition-all">
+      <div class="w-12 h-12 bg-rose-100 text-rose-600 rounded-xl flex items-center justify-center text-xl mb-4"><i class="fa-solid fa-face-grin-squint-tears"></i></div>
+      <h5 class="font-bold text-slate-900 text-base mb-2">Signal 2 — Dark Humor &amp; Memes</h5>
+      <p class="text-xs text-slate-500 leading-relaxed mb-3">Before people strike, quit, or revolt, they make jokes. A spike in cynical internal memes, satirical nicknames for a project, or dark humor on social media is the <strong>earliest detectable weak signal</strong> of lost autonomy. Humor functions as a socially safe mechanism for venting reactance — it is dissent with plausible deniability.</p>
+      <p class="text-xs text-indigo-600 font-semibold">Hirschman Stage: Voice (very early)</p>
+    </div>
+    <div class="p-6 bg-slate-50 border border-slate-200 rounded-2xl shadow-sm hover:shadow-md hover:border-indigo-400 transition-all">
+      <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center text-xl mb-4"><i class="fa-solid fa-microphone-lines-slash"></i></div>
+      <h5 class="font-bold text-slate-900 text-base mb-2">Signal 3 — The Death of Dissent</h5>
+      <p class="text-xs text-slate-500 leading-relaxed mb-3">When a usually vocal group suddenly goes quiet in meetings, forums, or feedback channels. Silence is never agreement — it is the strategic withdrawal of engagement. The group has calculated that voice is futile, and is mentally preparing for Exit. This signal is the most dangerous precisely because it is invisible to managers who read silence as consent.</p>
+      <p class="text-xs text-indigo-600 font-semibold">Hirschman Stage: Transition to Exit</p>
+    </div>
+    <div class="p-6 bg-slate-50 border border-slate-200 rounded-2xl shadow-sm hover:shadow-md hover:border-emerald-400 transition-all">
+      <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center text-xl mb-4"><i class="fa-solid fa-code-branch"></i></div>
+      <h5 class="font-bold text-slate-900 text-base mb-2">Signal 4 — Workaround Ecosystems</h5>
+      <p class="text-xs text-slate-500 leading-relaxed mb-3">The spontaneous emergence of informal parallel systems — shadow spreadsheets, unofficial Slack channels, unsanctioned processes — that reproduce the old way of working around the new mandate. When people build workarounds, they have already rejected the official system in their minds. Adoption metrics will still look acceptable; behavioral reality has already diverged.</p>
+      <p class="text-xs text-indigo-600 font-semibold">Hirschman Stage: Exit (early)</p>
+    </div>
+    <div class="p-6 bg-slate-50 border border-slate-200 rounded-2xl shadow-sm hover:shadow-md hover:border-violet-400 transition-all">
+      <div class="w-12 h-12 bg-violet-100 text-violet-600 rounded-xl flex items-center justify-center text-xl mb-4"><i class="fa-solid fa-person-running"></i></div>
+      <h5 class="font-bold text-slate-900 text-base mb-2">Signal 5 — Voluntary Attrition Spikes</h5>
+      <p class="text-xs text-slate-500 leading-relaxed mb-3">In organizational contexts, a sudden increase in voluntary resignations among high performers — not a reduction in the workforce, but a targeted loss of exactly the people who have enough options to choose exit. These individuals tend to leave 6–12 weeks after the reactance inflection point, making talent attrition a lagging but highly reliable confirmation signal.</p>
+      <p class="text-xs text-indigo-600 font-semibold">Hirschman Stage: Exit (confirmed)</p>
+    </div>
+    <div class="p-6 bg-slate-50 border border-slate-200 rounded-2xl shadow-sm hover:shadow-md hover:border-orange-400 transition-all">
+      <div class="w-12 h-12 bg-orange-100 text-orange-600 rounded-xl flex items-center justify-center text-xl mb-4"><i class="fa-solid fa-magnifying-glass-chart"></i></div>
+      <h5 class="font-bold text-slate-900 text-base mb-2">Signal 6 — Anomalous Information Seeking</h5>
+      <p class="text-xs text-slate-500 leading-relaxed mb-3">A measurable uptick in people researching alternatives, competitors, legal frameworks, union rights, or historical precedents for resistance. In the digital age, this is traceable through search trend analytics, document access logs, and intranet behavior data. People research before they act — the research phase is the last intercept window available to the strategist.</p>
+      <p class="text-xs text-indigo-600 font-semibold">Hirschman Stage: Exit (preparation)</p>
+    </div>
+  </div>
+</div>
+
+<h3 class="text-2xl font-extrabold text-slate-900 mt-16 mb-6">4. The Architecture of Influence: Five Expert-Level Intervention Models</h3>
+
+<p>If forcing the matchmaking doesn't work, what does? You become the <strong>Choice Architect</strong> — the designer of the environment in which choices are made, rather than the issuer of commands about which choices to make.</p>
+
+<p>In 2008, Richard Thaler and Cass Sunstein introduced <em>Nudge Theory</em> in their landmark work, fundamentally restructuring how governments and organizations approach behavioral change. A nudge alters behavior in a predictable way <strong>without forbidding any options</strong> or significantly changing economic incentives. You preserve autonomy entirely, and in doing so, you completely bypass the reactance mechanism. The brain never receives the threat signal. There is nothing to resist.</p>
+
+<div class="not-prose my-10 space-y-6">
+
+  <div class="p-6 bg-gradient-to-r from-indigo-50 to-slate-50 border border-indigo-200 rounded-2xl">
+    <div class="flex items-start gap-4">
+      <div class="w-10 h-10 bg-indigo-600 text-white rounded-xl flex items-center justify-center text-base shrink-0"><i class="fa-solid fa-1"></i></div>
+      <div>
+        <h5 class="font-extrabold text-indigo-900 text-base mb-2">Default Architecture (Status Quo Nudge)</h5>
+        <p class="text-sm text-slate-600 leading-relaxed mb-2">Humans exhibit powerful status-quo bias — they tend to stay with whatever option is pre-selected. Choice architects exploit this by making the desired behavior the <em>default</em>, while preserving the freedom to opt out. Johnson &amp; Goldstein (2003) demonstrated this dramatically in organ donation studies: countries using opt-out (presumed consent) systems had donation rates above 90%, while opt-in countries averaged below 20%. Same policy, opposite default, radically different outcome. No coercion involved.</p>
+        <p class="text-xs text-indigo-600 font-semibold">The Matchmaking Equivalent: Seat them next to each other at dinner. Don't announce anything. Let proximity do the work.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="p-6 bg-gradient-to-r from-emerald-50 to-slate-50 border border-emerald-200 rounded-2xl">
+    <div class="flex items-start gap-4">
+      <div class="w-10 h-10 bg-emerald-600 text-white rounded-xl flex items-center justify-center text-base shrink-0"><i class="fa-solid fa-2"></i></div>
+      <div>
+        <h5 class="font-extrabold text-emerald-900 text-base mb-2">Social Proof Engineering</h5>
+        <p class="text-sm text-slate-600 leading-relaxed mb-2">Rather than commanding behavior, the choice architect surfaces evidence that the desired behavior is already widespread and normalized. Cialdini's (1984) foundational work on influence showed that humans are exquisitely sensitive to what others like them are doing. A utility company reduced energy usage not by mandating conservation, but by telling households: <em>"Your neighbors use 18% less energy than you."</em> The result was a significant, sustained reduction in consumption — with zero coercion and zero reactance.</p>
+        <p class="text-xs text-emerald-600 font-semibold">The Matchmaking Equivalent: Mention casually to each friend, separately, that the other has been asking about them.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="p-6 bg-gradient-to-r from-amber-50 to-slate-50 border border-amber-200 rounded-2xl">
+    <div class="flex items-start gap-4">
+      <div class="w-10 h-10 bg-amber-600 text-white rounded-xl flex items-center justify-center text-base shrink-0"><i class="fa-solid fa-3"></i></div>
+      <div>
+        <h5 class="font-extrabold text-amber-900 text-base mb-2">Autonomy-Preserving Framing (Motivational Interviewing)</h5>
+        <p class="text-sm text-slate-600 leading-relaxed mb-2">Miller &amp; Rollnick's (2002) clinical framework of <em>Motivational Interviewing</em> — developed originally for addiction counseling — offers one of the most rigorously validated autonomy-preserving influence techniques. The practitioner never argues for the desired change. Instead, they ask questions that cause the subject to generate their own arguments for it. The person convinces themselves. Applied to policy and management, this means replacing "you should adopt this system" with "what would it mean for your workflow if the most tedious 20% of it disappeared?"</p>
+        <p class="text-xs text-amber-600 font-semibold">The Matchmaking Equivalent: Ask each friend what qualities they'd want in a partner. Watch them describe each other.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="p-6 bg-gradient-to-r from-rose-50 to-slate-50 border border-rose-200 rounded-2xl">
+    <div class="flex items-start gap-4">
+      <div class="w-10 h-10 bg-rose-600 text-white rounded-xl flex items-center justify-center text-base shrink-0"><i class="fa-solid fa-4"></i></div>
+      <div>
+        <h5 class="font-extrabold text-rose-900 text-base mb-2">BATNA Alignment (Interest-Based Negotiation)</h5>
+        <p class="text-sm text-slate-600 leading-relaxed mb-2">In international diplomacy and high-stakes negotiation, Fisher &amp; Ury's (1981) concept of the <strong>Best Alternative to a Negotiated Agreement (BATNA)</strong> offers the most powerful anti-reactance instrument available. You do not force a party to sign a treaty. You restructure the geopolitical, economic, and diplomatic landscape so that <em>not signing</em> becomes the costlier choice — while preserving the full appearance of sovereign, autonomous decision-making. The party signs because they chose to. The choice architect ensured that this was the only rational choice available, while making the menu look wide open.</p>
+        <p class="text-xs text-rose-600 font-semibold">The Matchmaking Equivalent: Create a world where running into each other is inevitable. Never say a word.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="p-6 bg-gradient-to-r from-violet-50 to-slate-50 border border-violet-200 rounded-2xl">
+    <div class="flex items-start gap-4">
+      <div class="w-10 h-10 bg-violet-600 text-white rounded-xl flex items-center justify-center text-base shrink-0"><i class="fa-solid fa-5"></i></div>
+      <div>
+        <h5 class="font-extrabold text-violet-900 text-base mb-2">Reactance Inoculation (Pre-emptive Acknowledgment)</h5>
+        <p class="text-sm text-slate-600 leading-relaxed mb-2">Perhaps the most counterintuitive instrument: proactively acknowledging the threat to autonomy <em>before</em> the audience perceives it, and explicitly affirming their right to refuse. Steindl et al. (2015) demonstrated that this inoculation strategy — opening with "you are completely free to disregard this" — paradoxically increases the uptake of the following message by 20–40% in controlled studies. The brain, having received the autonomy-safe signal, disengages its threat-detection system and evaluates the message on its merits.</p>
+        <p class="text-xs text-violet-600 font-semibold">The Matchmaking Equivalent: "I'm not trying to set you up — I just thought you'd enjoy talking to someone this interesting."</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="callout bg-slate-900 text-white p-8 rounded-2xl my-12 border border-slate-700">
+  <h4 class="text-yellow-400 font-extrabold flex items-center gap-3 text-xl mb-4"><i class="fa-solid fa-chess"></i> The Ultimate Law of Influence</h4>
+  <p class="text-slate-200 leading-relaxed mb-4">There is a profound distinction between <strong>positional power</strong> (the ability to issue commands) and <strong>architectural power</strong> (the ability to design the environment in which choices are made). Positional power generates compliance through fear; architectural power generates alignment through perceived freedom.</p>
+  <p class="text-slate-300 text-sm leading-relaxed m-0 border-l-4 border-yellow-400 pl-4">If they think it was your idea, they will fight it. If you build the environment so they think it was <em>their</em> idea, they will not just comply — they will <strong>defend it</strong>. They will recruit others. They will own the outcome. True power is not just invisible; it is attributable to the person you influenced. That is the signature of a master choice architect.</p>
+</div>
+
+<div class="not-prose mt-12 mb-8">
+  <a href="https://anggaconni.github.io/TheoryofChange_COM-B/tool.html" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-3 px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-full transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-indigo-500/40 group">
+    <div class="w-8 h-8 rounded-full bg-white/20 text-white flex items-center justify-center shadow-sm"><i class="fa-solid fa-gears group-hover:rotate-90 transition-transform duration-500"></i></div>
+    Architect Your Intervention via ToC &amp; COM-B Engine
+  </a>
+</div>
+
+<h3 class="text-2xl font-extrabold text-slate-900 mt-16 mb-6">5. The Integrated Framework: Scanning → Diagnosing → Architecting</h3>
+
+<p>The full operational sequence for a strategist working against the reactance clock looks like this:</p>
+
+<div class="not-prose my-10">
+  <div class="relative pl-8 border-l-4 border-indigo-200 space-y-8">
+    <div class="relative">
+      <div class="absolute -left-10 top-0 w-8 h-8 bg-indigo-600 text-white rounded-full flex items-center justify-center text-sm font-bold">1</div>
+      <h5 class="font-extrabold text-slate-900 mb-1">Establish the Reactance Baseline</h5>
+      <p class="text-sm text-slate-600 leading-relaxed">Before launching any intervention, audit the target population's existing autonomy sensitivity. Populations with a history of external control (colonial legacies, authoritarian management cultures, previous failed mandates) have a significantly lower reactance threshold. What works in one organizational culture may detonate in another. Calibrate accordingly.</p>
+    </div>
+    <div class="relative">
+      <div class="absolute -left-10 top-0 w-8 h-8 bg-indigo-600 text-white rounded-full flex items-center justify-center text-sm font-bold">2</div>
+      <h5 class="font-extrabold text-slate-900 mb-1">Deploy Horizon Scanning Tripwires</h5>
+      <p class="text-sm text-slate-600 leading-relaxed">Establish systematic monitoring of the six weak signals identified above — across internal communication channels, social media, anonymous feedback platforms, usage analytics, and voluntary attrition data. Assign reactance-specific PESTLE categories to your environmental scanning framework. Treat the first appearance of any weak signal as a priority-level alert, not a data footnote.</p>
+    </div>
+    <div class="relative">
+      <div class="absolute -left-10 top-0 w-8 h-8 bg-indigo-600 text-white rounded-full flex items-center justify-center text-sm font-bold">3</div>
+      <h5 class="font-extrabold text-slate-900 mb-1">Diagnose the Reactance Dimension</h5>
+      <p class="text-sm text-slate-600 leading-relaxed">Use Dillard &amp; Shen's (2005) dual-dimension diagnostic to determine whether the emerging reactance is primarily <em>cognitive</em> (counterarguing, alternative-seeking) or <em>affective</em> (anger, resentment, defiance). Cognitive reactance responds to autonomy-preserving information reframing. Affective reactance requires relational repair and participatory engagement before any information intervention will be effective.</p>
+    </div>
+    <div class="relative">
+      <div class="absolute -left-10 top-0 w-8 h-8 bg-indigo-600 text-white rounded-full flex items-center justify-center text-sm font-bold">4</div>
+      <h5 class="font-extrabold text-slate-900 mb-1">Redesign the Choice Environment</h5>
+      <p class="text-sm text-slate-600 leading-relaxed">Select the appropriate choice-architecture instrument from the five models above — or combine them. Critically: <strong>reduce intervention intensity before adding new instruments</strong>. More force, delivered in a more sophisticated package, still reads as force to the limbic system. The architecture change must be genuine, not cosmetic.</p>
+    </div>
+    <div class="relative">
+      <div class="absolute -left-10 top-0 w-8 h-8 bg-indigo-600 text-white rounded-full flex items-center justify-center text-sm font-bold">5</div>
+      <h5 class="font-extrabold text-slate-900 mb-1">Monitor, Iterate, and Suppress the Ego</h5>
+      <p class="text-sm text-slate-600 leading-relaxed">The most difficult element of choice architecture is accepting that your influence will be invisible. Success means the population believes the change was their idea. Resist every organizational instinct to claim credit, announce the strategy, or celebrate the nudge. The moment the architecture becomes visible, it becomes a mandate. The dinner party only works if no one knows it was a dinner party.</p>
+    </div>
+  </div>
+</div>
+
+<h3 class="text-2xl font-extrabold text-slate-900 mt-16 mb-6">Conclusion: Master the Environment, Not the Person</h3>
+
+<p>Psychological Reactance is the graveyard of good intentions. Whether you are playing matchmaker for your friends, launching a national healthcare system, rolling out a new enterprise platform, or negotiating a ceasefire, the moment you attack human autonomy — even in the service of an objectively better outcome — you lose. The brain does not evaluate the quality of your intentions. It only registers the presence or absence of a threat to freedom.</p>
+
+<p>The matchmaking story is not a metaphor. It is the complete theory, perfectly compressed. The friend who was forced to date rebelled because their brain correctly identified a threat. The friend who discovered love at a dinner party felt no threat because there was none — the environment had been designed, invisibly, to make discovery inevitable. The outcome was identical in both cases: two compatible people in the same room. The architecture was everything.</p>
+
+<p>By deploying Horizon Scanning, you intercept the weak signals of impending rebellion — the sarcastic memes, the malicious compliance, the dangerous silence — before the tipping point is crossed and remediation becomes impossible. By acting as a Choice Architect rather than a mandate-issuer, you guide outcomes without generating friction, resistance, or the boomerang effect that turns your solution into the problem.</p>
+
+<p class="text-lg font-bold text-rose-900 border-l-4 border-rose-500 pl-4 py-1 mt-6">Don't force the connection. Build the room, invite the right people, create the conditions for discovery, and let gravity do the rest. The most powerful influence leaves no fingerprints.</p>
+
+<div class="not-prose mt-20 mb-8 p-8 md:p-10 bg-slate-50 border border-slate-200 rounded-[1.5rem] shadow-inner">
+  <h4 class="text-2xl font-extrabold text-slate-900 mb-8 flex items-center gap-3"><i class="fa-solid fa-book-journal-whills text-indigo-600"></i> Academic References</h4>
+  <div class="space-y-4">
+    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-5 bg-white rounded-xl border border-slate-200 hover:border-slate-300 transition-all">
+      <div class="flex-1">
+        <span class="inline-block px-2 py-1 bg-slate-100 text-slate-500 text-[10px] font-bold rounded uppercase tracking-wider mb-2">Ref 1</span>
+        <p class="text-sm text-slate-700 leading-relaxed m-0">Brehm, J. W. (1966). <em>A theory of psychological reactance.</em> Academic Press.</p>
+      </div>
+      <div class="shrink-0 inline-flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-400 font-bold text-xs rounded-full"><i class="fa-solid fa-book"></i> Foundational Publication</div>
+    </div>
+    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-5 bg-white rounded-xl border border-slate-200 hover:border-slate-300 transition-all">
+      <div class="flex-1">
+        <span class="inline-block px-2 py-1 bg-slate-100 text-slate-500 text-[10px] font-bold rounded uppercase tracking-wider mb-2">Ref 2</span>
+        <p class="text-sm text-slate-700 leading-relaxed m-0">Thaler, R. H., &amp; Sunstein, C. R. (2008). <em>Nudge: Improving decisions about health, wealth, and happiness.</em> Yale University Press.</p>
+      </div>
+      <div class="shrink-0 inline-flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-400 font-bold text-xs rounded-full"><i class="fa-solid fa-book"></i> Publication</div>
+    </div>
+    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-5 bg-white rounded-xl border border-slate-200 hover:border-indigo-300 hover:shadow-md transition-all">
+      <div class="flex-1">
+        <span class="inline-block px-2 py-1 bg-slate-100 text-slate-500 text-[10px] font-bold rounded uppercase tracking-wider mb-2">Ref 3</span>
+        <p class="text-sm text-slate-700 leading-relaxed m-0">Steindl, C., Jonas, E., Sittenthaler, S., Traut-Mattausch, E., &amp; Greenberg, J. (2015). Understanding psychological reactance: New developments and findings. <em>Zeitschrift für Psychologie, 223</em>(4), 205–214.</p>
+      </div>
+      <a href="https://pubmed.ncbi.nlm.nih.gov/27453805/" target="_blank" rel="noopener noreferrer" class="shrink-0 inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-50 hover:bg-indigo-600 text-indigo-700 hover:text-white font-bold text-xs rounded-full transition-all border border-indigo-100 hover:border-indigo-600 shadow-sm"><i class="fa-solid fa-microscope"></i> Verify on PubMed</a>
+    </div>
+    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-5 bg-white rounded-xl border border-slate-200 hover:border-slate-300 transition-all">
+      <div class="flex-1">
+        <span class="inline-block px-2 py-1 bg-slate-100 text-slate-500 text-[10px] font-bold rounded uppercase tracking-wider mb-2">Ref 4</span>
+        <p class="text-sm text-slate-700 leading-relaxed m-0">Dillard, J. P., &amp; Shen, L. (2005). On the nature of reactance and its role in persuasive health communication. <em>Communication Monographs, 72</em>(2), 144–168.</p>
+      </div>
+      <div class="shrink-0 inline-flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-400 font-bold text-xs rounded-full"><i class="fa-solid fa-book"></i> Publication</div>
+    </div>
+    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-5 bg-white rounded-xl border border-slate-200 hover:border-slate-300 transition-all">
+      <div class="flex-1">
+        <span class="inline-block px-2 py-1 bg-slate-100 text-slate-500 text-[10px] font-bold rounded uppercase tracking-wider mb-2">Ref 5</span>
+        <p class="text-sm text-slate-700 leading-relaxed m-0">Hirschman, A. O. (1970). <em>Exit, voice, and loyalty: Responses to decline in firms, organizations, and states.</em> Harvard University Press.</p>
+      </div>
+      <div class="shrink-0 inline-flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-400 font-bold text-xs rounded-full"><i class="fa-solid fa-book"></i> Publication</div>
+    </div>
+    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-5 bg-white rounded-xl border border-slate-200 hover:border-slate-300 transition-all">
+      <div class="flex-1">
+        <span class="inline-block px-2 py-1 bg-slate-100 text-slate-500 text-[10px] font-bold rounded uppercase tracking-wider mb-2">Ref 6</span>
+        <p class="text-sm text-slate-700 leading-relaxed m-0">Miller, W. R., &amp; Rollnick, S. (2002). <em>Motivational interviewing: Preparing people for change</em> (2nd ed.). Guilford Press.</p>
+      </div>
+      <div class="shrink-0 inline-flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-400 font-bold text-xs rounded-full"><i class="fa-solid fa-book"></i> Publication</div>
+    </div>
+    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-5 bg-white rounded-xl border border-slate-200 hover:border-slate-300 transition-all">
+      <div class="flex-1">
+        <span class="inline-block px-2 py-1 bg-slate-100 text-slate-500 text-[10px] font-bold rounded uppercase tracking-wider mb-2">Ref 7</span>
+        <p class="text-sm text-slate-700 leading-relaxed m-0">Fisher, R., &amp; Ury, W. (1981). <em>Getting to yes: Negotiating agreement without giving in.</em> Houghton Mifflin.</p>
+      </div>
+      <div class="shrink-0 inline-flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-400 font-bold text-xs rounded-full"><i class="fa-solid fa-book"></i> Publication</div>
+    </div>
+    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-5 bg-white rounded-xl border border-slate-200 hover:border-slate-300 transition-all">
+      <div class="flex-1">
+        <span class="inline-block px-2 py-1 bg-slate-100 text-slate-500 text-[10px] font-bold rounded uppercase tracking-wider mb-2">Ref 8</span>
+        <p class="text-sm text-slate-700 leading-relaxed m-0">Rains, S. A. (2013). The nature of psychological reactance revisited: A meta-analytic review. <em>Human Communication Research, 39</em>(1), 47–73.</p>
+      </div>
+      <div class="shrink-0 inline-flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-400 font-bold text-xs rounded-full"><i class="fa-solid fa-book"></i> Publication</div>
+    </div>
+    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-5 bg-white rounded-xl border border-slate-200 hover:border-slate-300 transition-all">
+      <div class="flex-1">
+        <span class="inline-block px-2 py-1 bg-slate-100 text-slate-500 text-[10px] font-bold rounded uppercase tracking-wider mb-2">Ref 9</span>
+        <p class="text-sm text-slate-700 leading-relaxed m-0">Johnson, E. J., &amp; Goldstein, D. (2003). Do defaults save lives? <em>Science, 302</em>(5649), 1338–1339.</p>
+      </div>
+      <div class="shrink-0 inline-flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-400 font-bold text-xs rounded-full"><i class="fa-solid fa-flask"></i> Empirical Study</div>
+    </div>
+    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-5 bg-white rounded-xl border border-slate-200 hover:border-slate-300 transition-all">
+      <div class="flex-1">
+        <span class="inline-block px-2 py-1 bg-slate-100 text-slate-500 text-[10px] font-bold rounded uppercase tracking-wider mb-2">Ref 10</span>
+        <p class="text-sm text-slate-700 leading-relaxed m-0">Cialdini, R. B. (1984). <em>Influence: The psychology of persuasion.</em> William Morrow.</p>
+      </div>
+      <div class="shrink-0 inline-flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-400 font-bold text-xs rounded-full"><i class="fa-solid fa-book"></i> Publication</div>
+    </div>
+  </div>
+</div>
+        </article>
+        
+        <div class="mt-16 pt-8 border-t border-slate-200 text-center">
+            <h3 class="text-xl font-bold text-navy-900 mb-4">Share this insight</h3>
+            <div class="flex justify-center gap-4">
+                <a href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fhorizon-scanning.org%2Fblog%2Farticle%2Fthe-architecture-of-agency-using-horizon-scanning-to-predict-psychological-reactance.html" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-[#0A66C2] hover:text-white transition-all shadow-sm hover:shadow"><i class="ph-fill ph-linkedin-logo text-xl"></i></a>
+                <a href="https://twitter.com/intent/tweet?url=https%3A%2F%2Fhorizon-scanning.org%2Fblog%2Farticle%2Fthe-architecture-of-agency-using-horizon-scanning-to-predict-psychological-reactance.html&text=The%20Architecture%20of%20Agency%3A%20Using%20Horizon%20Scanning%20to%20Predict%20Psychological%20Reactance" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-[#1DA1F2] hover:text-white transition-all shadow-sm hover:shadow"><i class="ph-fill ph-twitter-logo text-xl"></i></a>
+                <a href="https://api.whatsapp.com/send?text=The%20Architecture%20of%20Agency%3A%20Using%20Horizon%20Scanning%20to%20Predict%20Psychological%20Reactance%20-%20https%3A%2F%2Fhorizon-scanning.org%2Fblog%2Farticle%2Fthe-architecture-of-agency-using-horizon-scanning-to-predict-psychological-reactance.html" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-[#25D366] hover:text-white transition-all shadow-sm hover:shadow"><i class="ph-fill ph-whatsapp-logo text-xl"></i></a>
+            </div>
+        </div>
+    </main>
+
+</body>
+</html>
+    
