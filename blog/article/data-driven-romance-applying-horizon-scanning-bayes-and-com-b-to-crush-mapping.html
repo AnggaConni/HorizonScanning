@@ -1,0 +1,509 @@
+
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data-Driven Romance: Applying Horizon Scanning, Bayes, and COM-B to 'Crush Mapping' | Horizon Scan AI</title>
+    <meta name="description" content="Who says foresight is only for global policy? Discover how to apply Horizon Scanning, Bayesian probability, and BATNA to navigate modern romance, avoid red flags, and architect a healthy relationship.">
+    <link rel="canonical" href="https://horizon-scanning.org/blog/article/data-driven-romance-applying-horizon-scanning-bayes-and-com-b-to-crush-mapping.html" />
+    
+    <!-- Open Graph / Facebook / LinkedIn / WA -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://horizon-scanning.org/blog/article/data-driven-romance-applying-horizon-scanning-bayes-and-com-b-to-crush-mapping.html">
+    <meta property="og:title" content="Data-Driven Romance: Applying Horizon Scanning, Bayes, and COM-B to 'Crush Mapping'">
+    <meta property="og:description" content="Who says foresight is only for global policy? Discover how to apply Horizon Scanning, Bayesian probability, and BATNA to navigate modern romance, avoid red flags, and architect a healthy relationship.">
+    <meta property="og:image" content="https://horizon-scanning.org/thum/romance-data.png">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://horizon-scanning.org/blog/article/data-driven-romance-applying-horizon-scanning-bayes-and-com-b-to-crush-mapping.html">
+    <meta name="twitter:title" content="Data-Driven Romance: Applying Horizon Scanning, Bayes, and COM-B to 'Crush Mapping'">
+    <meta name="twitter:description" content="Who says foresight is only for global policy? Discover how to apply Horizon Scanning, Bayesian probability, and BATNA to navigate modern romance, avoid red flags, and architect a healthy relationship.">
+    <meta name="twitter:image" content="https://horizon-scanning.org/thum/romance-data.png">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        navy: { 800: '#1e293b', 900: '#0f172a', 950: '#020617' },
+                        teal: { 400: '#2dd4bf', 500: '#14b8a6', 600: '#0d9488' }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- CUSTOM CSS UNTUK RICH TEXT (Table, Callout, Diagram) -->
+    <style>
+        /* Styling untuk Tabel agar responsif dan bagus */
+        .prose table { width: 100%; border-collapse: collapse; margin-top: 2rem; margin-bottom: 2rem; }
+        .prose th, .prose td { border: 1px solid #e2e8f0; padding: 1rem; text-align: left; }
+        .prose th { background-color: #f8fafc; color: #0f172a; font-weight: 700; }
+        .prose tr:nth-child(even) { background-color: #f8fafc; }
+        
+        /* Membungkus tabel untuk mobile */
+        .table-responsive { overflow-x: auto; width: 100%; border-radius: 0.5rem; box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1); border: 1px solid #e2e8f0; }
+        .table-responsive table { margin: 0; border: none; }
+
+        /* Styling untuk Box Catatan (Callout / Textbox) */
+        .callout { padding: 1.5rem; border-radius: 0.75rem; margin: 2rem 0; border-left: 4px solid #0d9488; background-color: #f0fdfa; }
+        .callout h4 { margin-top: 0 !important; color: #0f172a !important; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; }
+        .callout p:last-child { margin-bottom: 0 !important; }
+
+        /* Styling Blockquote */
+        .prose blockquote { border-left-color: #0d9488; font-style: normal; background-color: #f8fafc; padding: 1rem 1.5rem; border-radius: 0 0.75rem 0.75rem 0; color: #334155; }
+        .prose blockquote p { margin: 0; }
+
+        /* Styling Container Chart / Workflow */
+        .chart-container { background: white; border: 1px solid #e2e8f0; border-radius: 1rem; padding: 2rem; margin: 2.5rem 0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); text-align: center; }
+        .chart-container img { margin: 0 auto; border-radius: 0.5rem; }
+        .chart-caption { font-size: 0.875rem; color: #64748b; margin-top: 1rem; text-align: center; font-style: italic; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased">
+
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <a href="../../index.html" class="flex items-center gap-2">
+                    <i class="ph ph-radar text-teal-600 text-2xl"></i>
+                    <span class="font-bold text-lg text-navy-900 tracking-tight">HorizonScan<span class="text-teal-600">AI</span></span>
+                </a>
+                <a href="../../blog.html" class="text-sm font-bold text-slate-600 hover:text-teal-600 flex items-center gap-1 transition-colors">
+                    <i class="ph-bold ph-arrow-left"></i> Back to Articles
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <header class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-8">
+        <span class="inline-block bg-teal-100 text-teal-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-4 shadow-sm">
+            Behavioral Psychology & Lifestyle
+        </span>
+        <h1 class="text-3xl md:text-5xl font-extrabold text-navy-900 mb-6 leading-tight">Data-Driven Romance: Applying Horizon Scanning, Bayes, and COM-B to 'Crush Mapping'</h1>
+        
+        <div class="flex items-center gap-4 text-sm text-slate-500 font-medium">
+            <div class="flex items-center gap-2">
+                <i class="ph-fill ph-user-circle text-xl text-slate-400"></i> Angga Conni Saputra
+            </div>
+            <span>•</span>
+            <div class="flex items-center gap-2">
+                <i class="ph-fill ph-calendar-blank text-lg text-slate-400"></i> April 13, 2026
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
+        <img src="../../thum/romance-data.png" alt="Data-Driven Romance: Applying Horizon Scanning, Bayes, and COM-B to 'Crush Mapping'" class="w-full h-auto max-h-[500px] object-cover rounded-2xl shadow-lg border border-slate-200" onerror="this.src='https://via.placeholder.com/1200x600/0f172a/ffffff?text=HorizonScan+AI'">
+    </div>
+
+    <!-- MAIN CONTENT DENGAN TYPOGRAPHY YANG DISEMPURNAKAN -->
+    <main class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
+        <article class="prose prose-slate prose-lg max-w-none 
+            prose-headings:text-navy-900 prose-headings:font-bold 
+            prose-a:text-teal-600 hover:prose-a:text-teal-500 prose-a:font-semibold prose-a:no-underline hover:prose-a:underline
+            prose-img:rounded-xl prose-img:shadow-md
+            prose-li:marker:text-teal-500">
+            <p class="lead text-xl md:text-2xl text-slate-600 font-light leading-relaxed mb-8">Dating in the modern era is an exercise in extreme uncertainty. Mixed signals, "ghosting," "breadcrumbing," and unspoken intentions dominate the landscape. Most people navigate this chaos using emotion, hope, and terrible advice from friends. But what if we treated romance like a complex systemic environment? What if we applied the exact same intelligence frameworks used by foresight analysts, negotiators, and behavioral scientists?</p>
+
+<p>Who says Horizon Scanning and strategic foresight are only for governments, NGOs, or corporate risk analysis? You can apply the exact same architecture to something far more unpredictable: your <em>gebetan</em> (crush). Welcome to data-driven romance — where intuition is upgraded by intelligence, and heartbreak is just a risk you finally know how to mitigate.</p>
+
+<div class="not-prose my-12 p-8 md:p-10 bg-gradient-to-br from-rose-900 via-slate-900 to-indigo-950 rounded-[2rem] shadow-2xl relative overflow-hidden group">
+  <div class="absolute top-0 right-0 -mt-10 -mr-10 text-rose-500/20 text-[150px] transform group-hover:scale-110 group-hover:-rotate-12 transition-transform duration-700 pointer-events-none"><i class="fa-solid fa-heart-crack"></i></div>
+  <div class="relative z-10">
+    <p class="text-rose-300 text-xs font-black uppercase tracking-widest mb-3">The Intelligence Stack for Romance</p>
+    <h4 class="text-3xl font-extrabold text-white mb-4 mt-0">5 Tools. 1 Relationship. Zero Guessing.</h4>
+    <p class="text-indigo-200 text-base leading-relaxed mb-8">Each tool in this framework was built to help you move from emotional chaos to structured clarity. Used together, they form a complete intelligence pipeline — from your first interaction to a lasting, aligned relationship.</p>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div class="bg-white/10 rounded-xl p-4 border border-white/10">
+        <div class="text-teal-300 text-2xl mb-2"><i class="fa-solid fa-radar"></i></div>
+        <p class="text-white font-bold text-sm mb-1">Horizon Scanning</p>
+        <p class="text-slate-400 text-xs">Map weak signals & red flags before they become crises.</p>
+      </div>
+      <div class="bg-white/10 rounded-xl p-4 border border-white/10">
+        <div class="text-yellow-300 text-2xl mb-2"><i class="fa-solid fa-user-secret"></i></div>
+        <p class="text-white font-bold text-sm mb-1">Naive Bayesian</p>
+        <p class="text-slate-400 text-xs">Update your beliefs with evidence. Cut through the noise.</p>
+      </div>
+      <div class="bg-white/10 rounded-xl p-4 border border-white/10">
+        <div class="text-purple-300 text-2xl mb-2"><i class="fa-solid fa-project-diagram"></i></div>
+        <p class="text-white font-bold text-sm mb-1">Variable Planner</p>
+        <p class="text-slate-400 text-xs">Mindmap your values, goals, and alignment checkpoints.</p>
+      </div>
+      <div class="bg-white/10 rounded-xl p-4 border border-white/10">
+        <div class="text-rose-300 text-2xl mb-2"><i class="fa-solid fa-scale-balanced"></i></div>
+        <p class="text-white font-bold text-sm mb-1">BATNA Calculator</p>
+        <p class="text-slate-400 text-xs">Know your walk-away power. Never negotiate your worth.</p>
+      </div>
+      <div class="bg-white/10 rounded-xl p-4 border border-white/10 sm:col-span-2 lg:col-span-1">
+        <div class="text-indigo-300 text-2xl mb-2"><i class="fa-solid fa-gears"></i></div>
+        <p class="text-white font-bold text-sm mb-1">Theory of Change & COM-B</p>
+        <p class="text-slate-400 text-xs">Architect the behavior change needed for lasting impact.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h3>Phase 1: Horizon Scanning — The Radar of Romance</h3>
+<p>In foresight, we scan environments for "weak signals" — early indicators of emerging trends before they become obvious. In dating, every interaction is a weak signal. A late-night voice note, a deliberately slow reply, an overly casual "lol" when the conversation gets deep — all of it is data. The problem? Our emotions act as poor signal processors. We amplify what we want to see and suppress what we don't.</p>
+<p>This is exactly the gap that the <strong>Horizon Scanning Workspace</strong> was built to close. Instead of journaling about your feelings, you feed behavioral patterns into a structured foresight canvas built around an <strong>Influence vs. Interest Matrix</strong>.</p>
+
+<div class="not-prose my-10 p-6 md:p-8 bg-gradient-to-r from-indigo-50 to-slate-50 border border-indigo-100 rounded-2xl">
+  <h4 class="font-extrabold text-indigo-900 text-lg mb-4">How the Matrix Works</h4>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="flex gap-4 items-start">
+      <div class="mt-1 bg-indigo-100 rounded-full p-2 text-indigo-600 text-sm"><i class="fa-solid fa-arrows-left-right"></i></div>
+      <div>
+        <span class="text-indigo-900 font-bold block mb-1">X-Axis: Interest / Signal Strength</span>
+        <span class="text-slate-600 text-sm leading-relaxed">How much effort, time, vulnerability, and consistency they invest in you. This is what they <em>do</em>, not what they <em>say</em>.</span>
+      </div>
+    </div>
+    <div class="flex gap-4 items-start">
+      <div class="mt-1 bg-rose-100 rounded-full p-2 text-rose-600 text-sm"><i class="fa-solid fa-arrows-up-down"></i></div>
+      <div>
+        <span class="text-rose-900 font-bold block mb-1">Y-Axis: Influence / Emotional Impact</span>
+        <span class="text-slate-600 text-sm leading-relaxed">How much their behavior shapes your daily mood, focus, and decisions. This is how much real estate they occupy in your mental bandwidth.</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h4>Map the Signals: The Four Quadrants of Romance</h4>
+<p>By plotting their behavior on this matrix, you move from reactive emotional spiraling to structured, defensible insight. Here is your full Crush Mapping diagnostic:</p>
+
+<div class="not-prose my-12">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="p-6 bg-indigo-50 border border-indigo-200 rounded-2xl shadow-sm hover:shadow-md transition-all">
+      <div class="flex justify-between items-center mb-4">
+        <h5 class="font-extrabold text-indigo-900 m-0">💜 Soulmate Zone</h5>
+        <span class="px-3 py-1 bg-indigo-200 text-indigo-800 text-[10px] font-black uppercase rounded-full">High Interest / High Influence</span>
+      </div>
+      <p class="text-sm text-slate-700 mb-3"><em>"They initiated a deep conversation at 2 AM and remembered your favorite book." "They cleared their schedule without being asked."</em></p>
+      <div class="pt-4 border-t border-indigo-200/50">
+        <span class="text-xs font-bold text-indigo-600 uppercase tracking-wider">Foresight Strategy:</span>
+        <p class="text-sm text-slate-800 mt-1 font-medium">This is a high-yield signal. Engage actively and reciprocate transparently. This pattern, if consistent over 3–4 weeks, is a statistically strong predictor of mutual intent.</p>
+      </div>
+    </div>
+    <div class="p-6 bg-rose-50 border border-rose-200 rounded-2xl shadow-sm hover:shadow-md transition-all">
+      <div class="flex justify-between items-center mb-4">
+        <h5 class="font-extrabold text-rose-900 m-0">🔴 Overthinking Zone</h5>
+        <span class="px-3 py-1 bg-rose-200 text-rose-800 text-[10px] font-black uppercase rounded-full">Low Interest / High Influence</span>
+      </div>
+      <p class="text-sm text-slate-700 mb-3"><em>"Left you on read for 12 hours, but you can't stop checking your phone." "Hot and cold behavior that keeps you permanently anxious."</em></p>
+      <div class="pt-4 border-t border-rose-200/50">
+        <span class="text-xs font-bold text-rose-600 uppercase tracking-wider">Foresight Strategy:</span>
+        <p class="text-sm text-slate-800 mt-1 font-medium">Maximum emotional hazard, minimum return. This is the most dangerous quadrant for your mental health. Withdraw emotional investment immediately. Activate BATNA.</p>
+      </div>
+    </div>
+    <div class="p-6 bg-emerald-50 border border-emerald-200 rounded-2xl shadow-sm hover:shadow-md transition-all">
+      <div class="flex justify-between items-center mb-4">
+        <h5 class="font-extrabold text-emerald-900 m-0">🟢 Friendzone Ally</h5>
+        <span class="px-3 py-1 bg-emerald-200 text-emerald-800 text-[10px] font-black uppercase rounded-full">High Interest / Low Influence</span>
+      </div>
+      <p class="text-sm text-slate-700 mb-3"><em>"Replies instantly, highly supportive, checks on you regularly — but zero romantic tension exists on either side."</em></p>
+      <div class="pt-4 border-t border-emerald-200/50">
+        <span class="text-xs font-bold text-emerald-600 uppercase tracking-wider">Foresight Strategy:</span>
+        <p class="text-sm text-slate-800 mt-1 font-medium">Stable and reliable. Value the connection. But do not manufacture romantic signals that aren't there — misreading this quadrant is a leading cause of unnecessary heartbreak.</p>
+      </div>
+    </div>
+    <div class="p-6 bg-slate-50 border border-slate-200 rounded-2xl shadow-sm hover:shadow-md transition-all">
+      <div class="flex justify-between items-center mb-4">
+        <h5 class="font-extrabold text-slate-900 m-0">⬜ Noise Zone</h5>
+        <span class="px-3 py-1 bg-slate-200 text-slate-800 text-[10px] font-black uppercase rounded-full">Low Interest / Low Influence</span>
+      </div>
+      <p class="text-sm text-slate-700 mb-3"><em>"Liked your Instagram story from 2021 at 3 AM. Watched your entire highlights. Never DMed."</em></p>
+      <div class="pt-4 border-t border-slate-200/50">
+        <span class="text-xs font-bold text-slate-600 uppercase tracking-wider">Foresight Strategy:</span>
+        <p class="text-sm text-slate-800 mt-1 font-medium">Background noise. Passive monitoring only. Do not invest cognitive resources here. The scanner registers it, logs it, and moves on.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="not-prose my-10 p-8 bg-rose-50 border-l-4 border-rose-600 rounded-r-2xl shadow-sm">
+  <div class="flex items-start gap-4">
+    <div class="text-rose-600 text-2xl mt-1"><i class="fa-solid fa-triangle-exclamation"></i></div>
+    <div>
+      <h4 class="text-lg font-extrabold text-rose-900 mb-3 m-0">Scanning for Critical Red Flags</h4>
+      <p class="text-sm text-slate-700 leading-relaxed mb-4">In foresight, failing to identify systemic risk early leads to collapse. In romance, it leads to a slow, expensive emotional crash. These anomalies must be flagged before you invest further:</p>
+      <ul class="space-y-4 text-sm text-slate-800">
+        <li class="flex items-start gap-3">
+          <i class="fa-solid fa-xmark text-rose-500 mt-1"></i>
+          <span><strong>The Asymmetric Openness:</strong> They are expressive, vulnerable, and warm with others — but consistently closed off and guarded with you specifically. <em>Analysis: Deliberate signal suppression. Walk away before you invest more.</em></span>
+        </li>
+        <li class="flex items-start gap-3">
+          <i class="fa-solid fa-fire-flame-curved text-rose-500 mt-1"></i>
+          <span><strong>The Toxic Flirt:</strong> They send strong romantic signals, but they are already partnered — or they behave this way universally with everyone in their social circle. <em>Analysis: Massive systemic instability. High posterior probability of duplicity. Abort mission.</em></span>
+        </li>
+        <li class="flex items-start gap-3">
+          <i class="fa-solid fa-clock-rotate-left text-rose-500 mt-1"></i>
+          <span><strong>The Inconsistency Pattern:</strong> Intense engagement one week, complete disappearance the next — on a repeating cycle. <em>Analysis: Intermittent reinforcement. A well-documented psychological trap. Your scanner should flag this as a feedback loop designed to keep you hooked.</em></span>
+        </li>
+        <li class="flex items-start gap-3">
+          <i class="fa-solid fa-mask text-rose-500 mt-1"></i>
+          <span><strong>The Public vs. Private Persona:</strong> Warm and attentive in private, cold or dismissive around their social group. <em>Analysis: Social signal asymmetry. Indicates either shame or lack of genuine interest. Either way — proceed with extreme caution.</em></span>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<p>The Horizon Scanning Workspace lets you log these behaviors systematically, connect signal chains, and generate a structured trend report — so your pattern recognition is driven by data, not by what you desperately want to be true.</p>
+
+<div class="not-prose mt-6 mb-16 p-6 bg-gradient-to-r from-indigo-600 to-indigo-800 rounded-2xl shadow-xl">
+  <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+    <div>
+      <p class="text-indigo-200 text-xs font-black uppercase tracking-widest mb-1">Tool #1</p>
+      <h4 class="text-white font-extrabold text-xl mb-2">Horizon Scanning Workspace</h4>
+      <p class="text-indigo-200 text-sm">Map weak signals, plot the influence matrix, and generate your first Crush Report. Free to use, no login required.</p>
+    </div>
+    <a href="https://horizon-scanning.org/tool.html" target="_blank" rel="noopener noreferrer" class="flex-shrink-0 inline-flex items-center gap-3 px-6 py-3 bg-white hover:bg-indigo-50 text-indigo-700 font-bold text-sm rounded-full transition-all duration-300 shadow-lg hover:shadow-xl group">
+      <i class="fa-solid fa-radar group-hover:-translate-y-0.5 transition-transform"></i>
+      Launch the Scanner
+    </a>
+  </div>
+</div>
+
+<h3>Phase 2: Bayesian Analysis — The Detective Work</h3>
+<p>Your Horizon Scan is complete. The overall trend is positive — but one anomaly has flagged: <em>They are extremely close to a particular "guy friend" or "girl friend." They hang out alone. Regularly.</em></p>
+<p>Your gut tightens. Your mind fills the gap with the worst possible narratives. This is the exact moment most people either explode into irrational confrontation or go completely silent and spiral inward. Both are poor analytical responses.</p>
+<p>A trained intelligence analyst does neither. They apply <strong>Naive Bayesian Probability</strong> — a framework for updating beliefs rationally as new evidence arrives.</p>
+
+<div class="not-prose my-10 p-8 bg-slate-900 rounded-2xl text-white">
+  <h4 class="text-xl font-extrabold text-white mb-6">The Bayesian Romance Formula</h4>
+  <div class="space-y-5">
+    <div class="flex gap-4 items-start">
+      <div class="w-8 h-8 rounded-full bg-yellow-400 text-slate-900 font-black text-sm flex items-center justify-center flex-shrink-0">1</div>
+      <div>
+        <p class="text-yellow-300 font-bold text-sm mb-1">Set Your Prior Probability</p>
+        <p class="text-slate-300 text-sm">Before looking at any specific evidence, what is the base rate? For example: "Based on general social patterns, there is approximately a 25–30% chance that two people who hang out alone regularly are more than friends." This is your starting point — not 0%, not 100%.</p>
+      </div>
+    </div>
+    <div class="flex gap-4 items-start">
+      <div class="w-8 h-8 rounded-full bg-yellow-400 text-slate-900 font-black text-sm flex items-center justify-center flex-shrink-0">2</div>
+      <div>
+        <p class="text-yellow-300 font-bold text-sm mb-1">Feed in the Evidence</p>
+        <p class="text-slate-300 text-sm">Each behavioral observation updates your probability. Do they go quiet when this person texts? Do they guard their phone screen? Do overnight trips happen? Do they get defensive, deflecting, or disproportionately angry when you ask reasonable questions? Every "yes" is a likelihood multiplier that pushes your posterior probability upward.</p>
+      </div>
+    </div>
+    <div class="flex gap-4 items-start">
+      <div class="w-8 h-8 rounded-full bg-yellow-400 text-slate-900 font-black text-sm flex items-center justify-center flex-shrink-0">3</div>
+      <div>
+        <p class="text-yellow-300 font-bold text-sm mb-1">Read the Posterior Probability</p>
+        <p class="text-slate-300 text-sm">If after feeding your evidence the tool outputs a posterior of 80%+, you now have a mathematically grounded reason to act — not a feeling. You are no longer paranoid. You are informed. That is the difference between a breakdown and a breakthrough.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p>The key insight of Bayesian thinking is that you are not proving guilt or innocence — you are calibrating your confidence level to match the available evidence. It stops you from both catastrophizing on thin evidence <em>and</em> from gaslighting yourself into ignoring clear patterns.</p>
+
+<div class="not-prose mt-6 mb-16 p-6 bg-gradient-to-r from-slate-800 to-slate-900 rounded-2xl shadow-xl">
+  <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+    <div>
+      <p class="text-yellow-400 text-xs font-black uppercase tracking-widest mb-1">Tool #2</p>
+      <h4 class="text-white font-extrabold text-xl mb-2">Naive Bayesian Analyzer</h4>
+      <p class="text-slate-300 text-sm">Input your evidence, calibrate your priors, and get a probability-backed reading on the situation. Stop guessing. Start computing.</p>
+    </div>
+    <a href="https://anggaconni.github.io/Naive-Bayesian/" target="_blank" rel="noopener noreferrer" class="flex-shrink-0 inline-flex items-center gap-3 px-6 py-3 bg-yellow-400 hover:bg-yellow-300 text-slate-900 font-bold text-sm rounded-full transition-all duration-300 shadow-lg hover:shadow-xl group">
+      <i class="fa-solid fa-user-secret group-hover:-translate-y-0.5 transition-transform"></i>
+      Run the Analysis
+    </a>
+  </div>
+</div>
+
+<h3>Phase 3: Variable Planner — Mapping Alignment</h3>
+<p>Your Horizon Scan is green. Your Bayesian analysis cleared the anomaly. Now comes the work that most couples skip entirely — and pay for years down the road: <strong>alignment mapping</strong>.</p>
+<p>Attraction is easy. Compatibility is engineered. Two people can be intensely drawn to each other and still be fundamentally misaligned on the variables that actually determine long-term relationship success: financial philosophy, family expectations, career ambition, religious practice, lifestyle pace, and core values.</p>
+<p>The <strong>Variable Planner</strong> is a mindmapping tool that forces this conversation into structured, visual clarity. You map out your own non-negotiables, your partner's stated priorities, and the overlap — or the gaps.</p>
+
+<div class="not-prose my-10 grid grid-cols-1 md:grid-cols-3 gap-4">
+  <div class="p-5 bg-purple-50 border border-purple-200 rounded-xl">
+    <div class="text-purple-600 text-2xl mb-3"><i class="fa-solid fa-heart"></i></div>
+    <h5 class="font-extrabold text-purple-900 text-sm mb-2">Values & Beliefs</h5>
+    <p class="text-slate-600 text-xs">Religious alignment, ethical principles, family structures, and long-term purpose. Are you building toward the same kind of life?</p>
+  </div>
+  <div class="p-5 bg-purple-50 border border-purple-200 rounded-xl">
+    <div class="text-purple-600 text-2xl mb-3"><i class="fa-solid fa-coins"></i></div>
+    <h5 class="font-extrabold text-purple-900 text-sm mb-2">Financial Philosophy</h5>
+    <p class="text-slate-600 text-xs">Spending habits, savings goals, risk tolerance, and financial ambitions. This is one of the top three causes of relationship breakdown — map it early.</p>
+  </div>
+  <div class="p-5 bg-purple-50 border border-purple-200 rounded-xl">
+    <div class="text-purple-600 text-2xl mb-3"><i class="fa-solid fa-map-location-dot"></i></div>
+    <h5 class="font-extrabold text-purple-900 text-sm mb-2">Lifestyle & Location</h5>
+    <p class="text-slate-600 text-xs">City vs. hometown, travel frequency, social habits, health priorities, and career trajectory. Do your daily realities point in the same direction?</p>
+  </div>
+</div>
+
+<div class="not-prose mt-6 mb-16 p-6 bg-gradient-to-r from-purple-600 to-indigo-700 rounded-2xl shadow-xl">
+  <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+    <div>
+      <p class="text-purple-200 text-xs font-black uppercase tracking-widest mb-1">Tool #3</p>
+      <h4 class="text-white font-extrabold text-xl mb-2">Variable Planner (Mindmap Engine)</h4>
+      <p class="text-purple-100 text-sm">Visually map your values, goals, and relationship variables side-by-side. Identify alignment gaps before they become relationship crises.</p>
+    </div>
+    <a href="https://anggaconni.github.io/VariablePlanner/" target="_blank" rel="noopener noreferrer" class="flex-shrink-0 inline-flex items-center gap-3 px-6 py-3 bg-white hover:bg-purple-50 text-purple-700 font-bold text-sm rounded-full transition-all duration-300 shadow-lg hover:shadow-xl group">
+      <i class="fa-solid fa-project-diagram group-hover:-translate-y-0.5 transition-transform"></i>
+      Map Your Variables
+    </a>
+  </div>
+</div>
+
+<h3>Phase 4: BATNA — Your Walk-Away Power</h3>
+<p>Here is where most people collapse the entire framework. They scan, they analyze, they align — and then, when the other person shows reluctance, plays games, or refuses to clearly commit, they abandon everything they learned and accept scraps.</p>
+<p>In negotiation theory, your <strong>BATNA (Best Alternative to a Negotiated Agreement)</strong> is the single most important source of power in any negotiation. You cannot negotiate well if you desperately need the deal. The same is true in romance.</p>
+
+<div class="callout">
+  <h4><i class="fa-solid fa-chess-knight"></i> The Fundamental Rule of Romance BATNA</h4>
+  <p>In business, both parties negotiate until a middle ground is found — because both parties need something the other has. <strong>In romance, mutual desire is not negotiable.</strong> You cannot negotiate someone into wanting you enthusiastically. If one party is <em>enggan</em> (reluctant), that is not a negotiation — that is a signal. Your BATNA is walking away with your dignity intact. And if they do not enthusiastically choose you, your Best Alternative is being powerfully, intentionally single — which is not a consolation prize. It is the position from which all future, better choices are made.</p>
+</div>
+
+<p>The BATNA Calculator helps you quantify your alternatives. What does your life, your social life, your mental health, and your growth trajectory look like if this particular relationship does not happen? Most people have never sat down to genuinely answer that question — and as a result, they dramatically undervalue their own alternatives.</p>
+
+<div class="not-prose my-10 p-8 bg-amber-50 border border-amber-200 rounded-2xl">
+  <h4 class="font-extrabold text-amber-900 text-lg mb-4">What BATNA Calculation Reveals</h4>
+  <ul class="space-y-3">
+    <li class="flex gap-3 items-start">
+      <i class="fa-solid fa-check text-amber-600 mt-1"></i>
+      <span class="text-slate-700 text-sm"><strong>Your actual cost of walking away</strong> — often far lower than your anxiety is telling you right now.</span>
+    </li>
+    <li class="flex gap-3 items-start">
+      <i class="fa-solid fa-check text-amber-600 mt-1"></i>
+      <span class="text-slate-700 text-sm"><strong>Your opportunity cost of staying</strong> — the relationships, experiences, and growth you are forfeiting by chasing the wrong signal.</span>
+    </li>
+    <li class="flex gap-3 items-start">
+      <i class="fa-solid fa-check text-amber-600 mt-1"></i>
+      <span class="text-slate-700 text-sm"><strong>Your leverage in the current situation</strong> — knowing your BATNA is strong makes you calmer, less reactive, and paradoxically more attractive.</span>
+    </li>
+  </ul>
+</div>
+
+<div class="not-prose mt-6 mb-16 p-6 bg-gradient-to-r from-amber-500 to-rose-600 rounded-2xl shadow-xl">
+  <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+    <div>
+      <p class="text-amber-100 text-xs font-black uppercase tracking-widest mb-1">Tool #4</p>
+      <h4 class="text-white font-extrabold text-xl mb-2">BATNA Calculator</h4>
+      <p class="text-amber-100 text-sm">Calculate your walk-away value, map your alternatives, and enter every conversation from a position of genuine power — not desperation.</p>
+    </div>
+    <a href="https://anggaconni.github.io/BATNA/" target="_blank" rel="noopener noreferrer" class="flex-shrink-0 inline-flex items-center gap-3 px-6 py-3 bg-white hover:bg-amber-50 text-amber-700 font-bold text-sm rounded-full transition-all duration-300 shadow-lg hover:shadow-xl group">
+      <i class="fa-solid fa-scale-balanced group-hover:-translate-y-0.5 transition-transform"></i>
+      Calculate Your BATNA
+    </a>
+  </div>
+</div>
+
+<h3>Phase 5: Theory of Change & COM-B — Architecting the Relationship</h3>
+<p>You have scanned the horizon. Investigated the anomalies. Aligned your core variables. And you have held your BATNA power throughout. The final phase is where strategy becomes structure: <strong>building the relationship itself as a deliberate system</strong>.</p>
+<p>The <strong>Theory of Change</strong> framework asks: to reach your desired <em>Impact</em> (a healthy, committed, long-term relationship), what outputs, outcomes, and interventions must be in place? The <strong>COM-B model</strong> then diagnoses the behavioral architecture required to sustain those interventions:</p>
+
+<div class="not-prose my-10">
+  <div class="space-y-4">
+    <div class="p-6 bg-indigo-50 border border-indigo-200 rounded-2xl flex gap-5 items-start">
+      <div class="bg-indigo-600 text-white rounded-xl p-3 text-xl flex-shrink-0"><i class="fa-solid fa-brain"></i></div>
+      <div>
+        <h5 class="font-extrabold text-indigo-900 mb-2">C — Capability</h5>
+        <p class="text-slate-700 text-sm leading-relaxed">Are both of you emotionally mature enough to handle conflict without stonewalling, contempt, or deflection? Do you have the communication skills to navigate disagreement productively? Psychological capability is the bedrock. Without it, no amount of attraction survives sustained friction.</p>
+      </div>
+    </div>
+    <div class="p-6 bg-emerald-50 border border-emerald-200 rounded-2xl flex gap-5 items-start">
+      <div class="bg-emerald-600 text-white rounded-xl p-3 text-xl flex-shrink-0"><i class="fa-solid fa-door-open"></i></div>
+      <div>
+        <h5 class="font-extrabold text-emerald-900 mb-2">O — Opportunity</h5>
+        <p class="text-slate-700 text-sm leading-relaxed">Are the physical and social conditions in place to actually support the relationship? Do you live close enough to meet consistently? Do your schedules align? Is your social environment supportive — or actively hostile — to this partnership? Physical opportunity is often overlooked, and it quietly kills more relationships than incompatibility does.</p>
+      </div>
+    </div>
+    <div class="p-6 bg-rose-50 border border-rose-200 rounded-2xl flex gap-5 items-start">
+      <div class="bg-rose-600 text-white rounded-xl p-3 text-xl flex-shrink-0"><i class="fa-solid fa-fire"></i></div>
+      <div>
+        <h5 class="font-extrabold text-rose-900 mb-2">M — Motivation</h5>
+        <p class="text-slate-700 text-sm leading-relaxed">Do they actively and consistently prioritize you — not just when it is convenient, but especially when it is inconvenient? Automatic motivation shows up in habits (they text first, they remember, they initiate). Reflective motivation shows up in choices (they choose you over competing priorities when it actually costs something). Both are required.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p>When you feed your complete intelligence stack — the Horizon Scan results, the Bayesian posterior, and the BATNA score — into the Theory of Change & COM-B engine, the tool generates a behavioral diagnosis: exactly which COM-B component is the bottleneck, and precisely what intervention will address it. It converts emotional intuition into an actionable relationship design plan.</p>
+
+<div class="not-prose mt-6 mb-16 p-6 bg-gradient-to-br from-indigo-700 via-indigo-800 to-slate-900 rounded-2xl shadow-2xl">
+  <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+    <div>
+      <p class="text-indigo-300 text-xs font-black uppercase tracking-widest mb-1">Tool #5 — The Capstone</p>
+      <h4 class="text-white font-extrabold text-xl mb-2">Theory of Change & COM-B Engine</h4>
+      <p class="text-indigo-200 text-sm">Input your complete relationship data. Get a behavioral diagnosis, identify the bottleneck, and receive a targeted intervention plan. The only tool that synthesizes everything into a clear path forward.</p>
+    </div>
+    <a href="https://anggaconni.github.io/TheoryofChange_COM-B/tool.html" target="_blank" rel="noopener noreferrer" class="flex-shrink-0 inline-flex items-center gap-3 px-6 py-3 bg-indigo-400 hover:bg-indigo-300 text-indigo-950 font-bold text-sm rounded-full transition-all duration-300 shadow-lg hover:shadow-xl group">
+      <i class="fa-solid fa-gears group-hover:rotate-90 transition-transform duration-500"></i>
+      Architect the Relationship
+    </a>
+  </div>
+</div>
+
+<h3>Conclusion: Engineering Serendipity</h3>
+<p>Love is an emotion. But relationships are systems — and systems can be designed, diagnosed, and improved. By relying purely on "vibes" and "fate," you expose your mental health to massive, preventable systemic risk.</p>
+
+<div class="not-prose my-10 p-8 bg-gradient-to-br from-slate-900 to-indigo-950 rounded-2xl">
+  <h4 class="text-white font-extrabold text-xl mb-6">The Five-Phase Intelligence Stack</h4>
+  <div class="space-y-3">
+    <div class="flex gap-4 items-center p-4 bg-white/5 rounded-xl">
+      <span class="text-teal-400 text-lg w-8"><i class="fa-solid fa-radar"></i></span>
+      <div>
+        <p class="text-white font-bold text-sm">Phase 1: Horizon Scanning</p>
+        <p class="text-slate-400 text-xs">See the red flags early. Don't invest in a collapsing system.</p>
+      </div>
+    </div>
+    <div class="flex gap-4 items-center p-4 bg-white/5 rounded-xl">
+      <span class="text-yellow-400 text-lg w-8"><i class="fa-solid fa-user-secret"></i></span>
+      <div>
+        <p class="text-white font-bold text-sm">Phase 2: Bayesian Analysis</p>
+        <p class="text-slate-400 text-xs">Cut through the lies and the wishful thinking with evidence-based probability.</p>
+      </div>
+    </div>
+    <div class="flex gap-4 items-center p-4 bg-white/5 rounded-xl">
+      <span class="text-purple-400 text-lg w-8"><i class="fa-solid fa-project-diagram"></i></span>
+      <div>
+        <p class="text-white font-bold text-sm">Phase 3: Variable Planner</p>
+        <p class="text-slate-400 text-xs">Map your alignment. Don't discover incompatibility two years in.</p>
+      </div>
+    </div>
+    <div class="flex gap-4 items-center p-4 bg-white/5 rounded-xl">
+      <span class="text-rose-400 text-lg w-8"><i class="fa-solid fa-scale-balanced"></i></span>
+      <div>
+        <p class="text-white font-bold text-sm">Phase 4: BATNA</p>
+        <p class="text-slate-400 text-xs">Never settle. Hold your walk-away power and never negotiate basic respect.</p>
+      </div>
+    </div>
+    <div class="flex gap-4 items-center p-4 bg-white/5 rounded-xl">
+      <span class="text-indigo-400 text-lg w-8"><i class="fa-solid fa-gears"></i></span>
+      <div>
+        <p class="text-white font-bold text-sm">Phase 5: Theory of Change & COM-B</p>
+        <p class="text-slate-400 text-xs">Architect the relationship. Build the behavioral foundation for lasting impact.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p>Stop guessing. Start scanning. Because the best romances aren't just found by accident — they are <strong>intelligently designed</strong> by people who understood what they were building before they started building it.</p>
+<p>Each tool in this stack is free, standalone, and built precisely to give you the analytical edge that most people in your position simply don't have. Use them in sequence, trust the output, and protect your peace.</p>
+        </article>
+        
+        <div class="mt-16 pt-8 border-t border-slate-200 text-center">
+            <h3 class="text-xl font-bold text-navy-900 mb-4">Share this insight</h3>
+            <div class="flex justify-center gap-4">
+                <a href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fhorizon-scanning.org%2Fblog%2Farticle%2Fdata-driven-romance-applying-horizon-scanning-bayes-and-com-b-to-crush-mapping.html" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-[#0A66C2] hover:text-white transition-all shadow-sm hover:shadow"><i class="ph-fill ph-linkedin-logo text-xl"></i></a>
+                <a href="https://twitter.com/intent/tweet?url=https%3A%2F%2Fhorizon-scanning.org%2Fblog%2Farticle%2Fdata-driven-romance-applying-horizon-scanning-bayes-and-com-b-to-crush-mapping.html&text=Data-Driven%20Romance%3A%20Applying%20Horizon%20Scanning%2C%20Bayes%2C%20and%20COM-B%20to%20'Crush%20Mapping'" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-[#1DA1F2] hover:text-white transition-all shadow-sm hover:shadow"><i class="ph-fill ph-twitter-logo text-xl"></i></a>
+                <a href="https://api.whatsapp.com/send?text=Data-Driven%20Romance%3A%20Applying%20Horizon%20Scanning%2C%20Bayes%2C%20and%20COM-B%20to%20'Crush%20Mapping'%20-%20https%3A%2F%2Fhorizon-scanning.org%2Fblog%2Farticle%2Fdata-driven-romance-applying-horizon-scanning-bayes-and-com-b-to-crush-mapping.html" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-[#25D366] hover:text-white transition-all shadow-sm hover:shadow"><i class="ph-fill ph-whatsapp-logo text-xl"></i></a>
+            </div>
+        </div>
+    </main>
+
+</body>
+</html>
+    
