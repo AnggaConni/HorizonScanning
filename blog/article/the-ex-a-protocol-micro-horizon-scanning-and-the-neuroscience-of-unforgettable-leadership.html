@@ -159,65 +159,7 @@
   <h4 class="text-slate-900 font-extrabold mb-2 text-xl text-center">The Memory Retention Curve</h4>
   <p class="text-center text-slate-500 text-sm mb-10">Information retention over time: Emotionally tagged (Ex A) vs. cognitively flat (Ex B) — with spaced retrieval interventions.</p>
   <div class="w-full max-w-2xl relative">
-    <svg viewBox="0 0 600 370" class="w-full h-auto overflow-visible">
-      <defs>
-        <linearGradient id="gradExA" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stop-color="#e11d48" stop-opacity="0.15"/>
-          <stop offset="100%" stop-color="#e11d48" stop-opacity="0"/>
-        </linearGradient>
-        <linearGradient id="gradExB" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stop-color="#94a3b8" stop-opacity="0.15"/>
-          <stop offset="100%" stop-color="#94a3b8" stop-opacity="0"/>
-        </linearGradient>
-        <linearGradient id="gradExAR" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stop-color="#7c3aed" stop-opacity="0.15"/>
-          <stop offset="100%" stop-color="#7c3aed" stop-opacity="0"/>
-        </linearGradient>
-      </defs>
-      <line x1="50" y1="300" x2="570" y2="300" stroke="#cbd5e1" stroke-width="2"/>
-      <line x1="50" y1="300" x2="50" y2="40" stroke="#cbd5e1" stroke-width="2"/>
-      <!-- Y axis labels -->
-      <text x="45" y="65" font-family="sans-serif" font-size="10" fill="#94a3b8" text-anchor="end">100%</text>
-      <text x="45" y="135" font-family="sans-serif" font-size="10" fill="#94a3b8" text-anchor="end">75%</text>
-      <text x="45" y="200" font-family="sans-serif" font-size="10" fill="#94a3b8" text-anchor="end">50%</text>
-      <text x="45" y="268" font-family="sans-serif" font-size="10" fill="#94a3b8" text-anchor="end">25%</text>
-      <!-- Grid lines -->
-      <line x1="50" y1="65" x2="570" y2="65" stroke="#f1f5f9" stroke-width="1"/>
-      <line x1="50" y1="135" x2="570" y2="135" stroke="#f1f5f9" stroke-width="1"/>
-      <line x1="50" y1="200" x2="570" y2="200" stroke="#f1f5f9" stroke-width="1"/>
-      <line x1="50" y1="268" x2="570" y2="268" stroke="#f1f5f9" stroke-width="1"/>
-      <!-- Axis labels -->
-      <text x="310" y="345" font-family="sans-serif" font-size="12" font-weight="bold" fill="#64748b" text-anchor="middle">Time after Training →</text>
-      <text x="20" y="175" font-family="sans-serif" font-size="12" font-weight="bold" fill="#64748b" text-anchor="middle" transform="rotate(-90 20,175)">Memory Retention (%)</text>
-      <!-- X axis labels -->
-      <text x="50" y="318" font-family="sans-serif" font-size="10" fill="#94a3b8" text-anchor="middle">0</text>
-      <text x="170" y="318" font-family="sans-serif" font-size="10" fill="#94a3b8" text-anchor="middle">1 hr</text>
-      <text x="290" y="318" font-family="sans-serif" font-size="10" fill="#94a3b8" text-anchor="middle">24 hrs</text>
-      <text x="410" y="318" font-family="sans-serif" font-size="10" fill="#94a3b8" text-anchor="middle">1 week</text>
-      <text x="555" y="318" font-family="sans-serif" font-size="10" fill="#94a3b8" text-anchor="middle">1 month</text>
-      <!-- Ex B curve: steep forgetting -->
-      <path d="M 50,62 C 120,110 170,200 290,255 C 380,285 480,292 555,295" fill="url(#gradExB)" stroke="#94a3b8" stroke-width="3" stroke-linecap="round" stroke-dasharray="6,6"/>
-      <!-- Ex A curve: gradual, high plateau -->
-      <path d="M 50,62 C 150,70 230,90 290,100 C 380,112 480,118 555,122" fill="url(#gradExA)" stroke="#e11d48" stroke-width="3.5" stroke-linecap="round"/>
-      <!-- Ex A + Spaced Retrieval: rises after retrieval events -->
-      <path d="M 50,62 C 130,68 200,78 290,82 C 320,80 340,62 410,65 C 450,64 510,58 555,57" fill="url(#gradExAR)" stroke="#7c3aed" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="3,0"/>
-      <!-- Spaced retrieval event markers -->
-      <circle cx="290" cy="82" r="5" fill="#7c3aed" opacity="0.9"/>
-      <circle cx="410" cy="65" r="5" fill="#7c3aed" opacity="0.9"/>
-      <text x="290" y="72" font-family="sans-serif" font-size="9" fill="#7c3aed" text-anchor="middle">Retrieval 1</text>
-      <text x="410" y="55" font-family="sans-serif" font-size="9" fill="#7c3aed" text-anchor="middle">Retrieval 2</text>
-      <!-- End labels -->
-      <text x="558" y="118" font-family="sans-serif" font-size="11" font-weight="bold" fill="#e11d48" text-anchor="start">~78%</text>
-      <text x="558" y="53" font-family="sans-serif" font-size="11" font-weight="bold" fill="#7c3aed" text-anchor="start">~92%</text>
-      <text x="558" y="291" font-family="sans-serif" font-size="11" font-weight="bold" fill="#94a3b8" text-anchor="start">~12%</text>
-      <!-- Legend -->
-      <rect x="60" y="50" width="12" height="12" fill="#e11d48" rx="2"/>
-      <text x="78" y="60" font-family="sans-serif" font-size="11" font-weight="bold" fill="#334155" alignment-baseline="middle">"Ex A" — Emotional Encoding Only</text>
-      <rect x="60" y="72" width="12" height="4" fill="#7c3aed" rx="1" y="76"/>
-      <text x="78" y="79" font-family="sans-serif" font-size="11" font-weight="bold" fill="#334155" alignment-baseline="middle">"Ex A" + Spaced Retrieval Practice</text>
-      <line x1="60" y1="98" x2="72" y2="98" stroke="#94a3b8" stroke-width="3" stroke-dasharray="4,3"/>
-      <text x="78" y="98" font-family="sans-serif" font-size="11" font-weight="bold" fill="#334155" alignment-baseline="middle">"Ex B" — No Emotional Encoding</text>
-    </svg>
+    <svg viewBox="0 0 600 370" class="w-full h-auto overflow-visible"><defs><linearGradient id="gradExA" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#e11d48" stop-opacity="0.15"/><stop offset="100%" stop-color="#e11d48" stop-opacity="0"/></linearGradient><linearGradient id="gradExB" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#94a3b8" stop-opacity="0.15"/><stop offset="100%" stop-color="#94a3b8" stop-opacity="0"/></linearGradient><linearGradient id="gradExAR" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#7c3aed" stop-opacity="0.15"/><stop offset="100%" stop-color="#7c3aed" stop-opacity="0"/></linearGradient></defs><line x1="50" y1="300" x2="570" y2="300" stroke="#cbd5e1" stroke-width="2"/><line x1="50" y1="300" x2="50" y2="40" stroke="#cbd5e1" stroke-width="2"/><text x="45" y="65" font-family="sans-serif" font-size="10" fill="#94a3b8" text-anchor="end">100%</text><text x="45" y="135" font-family="sans-serif" font-size="10" fill="#94a3b8" text-anchor="end">75%</text><text x="45" y="200" font-family="sans-serif" font-size="10" fill="#94a3b8" text-anchor="end">50%</text><text x="45" y="268" font-family="sans-serif" font-size="10" fill="#94a3b8" text-anchor="end">25%</text><line x1="50" y1="65" x2="570" y2="65" stroke="#f1f5f9" stroke-width="1"/><line x1="50" y1="135" x2="570" y2="135" stroke="#f1f5f9" stroke-width="1"/><line x1="50" y1="200" x2="570" y2="200" stroke="#f1f5f9" stroke-width="1"/><line x1="50" y1="268" x2="570" y2="268" stroke="#f1f5f9" stroke-width="1"/><text x="310" y="345" font-family="sans-serif" font-size="12" font-weight="bold" fill="#64748b" text-anchor="middle">Time after Training →</text><text x="20" y="175" font-family="sans-serif" font-size="12" font-weight="bold" fill="#64748b" text-anchor="middle" transform="rotate(-90 20,175)">Memory Retention (%)</text><text x="50" y="318" font-family="sans-serif" font-size="10" fill="#94a3b8" text-anchor="middle">0</text><text x="170" y="318" font-family="sans-serif" font-size="10" fill="#94a3b8" text-anchor="middle">1 hr</text><text x="290" y="318" font-family="sans-serif" font-size="10" fill="#94a3b8" text-anchor="middle">24 hrs</text><text x="410" y="318" font-family="sans-serif" font-size="10" fill="#94a3b8" text-anchor="middle">1 week</text><text x="555" y="318" font-family="sans-serif" font-size="10" fill="#94a3b8" text-anchor="middle">1 month</text><path d="M 50,300 L 50,62 C 120,110 170,200 290,255 C 380,285 480,292 555,295 L 555,300 Z" fill="url(#gradExB)"/><path d="M 50,300 L 50,62 C 150,70 230,90 290,100 C 380,112 480,118 555,122 L 555,300 Z" fill="url(#gradExA)"/><path d="M 50,300 L 50,62 C 130,68 200,78 290,82 C 320,80 340,62 410,65 C 450,64 510,58 555,57 L 555,300 Z" fill="url(#gradExAR)"/><path d="M 50,62 C 120,110 170,200 290,255 C 380,285 480,292 555,295" fill="none" stroke="#94a3b8" stroke-width="3" stroke-linecap="round" stroke-dasharray="6,6"/><path d="M 50,62 C 150,70 230,90 290,100 C 380,112 480,118 555,122" fill="none" stroke="#e11d48" stroke-width="3.5" stroke-linecap="round"/><path d="M 50,62 C 130,68 200,78 290,82 C 320,80 340,62 410,65 C 450,64 510,58 555,57" fill="none" stroke="#7c3aed" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="3,0"/><circle cx="290" cy="82" r="5" fill="#7c3aed" opacity="0.9"/><circle cx="410" cy="65" r="5" fill="#7c3aed" opacity="0.9"/><text x="290" y="72" font-family="sans-serif" font-size="9" fill="#7c3aed" text-anchor="middle">Retrieval 1</text><text x="410" y="55" font-family="sans-serif" font-size="9" fill="#7c3aed" text-anchor="middle">Retrieval 2</text><text x="558" y="118" font-family="sans-serif" font-size="11" font-weight="bold" fill="#e11d48" text-anchor="start">~78%</text><text x="558" y="53" font-family="sans-serif" font-size="11" font-weight="bold" fill="#7c3aed" text-anchor="start">~92%</text><text x="558" y="291" font-family="sans-serif" font-size="11" font-weight="bold" fill="#94a3b8" text-anchor="start">~12%</text><rect x="70" y="220" width="12" height="12" fill="#e11d48" rx="2"/><text x="90" y="230" font-family="sans-serif" font-size="11" font-weight="bold" fill="#334155">"Ex A" — Emotional Encoding Only</text><rect x="70" y="240" width="12" height="4" fill="#7c3aed" rx="1"/><text x="90" y="246" font-family="sans-serif" font-size="11" font-weight="bold" fill="#334155">"Ex A" + Spaced Retrieval Practice</text><line x1="70" y1="260" x2="82" y2="260" stroke="#94a3b8" stroke-width="3" stroke-dasharray="4,3"/><text x="90" y="264" font-family="sans-serif" font-size="11" font-weight="bold" fill="#334155">"Ex B" — No Emotional Encoding</text></svg>  
   </div>
   <p class="chart-caption mt-8 m-0">Figure 1: Memory retention trajectories based on emotional encoding and retrieval practice. Data synthesized from Ebbinghaus (1885), Cahill &amp; McGaugh (1998), and Kornell &amp; Bjork (2008).</p>
 </div>
