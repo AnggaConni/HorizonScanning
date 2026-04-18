@@ -402,6 +402,342 @@
 #paginationControls button:disabled { opacity: 0.4; cursor: not-allowed; }
 </style>
 
+  <style>
+    .foresight-section {
+      --navy: #0f172a;
+      --teal: #0d9488;
+      --amber: #d97706;
+      --rose: #e11d48;
+      --sky: #0284c7;
+      --emerald: #059669;
+      --slate: #64748b;
+      --pink: #db2777;
+    }
+ 
+    .foresight-section * { box-sizing: border-box; }
+ 
+    .fs-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 9999px;
+      padding: 6px 16px;
+      font-size: 11px;
+      font-family: 'Courier New', monospace;
+      font-weight: 700;
+      color: #64748b;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+ 
+    .fs-title-block {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+ 
+    .fs-main-title {
+      font-size: clamp(1.5rem, 3vw, 2.2rem);
+      font-weight: 900;
+      color: #0f172a;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+      margin: 0.75rem 0 0.4rem;
+      font-family: 'Georgia', serif;
+    }
+ 
+    .fs-subtitle {
+      color: #64748b;
+      font-size: 0.85rem;
+      margin: 0;
+      font-style: italic;
+    }
+ 
+    .fs-meta {
+      font-size: 10px;
+      color: #94a3b8;
+      margin-top: 1.2rem;
+    }
+ 
+    /* Grid layout */
+    .fs-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+      max-width: 960px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+ 
+    @media(min-width: 900px) {
+      .fs-grid { grid-template-columns: 7fr 5fr; }
+    }
+ 
+    .fs-card {
+      background: #fff;
+      border-radius: 1rem;
+      border: 1px solid #e2e8f0;
+      padding: 1.5rem;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    }
+ 
+    .fs-card-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #334155;
+      margin-bottom: 1rem;
+      font-family: 'Courier New', monospace;
+    }
+ 
+    /* Matrix Chart */
+    .matrix-canvas {
+      position: relative;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 0.75rem;
+      overflow: hidden;
+      aspect-ratio: 4/3;
+    }
+ 
+    .matrix-quadrant {
+      position: absolute;
+      width: 50%; height: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .q-tl { top:0; left:0; background: rgba(14,165,233,0.04); }
+    .q-tr { top:0; right:0; background: rgba(220,38,38,0.05); }
+    .q-bl { bottom:0; left:0; background: rgba(148,163,184,0.04); }
+    .q-br { bottom:0; right:0; background: rgba(16,185,129,0.05); }
+ 
+    .matrix-axis-label {
+      position: absolute;
+      font-size: 9px;
+      font-family: 'Courier New', monospace;
+      font-weight: 700;
+      color: #94a3b8;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .mat-top    { top: 8px; left: 50%; transform: translateX(-50%); }
+    .mat-bottom { bottom: 8px; left: 50%; transform: translateX(-50%); }
+    .mat-left   { left: 8px; top: 50%; transform: translateY(-50%) rotate(-90deg); }
+    .mat-right  { right: 8px; top: 50%; transform: translateY(-50%) rotate(90deg); }
+ 
+    .mat-divider-h {
+      position: absolute;
+      top: 50%; left: 0; right: 0;
+      height: 1px; background: #cbd5e1;
+    }
+    .mat-divider-v {
+      position: absolute;
+      left: 50%; top: 0; bottom: 0;
+      width: 1px; background: #cbd5e1;
+    }
+ 
+    .mat-dot {
+      position: absolute;
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 800;
+      color: #fff;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      cursor: default;
+      transition: transform 0.2s;
+      font-family: 'Courier New', monospace;
+    }
+    .mat-dot:hover { transform: translate(-50%, -50%) scale(1.3); z-index: 10; }
+ 
+    .mat-legend {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 0.75rem;
+      font-size: 10px;
+      color: #475569;
+      font-family: 'Courier New', monospace;
+    }
+    .mat-legend-item { display: flex; align-items: center; gap: 6px; }
+    .mat-legend-dot {
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+ 
+    /* Bar chart */
+    .bar-wrap { margin-top: 0.5rem; }
+    .bar-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 7px;
+      font-size: 11px;
+      color: #334155;
+      font-family: 'Courier New', monospace;
+    }
+    .bar-label { width: 110px; text-align: right; flex-shrink: 0; font-size: 10px; }
+    .bar-track {
+      flex: 1;
+      height: 14px;
+      background: #f1f5f9;
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      border-radius: 99px;
+      transition: width 1s ease;
+    }
+    .bar-val { width: 28px; font-size: 10px; font-weight: 700; color: #64748b; }
+ 
+    /* Radar summary cards */
+    .radar-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+ 
+    .rc {
+      background: #fff;
+      border-radius: 0.875rem;
+      border: 1px solid #e2e8f0;
+      padding: 1rem 1.1rem;
+    }
+    .rc-head { display: flex; align-items: center; gap: 8px; margin-bottom: 0.5rem; }
+    .rc-icon { font-size: 1.3rem; }
+    .rc-label { font-size: 10px; font-family: 'Courier New', monospace; font-weight: 800; }
+    .rc-sub { font-size: 9px; color: #94a3b8; }
+    .rc-body { font-size: 12px; line-height: 1.5; color: #475569; font-family: Georgia, serif; }
+ 
+    /* Prose section */
+    .fs-prose {
+      max-width: 960px;
+      margin: 0 auto;
+      color: #334155;
+    }
+ 
+    .fs-prose h3 {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #0f172a;
+      margin: 2.2rem 0 0.6rem;
+      font-family: Georgia, serif;
+      letter-spacing: -0.01em;
+      border-left: 3px solid #0d9488;
+      padding-left: 12px;
+    }
+ 
+    .fs-prose p {
+      font-size: 0.92rem;
+      line-height: 1.75;
+      margin: 0 0 0.8rem;
+      font-family: Georgia, serif;
+    }
+ 
+    .fs-prose ul {
+      padding-left: 1.4rem;
+      margin: 0.4rem 0 0.8rem;
+    }
+ 
+    .fs-prose li {
+      font-size: 0.9rem;
+      line-height: 1.7;
+      margin-bottom: 0.3rem;
+      font-family: Georgia, serif;
+    }
+ 
+    .fs-tag {
+      display: inline-block;
+      font-size: 10px;
+      font-family: 'Courier New', monospace;
+      font-weight: 700;
+      border-radius: 4px;
+      padding: 2px 7px;
+      margin-right: 4px;
+      vertical-align: middle;
+    }
+ 
+    .fs-footer {
+      font-size: 10px;
+      color: #94a3b8;
+      margin-top: 3rem;
+      padding-top: 1.2rem;
+      border-top: 1px solid #e2e8f0;
+      font-family: 'Courier New', monospace;
+      line-height: 1.6;
+    }
+ 
+    /* Risk gauge strip */
+    .risk-strip {
+      display: flex;
+      gap: 4px;
+      margin: 0.5rem 0 1rem;
+      align-items: flex-end;
+    }
+    .risk-bar-item { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+    .risk-bar-body {
+      width: 22px;
+      border-radius: 4px 4px 0 0;
+      transition: height 0.8s ease;
+    }
+    .risk-bar-lbl { font-size: 8px; color: #94a3b8; font-family: 'Courier New', monospace; }
+ 
+    /* Signal timeline */
+    .timeline { margin: 0.5rem 0 1.2rem; }
+    .tl-item {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      margin-bottom: 0.9rem;
+      font-size: 0.85rem;
+    }
+    .tl-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      margin-top: 5px;
+      flex-shrink: 0;
+    }
+    .tl-content { flex: 1; line-height: 1.5; font-family: Georgia, serif; color: #334155; }
+    .tl-title { font-weight: 700; }
+    .tl-meta { font-size: 10px; color: #94a3b8; font-family: 'Courier New', monospace; }
+ 
+    /* Platform bar chart */
+    .platform-list { margin: 0.5rem 0; }
+    .plt-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px 0;
+      border-bottom: 1px dashed #f1f5f9;
+      font-size: 11px;
+      font-family: 'Courier New', monospace;
+    }
+    .plt-name { color: #334155; }
+    .plt-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 24px;
+      height: 18px;
+      border-radius: 99px;
+      font-size: 10px;
+      font-weight: 700;
+      color: #fff;
+      padding: 0 6px;
+    }
+  </style>
 
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans antialiased selection:bg-teal-200 selection:text-teal-900">
@@ -1539,6 +1875,389 @@
             </div>
         </div>
     </div>
+
+<!-- ========== FORESIGHT REPORT SECTION ========== -->
+<div class="foresight-section" style="margin-top:4rem; border-top:1px solid #e2e8f0; padding-top:3rem; font-family:'Georgia', serif;">
+ 
+  <!-- Header -->
+  <div class="fs-title-block">
+    <div class="fs-badge">
+      <span style="color:#f59e0b;">◈</span>
+      Strategic Foresight
+    </div>
+    <h2 class="fs-main-title">Foresight Report: Horizon 2026–2035</h2>
+    <p class="fs-subtitle">Implications of Live Signals from ICH, GSI-STI, Artifact, and Nexus Radars</p>
+    <p class="fs-meta">
+      Generated on: <strong>18 April 2026</strong> &nbsp;·&nbsp;
+      Based on live radar data (ICH, GSI-STI, Artifact, Nexus) &nbsp;·&nbsp;
+      Generated by <strong>Claude (Anthropic)</strong>
+    </p>
+  </div>
+ 
+  <!-- ─── VISUAL MATRIX + RADAR SUMMARY ─── -->
+  <div class="fs-grid">
+ 
+    <!-- Impact vs Uncertainty Matrix -->
+    <div class="fs-card">
+      <div class="fs-card-title">
+        <span style="color:#0d9488;">▲</span> Impact × Certainty Matrix
+      </div>
+ 
+      <div class="matrix-canvas">
+        <!-- Quadrant backgrounds -->
+        <div class="matrix-quadrant q-tl"></div>
+        <div class="matrix-quadrant q-tr"></div>
+        <div class="matrix-quadrant q-bl"></div>
+        <div class="matrix-quadrant q-br"></div>
+ 
+        <!-- Dividers -->
+        <div class="mat-divider-h"></div>
+        <div class="mat-divider-v"></div>
+ 
+        <!-- Axis labels -->
+        <span class="matrix-axis-label mat-top">HIGH IMPACT</span>
+        <span class="matrix-axis-label mat-bottom">LOWER IMPACT</span>
+        <span class="matrix-axis-label mat-left">HIGH UNCERTAINTY</span>
+        <span class="matrix-axis-label mat-right">HIGH CERTAINTY</span>
+ 
+        <!-- Signal Dots: left% = certainty axis (left=uncertain, right=certain), top% = impact (top=high) -->
+        <!-- 1. Coral Mesophotic Loss — High impact, High certainty -->
+        <div class="mat-dot" style="background:#dc2626; left:78%; top:14%;" title="Mesophotic Coral Collapse (Nexus · 9/10)">9</div>
+        <!-- 2. Majapahit Artifact Trade — High impact, High certainty (documented listings) -->
+        <div class="mat-dot" style="background:#d97706; left:70%; top:22%;" title="Majapahit Artifact Trade (Artifact · 10/10)">10</div>
+        <!-- 3. Sundarbans Tipping Point — High impact, Medium certainty -->
+        <div class="mat-dot" style="background:#8b5cf6; left:38%; top:18%;" title="Sundarbans Critical Slowing (Nexus · 9/10)">9</div>
+        <!-- 4. Florida Reef Seafloor Deepening — High impact, High certainty -->
+        <div class="mat-dot" style="background:#ef4444; left:82%; top:30%;" title="Florida Reef Structural Collapse (Nexus · 9/10)">9</div>
+        <!-- 5. Ghost Forests / Saltwater Intrusion — Med-high, medium certainty -->
+        <div class="mat-dot" style="background:#f97316; left:58%; top:40%;" title="Ghost Forests / Saltwater Intrusion (Nexus · 8/10)">8</div>
+        <!-- 6. ICH Shared Textile Opportunity — Medium impact, Low certainty -->
+        <div class="mat-dot" style="background:#0284c7; left:28%; top:52%;" title="ICH Textile Shared Heritage (ICH)">·</div>
+        <!-- 7. GSI Biogas/Composting Innovations — Medium impact, High certainty -->
+        <div class="mat-dot" style="background:#059669; left:72%; top:60%;" title="GSI-STI Scalable Innovations">✓</div>
+        <!-- 8. Glacial Lake Floods Alaska — High impact, fast escalation -->
+        <div class="mat-dot" style="background:#7c3aed; left:44%; top:12%;" title="Glacial Lake Outburst Floods · Alaska (Nexus · 9/10)">9</div>
+        <!-- 9. Urban Nighttime Heat — Med-high, high certainty -->
+        <div class="mat-dot" style="background:#b45309; left:65%; top:46%;" title="Tropical Nights / Urban Heat (Nexus · 8/10)">8</div>
+ 
+        <!-- Small legend overlay -->
+        <div style="position:absolute; bottom:8px; right:8px; background:rgba(255,255,255,0.92); border:1px solid #e2e8f0; border-radius:6px; padding:6px 8px; font-size:9px; font-family:'Courier New',monospace; line-height:1.8; color:#475569;">
+          <span style="color:#dc2626;">●</span> Coral Mesophotic (Nexus)<br>
+          <span style="color:#d97706;">●</span> Majapahit Trade (Artifact)<br>
+          <span style="color:#8b5cf6;">●</span> Sundarbans (Nexus)<br>
+          <span style="color:#7c3aed;">●</span> Glacial Floods (Nexus)<br>
+          <span style="color:#059669;">●</span> GSI Innovations<br>
+          <span style="color:#0284c7;">●</span> ICH Shared Textiles
+        </div>
+      </div>
+ 
+      <p style="font-size:9px; color:#94a3b8; margin-top:8px; text-align:center; font-family:'Courier New',monospace;">
+        Numbers = risk score (1–10). High-certainty / high-impact signals cluster top-right.
+      </p>
+    </div>
+ 
+    <!-- Right: Radar Summary Cards -->
+    <div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;">
+ 
+        <!-- ICH -->
+        <div class="rc" style="border-color:#fce7f3;">
+          <div class="rc-head">
+            <span class="rc-icon">🛕</span>
+            <div>
+              <div class="rc-label" style="color:#db2777;">ICH RADAR</div>
+              <div class="rc-sub">Culture · 18 Elements</div>
+            </div>
+          </div>
+          <div class="rc-body">
+            Textile traditions dominate: Thai Silk, Kanchipuram, Yuki-tsumugi, Sindhi Ajrak. Shared heritage across 6+ nations via Kebaya consortium. Performing arts & culinary traditions (Hahoe, Tejate, Chandeleur) expanding global nominations.
+          </div>
+        </div>
+ 
+        <!-- Nexus -->
+        <div class="rc" style="border-color:#d1fae5;">
+          <div class="rc-head">
+            <span class="rc-icon">🌊</span>
+            <div>
+              <div class="rc-label" style="color:#059669;">NEXUS RADAR</div>
+              <div class="rc-sub">Environment · 27 Signals</div>
+            </div>
+          </div>
+          <div class="rc-body">
+            <span style="color:#dc2626; font-weight:700;">CRITICAL:</span> Mesophotic coral refugia collapsing (9/10). Florida reef structural failure (seafloor deepening). Sundarbans approaching tipping point. Alaska glacial lake floods (April 2026, recurring). Urban thermal crisis escalating.
+          </div>
+        </div>
+ 
+        <!-- Artifact -->
+        <div class="rc" style="border-color:#fef3c7;">
+          <div class="rc-head">
+            <span class="rc-icon">🏺</span>
+            <div>
+              <div class="rc-label" style="color:#d97706;">ARTIFACT RADAR</div>
+              <div class="rc-sub">Heritage Risk · 136 listings</div>
+            </div>
+          </div>
+          <div class="rc-body">
+            <strong>56 HIGH-RISK</strong> · 40 medium. Majapahit items on Tokopedia & Shopee (risk 10/10). Syrian Palmyra pieces on Facebook Marketplace. Thracian gold stolen from Drents Museum (Jan 2025). eBay/Etsy dominate volume (18 listings combined).
+          </div>
+        </div>
+ 
+        <!-- GSI-STI -->
+        <div class="rc" style="border-color:#dbeafe;">
+          <div class="rc-head">
+            <span class="rc-icon">🔧</span>
+            <div>
+              <div class="rc-label" style="color:#0284c7;">GSI-STI RADAR</div>
+              <div class="rc-sub">Innovation · 30+ Solutions</div>
+            </div>
+          </div>
+          <div class="rc-body">
+            Top scores: Hot Pepper pesticide (84), SOIL Haiti EcoSan (82), Terra Preta biochar (80). Wind turbine blade upcycling, PET greenhouses, hermetic grain storage, chinampa/milpa systems. High replicability for island/archipelago contexts.
+          </div>
+        </div>
+ 
+      </div><!-- /radar cards -->
+ 
+      <!-- Artifact Risk Bar chart -->
+      <div class="fs-card" style="margin-top:0.75rem; padding:1rem 1.25rem;">
+        <div class="fs-card-title" style="margin-bottom:0.6rem;">
+          <span style="color:#d97706;">▰</span> Artifact Risk Distribution
+        </div>
+        <div class="bar-wrap">
+          <div class="bar-row">
+            <span class="bar-label">High Risk</span>
+            <div class="bar-track"><div class="bar-fill" style="width:41%; background:#dc2626;"></div></div>
+            <span class="bar-val">56</span>
+          </div>
+          <div class="bar-row">
+            <span class="bar-label">Medium Risk</span>
+            <div class="bar-track"><div class="bar-fill" style="width:29%; background:#f59e0b;"></div></div>
+            <span class="bar-val">40</span>
+          </div>
+          <div class="bar-row">
+            <span class="bar-label">Low / Info</span>
+            <div class="bar-track"><div class="bar-fill" style="width:29%; background:#94a3b8;"></div></div>
+            <span class="bar-val">40</span>
+          </div>
+        </div>
+        <div class="platform-list" style="margin-top:0.6rem;">
+          <div style="font-size:9px; font-family:'Courier New',monospace; color:#94a3b8; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.08em;">Top Platforms by Listing Count</div>
+          <div class="plt-row"><span class="plt-name">eBay</span><span class="plt-badge" style="background:#dc2626;">11</span></div>
+          <div class="plt-row"><span class="plt-name">Etsy</span><span class="plt-badge" style="background:#f97316;">7</span></div>
+          <div class="plt-row"><span class="plt-name">Sotheby's</span><span class="plt-badge" style="background:#64748b;">5</span></div>
+          <div class="plt-row"><span class="plt-name">Reddit</span><span class="plt-badge" style="background:#64748b;">5</span></div>
+          <div class="plt-row"><span class="plt-name">1stDibs</span><span class="plt-badge" style="background:#b45309;">3</span></div>
+          <div class="plt-row"><span class="plt-name">Tokopedia + Shopee</span><span class="plt-badge" style="background:#dc2626;">3</span></div>
+        </div>
+      </div>
+    </div><!-- /right col -->
+ 
+  </div><!-- /fs-grid -->
+ 
+  <!-- ─── NEXUS SIGNAL PRIORITY CHART ─── -->
+  <div style="max-width:960px; margin:0 auto 2rem;">
+    <div class="fs-card">
+      <div class="fs-card-title">
+        <span style="color:#dc2626;">▲</span> Nexus Radar — Top Priority Signals (Score 92–96)
+      </div>
+      <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap:10px; margin-top:4px;">
+        <!-- Signals -->
+        <div style="background:#fff5f5; border:1px solid #fecaca; border-radius:8px; padding:10px 12px;">
+          <div style="font-size:10px; font-family:'Courier New',monospace; font-weight:700; color:#dc2626; margin-bottom:4px;">PRIORITY 96</div>
+          <div style="font-size:12px; font-weight:700; color:#0f172a; line-height:1.3;">Mesophotic Coral Refugia Loss</div>
+          <div style="font-size:10px; color:#64748b; margin-top:4px; font-family:Georgia,serif;">Deep-water corals bleaching more severely than surface, destroying reef recovery seed banks.</div>
+        </div>
+        <div style="background:#fff5f5; border:1px solid #fecaca; border-radius:8px; padding:10px 12px;">
+          <div style="font-size:10px; font-family:'Courier New',monospace; font-weight:700; color:#dc2626; margin-bottom:4px;">PRIORITY 96</div>
+          <div style="font-size:12px; font-weight:700; color:#0f172a; line-height:1.3;">Florida Reef Seafloor Deepening</div>
+          <div style="font-size:10px; color:#64748b; margin-top:4px; font-family:Georgia,serif;">Structural reef collapse allows unattenuated waves; Bonita Springs shoreline retreated 45ft in days.</div>
+        </div>
+        <div style="background:#fff5f5; border:1px solid #fecaca; border-radius:8px; padding:10px 12px;">
+          <div style="font-size:10px; font-family:'Courier New',monospace; font-weight:700; color:#dc2626; margin-bottom:4px;">PRIORITY 96</div>
+          <div style="font-size:12px; font-weight:700; color:#0f172a; line-height:1.3;">Sundarbans Critical Slowing</div>
+          <div style="font-size:10px; color:#64748b; margin-top:4px; font-family:Georgia,serif;">10–15% of mangrove losing resilience over 25 years; precursor to irreversible tipping point.</div>
+        </div>
+        <div style="background:#fff5f5; border:1px solid #fecaca; border-radius:8px; padding:10px 12px;">
+          <div style="font-size:10px; font-family:'Courier New',monospace; font-weight:700; color:#dc2626; margin-bottom:4px;">PRIORITY 96</div>
+          <div style="font-size:12px; font-weight:700; color:#0f172a; line-height:1.3;">Alaska Glacial Lake Floods</div>
+          <div style="font-size:10px; color:#64748b; margin-top:4px; font-family:Georgia,serif;">Suicide Basin (Mendenhall Glacier) flooding Juneau for 3rd consecutive year — ongoing Apr 2026.</div>
+        </div>
+        <div style="background:#fff5f5; border:1px solid #fecaca; border-radius:8px; padding:10px 12px;">
+          <div style="font-size:10px; font-family:'Courier New',monospace; font-weight:700; color:#dc2626; margin-bottom:4px;">PRIORITY 96</div>
+          <div style="font-size:12px; font-weight:700; color:#0f172a; line-height:1.3;">Yamuna River Toxic Foam</div>
+          <div style="font-size:10px; color:#64748b; margin-top:4px; font-family:Georgia,serif;">E-class biological dead zone; zero dissolved oxygen from phosphate/ammonia overload near Delhi.</div>
+        </div>
+        <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:8px; padding:10px 12px;">
+          <div style="font-size:10px; font-family:'Courier New',monospace; font-weight:700; color:#d97706; margin-bottom:4px;">PRIORITY 92</div>
+          <div style="font-size:12px; font-weight:700; color:#0f172a; line-height:1.3;">Urban Tropical Nights</div>
+          <div style="font-size:10px; color:#64748b; margin-top:4px; font-family:Georgia,serif;">Nighttime temps rising 10× faster than daytime in cities; biological recovery failure increasing mortality.</div>
+        </div>
+        <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:8px; padding:10px 12px;">
+          <div style="font-size:10px; font-family:'Courier New',monospace; font-weight:700; color:#d97706; margin-bottom:4px;">PRIORITY 92</div>
+          <div style="font-size:12px; font-weight:700; color:#0f172a; line-height:1.3;">Wayanad Tension Cracks</div>
+          <div style="font-size:10px; color:#64748b; margin-top:4px; font-family:Georgia,serif;">Hidden soil fissures in Kerala (Chooralmala, Meppadi) — precursors to debris flows that killed hundreds.</div>
+        </div>
+        <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:8px; padding:10px 12px;">
+          <div style="font-size:10px; font-family:'Courier New',monospace; font-weight:700; color:#d97706; margin-bottom:4px;">PRIORITY 92</div>
+          <div style="font-size:12px; font-weight:700; color:#0f172a; line-height:1.3;">Marsh Interior Fragmentation</div>
+          <div style="font-size:10px; color:#64748b; margin-top:4px; font-family:Georgia,serif;">Swiss-cheese pond coalescence indicating sea-level rise has outpaced marsh accretion — runaway collapse imminent.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+ 
+  <!-- ─── GSI Innovation Priority Chart ─── -->
+  <div style="max-width:960px; margin:0 auto 2rem;">
+    <div class="fs-card">
+      <div class="fs-card-title" style="margin-bottom:0.8rem;">
+        <span style="color:#059669;">▰</span> GSI-STI Radar — Top Innovation Priority Scores
+      </div>
+      <div class="bar-wrap">
+        <div class="bar-row">
+          <span class="bar-label" style="width:180px; font-size:10px;">Hot Pepper Pesticide</span>
+          <div class="bar-track"><div class="bar-fill" style="width:84%; background:linear-gradient(90deg,#059669,#34d399);"></div></div>
+          <span class="bar-val">84</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label" style="width:180px; font-size:10px;">SOIL EkoLakay (Haiti)</span>
+          <div class="bar-track"><div class="bar-fill" style="width:82%; background:linear-gradient(90deg,#059669,#34d399);"></div></div>
+          <span class="bar-val">82</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label" style="width:180px; font-size:10px;">Terra Preta (Amazon)</span>
+          <div class="bar-track"><div class="bar-fill" style="width:80%; background:linear-gradient(90deg,#0284c7,#38bdf8);"></div></div>
+          <span class="bar-val">80</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label" style="width:180px; font-size:10px;">Metal Grain Silos (Africa)</span>
+          <div class="bar-track"><div class="bar-fill" style="width:78%; background:linear-gradient(90deg,#0284c7,#38bdf8);"></div></div>
+          <span class="bar-val">78</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label" style="width:180px; font-size:10px;">Chinampa Floating Gardens</span>
+          <div class="bar-track"><div class="bar-fill" style="width:78%; background:linear-gradient(90deg,#0284c7,#38bdf8);"></div></div>
+          <span class="bar-val">78</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label" style="width:180px; font-size:10px;">Voltarent ECU (Kenya)</span>
+          <div class="bar-track"><div class="bar-fill" style="width:76%; background:linear-gradient(90deg,#7c3aed,#a78bfa);"></div></div>
+          <span class="bar-val">76</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label" style="width:180px; font-size:10px;">Uphill Trust Toilet (Uganda)</span>
+          <div class="bar-track"><div class="bar-fill" style="width:76%; background:linear-gradient(90deg,#7c3aed,#a78bfa);"></div></div>
+          <span class="bar-val">76</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label" style="width:180px; font-size:10px;">Humanure Handbook System</span>
+          <div class="bar-track"><div class="bar-fill" style="width:72%; background:linear-gradient(90deg,#b45309,#fbbf24);"></div></div>
+          <span class="bar-val">72</span>
+        </div>
+      </div>
+    </div>
+  </div>
+ 
+  <!-- ─── ICH Shared Heritage Timeline ─── -->
+  <div style="max-width:960px; margin:0 auto 2rem;">
+    <div class="fs-card">
+      <div class="fs-card-title" style="margin-bottom:0.8rem;">
+        <span style="color:#db2777;">⬡</span> ICH Radar — High-Confidence Shared Heritage Detections
+      </div>
+      <div class="timeline">
+ 
+        <div class="tl-item">
+          <div class="tl-dot" style="background:#0284c7;"></div>
+          <div class="tl-content">
+            <span class="tl-title">Kebaya Textile Consortium</span> — Thailand · Indonesia · Malaysia · Singapore · Brunei
+            <div>Thai Silk Weaving shares ikat techniques and silk heritage with Kebaya nations. Confidence 0.9. UNESCO joint nomination pathway open.</div>
+            <div class="tl-meta">ICH RADAR · Shared · Confidence 0.9</div>
+          </div>
+        </div>
+ 
+        <div class="tl-item">
+          <div class="tl-dot" style="background:#db2777;"></div>
+          <div class="tl-content">
+            <span class="tl-title">Ajrak Block-Print Corridor</span> — Pakistan (Sindh) ↔ India (Gujarat, Rajasthan)
+            <div>Sindhi Ajrak shares identical Khatri community origins with Kachchhi Ajrakh and Barmeri Ajrakh. 5000-year-old Indus Valley heritage.</div>
+            <div class="tl-meta">ICH RADAR · Shared · Confidence 1.0</div>
+          </div>
+        </div>
+ 
+        <div class="tl-item">
+          <div class="tl-dot" style="background:#8b5cf6;"></div>
+          <div class="tl-content">
+            <span class="tl-title">Pysanka Wax-Resist Egg Tradition</span> — Ukraine · Poland · Lithuania · Romania · Slovakia · Czech Republic · Estonia
+            <div>Highest-confidence (1.0) shared heritage in dataset. Estonia co-applied with Ukraine for UNESCO recognition in 2013.</div>
+            <div class="tl-meta">ICH RADAR · Shared · Confidence 1.0</div>
+          </div>
+        </div>
+ 
+        <div class="tl-item">
+          <div class="tl-dot" style="background:#059669;"></div>
+          <div class="tl-content">
+            <span class="tl-title">Matyó Embroidery Cluster</span> — Hungary (Mezőkövesd) + Central/Eastern European traditions
+            <div>Shares lineage with Kalocsa, Kalotaszeg, and furrier embroidery traditions. Represents strong regional diplomacy opportunity.</div>
+            <div class="tl-meta">ICH RADAR · Shared · Confidence 0.8</div>
+          </div>
+        </div>
+ 
+        <div class="tl-item">
+          <div class="tl-dot" style="background:#d97706;"></div>
+          <div class="tl-content">
+            <span class="tl-title">Bunya Nut ↔ Toka (Vanuatu)</span> — Australia ↔ Pacific Islands
+            <div>Araucaria araucana (Monkey Puzzle) gatherings in Vanuatu mirror Aboriginal Bunya Nut Festival structure. Pacific ICH solidarity pathway.</div>
+            <div class="tl-meta">ICH RADAR · Shared · Confidence 0.9</div>
+          </div>
+        </div>
+ 
+      </div>
+    </div>
+  </div>
+ 
+  <!-- ─── PROSE REPORT ─── -->
+  <div class="fs-prose">
+ 
+    <h3>Executive Summary</h3>
+    <p>A cross-radar analysis of live signals collected up to 18 April 2026 reveals a deeply interconnected landscape of accelerating environmental crises, persistent cultural heritage risks, and underutilised grassroots innovation capacity. The Nexus Radar dominates the risk landscape with 12 signals at priority scores of 92 or above, several representing irreversible tipping points now actively underway. The Artifact Radar records 56 high-risk listings across 80+ platforms, with Indonesia's Majapahit heritage particularly exposed. ICH data exposes powerful shared-heritage corridors that remain diplomatically underdeveloped. GSI-STI innovations — most with low-cost, high-replicability profiles — offer concrete adaptive responses.</p>
+ 
+    <ul>
+      <li><strong>Environmental tipping points are no longer theoretical:</strong> Alaska's glacial lake is flooding Juneau for the third straight year (April 2026). Florida's coastline is retreating without storms due to reef structural collapse. The Sundarbans has entered measurable resilience decline.</li>
+      <li><strong>Majapahit heritage is under active marketplace pressure</strong> — 6 listings (risk 7–10) identified on Indonesian platforms, including a keris priced at IDR 4.8 million on Tokopedia without provenance documentation.</li>
+      <li><strong>ICH shared heritage creates immediate multilateral nomination opportunities</strong> — Ajrak (Pakistan-India), Kebaya textiles (6 ASEAN nations), and Pysanka egg-decorating (7 European nations) are all high-confidence shared heritage assets ready for joint UNESCO advocacy.</li>
+      <li><strong>GSI-STI provides cost-appropriate solutions</strong> — Hot pepper spray (priority 84), ecological sanitation (82), and Terra Preta biochar (80) are scalable, low-cost, and proven in archipelagic and tropical contexts.</li>
+    </ul>
+ 
+    <h3>Key Signals by Domain (April 2026)</h3>
+ 
+    <p><strong><span class="fs-tag" style="background:#fef2f2; color:#dc2626;">Environmental — Nexus</span></strong> The most acute new signal is the Alaska glacial outburst flood from Suicide Basin (Mendenhall Glacier), now actively flooding Juneau in April 2026 for the third consecutive summer. In the marine domain, mesophotic coral reefs at 30–150m depth — historically the thermal safety net for reef recovery — are now bleaching more severely than surface corals in the Red Sea and Chagos Archipelago. Florida's reef structural collapse is translating directly into coastal erosion: Bonita Springs and Sanibel Island lost up to 45 feet of shoreline in days without a storm event. The Sundarbans shows statistical "critical slowing down" — a mathematically recognised precursor to irreversible regime shift — in 10–15% of its area. Urban signals are also intensifying: nighttime minimum temperatures are rising 10× faster than daytime maximums across dense cities, preventing biological recovery from heat stress and increasing mortality without triggering traditional heat-alert thresholds.</p>
+ 
+    <p><strong><span class="fs-tag" style="background:#fffbeb; color:#d97706;">Heritage — Artifact + ICH</span></strong> The Artifact Radar's 136 listings represent the largest wave of flagged illicit trade activity to date. The most concerning cluster remains Majapahit (Indonesia): two items on Tokopedia, one on Shopee, one via YouTube auction channel, and broader coverage via news of international syndicates returning 30 stolen Majapahit artifacts from the US. At the global level, the Drents Museum theft of a Dacian gold helmet (January 2025) remains unresolved, with items still missing. Syrian Palmyra reliefs continue to appear on Facebook Marketplace. eBay and Etsy together account for 18 high-risk listings, indicating that mainstream consumer platforms remain primary vectors. The ICH Radar's 18 documented elements reveal rich shared heritage corridors — Ajrak printmaking, Kebaya textiles, Pysanka egg art — that represent ready-made multilateral diplomatic assets if formalised through ASEAN/EU frameworks.</p>
+ 
+    <p><strong><span class="fs-tag" style="background:#f0fdf4; color:#059669;">Innovation — GSI-STI</span></strong> The GSI-STI Radar catalogues diverse grassroots solutions with strong tropical and archipelagic relevance. SOIL's EkoLakay container-based sanitation in Haiti (priority 82) serves 9,000 people and produces WHO-standard compost — a model directly applicable to Indonesian outer islands. Terra Preta biochar (priority 80), the Milpa intercropping system, and Chinampa floating gardens (priority 78) represent ancient knowledge systems that outperform modern monoculture in climate resilience metrics. The hot pepper capsaicin spray (priority 84) and garlic brew offer zero-input pest control for smallholder farmers. Wind turbine blade upcycling initiatives in the US and Netherlands signal emerging circular-economy precedents for coastal infrastructure.</p>
+ 
+    <h3>Strategic Implications (2026–2035)</h3>
+ 
+    <p><strong>Environmental:</strong> The simultaneous collapse of multiple marine refugia systems — mesophotic corals (depth), temperate corals (latitude), and mangroves (Sundarbans) — signals systemic marine thermal safety net failure within this decade. For Indonesia and the Coral Triangle, this means that reef recovery after bleaching events will become increasingly unlikely within 5–7 years, with direct consequences for fisheries (food security for 120+ million coastal people), tourism, and coastal protection. Urban heat signals point to a looming mortality crisis in tropical megacities where nighttime cooling is already failing.</p>
+ 
+    <p><strong>Economic and Cultural:</strong> Heritage leakage via domestic e-commerce platforms (Tokopedia, Shopee) represents both a loss and an opportunity. Indonesia's response to the international return of Majapahit artifacts creates leverage for establishing a formal AI-powered monitoring system — a "Heritage Sentinel" — on domestic platforms. Simultaneously, the shared textile heritage documented by the ICH Radar offers ethical branding opportunities for ASEAN economic diplomacy, particularly in high-value fashion and artisan export markets.</p>
+ 
+    <p><strong>Political and Diplomatic:</strong> Indonesia is uniquely positioned at the intersection of all four radar streams: it has documented Majapahit artifact risk, active Nexus environmental exposure (Coral Triangle, mangroves), strong ICH assets (Pinisi boat-building, Kebaya, Batik), and geography suited to many GSI-STI innovations. This convergence creates a compelling case for Indonesia to lead a regional "Nexus Heritage Climate Initiative" within the ASEAN framework, connecting environmental and cultural diplomacy.</p>
+ 
+    <h3>Actionable Recommendations</h3>
+    <ul>
+      <li>🌊 <strong>Coral Triangle Emergency Protocol:</strong> Commission a dedicated mesophotic monitoring buoy network across Indonesia's Coral Triangle; integrate Nexus Radar signals into national disaster risk dashboards within 12 months.</li>
+      <li>🏺 <strong>Heritage Sentinel AI System:</strong> Deploy automated AI scraping of Tokopedia, Shopee, and Bukalapak for Majapahit, Batik, and other keyword-triggered artifacts; escalate to POLRI cultural property unit. Expand to Facebook Marketplace (Palmyra model).</li>
+      <li>🛕 <strong>ASEAN Joint ICH Nominations:</strong> Fast-track joint UNESCO nominations for Kebaya textiles (6 nations already on record), Ajrak block printing (Pakistan + India), and Pinisi boat-building with regional maritime partners.</li>
+      <li>🔧 <strong>GSI-STI Island Pilot Programme:</strong> Select 3–5 outer islands (Nusa Tenggara, Maluku) for pilot deployment of hermetic grain storage, biogas chambers, and PET bottle greenhouse systems — all rated low-cost, easy-replication in GSI-STI data.</li>
+      <li>🌡 <strong>Urban Night-Heat Early Warning:</strong> Integrate ECOSTRESS satellite data (urban canyon thermal failure) into city-level emergency management systems across Jabodetabek, Surabaya, and Makassar before the 2026–2027 dry season.</li>
+      <li>📡 <strong>Nexus-ICH Unified Dashboard:</strong> Build a single cross-radar web interface connecting environmental tipping point signals with cultural heritage risk maps — a "Strategic Sovereignty Dashboard" for Indonesia's Ministry of Culture and BRIN.</li>
+    </ul>
+ 
+  </div><!-- /fs-prose -->
+ 
+ 
+</div>
+
 </section>
 
 <!-- ========== END OMNIRADAR MINI SECTION (PAGINATED) ========== -->
