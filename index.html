@@ -53,6 +53,10 @@
     
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     
     <script>
         tailwind.config = {
@@ -293,6 +297,112 @@
         /* ─── Anchor offset (sticky nav) ───────────────────── */
         [id] { scroll-margin-top: 5rem; }
     </style>
+
+    <style>
+/* Gaya sama seperti sebelumnya, ditambah sedikit untuk pagination */
+.omni-mini-container {
+    --omni-bg: #0f1117;
+    --omni-surface: #181c27;
+    --omni-surface2: #1f2435;
+    --omni-border: rgba(255,255,255,0.07);
+    --omni-border-bright: rgba(255,255,255,0.14);
+    --omni-text: #e2e8f0;
+    --omni-text-muted: #64748b;
+    --omni-ich: #e879a0;
+    --omni-sti: #38bdf8;
+    --omni-nexus: #86efac;
+    --omni-artifact: #fbbf24;
+    --omni-red: #f87171;
+}
+.omni-mini-container {
+    background: var(--omni-bg);
+    border-radius: 1.5rem;
+    padding: 1.5rem;
+    font-family: 'Inter', 'DM Sans', system-ui, sans-serif;
+    color: var(--omni-text);
+    border: 1px solid var(--omni-border);
+    box-shadow: 0 20px 35px -12px rgba(0,0,0,0.4);
+}
+.omni-mini-container .badge-mini {
+    font-size: 9px;
+    font-weight: 700;
+    font-family: 'Inter', monospace;
+    padding: 2px 7px;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+.omni-mini-container .badge-ich { background: rgba(232,121,160,0.15); color: var(--omni-ich); }
+.omni-mini-container .badge-sti { background: rgba(56,189,248,0.15); color: var(--omni-sti); }
+.omni-mini-container .badge-nexus { background: rgba(134,239,172,0.15); color: var(--omni-nexus); }
+.omni-mini-container .badge-artifact { background: rgba(251,191,36,0.15); color: var(--omni-artifact); }
+.omni-mini-container .risk-pill-mini {
+    font-size: 9px;
+    font-weight: 700;
+    font-family: 'Inter', monospace;
+    padding: 2px 7px;
+    border-radius: 20px;
+}
+.omni-mini-container .risk-high { background: rgba(248,113,113,0.15); color: var(--omni-red); }
+.omni-mini-container .risk-med { background: rgba(251,191,36,0.15); color: var(--omni-artifact); }
+.omni-mini-container .risk-low { background: rgba(134,239,172,0.15); color: var(--omni-nexus); }
+.omni-mini-container .signal-card-mini {
+    background: var(--omni-surface);
+    border: 1px solid var(--omni-border);
+    border-radius: 12px;
+    padding: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.omni-mini-container .signal-card-mini:hover {
+    border-color: var(--omni-border-bright);
+    transform: translateY(-1px);
+    background: var(--omni-surface2);
+}
+.omni-mini-container .search-mini {
+    background: var(--omni-surface2);
+    border: 1px solid var(--omni-border);
+    border-radius: 10px;
+    padding: 8px 12px 8px 34px;
+    font-size: 13px;
+    width: 100%;
+    color: var(--omni-text);
+}
+.omni-mini-container .search-mini:focus { outline: none; border-color: var(--omni-sti); }
+.omni-mini-container .filter-chip {
+    background: var(--omni-surface);
+    border: 1px solid var(--omni-border);
+    border-radius: 30px;
+    padding: 5px 12px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    color: var(--omni-text-muted);
+}
+.omni-mini-container .filter-chip.active {
+    background: var(--omni-sti);
+    border-color: var(--omni-sti);
+    color: #0f1117;
+}
+.omni-mini-container .stat-number {
+    font-family: 'Inter', monospace;
+    font-weight: 700;
+    font-size: 1.2rem;
+}
+.omni-mini-feed {
+    max-height: 550px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+.omni-mini-feed::-webkit-scrollbar { width: 4px; }
+.omni-mini-feed::-webkit-scrollbar-track { background: transparent; }
+.omni-mini-feed::-webkit-scrollbar-thumb { background: var(--omni-border-bright); border-radius: 10px; }
+#paginationControls button:disabled { opacity: 0.4; cursor: not-allowed; }
+</style>
+
+
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans antialiased selection:bg-teal-200 selection:text-teal-900">
 
@@ -1402,8 +1512,18 @@
                 </div>
 
                 <!-- feed sinyal + pagination -->
+
                 <div id="omniFeed" class="omni-mini-feed space-y-3">
-                    <div class="text-center py-10 text-slate-500"><i class="fa-solid fa-circle-notch fa-spin mr-2"></i> Loading signals...</div>
+                    <div id="standbyOverlay" class="flex flex-col items-center justify-center py-16 border-2 border-dashed border-white/10 rounded-xl bg-white/5">
+                        <i class="fa-solid fa-database text-4xl text-slate-600 mb-4"></i>
+                        <h4 class="text-white font-bold mb-2">Engines on Standby</h4>
+                        <p class="text-xs text-slate-400 mb-6 text-center max-w-sm px-4">
+                            Data is currently dormant to save memory. Initialize the engines to fetch and render signals from external databases.
+                        </p>
+                        <button id="btnLoadOmni" class="px-6 py-2.5 bg-teal-600 hover:bg-teal-500 text-white rounded-lg font-bold text-sm shadow-[0_0_15px_rgba(20,184,166,0.3)] transition-all flex items-center gap-2 transform hover:scale-105">
+                            <i class="fa-solid fa-power-off"></i> Initialize Engines & Fetch Data
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Pagination controls -->
@@ -1421,355 +1541,6 @@
     </div>
 </section>
 
-<style>
-/* Gaya sama seperti sebelumnya, ditambah sedikit untuk pagination */
-.omni-mini-container {
-    --omni-bg: #0f1117;
-    --omni-surface: #181c27;
-    --omni-surface2: #1f2435;
-    --omni-border: rgba(255,255,255,0.07);
-    --omni-border-bright: rgba(255,255,255,0.14);
-    --omni-text: #e2e8f0;
-    --omni-text-muted: #64748b;
-    --omni-ich: #e879a0;
-    --omni-sti: #38bdf8;
-    --omni-nexus: #86efac;
-    --omni-artifact: #fbbf24;
-    --omni-red: #f87171;
-}
-.omni-mini-container {
-    background: var(--omni-bg);
-    border-radius: 1.5rem;
-    padding: 1.5rem;
-    font-family: 'Inter', 'DM Sans', system-ui, sans-serif;
-    color: var(--omni-text);
-    border: 1px solid var(--omni-border);
-    box-shadow: 0 20px 35px -12px rgba(0,0,0,0.4);
-}
-.omni-mini-container .badge-mini {
-    font-size: 9px;
-    font-weight: 700;
-    font-family: 'Inter', monospace;
-    padding: 2px 7px;
-    border-radius: 4px;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-}
-.omni-mini-container .badge-ich { background: rgba(232,121,160,0.15); color: var(--omni-ich); }
-.omni-mini-container .badge-sti { background: rgba(56,189,248,0.15); color: var(--omni-sti); }
-.omni-mini-container .badge-nexus { background: rgba(134,239,172,0.15); color: var(--omni-nexus); }
-.omni-mini-container .badge-artifact { background: rgba(251,191,36,0.15); color: var(--omni-artifact); }
-.omni-mini-container .risk-pill-mini {
-    font-size: 9px;
-    font-weight: 700;
-    font-family: 'Inter', monospace;
-    padding: 2px 7px;
-    border-radius: 20px;
-}
-.omni-mini-container .risk-high { background: rgba(248,113,113,0.15); color: var(--omni-red); }
-.omni-mini-container .risk-med { background: rgba(251,191,36,0.15); color: var(--omni-artifact); }
-.omni-mini-container .risk-low { background: rgba(134,239,172,0.15); color: var(--omni-nexus); }
-.omni-mini-container .signal-card-mini {
-    background: var(--omni-surface);
-    border: 1px solid var(--omni-border);
-    border-radius: 12px;
-    padding: 12px;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-.omni-mini-container .signal-card-mini:hover {
-    border-color: var(--omni-border-bright);
-    transform: translateY(-1px);
-    background: var(--omni-surface2);
-}
-.omni-mini-container .search-mini {
-    background: var(--omni-surface2);
-    border: 1px solid var(--omni-border);
-    border-radius: 10px;
-    padding: 8px 12px 8px 34px;
-    font-size: 13px;
-    width: 100%;
-    color: var(--omni-text);
-}
-.omni-mini-container .search-mini:focus { outline: none; border-color: var(--omni-sti); }
-.omni-mini-container .filter-chip {
-    background: var(--omni-surface);
-    border: 1px solid var(--omni-border);
-    border-radius: 30px;
-    padding: 5px 12px;
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.15s;
-    color: var(--omni-text-muted);
-}
-.omni-mini-container .filter-chip.active {
-    background: var(--omni-sti);
-    border-color: var(--omni-sti);
-    color: #0f1117;
-}
-.omni-mini-container .stat-number {
-    font-family: 'Inter', monospace;
-    font-weight: 700;
-    font-size: 1.2rem;
-}
-.omni-mini-feed {
-    max-height: 550px;
-    overflow-y: auto;
-    padding-right: 4px;
-}
-.omni-mini-feed::-webkit-scrollbar { width: 4px; }
-.omni-mini-feed::-webkit-scrollbar-track { background: transparent; }
-.omni-mini-feed::-webkit-scrollbar-thumb { background: var(--omni-border-bright); border-radius: 10px; }
-#paginationControls button:disabled { opacity: 0.4; cursor: not-allowed; }
-</style>
-
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-
-<script>
-(function(){
-    const SOURCES = [
-        { id: 'ich',      name: 'Culture & ICH',   url: 'https://anggaconni.github.io/ICH-Radar/data.json',      color: '#e879a0', icon: 'fa-landmark', badgeClass: 'badge-ich'      },
-        { id: 'sti',      name: 'Innovation & STI', url: 'https://anggaconni.github.io/GSI-Radar/data.json',      color: '#38bdf8', icon: 'fa-microchip', badgeClass: 'badge-sti'      },
-        { id: 'nexus',    name: 'Nature & DRR',     url: 'https://anggaconni.github.io/Nexus-Radar/data.json',    color: '#86efac', icon: 'fa-leaf',       badgeClass: 'badge-nexus'    },
-        { id: 'artifact', name: 'Artifact Risk',    url: 'https://anggaconni.github.io/artifact-radar/data.json', color: '#fbbf24', icon: 'fa-gem',        badgeClass: 'badge-artifact' },
-    ];
-
-    let masterData = [];
-    let filteredData = [];
-    let activeFilter = 'all';
-    let searchQuery = '';
-    let currentPage = 1;
-    const ITEMS_PER_PAGE = 15;
-
-    // Helper functions (sama seperti sebelumnya)
-    function extractArray(data) {
-        if (Array.isArray(data)) return data;
-        for (let k of ['inventory', 'listings', 'data', 'items', 'results']) {
-            if (data[k] && Array.isArray(data[k])) return data[k];
-        }
-        return [];
-    }
-
-    function normalizeItem(item, src) {
-        const uid = Math.random().toString(36).slice(2);
-        let lat = null, lon = null;
-        const rawLat = item.lat ?? item.location?.lat ?? null;
-        const rawLon = item.lon ?? item.lng ?? item.location?.lon ?? item.location?.lng ?? null;
-        if (rawLat && rawLon) { lat = parseFloat(rawLat); lon = parseFloat(rawLon); }
-
-        let location = 'Global';
-        if (item.origin_region) location = item.origin_region;
-        else if (item.location?.region) location = item.location.region;
-        else if (item.location?.country) location = item.location.country;
-
-        let tags = item.tags || item.category || [];
-        if (item.resume_analisa?.gemini_tags) tags = item.resume_analisa.gemini_tags;
-        if (!Array.isArray(tags)) tags = [];
-
-        const title = item.title || item.element_name || item.original_title || 'Untitled';
-        const desc = item.summary || item.description || item.reason || item.resume_analisa?.description || 'No details.';
-        const date = item.timestamp || item.date || item.scraped_at || new Date().toISOString();
-        let urls = [];
-        if (item.source_urls) urls = item.source_urls;
-        else if (item.sources) urls = item.sources;
-        else if (item.source_url) urls = [item.source_url];
-        else if (item.url) urls = [item.url];
-
-        const risk_score = item.risk_score ?? item.risk_assessment?.risk_score ?? null;
-        const status = item.status || null;
-        const thumbnail = item.thumbnail_url || item.image_url || null;
-
-        return {
-            uid, id_source: src.id, source_name: src.name, color: src.color, icon: src.icon, badgeClass: src.badgeClass,
-            title, desc, urls, date, location, tags, risk_score, status, thumbnail,
-            lat, lon
-        };
-    }
-
-    function riskClass(item) {
-        const score = item.risk_score;
-        if (!score && !item.status) return null;
-        if (score >= 8 || item.status?.includes('HIGH')) return 'high';
-        if (score >= 5 || item.status?.includes('MEDIUM')) return 'med';
-        return 'low';
-    }
-
-    function riskLabel(rc) {
-        return rc === 'high' ? 'HIGH RISK' : rc === 'med' ? 'MEDIUM' : 'LOW';
-    }
-
-    function fmtDate(str) {
-        try {
-            let d = new Date(str);
-            if (isNaN(d)) return '—';
-            return d.toLocaleDateString('en-US', { day:'numeric', month:'short', year:'numeric' });
-        } catch { return '—'; }
-    }
-
-    function highlight(text, q) {
-        if (!q) return text;
-        let esc = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        return text.replace(new RegExp(`(${esc})`, 'gi'), '<mark style="background:#0d9488;color:white;border-radius:2px;">$1</mark>');
-    }
-
-    // Render dengan pagination
-    function renderFeed() {
-        const container = document.getElementById('omniFeed');
-        if (!container) return;
-
-        const q = searchQuery.trim().toLowerCase();
-        filteredData = masterData.filter(item => {
-            if (activeFilter !== 'all' && item.id_source !== activeFilter) return false;
-            if (!q) return true;
-            return item.title.toLowerCase().includes(q) || item.desc.toLowerCase().includes(q) ||
-                   item.location.toLowerCase().includes(q) || item.tags.some(t => t.toLowerCase().includes(q));
-        });
-
-        // Update statistik
-        const total = filteredData.length;
-        const highRiskCount = filteredData.filter(i => riskClass(i) === 'high').length;
-        const mappedCount = filteredData.filter(i => i.lat !== null && i.lon !== null).length;
-        document.getElementById('omniTotalCount').innerText = total;
-        document.getElementById('omniHighRiskCount').innerText = highRiskCount;
-        document.getElementById('omniMappedCount').innerText = mappedCount;
-
-        // Pagination logic
-        const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
-        if (currentPage > totalPages) currentPage = totalPages || 1;
-        const start = (currentPage - 1) * ITEMS_PER_PAGE;
-        const end = start + ITEMS_PER_PAGE;
-        const pageItems = filteredData.slice(start, end);
-
-        // Update tombol prev/next
-        const prevBtn = document.getElementById('prevPageBtn');
-        const nextBtn = document.getElementById('nextPageBtn');
-        if (prevBtn) prevBtn.disabled = (currentPage === 1);
-        if (nextBtn) nextBtn.disabled = (currentPage === totalPages || total === 0);
-        document.getElementById('pageInfo').innerText = total === 0 ? '0 items' : `${start+1}–${Math.min(end, total)} of ${total}`;
-
-        if (!pageItems.length) {
-            container.innerHTML = `<div class="text-center py-12 text-slate-500"><i class="fa-regular fa-eye-slash"></i> No signals match.</div>`;
-            return;
-        }
-
-        let html = '';
-        pageItems.forEach(item => {
-            const rc = riskClass(item);
-            const riskHtml = rc ? `<span class="risk-pill-mini risk-${rc}"><i class="fa-solid fa-triangle-exclamation" style="font-size:7px"></i> ${riskLabel(rc)}${item.risk_score ? ` ${item.risk_score}/10` : ''}</span>` : '';
-            const tagsHtml = item.tags.slice(0, 3).map(t => `<span style="font-size:9px;background:rgba(255,255,255,0.05);padding:1px 6px;border-radius:3px;">${t}</span>`).join('');
-            const titleHigh = highlight(item.title, q);
-            const descHigh = highlight(item.desc, q);
-            html += `
-                <div class="signal-card-mini" data-uid="${item.uid}">
-                    <div class="flex gap-3">
-                        ${item.thumbnail ? `<img src="${item.thumbnail}" class="w-14 h-12 rounded-md object-cover border border-white/5" onerror="this.style.display='none'" loading="lazy">` : ''}
-                        <div class="flex-1 min-w-0">
-                            <div class="flex flex-wrap items-center gap-2 mb-1">
-                                <span class="badge-mini ${item.badgeClass}"><i class="fa-solid ${item.icon}" style="font-size:8px"></i> ${item.source_name}</span>
-                                ${riskHtml}
-                                <span class="text-[9px] text-slate-500 ml-auto">${fmtDate(item.date)}</span>
-                            </div>
-                            <h4 class="font-semibold text-sm text-white leading-tight mb-0.5">${titleHigh}</h4>
-                            <p class="text-xs text-slate-400 line-clamp-2">${descHigh}</p>
-                            ${tagsHtml ? `<div class="flex flex-wrap gap-1 mt-1.5">${tagsHtml}</div>` : ''}
-                        </div>
-                        <i class="fa-solid fa-chevron-right text-slate-600 text-xs self-center"></i>
-                    </div>
-                </div>
-            `;
-        });
-        container.innerHTML = html;
-
-        // Attach click events
-        document.querySelectorAll('#omniFeed .signal-card-mini').forEach(card => {
-            card.addEventListener('click', () => {
-                const uid = card.dataset.uid;
-                const item = masterData.find(i => i.uid === uid);
-                if (item) showMiniModal(item);
-            });
-        });
-    }
-
-    function showMiniModal(item) {
-        const modalDiv = document.createElement('div');
-        modalDiv.className = 'fixed inset-0 z-[200] bg-black/70 backdrop-blur-sm flex justify-center items-center p-4';
-        modalDiv.onclick = (e) => { if(e.target === modalDiv) modalDiv.remove(); };
-        const rc = riskClass(item);
-        const riskHtml = rc ? `<span class="risk-pill-mini risk-${rc}"><i class="fa-solid fa-triangle-exclamation"></i> ${riskLabel(rc)}${item.risk_score ? ` ${item.risk_score}/10` : ''}</span>` : '';
-        const validUrls = item.urls.filter(u => u && u !== '#');
-        modalDiv.innerHTML = `
-            <div class="max-w-lg w-full rounded-xl overflow-hidden border border-white/10" style="background:#181c27;">
-                <div class="p-4 border-b border-white/10 flex justify-between items-start">
-                    <div>
-                        <div class="flex gap-2 mb-2 flex-wrap">
-                            <span class="badge-mini ${item.badgeClass}"><i class="fa-solid ${item.icon}"></i> ${item.source_name}</span>
-                            ${riskHtml}
-                        </div>
-                        <h3 class="text-lg font-bold text-white">${item.title}</h3>
-                        <div class="text-xs text-slate-500 mt-1">${item.location} · ${fmtDate(item.date)}</div>
-                    </div>
-                    <button class="text-slate-400 hover:text-white text-xl leading-5" onclick="this.closest('.fixed').remove()">×</button>
-                </div>
-                <div class="p-4 space-y-3 max-h-[60vh] overflow-y-auto">
-                    <p class="text-sm text-slate-300">${item.desc}</p>
-                    ${item.tags.length ? `<div class="flex flex-wrap gap-1">${item.tags.map(t => `<span class="text-[10px] bg-white/5 px-2 py-0.5 rounded">#${t}</span>`).join('')}</div>` : ''}
-                    ${validUrls.length ? `<div class="pt-2"><div class="text-[10px] text-slate-500 uppercase mb-1">Sources</div>${validUrls.map(u => `<a href="${u}" target="_blank" class="block text-xs text-blue-400 truncate hover:underline">${u}</a>`).join('')}</div>` : ''}
-                </div>
-            </div>
-        `;
-        document.body.appendChild(modalDiv);
-    }
-
-    function changePage(delta) {
-        const totalPages = Math.ceil(filteredData.length / ITEMS_PER_PAGE);
-        let newPage = currentPage + delta;
-        if (newPage < 1) newPage = 1;
-        if (newPage > totalPages) newPage = totalPages;
-        if (newPage !== currentPage) {
-            currentPage = newPage;
-            renderFeed();
-            // Scroll feed ke atas
-            document.querySelector('.omni-mini-feed')?.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-    }
-
-    async function loadAllData() {
-        const results = await Promise.all(
-            SOURCES.map(src =>
-                fetch(src.url).then(r => r.json()).then(data => extractArray(data).map(item => normalizeItem(item, src)))
-                .catch(() => [])
-            )
-        );
-        masterData = results.flat().filter(i => i.title !== 'Untitled');
-        masterData.sort((a,b) => new Date(b.date) - new Date(a.date));
-        currentPage = 1;
-        renderFeed();
-    }
-
-    // Event listeners
-    document.querySelectorAll('.omni-mini-container .filter-chip').forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.querySelectorAll('.omni-mini-container .filter-chip').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            activeFilter = btn.dataset.filter;
-            currentPage = 1;
-            renderFeed();
-        });
-    });
-    document.getElementById('omniSearchInput')?.addEventListener('input', (e) => {
-        searchQuery = e.target.value;
-        currentPage = 1;
-        renderFeed();
-    });
-    document.getElementById('prevPageBtn')?.addEventListener('click', () => changePage(-1));
-    document.getElementById('nextPageBtn')?.addEventListener('click', () => changePage(1));
-
-    loadAllData();
-})();
-</script>
 <!-- ========== END OMNIRADAR MINI SECTION (PAGINATED) ========== -->
 
     <!-- ═══════════════════════════════════════════════════════
@@ -2239,6 +2010,268 @@
             }
         });
     </script>
+
+    <script>
+(function(){
+    const SOURCES = [
+        { id: 'ich',      name: 'Culture & ICH',   url: 'https://anggaconni.github.io/ICH-Radar/data.json',      color: '#e879a0', icon: 'fa-landmark', badgeClass: 'badge-ich'      },
+        { id: 'sti',      name: 'Innovation & STI', url: 'https://anggaconni.github.io/GSI-Radar/data.json',      color: '#38bdf8', icon: 'fa-microchip', badgeClass: 'badge-sti'      },
+        { id: 'nexus',    name: 'Nature & DRR',     url: 'https://anggaconni.github.io/Nexus-Radar/data.json',    color: '#86efac', icon: 'fa-leaf',       badgeClass: 'badge-nexus'    },
+        { id: 'artifact', name: 'Artifact Risk',    url: 'https://anggaconni.github.io/artifact-radar/data.json', color: '#fbbf24', icon: 'fa-gem',        badgeClass: 'badge-artifact' },
+    ];
+
+    let masterData = [];
+    let filteredData = [];
+    let activeFilter = 'all';
+    let searchQuery = '';
+    let currentPage = 1;
+    const ITEMS_PER_PAGE = 15;
+
+    // Helper functions (sama seperti sebelumnya)
+    function extractArray(data) {
+        if (Array.isArray(data)) return data;
+        for (let k of ['inventory', 'listings', 'data', 'items', 'results']) {
+            if (data[k] && Array.isArray(data[k])) return data[k];
+        }
+        return [];
+    }
+
+    function normalizeItem(item, src) {
+        const uid = Math.random().toString(36).slice(2);
+        let lat = null, lon = null;
+        const rawLat = item.lat ?? item.location?.lat ?? null;
+        const rawLon = item.lon ?? item.lng ?? item.location?.lon ?? item.location?.lng ?? null;
+        if (rawLat && rawLon) { lat = parseFloat(rawLat); lon = parseFloat(rawLon); }
+
+        let location = 'Global';
+        if (item.origin_region) location = item.origin_region;
+        else if (item.location?.region) location = item.location.region;
+        else if (item.location?.country) location = item.location.country;
+
+        let tags = item.tags || item.category || [];
+        if (item.resume_analisa?.gemini_tags) tags = item.resume_analisa.gemini_tags;
+        if (!Array.isArray(tags)) tags = [];
+
+        const title = item.title || item.element_name || item.original_title || 'Untitled';
+        const desc = item.summary || item.description || item.reason || item.resume_analisa?.description || 'No details.';
+        const date = item.timestamp || item.date || item.scraped_at || new Date().toISOString();
+        let urls = [];
+        if (item.source_urls) urls = item.source_urls;
+        else if (item.sources) urls = item.sources;
+        else if (item.source_url) urls = [item.source_url];
+        else if (item.url) urls = [item.url];
+
+        const risk_score = item.risk_score ?? item.risk_assessment?.risk_score ?? null;
+        const status = item.status || null;
+        const thumbnail = item.thumbnail_url || item.image_url || null;
+
+        return {
+            uid, id_source: src.id, source_name: src.name, color: src.color, icon: src.icon, badgeClass: src.badgeClass,
+            title, desc, urls, date, location, tags, risk_score, status, thumbnail,
+            lat, lon
+        };
+    }
+
+    function riskClass(item) {
+        const score = item.risk_score;
+        if (!score && !item.status) return null;
+        if (score >= 8 || item.status?.includes('HIGH')) return 'high';
+        if (score >= 5 || item.status?.includes('MEDIUM')) return 'med';
+        return 'low';
+    }
+
+    function riskLabel(rc) {
+        return rc === 'high' ? 'HIGH RISK' : rc === 'med' ? 'MEDIUM' : 'LOW';
+    }
+
+    function fmtDate(str) {
+        try {
+            let d = new Date(str);
+            if (isNaN(d)) return '—';
+            return d.toLocaleDateString('en-US', { day:'numeric', month:'short', year:'numeric' });
+        } catch { return '—'; }
+    }
+
+    function highlight(text, q) {
+        if (!q) return text;
+        let esc = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        return text.replace(new RegExp(`(${esc})`, 'gi'), '<mark style="background:#0d9488;color:white;border-radius:2px;">$1</mark>');
+    }
+
+    // Render dengan pagination
+    function renderFeed() {
+        const container = document.getElementById('omniFeed');
+        if (!container) return;
+
+        const q = searchQuery.trim().toLowerCase();
+        filteredData = masterData.filter(item => {
+            if (activeFilter !== 'all' && item.id_source !== activeFilter) return false;
+            if (!q) return true;
+            return item.title.toLowerCase().includes(q) || item.desc.toLowerCase().includes(q) ||
+                   item.location.toLowerCase().includes(q) || item.tags.some(t => t.toLowerCase().includes(q));
+        });
+
+        // Update statistik
+        const total = filteredData.length;
+        const highRiskCount = filteredData.filter(i => riskClass(i) === 'high').length;
+        const mappedCount = filteredData.filter(i => i.lat !== null && i.lon !== null).length;
+        document.getElementById('omniTotalCount').innerText = total;
+        document.getElementById('omniHighRiskCount').innerText = highRiskCount;
+        document.getElementById('omniMappedCount').innerText = mappedCount;
+
+        // Pagination logic
+        const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
+        if (currentPage > totalPages) currentPage = totalPages || 1;
+        const start = (currentPage - 1) * ITEMS_PER_PAGE;
+        const end = start + ITEMS_PER_PAGE;
+        const pageItems = filteredData.slice(start, end);
+
+        // Update tombol prev/next
+        const prevBtn = document.getElementById('prevPageBtn');
+        const nextBtn = document.getElementById('nextPageBtn');
+        if (prevBtn) prevBtn.disabled = (currentPage === 1);
+        if (nextBtn) nextBtn.disabled = (currentPage === totalPages || total === 0);
+        document.getElementById('pageInfo').innerText = total === 0 ? '0 items' : `${start+1}–${Math.min(end, total)} of ${total}`;
+
+        if (!pageItems.length) {
+            container.innerHTML = `<div class="text-center py-12 text-slate-500"><i class="fa-regular fa-eye-slash"></i> No signals match.</div>`;
+            return;
+        }
+
+        let html = '';
+        pageItems.forEach(item => {
+            const rc = riskClass(item);
+            const riskHtml = rc ? `<span class="risk-pill-mini risk-${rc}"><i class="fa-solid fa-triangle-exclamation" style="font-size:7px"></i> ${riskLabel(rc)}${item.risk_score ? ` ${item.risk_score}/10` : ''}</span>` : '';
+            const tagsHtml = item.tags.slice(0, 3).map(t => `<span style="font-size:9px;background:rgba(255,255,255,0.05);padding:1px 6px;border-radius:3px;">${t}</span>`).join('');
+            const titleHigh = highlight(item.title, q);
+            const descHigh = highlight(item.desc, q);
+            html += `
+                <div class="signal-card-mini" data-uid="${item.uid}">
+                    <div class="flex gap-3">
+                        ${item.thumbnail ? `<img src="${item.thumbnail}" class="w-14 h-12 rounded-md object-cover border border-white/5" onerror="this.style.display='none'" loading="lazy">` : ''}
+                        <div class="flex-1 min-w-0">
+                            <div class="flex flex-wrap items-center gap-2 mb-1">
+                                <span class="badge-mini ${item.badgeClass}"><i class="fa-solid ${item.icon}" style="font-size:8px"></i> ${item.source_name}</span>
+                                ${riskHtml}
+                                <span class="text-[9px] text-slate-500 ml-auto">${fmtDate(item.date)}</span>
+                            </div>
+                            <h4 class="font-semibold text-sm text-white leading-tight mb-0.5">${titleHigh}</h4>
+                            <p class="text-xs text-slate-400 line-clamp-2">${descHigh}</p>
+                            ${tagsHtml ? `<div class="flex flex-wrap gap-1 mt-1.5">${tagsHtml}</div>` : ''}
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-slate-600 text-xs self-center"></i>
+                    </div>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+
+        // Attach click events
+        document.querySelectorAll('#omniFeed .signal-card-mini').forEach(card => {
+            card.addEventListener('click', () => {
+                const uid = card.dataset.uid;
+                const item = masterData.find(i => i.uid === uid);
+                if (item) showMiniModal(item);
+            });
+        });
+    }
+
+    function showMiniModal(item) {
+        const modalDiv = document.createElement('div');
+        modalDiv.className = 'fixed inset-0 z-[200] bg-black/70 backdrop-blur-sm flex justify-center items-center p-4';
+        modalDiv.onclick = (e) => { if(e.target === modalDiv) modalDiv.remove(); };
+        const rc = riskClass(item);
+        const riskHtml = rc ? `<span class="risk-pill-mini risk-${rc}"><i class="fa-solid fa-triangle-exclamation"></i> ${riskLabel(rc)}${item.risk_score ? ` ${item.risk_score}/10` : ''}</span>` : '';
+        const validUrls = item.urls.filter(u => u && u !== '#');
+        modalDiv.innerHTML = `
+            <div class="max-w-lg w-full rounded-xl overflow-hidden border border-white/10" style="background:#181c27;">
+                <div class="p-4 border-b border-white/10 flex justify-between items-start">
+                    <div>
+                        <div class="flex gap-2 mb-2 flex-wrap">
+                            <span class="badge-mini ${item.badgeClass}"><i class="fa-solid ${item.icon}"></i> ${item.source_name}</span>
+                            ${riskHtml}
+                        </div>
+                        <h3 class="text-lg font-bold text-white">${item.title}</h3>
+                        <div class="text-xs text-slate-500 mt-1">${item.location} · ${fmtDate(item.date)}</div>
+                    </div>
+                    <button class="text-slate-400 hover:text-white text-xl leading-5" onclick="this.closest('.fixed').remove()">×</button>
+                </div>
+                <div class="p-4 space-y-3 max-h-[60vh] overflow-y-auto">
+                    <p class="text-sm text-slate-300">${item.desc}</p>
+                    ${item.tags.length ? `<div class="flex flex-wrap gap-1">${item.tags.map(t => `<span class="text-[10px] bg-white/5 px-2 py-0.5 rounded">#${t}</span>`).join('')}</div>` : ''}
+                    ${validUrls.length ? `<div class="pt-2"><div class="text-[10px] text-slate-500 uppercase mb-1">Sources</div>${validUrls.map(u => `<a href="${u}" target="_blank" class="block text-xs text-blue-400 truncate hover:underline">${u}</a>`).join('')}</div>` : ''}
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modalDiv);
+    }
+
+    function changePage(delta) {
+        const totalPages = Math.ceil(filteredData.length / ITEMS_PER_PAGE);
+        let newPage = currentPage + delta;
+        if (newPage < 1) newPage = 1;
+        if (newPage > totalPages) newPage = totalPages;
+        if (newPage !== currentPage) {
+            currentPage = newPage;
+            renderFeed();
+            // Scroll feed ke atas
+            document.querySelector('.omni-mini-feed')?.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }
+
+    async function loadAllData() {
+        const results = await Promise.all(
+            SOURCES.map(src =>
+                fetch(src.url).then(r => r.json()).then(data => extractArray(data).map(item => normalizeItem(item, src)))
+                .catch(() => [])
+            )
+        );
+        masterData = results.flat().filter(i => i.title !== 'Untitled');
+        masterData.sort((a,b) => new Date(b.date) - new Date(a.date));
+        currentPage = 1;
+        renderFeed();
+    }
+
+    // Event listeners
+    document.querySelectorAll('.omni-mini-container .filter-chip').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.omni-mini-container .filter-chip').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            activeFilter = btn.dataset.filter;
+            currentPage = 1;
+            renderFeed();
+        });
+    });
+    document.getElementById('omniSearchInput')?.addEventListener('input', (e) => {
+        searchQuery = e.target.value;
+        currentPage = 1;
+        renderFeed();
+    });
+document.getElementById('prevPageBtn')?.addEventListener('click', () => changePage(-1));
+    document.getElementById('nextPageBtn')?.addEventListener('click', () => changePage(1));
+
+    // 1. HAPUS PEMANGGILAN OTOMATIS: loadAllData();
+    
+    // 2. TAMBAHKAN EVENT LISTENER UNTUK TOMBOL MANUAL
+    const btnLoadOmni = document.getElementById('btnLoadOmni');
+    if (btnLoadOmni) {
+        btnLoadOmni.addEventListener('click', function() {
+            // Tampilkan animasi loading saat tombol diklik
+            document.getElementById('omniFeed').innerHTML = `
+                <div class="text-center py-16 text-slate-400 flex flex-col items-center">
+                    <i class="fa-solid fa-satellite-dish fa-beat-fade text-3xl mb-4 text-teal-500"></i>
+                    <p class="text-sm">Connecting to external nodes...</p>
+                    <p class="text-xs text-slate-500 mt-1">Downloading and structuring data.</p>
+                </div>
+            `;
+            
+            // Panggil fungsi penarik data
+            loadAllData();
+        });
+    }
+
+})();
+</script>
 
 </body>
 </html>
