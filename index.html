@@ -81,6 +81,9 @@
             }
         }
     </script>
+
+    <!-- CSS PART -->
+
 <style>
         /* ─── Base & Glass Nav ──────────────────────────────── */
         .glass-nav {
@@ -413,6 +416,13 @@
       --slate: #64748b;
       --pink: #db2777;
     }
+
+    /* =========================
+       CUSTOM GRID SPANNING
+    ========================= */
+    .fs-span-full {
+      grid-column: 1 / -1; 
+    }
  
     .foresight-section * { box-sizing: border-box; }
  
@@ -462,18 +472,22 @@
     }
  
     /* Grid layout */
-    .fs-grid {
+    /* =========================
+    MAIN LAYOUT
+    ========================= */
+    .fs-grid{
       display: grid;
-      grid-template-columns: 1fr;
+      /* A tetap besar di kiri */
+      grid-template-columns: 1.35fr 1fr;
       gap: 1.5rem;
-      margin-bottom: 2.5rem;
-      max-width: 960px;
-      margin-left: auto;
-      margin-right: auto;
+      align-items: stretch; /* Agar kiri dan kanan tingginya sama */
+      width: 100%;
     }
- 
-    @media(min-width: 900px) {
-      .fs-grid { grid-template-columns: 7fr 5fr; }
+
+    @media (max-width: 750px){
+      .fs-grid{
+          grid-template-columns: 1fr;
+      }
     }
  
     .fs-card {
@@ -482,16 +496,19 @@
       border: 1px solid #e2e8f0;
       padding: 1.5rem;
       box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+      display: flex;
+      flex-direction: column;
     }
  
-    .fs-card-title {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 0.85rem;
+    /* =========================
+    TITLES
+    ========================= */
+    .fs-card-title{
+      font-size: 13px;
       font-weight: 700;
-      color: #334155;
-      margin-bottom: 1rem;
+      letter-spacing: 0.04em;
+      color: #0f172a;
+      margin-bottom: 0.85rem;
       font-family: 'Courier New', monospace;
     }
  
@@ -503,6 +520,7 @@
       border-radius: 0.75rem;
       overflow: hidden;
       aspect-ratio: 4/3;
+      width: 100%; /* PENTING: Mencegah matrix menyusut */
     }
  
     .matrix-quadrant {
@@ -576,13 +594,26 @@
       flex-shrink: 0;
     }
  
-    /* Bar chart */
-    .bar-wrap { margin-top: 0.5rem; }
+    /* Bar chart Layout baru untuk kolom C */
+    .bar-chart-container {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 2.5rem;
+      align-items: start;
+    }
+    @media (max-width: 768px) {
+      .bar-chart-container {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+    }
+
+    .bar-wrap { margin-top: 0; }
     .bar-row {
       display: flex;
       align-items: center;
       gap: 8px;
-      margin-bottom: 7px;
+      margin-bottom: 12px;
       font-size: 11px;
       color: #334155;
       font-family: 'Courier New', monospace;
@@ -607,6 +638,7 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 0.75rem;
+      height: 100%; /* Agar sejajar tingginya dengan matrix */
     }
  
     .rc {
@@ -614,12 +646,14 @@
       border-radius: 0.875rem;
       border: 1px solid #e2e8f0;
       padding: 1rem 1.1rem;
+      display: flex;
+      flex-direction: column;
     }
     .rc-head { display: flex; align-items: center; gap: 8px; margin-bottom: 0.5rem; }
     .rc-icon { font-size: 1.3rem; }
     .rc-label { font-size: 10px; font-family: 'Courier New', monospace; font-weight: 800; }
     .rc-sub { font-size: 9px; color: #94a3b8; }
-    .rc-body { font-size: 12px; line-height: 1.5; color: #475569; font-family: Georgia, serif; }
+    .rc-body { font-size: 12px; line-height: 1.5; color: #475569; font-family: Georgia, serif; flex-grow: 1; }
  
     /* Prose section */
     .fs-prose {
@@ -714,12 +748,12 @@
     .tl-meta { font-size: 10px; color: #94a3b8; font-family: 'Courier New', monospace; }
  
     /* Platform bar chart */
-    .platform-list { margin: 0.5rem 0; }
+    .platform-list { margin: 0; }
     .plt-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 4px 0;
+      padding: 6px 0;
       border-bottom: 1px dashed #f1f5f9;
       font-size: 11px;
       font-family: 'Courier New', monospace;
@@ -738,6 +772,11 @@
       padding: 0 6px;
     }
   </style>
+
+
+
+
+    <!-- CSS PART -->
 
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans antialiased selection:bg-teal-200 selection:text-teal-900">
@@ -1877,7 +1916,7 @@
     </div>
 
 <!-- ========== FORESIGHT REPORT SECTION ========== -->
-<div class="foresight-section" style="margin-top:4rem; border-top:1px solid #e2e8f0; padding-top:3rem; font-family:'Georgia', serif;">
+<div class="foresight-section w-full md:w-3/4 mx-auto" style="margin-top:4rem; border-top:1px solid #e2e8f0; padding-top:3rem; font-family:'Georgia', serif;">
  
   <!-- Header -->
   <div class="fs-title-block">
