@@ -310,7 +310,9 @@
                     <a href="#about" class="text-slate-600 hover:text-teal-600 text-sm font-medium transition-colors">About</a>
                     <a href="#features" class="text-slate-600 hover:text-teal-600 text-sm font-medium transition-colors">Features</a>
                     <a href="#guide" class="text-slate-600 hover:text-teal-600 text-sm font-medium transition-colors">Masterclass</a>
+                    <a href="#omni-radar-mini" class="text-slate-600 hover:text-teal-600 text-sm font-medium transition-colors">Omni Radar</a>
                     <a href="#faq" class="text-slate-600 hover:text-teal-600 text-sm font-medium transition-colors">FAQ</a>
+
 
                     <a href="blog.html" class="inline-flex items-center text-slate-700 hover:text-teal-600 text-sm font-bold transition-all px-3 py-2 rounded-lg hover:bg-slate-50">
                         <i class="ph ph-newspaper mr-1.5 text-lg"></i> Articles
@@ -1314,6 +1316,416 @@
             </article>
         </div>
     </section>
+
+    <!-- ========== OMNIRADAR MINI SECTION – GLOBAL SIGNALS INTELLIGENCE ========== -->
+<section class="py-16 bg-slate-50" id="omni-radar-mini">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-center">
+        <div class="w-3/4 min-w-[280px]">
+
+            <!-- Deskripsi widget -->
+        <div class="text-center mb-6">
+            <div class="inline-flex items-center gap-2 bg-white rounded-full px-4 py-1.5 shadow-sm border border-slate-200 mb-4">
+                <i class="ph-fill ph-satellite text-teal-500 text-sm"></i>
+                <span class="text-xs font-mono font-bold text-slate-500 tracking-wider uppercase">Multi-Engine Intelligence Feed</span>
+            </div>
+
+            <h2 class="text-2xl md:text-3xl font-extrabold text-navy-900 tracking-tight">
+                Omni‑Radar <span class="text-teal-600">Mini</span>
+            </h2>
+
+            <p class="text-slate-600 max-w-2xl mx-auto mt-3 text-sm leading-relaxed">
+                An integrated AI-OSINT portal aggregating signals from <strong>four specialized radar engines</strong>. 
+                Transforming decentralized grassroots innovation, environmental anomalies, cultural heritage, and illicit trade data into policy-ready intelligence.
+            </p>
+
+            <div class="flex flex-wrap justify-center gap-2 mt-5">
+                <a href="https://anggaconni.github.io/GSI-Radar/" target="_blank" 
+                class="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-50 border border-slate-200 rounded-md text-[10px] font-bold text-slate-600 hover:bg-teal-50 hover:border-teal-200 hover:text-teal-700 transition-all shadow-sm" title="Grassroots Innovation Monitoring">
+                    <i class="ph-bold ph-lightbulb"></i> GSI RADAR
+                </a>
+                <a href="https://anggaconni.github.io/Nexus-Radar/" target="_blank" 
+                class="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-50 border border-slate-200 rounded-md text-[10px] font-bold text-slate-600 hover:bg-teal-50 hover:border-teal-200 hover:text-teal-700 transition-all shadow-sm" title="Early Warning System">
+                    <i class="ph-bold ph-warning-circle"></i> NEXUS RADAR
+                </a>
+                <a href="https://anggaconni.github.io/ICH-Radar/" target="_blank" 
+                class="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-50 border border-slate-200 rounded-md text-[10px] font-bold text-slate-600 hover:bg-teal-50 hover:border-teal-200 hover:text-teal-700 transition-all shadow-sm" title="Cultural Intelligence">
+                    <i class="ph-bold ph-hands-praying"></i> ICH RADAR
+                </a>
+                <a href="https://anggaconni.github.io/artifact-radar/" target="_blank" 
+                class="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-50 border border-slate-200 rounded-md text-[10px] font-bold text-slate-600 hover:bg-teal-50 hover:border-teal-200 hover:text-teal-700 transition-all shadow-sm" title="Illicit Antiquities Detection">
+                    <i class="ph-bold ph-bank"></i> ARTIFACT RADAR
+                </a>
+            </div>
+
+            <p class="text-[10px] text-slate-400 mt-4 flex items-center justify-center gap-2">
+                <span class="flex h-1.5 w-1.5 rounded-full bg-teal-500 animate-pulse"></span>
+                Aggregated from live JSON feeds · Synchronized with parent OSINT engines
+            </p>
+        </div>
+
+            <!-- Widget Omni-Radar (lebar 100% di dalam container 75% parent) -->
+            <div class="omni-mini-container" style="width:100%; margin:0 auto;">
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-full bg-teal-500/10 border border-teal-500/20 flex items-center justify-center">
+                            <i class="fa-solid fa-satellite-dish text-teal-400 text-sm"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold tracking-tight" style="font-family:'Inter', monospace;">OMNI<span style="color:#0d9488">-RADAR</span> <span class="text-xs font-normal text-slate-500">mini</span></h3>
+                            <p class="text-[9px] text-slate-500 uppercase tracking-wider">Strategic signals feed</p>
+                        </div>
+                    </div>
+                    <a href="omni.html" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-bold transition-all" style="background: #0d9488; color: white;">
+                        <i class="fa-solid fa-chart-simple"></i> Full Omni‑Radar
+                    </a>
+                </div>
+
+                <!-- filter & search -->
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+                    <div class="flex flex-wrap gap-2">
+                        <button data-filter="all" class="filter-chip active">All</button>
+                        <button data-filter="ich" class="filter-chip"><span style="color:#e879a0">●</span> Culture</button>
+                        <button data-filter="sti" class="filter-chip"><span style="color:#38bdf8">●</span> Innovation</button>
+                        <button data-filter="nexus" class="filter-chip"><span style="color:#86efac">●</span> Nature</button>
+                        <button data-filter="artifact" class="filter-chip"><span style="color:#fbbf24">●</span> Artifact</button>
+                    </div>
+                    <div class="relative w-full sm:w-64">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+                        <input type="text" id="omniSearchInput" class="search-mini" placeholder="Search signals...">
+                    </div>
+                </div>
+
+                <!-- stat ringkas -->
+                <div class="flex flex-wrap gap-4 mb-5 text-xs">
+                    <div><span class="stat-number text-white" id="omniTotalCount">0</span> <span class="text-slate-500">total signals</span></div>
+                    <div><span class="stat-number" style="color:#f87171" id="omniHighRiskCount">0</span> <span class="text-slate-500">high risk</span></div>
+                    <div><span class="stat-number" style="color:#38bdf8" id="omniMappedCount">0</span> <span class="text-slate-500">geo‑tagged</span></div>
+                </div>
+
+                <!-- feed sinyal -->
+                <div id="omniFeed" class="omni-mini-feed space-y-3">
+                    <div class="text-center py-10 text-slate-500"><i class="fa-solid fa-circle-notch fa-spin mr-2"></i> Loading signals...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+/* Tambahan gaya khusus untuk widget di dalam section ini, menyesuaikan tema landing page */
+.omni-mini-container {
+    --omni-bg: #0f1117;
+    --omni-surface: #181c27;
+    --omni-surface2: #1f2435;
+    --omni-border: rgba(255,255,255,0.07);
+    --omni-border-bright: rgba(255,255,255,0.14);
+    --omni-text: #e2e8f0;
+    --omni-text-muted: #64748b;
+    --omni-ich: #e879a0;
+    --omni-sti: #38bdf8;
+    --omni-nexus: #86efac;
+    --omni-artifact: #fbbf24;
+    --omni-red: #f87171;
+}
+
+.omni-mini-container {
+    background: var(--omni-bg);
+    border-radius: 1.5rem;
+    padding: 1.5rem;
+    font-family: 'Inter', 'DM Sans', system-ui, sans-serif;
+    color: var(--omni-text);
+    border: 1px solid var(--omni-border);
+    box-shadow: 0 20px 35px -12px rgba(0,0,0,0.4);
+}
+
+.omni-mini-container .badge-mini {
+    font-size: 9px;
+    font-weight: 700;
+    font-family: 'Inter', monospace;
+    padding: 2px 7px;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+.omni-mini-container .badge-ich { background: rgba(232,121,160,0.15); color: var(--omni-ich); }
+.omni-mini-container .badge-sti { background: rgba(56,189,248,0.15); color: var(--omni-sti); }
+.omni-mini-container .badge-nexus { background: rgba(134,239,172,0.15); color: var(--omni-nexus); }
+.omni-mini-container .badge-artifact { background: rgba(251,191,36,0.15); color: var(--omni-artifact); }
+.omni-mini-container .risk-pill-mini {
+    font-size: 9px;
+    font-weight: 700;
+    font-family: 'Inter', monospace;
+    padding: 2px 7px;
+    border-radius: 20px;
+}
+.omni-mini-container .risk-high { background: rgba(248,113,113,0.15); color: var(--omni-red); }
+.omni-mini-container .risk-med { background: rgba(251,191,36,0.15); color: var(--omni-artifact); }
+.omni-mini-container .risk-low { background: rgba(134,239,172,0.15); color: var(--omni-nexus); }
+.omni-mini-container .signal-card-mini {
+    background: var(--omni-surface);
+    border: 1px solid var(--omni-border);
+    border-radius: 12px;
+    padding: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.omni-mini-container .signal-card-mini:hover {
+    border-color: var(--omni-border-bright);
+    transform: translateY(-1px);
+    background: var(--omni-surface2);
+}
+.omni-mini-container .search-mini {
+    background: var(--omni-surface2);
+    border: 1px solid var(--omni-border);
+    border-radius: 10px;
+    padding: 8px 12px 8px 34px;
+    font-size: 13px;
+    width: 100%;
+    color: var(--omni-text);
+}
+.omni-mini-container .search-mini:focus { outline: none; border-color: var(--omni-sti); }
+.omni-mini-container .filter-chip {
+    background: var(--omni-surface);
+    border: 1px solid var(--omni-border);
+    border-radius: 30px;
+    padding: 5px 12px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    color: var(--omni-text-muted);
+}
+.omni-mini-container .filter-chip.active {
+    background: var(--omni-sti);
+    border-color: var(--omni-sti);
+    color: #0f1117;
+}
+.omni-mini-container .stat-number {
+    font-family: 'Inter', monospace;
+    font-weight: 700;
+    font-size: 1.2rem;
+}
+.omni-mini-feed {
+    max-height: 500px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+.omni-mini-feed::-webkit-scrollbar { width: 4px; }
+.omni-mini-feed::-webkit-scrollbar-track { background: transparent; }
+.omni-mini-feed::-webkit-scrollbar-thumb { background: var(--omni-border-bright); border-radius: 10px; }
+</style>
+
+<!-- Font Awesome (jika belum ada) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<script>
+(function(){
+    // Sumber data (sama dengan omni.html)
+    const SOURCES = [
+        { id: 'ich',      name: 'Culture & ICH',   url: 'https://anggaconni.github.io/ICH-Radar/data.json',      color: '#e879a0', icon: 'fa-landmark', badgeClass: 'badge-ich'      },
+        { id: 'sti',      name: 'Innovation & STI', url: 'https://anggaconni.github.io/GSI-Radar/data.json',      color: '#38bdf8', icon: 'fa-microchip', badgeClass: 'badge-sti'      },
+        { id: 'nexus',    name: 'Nature & DRR',     url: 'https://anggaconni.github.io/Nexus-Radar/data.json',    color: '#86efac', icon: 'fa-leaf',       badgeClass: 'badge-nexus'    },
+        { id: 'artifact', name: 'Artifact Risk',    url: 'https://anggaconni.github.io/artifact-radar/data.json', color: '#fbbf24', icon: 'fa-gem',        badgeClass: 'badge-artifact' },
+    ];
+
+    let masterData = [];
+    let activeFilter = 'all';
+    let searchQuery = '';
+
+    function extractArray(data) {
+        if (Array.isArray(data)) return data;
+        for (let k of ['inventory', 'listings', 'data', 'items', 'results']) {
+            if (data[k] && Array.isArray(data[k])) return data[k];
+        }
+        return [];
+    }
+
+    function normalizeItem(item, src) {
+        const uid = Math.random().toString(36).slice(2);
+        let lat = null, lon = null;
+        const rawLat = item.lat ?? item.location?.lat ?? null;
+        const rawLon = item.lon ?? item.lng ?? item.location?.lon ?? item.location?.lng ?? null;
+        if (rawLat && rawLon) { lat = parseFloat(rawLat); lon = parseFloat(rawLon); }
+
+        let location = 'Global';
+        if (item.origin_region) location = item.origin_region;
+        else if (item.location?.region) location = item.location.region;
+        else if (item.location?.country) location = item.location.country;
+
+        let tags = item.tags || item.category || [];
+        if (item.resume_analisa?.gemini_tags) tags = item.resume_analisa.gemini_tags;
+        if (!Array.isArray(tags)) tags = [];
+
+        const title = item.title || item.element_name || item.original_title || 'Untitled';
+        const desc = item.summary || item.description || item.reason || item.resume_analisa?.description || 'No details.';
+        const date = item.timestamp || item.date || item.scraped_at || new Date().toISOString();
+        let urls = [];
+        if (item.source_urls) urls = item.source_urls;
+        else if (item.sources) urls = item.sources;
+        else if (item.source_url) urls = [item.source_url];
+        else if (item.url) urls = [item.url];
+
+        const risk_score = item.risk_score ?? item.risk_assessment?.risk_score ?? null;
+        const status = item.status || null;
+        const thumbnail = item.thumbnail_url || item.image_url || null;
+
+        return {
+            uid, id_source: src.id, source_name: src.name, color: src.color, icon: src.icon, badgeClass: src.badgeClass,
+            title, desc, urls, date, location, tags, risk_score, status, thumbnail,
+            lat, lon
+        };
+    }
+
+    function riskClass(item) {
+        const score = item.risk_score;
+        if (!score && !item.status) return null;
+        if (score >= 8 || item.status?.includes('HIGH')) return 'high';
+        if (score >= 5 || item.status?.includes('MEDIUM')) return 'med';
+        return 'low';
+    }
+
+    function riskLabel(rc) {
+        return rc === 'high' ? 'HIGH RISK' : rc === 'med' ? 'MEDIUM' : 'LOW';
+    }
+
+    function fmtDate(str) {
+        try {
+            let d = new Date(str);
+            if (isNaN(d)) return '—';
+            return d.toLocaleDateString('en-US', { day:'numeric', month:'short', year:'numeric' });
+        } catch { return '—'; }
+    }
+
+    function highlight(text, q) {
+        if (!q) return text;
+        let esc = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        return text.replace(new RegExp(`(${esc})`, 'gi'), '<mark style="background:#0d9488;color:white;border-radius:2px;">$1</mark>');
+    }
+
+    function renderFeed() {
+        const container = document.getElementById('omniFeed');
+        if (!container) return;
+        const q = searchQuery.trim().toLowerCase();
+        let data = masterData.filter(item => {
+            if (activeFilter !== 'all' && item.id_source !== activeFilter) return false;
+            if (!q) return true;
+            return item.title.toLowerCase().includes(q) || item.desc.toLowerCase().includes(q) ||
+                   item.location.toLowerCase().includes(q) || item.tags.some(t => t.toLowerCase().includes(q));
+        });
+
+        const total = data.length;
+        const highRiskCount = data.filter(i => riskClass(i) === 'high').length;
+        const mappedCount = data.filter(i => i.lat !== null && i.lon !== null).length;
+        document.getElementById('omniTotalCount').innerText = total;
+        document.getElementById('omniHighRiskCount').innerText = highRiskCount;
+        document.getElementById('omniMappedCount').innerText = mappedCount;
+
+        if (!data.length) {
+            container.innerHTML = `<div class="text-center py-12 text-slate-500"><i class="fa-regular fa-eye-slash"></i> No signals match.</div>`;
+            return;
+        }
+
+        let html = '';
+        data.slice(0, 80).forEach(item => {
+            const rc = riskClass(item);
+            const riskHtml = rc ? `<span class="risk-pill-mini risk-${rc}"><i class="fa-solid fa-triangle-exclamation" style="font-size:7px"></i> ${riskLabel(rc)}${item.risk_score ? ` ${item.risk_score}/10` : ''}</span>` : '';
+            const tagsHtml = item.tags.slice(0, 3).map(t => `<span style="font-size:9px;background:rgba(255,255,255,0.05);padding:1px 6px;border-radius:3px;">${t}</span>`).join('');
+            const titleHigh = highlight(item.title, q);
+            const descHigh = highlight(item.desc, q);
+            html += `
+                <div class="signal-card-mini" data-uid="${item.uid}">
+                    <div class="flex gap-3">
+                        ${item.thumbnail ? `<img src="${item.thumbnail}" class="w-14 h-12 rounded-md object-cover border border-white/5" onerror="this.style.display='none'" loading="lazy">` : ''}
+                        <div class="flex-1 min-w-0">
+                            <div class="flex flex-wrap items-center gap-2 mb-1">
+                                <span class="badge-mini ${item.badgeClass}"><i class="fa-solid ${item.icon}" style="font-size:8px"></i> ${item.source_name}</span>
+                                ${riskHtml}
+                                <span class="text-[9px] text-slate-500 ml-auto">${fmtDate(item.date)}</span>
+                            </div>
+                            <h4 class="font-semibold text-sm text-white leading-tight mb-0.5">${titleHigh}</h4>
+                            <p class="text-xs text-slate-400 line-clamp-2">${descHigh}</p>
+                            ${tagsHtml ? `<div class="flex flex-wrap gap-1 mt-1.5">${tagsHtml}</div>` : ''}
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-slate-600 text-xs self-center"></i>
+                    </div>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+        document.querySelectorAll('#omniFeed .signal-card-mini').forEach(card => {
+            card.addEventListener('click', () => {
+                const uid = card.dataset.uid;
+                const item = masterData.find(i => i.uid === uid);
+                if (item) showMiniModal(item);
+            });
+        });
+    }
+
+    function showMiniModal(item) {
+        const modalDiv = document.createElement('div');
+        modalDiv.className = 'fixed inset-0 z-[200] bg-black/70 backdrop-blur-sm flex justify-center items-center p-4';
+        modalDiv.onclick = (e) => { if(e.target === modalDiv) modalDiv.remove(); };
+        const rc = riskClass(item);
+        const riskHtml = rc ? `<span class="risk-pill-mini risk-${rc}"><i class="fa-solid fa-triangle-exclamation"></i> ${riskLabel(rc)}${item.risk_score ? ` ${item.risk_score}/10` : ''}</span>` : '';
+        const validUrls = item.urls.filter(u => u && u !== '#');
+        modalDiv.innerHTML = `
+            <div class="max-w-lg w-full rounded-xl overflow-hidden border border-white/10" style="background:#181c27;">
+                <div class="p-4 border-b border-white/10 flex justify-between items-start">
+                    <div>
+                        <div class="flex gap-2 mb-2 flex-wrap">
+                            <span class="badge-mini ${item.badgeClass}"><i class="fa-solid ${item.icon}"></i> ${item.source_name}</span>
+                            ${riskHtml}
+                        </div>
+                        <h3 class="text-lg font-bold text-white">${item.title}</h3>
+                        <div class="text-xs text-slate-500 mt-1">${item.location} · ${fmtDate(item.date)}</div>
+                    </div>
+                    <button class="text-slate-400 hover:text-white text-xl leading-5" onclick="this.closest('.fixed').remove()">×</button>
+                </div>
+                <div class="p-4 space-y-3 max-h-[60vh] overflow-y-auto">
+                    <p class="text-sm text-slate-300">${item.desc}</p>
+                    ${item.tags.length ? `<div class="flex flex-wrap gap-1">${item.tags.map(t => `<span class="text-[10px] bg-white/5 px-2 py-0.5 rounded">#${t}</span>`).join('')}</div>` : ''}
+                    ${validUrls.length ? `<div class="pt-2"><div class="text-[10px] text-slate-500 uppercase mb-1">Sources</div>${validUrls.map(u => `<a href="${u}" target="_blank" class="block text-xs text-blue-400 truncate hover:underline">${u}</a>`).join('')}</div>` : ''}
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modalDiv);
+    }
+
+    async function loadAllData() {
+        const results = await Promise.all(
+            SOURCES.map(src =>
+                fetch(src.url).then(r => r.json()).then(data => extractArray(data).map(item => normalizeItem(item, src)))
+                .catch(() => [])
+            )
+        );
+        masterData = results.flat().filter(i => i.title !== 'Untitled');
+        masterData.sort((a,b) => new Date(b.date) - new Date(a.date));
+        renderFeed();
+    }
+
+    // event listener filter & search
+    const filterBtns = document.querySelectorAll('.omni-mini-container .filter-chip');
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            filterBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            activeFilter = btn.dataset.filter;
+            renderFeed();
+        });
+    });
+    const searchInput = document.getElementById('omniSearchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            searchQuery = e.target.value;
+            renderFeed();
+        });
+    }
+    loadAllData();
+})();
+</script>
+<!-- ========== END OMNIRADAR MINI SECTION ========== -->
 
     <!-- ═══════════════════════════════════════════════════════
      FAQ (SEO-FRIENDLY)
