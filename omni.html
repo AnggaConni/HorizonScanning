@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Omni-Radar | Global Horizon Scanner</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg: #0f1117;
+            --surface: #181c27;
+            --surface2: #1f2435;
+            --border: rgba(255,255,255,0.07);
+            --border-bright: rgba(255,255,255,0.14);
+            --text: #e2e8f0;
+            --text-muted: #64748b;
+            --text-dim: #94a3b8;
+            --ich: #e879a0;
+            --sti: #38bdf8;
+            --nexus: #86efac;
+            --artifact: #fbbf24;
+            --red: #f87171;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        /* Subtle grid background */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+            background-size: 32px 32px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container { position: relative; z-index: 1; }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 99px; }
+
+        /* Card */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+
+        .card-hover {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .card-hover:hover {
+            border-color: var(--border-bright);
+            transform: translateY(-1px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+        }
+
+        /* Tabs */
+        .tab-btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-muted);
+            border: 1px solid transparent;
+            background: transparent;
+        }
+        .tab-btn.active {
+            background: var(--surface2);
+            color: var(--text);
+            border-color: var(--border-bright);
+        }
+        .tab-btn:not(.active):hover { color: var(--text-dim); }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: flex; flex-direction: column; }
+
+        /* Filter buttons */
+        .filter-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text-muted);
+            width: 100%;
+            text-align: left;
+        }
+        .filter-btn:hover { border-color: var(--border-bright); color: var(--text-dim); background: var(--surface2); }
+        .filter-btn.active { color: var(--text); background: var(--surface2); border-color: var(--border-bright); }
+        .filter-btn.active .dot { opacity: 1; }
+        .filter-btn .dot { width: 7px; height: 7px; border-radius: 50%; opacity: 0.4; transition: opacity 0.2s; flex-shrink: 0; }
+
+        /* Signal cards */
+        .signal-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px;
+            cursor: pointer;
+            transition: all 0.18s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .signal-card::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 3px;
+            border-radius: 3px 0 0 3px;
+        }
+        .signal-card.ich::before { background: var(--ich); }
+        .signal-card.sti::before { background: var(--sti); }
+        .signal-card.nexus::before { background: var(--nexus); }
+        .signal-card.artifact::before { background: var(--artifact); }
+        .signal-card:hover { border-color: var(--border-bright); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
+        .signal-card .thumbnail { width: 72px; height: 54px; border-radius: 6px; object-fit: cover; flex-shrink: 0; background: var(--surface2); border: 1px solid var(--border); }
+
+        /* Badge */
+        .badge {
+            font-size: 10px;
+            font-weight: 700;
+            font-family: 'Space Mono', monospace;
+            padding: 2px 7px;
+            border-radius: 4px;
+            letter-spacing: 0.04em;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .badge-ich { background: rgba(232, 121, 160, 0.15); color: var(--ich); }
+        .badge-sti { background: rgba(56, 189, 248, 0.15); color: var(--sti); }
+        .badge-nexus { background: rgba(134, 239, 172, 0.15); color: var(--nexus); }
+        .badge-artifact { background: rgba(251, 191, 36, 0.15); color: var(--artifact); }
+        .badge-risk-high { background: rgba(248, 113, 113, 0.15); color: var(--red); }
+        .badge-risk-med { background: rgba(251, 191, 36, 0.12); color: var(--artifact); }
+
+        /* Search */
+        .search-input {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            padding: 8px 12px 8px 34px;
+            font-size: 13px;
+            font-family: 'DM Sans', sans-serif;
+            width: 100%;
+            transition: border-color 0.2s;
+            outline: none;
+        }
+        .search-input:focus { border-color: var(--border-bright); }
+        .search-input::placeholder { color: var(--text-muted); }
+
+        /* Map */
+        #map { z-index: 10; width: 100%; height: 100%; filter: brightness(0.85) saturate(0.7); }
+        .leaflet-popup-content-wrapper { background: var(--surface2); color: var(--text); border: 1px solid var(--border-bright); border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .leaflet-popup-tip { background: var(--surface2); }
+        .leaflet-popup-content { margin: 12px 14px; }
+        .custom-div-icon { background: transparent; border: none; }
+        .pin-marker { width: 12px; height: 12px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.6); box-shadow: 0 0 6px currentColor; }
+
+        /* Radar animation */
+        .radar-pulse { animation: radar-anim 2.5s ease-out infinite; }
+        @keyframes radar-anim { 0% { transform: scale(1); opacity: 0.5; } 100% { transform: scale(3); opacity: 0; } }
+
+        /* Stat number */
+        .stat-num { font-family: 'Space Mono', monospace; font-weight: 700; }
+
+        /* Modal */
+        #signal-modal { transition: opacity 0.2s; }
+
+        /* Highlight for search */
+        mark { background: rgba(56, 189, 248, 0.25); color: inherit; border-radius: 2px; padding: 0 1px; }
+
+        /* Line clamp */
+        .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+        /* Mono text */
+        .mono { font-family: 'Space Mono', monospace; }
+
+        /* Risk score pill */
+        .risk-pill {
+            display: inline-flex; align-items: center; gap: 4px;
+            font-size: 10px; font-weight: 700; font-family: 'Space Mono', monospace;
+            padding: 2px 8px; border-radius: 99px;
+        }
+        .risk-high { background: rgba(248,113,113,0.15); color: #f87171; }
+        .risk-med { background: rgba(251,191,36,0.15); color: #fbbf24; }
+        .risk-low { background: rgba(134,239,172,0.15); color: #86efac; }
+
+        /* Scrollable feed */
+        #feed-container { overflow-y: auto; }
+    </style>
+</head>
+<body>
+<div class="container p-4 md:p-6 max-w-[1440px] mx-auto">
+
+    <!-- HEADER -->
+    <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 pb-5 border-b border-white/5">
+        <div class="flex items-center gap-4 mb-3 md:mb-0">
+            <div class="relative w-11 h-11 flex items-center justify-center rounded-full bg-blue-500/10 border border-blue-500/20">
+                <i class="fa-solid fa-satellite-dish text-blue-400 text-lg z-10"></i>
+                <div class="absolute inset-0 rounded-full border border-blue-400/30 radar-pulse"></div>
+            </div>
+            <div>
+                <h1 class="text-2xl font-bold tracking-tight mono">OMNI<span class="text-blue-400">-RADAR</span></h1>
+                <p class="text-[10px] text-slate-500 uppercase tracking-widest mono">Global Horizon Scanning System</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-6">
+            <div id="header-stats" class="flex gap-4 text-xs text-slate-500"></div>
+            <div class="text-right">
+                <div class="flex items-center justify-end gap-1.5 text-emerald-400 mono text-xs font-bold">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> LIVE
+                </div>
+                <div id="last-update" class="text-[10px] text-slate-600 mt-0.5 mono">Syncing…</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN GRID -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-5">
+
+        <!-- LEFT SIDEBAR -->
+        <div class="md:col-span-1 flex flex-col gap-4">
+
+            <!-- Search -->
+            <div class="relative">
+                <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs pointer-events-none"></i>
+                <input type="text" id="search-input" class="search-input" placeholder="Search signals…" oninput="handleSearch()">
+            </div>
+
+            <!-- Filters -->
+            <div class="card p-4 flex flex-col gap-2">
+                <p class="text-[10px] text-slate-500 uppercase tracking-widest mono mb-1">Signal Filter</p>
+
+                <button onclick="filterDashboard('all')" class="filter-btn active" data-filter="all">
+                    <span class="dot" style="background:#94a3b8"></span>
+                    <span>All Signals</span>
+                    <span class="ml-auto mono text-[10px]" id="cnt-all">—</span>
+                </button>
+                <button onclick="filterDashboard('ich')" class="filter-btn" data-filter="ich">
+                    <span class="dot" style="background:var(--ich)"></span>
+                    <i class="fa-solid fa-landmark text-[var(--ich)] w-3"></i> Culture & ICH
+                    <span class="ml-auto mono text-[10px]" id="cnt-ich">—</span>
+                </button>
+                <button onclick="filterDashboard('sti')" class="filter-btn" data-filter="sti">
+                    <span class="dot" style="background:var(--sti)"></span>
+                    <i class="fa-solid fa-microchip text-[var(--sti)] w-3"></i> Innovation & STI
+                    <span class="ml-auto mono text-[10px]" id="cnt-sti">—</span>
+                </button>
+                <button onclick="filterDashboard('nexus')" class="filter-btn" data-filter="nexus">
+                    <span class="dot" style="background:var(--nexus)"></span>
+                    <i class="fa-solid fa-leaf text-[var(--nexus)] w-3"></i> Nature & DRR
+                    <span class="ml-auto mono text-[10px]" id="cnt-nexus">—</span>
+                </button>
+                <button onclick="filterDashboard('artifact')" class="filter-btn" data-filter="artifact">
+                    <span class="dot" style="background:var(--artifact)"></span>
+                    <i class="fa-solid fa-gem text-[var(--artifact)] w-3"></i> Artifact Risk
+                    <span class="ml-auto mono text-[10px]" id="cnt-artifact">—</span>
+                </button>
+            </div>
+
+            <!-- Donut chart -->
+            <div class="card p-5">
+                <p class="text-[10px] text-slate-500 uppercase tracking-widest mono mb-3">Distribution</p>
+                <div class="relative aspect-square max-w-[160px] mx-auto">
+                    <canvas id="donutChart"></canvas>
+                    <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                        <div class="stat-num text-2xl text-white" id="count-total">—</div>
+                        <div class="text-[10px] text-slate-500 uppercase">Items</div>
+                    </div>
+                </div>
+                <div class="mt-4 grid grid-cols-2 gap-2">
+                    <div class="bg-[var(--surface2)] rounded-lg p-2.5 text-center">
+                        <div class="stat-num text-sm" id="stat-high-risk" style="color:var(--red)">—</div>
+                        <div class="text-[9px] text-slate-500 uppercase mono mt-0.5">High Risk</div>
+                    </div>
+                    <div class="bg-[var(--surface2)] rounded-lg p-2.5 text-center">
+                        <div class="stat-num text-sm" id="stat-mapped" style="color:var(--sti)">—</div>
+                        <div class="text-[9px] text-slate-500 uppercase mono mt-0.5">Mapped</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Legend -->
+            <div class="card p-4">
+                <p class="text-[10px] text-slate-500 uppercase tracking-widest mono mb-3">Risk Scale</p>
+                <div class="flex flex-col gap-2 text-xs">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-sm" style="background:var(--red)"></span>
+                        <span class="text-slate-400">Score 8–10 · High Risk</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-sm" style="background:var(--artifact)"></span>
+                        <span class="text-slate-400">Score 5–7 · Medium Risk</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-sm" style="background:var(--nexus)"></span>
+                        <span class="text-slate-400">Score 1–4 · Low Risk</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT MAIN PANEL -->
+        <div class="md:col-span-3 flex flex-col">
+
+            <!-- Tab nav -->
+            <div class="flex items-center gap-2 mb-3">
+                <button onclick="switchTab('feed')" id="tab-btn-feed" class="tab-btn active">
+                    <i class="fa-solid fa-stream mr-1.5"></i> Signal Stream
+                </button>
+                <button onclick="switchTab('map')" id="tab-btn-map" class="tab-btn">
+                    <i class="fa-solid fa-earth-americas mr-1.5"></i> Global Map
+                </button>
+                <div class="ml-auto text-[10px] text-slate-600 mono" id="results-count"></div>
+            </div>
+
+            <!-- Panel -->
+            <div class="card overflow-hidden" style="height: calc(100vh - 220px); min-height: 560px; display: flex; flex-direction: column;">
+
+                <!-- FEED TAB -->
+                <div id="tab-feed" class="tab-content active flex-1 overflow-hidden">
+                    <div id="feed-container" class="flex-1 p-4 space-y-3 overflow-y-auto">
+                        <div class="flex items-center justify-center h-40 text-slate-600">
+                            <i class="fa-solid fa-circle-notch fa-spin text-2xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MAP TAB -->
+                <div id="tab-map" class="tab-content flex-1 relative overflow-hidden">
+                    <div id="map" class="absolute inset-0"></div>
+                    <!-- Map legend overlay -->
+                    <div class="absolute bottom-4 right-4 z-20 card p-3 text-[10px] space-y-1.5">
+                        <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full border-2 border-white/50" style="background:var(--ich)"></span> Culture</div>
+                        <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full border-2 border-white/50" style="background:var(--sti)"></span> Innovation</div>
+                        <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full border-2 border-white/50" style="background:var(--nexus)"></span> Nature</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- DETAIL MODAL -->
+<div id="signal-modal" class="fixed inset-0 z-[100] hidden bg-black/70 backdrop-blur-sm flex justify-center items-center p-4">
+    <div class="w-full max-w-2xl max-h-[90vh] flex flex-col rounded-2xl overflow-hidden border border-white/10" style="background:var(--surface);">
+        <!-- Modal header -->
+        <div class="p-5 border-b border-white/5" style="background:var(--surface2);">
+            <div class="flex justify-between items-start gap-4">
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 mb-2 flex-wrap">
+                        <span id="modal-badge" class="badge"></span>
+                        <span id="modal-risk-badge" class=""></span>
+                        <span id="modal-location-badge" class="text-[10px] text-slate-500 mono flex items-center gap-1">
+                            <i class="fa-solid fa-map-marker-alt"></i> <span id="modal-location"></span>
+                        </span>
+                    </div>
+                    <h2 id="modal-title" class="text-lg font-bold text-white leading-snug"></h2>
+                    <div class="flex items-center gap-4 mt-2 text-[10px] text-slate-500 mono">
+                        <span id="modal-date"></span>
+                        <span id="modal-platform"></span>
+                    </div>
+                </div>
+                <button onclick="closeModal()" class="w-8 h-8 rounded-full flex items-center justify-center text-slate-500 hover:text-white hover:bg-white/10 transition flex-shrink-0">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Modal thumbnail (optional) -->
+        <div id="modal-thumb-wrap" class="hidden">
+            <img id="modal-thumb" src="" alt="" class="w-full h-40 object-cover" onerror="this.parentElement.classList.add('hidden')">
+        </div>
+
+        <!-- Modal body -->
+        <div id="modal-body" class="flex-1 overflow-y-auto p-5 text-sm space-y-5"></div>
+    </div>
+</div>
+
+<script>
+// ─── SOURCE CONFIG ────────────────────────────────────────────────────────────
+const SOURCES = [
+    { id: 'ich',      name: 'Culture & ICH',   url: 'https://anggaconni.github.io/ICH-Radar/data.json',      color: '#e879a0', icon: 'fa-landmark',  badgeClass: 'badge-ich'      },
+    { id: 'sti',      name: 'Innovation & STI', url: 'https://anggaconni.github.io/GSI-Radar/data.json',      color: '#38bdf8', icon: 'fa-microchip', badgeClass: 'badge-sti'      },
+    { id: 'nexus',    name: 'Nature & DRR',     url: 'https://anggaconni.github.io/Nexus-Radar/data.json',    color: '#86efac', icon: 'fa-leaf',       badgeClass: 'badge-nexus'    },
+    { id: 'artifact', name: 'Artifact Risk',    url: 'https://anggaconni.github.io/artifact-radar/data.json', color: '#fbbf24', icon: 'fa-gem',        badgeClass: 'badge-artifact' },
+];
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+let masterData = [];
+let filteredData = [];
+let activeFilter = 'all';
+let searchQuery = '';
+let chartInstance = null;
+let mapInstance = null;
+let mapMarkers = null;
+
+// ─── EXTRACT ARRAY FROM ANY JSON SHAPE ───────────────────────────────────────
+function extractArray(data) {
+    if (Array.isArray(data)) return data;
+    for (const key of ['inventory', 'listings', 'data', 'items', 'results']) {
+        if (data[key] && Array.isArray(data[key])) return data[key];
+    }
+    return [];
+}
+
+// ─── NORMALIZE ITEM ───────────────────────────────────────────────────────────
+function normalize(item, src) {
+    const uid = Math.random().toString(36).slice(2, 11);
+
+    // ── Coordinates (handle .lon AND .lng, both root and nested) ──
+    const rawLat = item.lat ?? item.location?.lat ?? null;
+    const rawLon = item.lon ?? item.lng ?? item.location?.lon ?? item.location?.lng ?? null;
+    const lat = rawLat !== null && rawLat !== undefined ? parseFloat(rawLat) : null;
+    const lon = rawLon !== null && rawLon !== undefined ? parseFloat(rawLon) : null;
+
+    // ── Location label ──
+    let locStr = 'Global';
+    const loc = item.location || {};
+    if (item.origin_region) locStr = item.origin_region;
+    else if (loc.region && loc.country) locStr = `${loc.region}, ${loc.country}`;
+    else if (loc.region) locStr = loc.region;
+    else if (loc.country) locStr = loc.country;
+
+    // ── Tags / categories ──
+    let tags = item.tags || item.domain_classification || item.category || item.categories || [];
+    if (item.resume_analisa?.gemini_tags) tags = item.resume_analisa.gemini_tags;
+    if (typeof tags === 'string') tags = [tags];
+    if (!Array.isArray(tags)) tags = [];
+
+    // ── Title ──
+    const title = item.title || item.element_name || item.original_title || 'Untitled';
+
+    // ── Description ──
+    const desc = item.summary
+        || item.description
+        || item.reason
+        || item.resume_analisa?.description
+        || 'No details available.';
+
+    // ── Date ──
+    const date = item.timestamp || item.date || item.scraped_at || new Date().toISOString();
+
+    // ── Source URLs (handle source_urls array, sources array, source_url string, url string) ──
+    let urls = [];
+    if (Array.isArray(item.source_urls) && item.source_urls.length) urls = item.source_urls;
+    else if (Array.isArray(item.sources) && item.sources.length) urls = item.sources;
+    else if (item.source_url) urls = [item.source_url];
+    else if (item.url) urls = [item.url];
+    else if (item.link) urls = [item.link];
+
+    // ── Risk ──
+    const risk_score = item.risk_score ?? item.risk_assessment?.risk_score ?? null;
+    const status = item.status || null;
+    const priority_score = item.priority_score ?? null;
+
+    // ── Thumbnails ──
+    const thumbnail = item.thumbnail_url || item.screenshot_url || item.image_url || null;
+
+    // ── Platform (artifacts) ──
+    const platform = item.platform || null;
+
+    return {
+        uid, id_source: src.id, source_name: src.name,
+        color: src.color, icon: src.icon, badgeClass: src.badgeClass,
+        title, desc, urls, date, location: locStr, tags, status,
+        risk_score, priority_score, platform, thumbnail,
+        lat: isNaN(lat) ? null : lat,
+        lon: isNaN(lon) ? null : lon,
+        raw: item,
+    };
+}
+
+// ─── RISK HELPERS ─────────────────────────────────────────────────────────────
+function riskClass(score, status) {
+    if (!score && !status) return null;
+    const s = score ?? 0;
+    const isHigh = s >= 8 || (status && status.includes('HIGH'));
+    const isMed  = s >= 5 || (status && status.includes('MEDIUM'));
+    return isHigh ? 'high' : isMed ? 'med' : 'low';
+}
+
+function riskLabel(rc) {
+    return rc === 'high' ? 'HIGH RISK' : rc === 'med' ? 'MEDIUM' : 'LOW';
+}
+
+function riskColor(rc) {
+    return rc === 'high' ? 'var(--red)' : rc === 'med' ? 'var(--artifact)' : 'var(--nexus)';
+}
+
+// ─── FORMAT DATE ──────────────────────────────────────────────────────────────
+function fmtDate(str, short = false) {
+    try {
+        const d = new Date(str);
+        if (isNaN(d)) return '—';
+        return d.toLocaleDateString('en-US', short
+            ? { day: 'numeric', month: 'short' }
+            : { day: 'numeric', month: 'long', year: 'numeric' });
+    } catch { return '—'; }
+}
+
+// ─── SEARCH HIGHLIGHT ─────────────────────────────────────────────────────────
+function highlight(text, q) {
+    if (!q) return text;
+    const esc = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return text.replace(new RegExp(`(${esc})`, 'gi'), '<mark>$1</mark>');
+}
+
+// ─── TABS ─────────────────────────────────────────────────────────────────────
+window.switchTab = function(tabId) {
+    ['feed', 'map'].forEach(t => {
+        document.getElementById(`tab-${t}`).classList.toggle('active', t === tabId);
+        document.getElementById(`tab-btn-${t}`).classList.toggle('active', t === tabId);
+    });
+    if (tabId === 'map' && mapInstance) setTimeout(() => mapInstance.invalidateSize(), 100);
+};
+
+// ─── MAP INIT ─────────────────────────────────────────────────────────────────
+function initMap() {
+    if (mapInstance) return;
+    mapInstance = L.map('map', { zoomControl: false }).setView([20, 0], 2);
+    L.control.zoom({ position: 'topright' }).addTo(mapInstance);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; OSM &copy; CARTO', subdomains: 'abcd', maxZoom: 20
+    }).addTo(mapInstance);
+    mapMarkers = L.featureGroup().addTo(mapInstance);
+}
+
+// ─── RENDER MAP ───────────────────────────────────────────────────────────────
+function renderMap(data) {
+    if (!mapMarkers) return;
+    mapMarkers.clearLayers();
+    let hasMarkers = false;
+
+    data.forEach(item => {
+        if (item.lat !== null && item.lon !== null && !isNaN(item.lat) && !isNaN(item.lon)) {
+            hasMarkers = true;
+            const icon = L.divIcon({
+                className: 'custom-div-icon',
+                html: `<div class="pin-marker" style="background:${item.color};box-shadow:0 0 8px ${item.color}80;"></div>`,
+                iconSize: [12, 12], iconAnchor: [6, 6]
+            });
+            const marker = L.marker([item.lat, item.lon], { icon });
+            const rc = riskClass(item.risk_score, item.status);
+            marker.bindPopup(`
+                <div style="min-width:180px;font-family:DM Sans,sans-serif;">
+                    <p style="font-size:9px;font-weight:700;color:${item.color};letter-spacing:.05em;margin:0 0 4px">${item.source_name.toUpperCase()}</p>
+                    <p style="font-size:12px;font-weight:700;color:#e2e8f0;margin:0 0 8px;line-height:1.4">${item.title}</p>
+                    ${rc ? `<p style="font-size:9px;color:${riskColor(rc)};margin:0 0 8px;font-weight:700">⚠ ${riskLabel(rc)}${item.risk_score ? ` · ${item.risk_score}/10` : ''}</p>` : ''}
+                    <button onclick="openModal('${item.uid}')" style="font-size:11px;background:#38bdf8;color:#0f1117;border:none;padding:5px 10px;border-radius:6px;cursor:pointer;font-weight:700;width:100%">View Details</button>
+                </div>
+            `);
+            mapMarkers.addLayer(marker);
+        }
+    });
+
+    if (hasMarkers) {
+        try { mapInstance.fitBounds(mapMarkers.getBounds(), { padding: [40, 40], maxZoom: 5 }); }
+        catch { mapInstance.setView([20, 0], 2); }
+    } else {
+        mapInstance.setView([20, 0], 2);
+    }
+}
+
+// ─── RENDER FEED ──────────────────────────────────────────────────────────────
+function renderFeed(data) {
+    const container = document.getElementById('feed-container');
+    container.innerHTML = '';
+
+    if (!data.length) {
+        container.innerHTML = `<div class="flex flex-col items-center justify-center h-40 gap-3 text-slate-600">
+            <i class="fa-solid fa-ghost text-3xl"></i><p class="text-sm">No signals found.</p></div>`;
+        return;
+    }
+
+    const q = searchQuery.trim().toLowerCase();
+
+    data.slice(0, 250).forEach(item => {
+        const rc = riskClass(item.risk_score, item.status);
+        const hasThumbnail = item.thumbnail && item.thumbnail !== '';
+
+        const tagsHtml = item.tags.slice(0, 3).map(t =>
+            `<span style="font-size:9px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);color:#94a3b8;padding:1px 6px;border-radius:3px;">${t}</span>`
+        ).join('');
+
+        const riskHtml = rc
+            ? `<span class="risk-pill risk-${rc}"><i class="fa-solid fa-triangle-exclamation" style="font-size:8px"></i> ${riskLabel(rc)}${item.risk_score ? ` ${item.risk_score}/10` : ''}</span>`
+            : '';
+
+        const mappedHtml = (item.lat !== null)
+            ? `<span style="font-size:9px;color:#86efac;display:inline-flex;align-items:center;gap:3px"><i class="fa-solid fa-location-crosshairs" style="font-size:8px"></i> mapped</span>`
+            : '';
+
+        const platformHtml = item.platform
+            ? `<span style="font-size:9px;color:#64748b;font-family:'Space Mono',monospace">${item.platform}</span>`
+            : '';
+
+        const titleHighlighted = highlight(item.title, q);
+        const descHighlighted  = highlight(item.desc,  q);
+
+        const card = document.createElement('div');
+        card.className = `signal-card ${item.id_source}`;
+        card.onclick = () => openModal(item.uid);
+
+        card.innerHTML = `
+            <div class="flex gap-3">
+                ${hasThumbnail ? `<img src="${item.thumbnail}" class="thumbnail" alt="" onerror="this.style.display='none'">` : ''}
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 mb-1.5 flex-wrap">
+                        <span class="badge ${item.badgeClass}"><i class="fa-solid ${item.icon}" style="font-size:8px"></i> ${item.source_name}</span>
+                        ${riskHtml}
+                        ${mappedHtml}
+                        ${platformHtml}
+                        <span style="margin-left:auto;font-size:9px;color:#475569;font-family:'Space Mono',monospace">${fmtDate(item.date, true)}</span>
+                    </div>
+                    <h3 class="font-semibold text-sm text-white leading-snug mb-1">${titleHighlighted}</h3>
+                    <p class="line-clamp-2 text-xs" style="color:#64748b">${descHighlighted}</p>
+                    ${tagsHtml ? `<div class="flex gap-1 mt-2 flex-wrap">${tagsHtml}</div>` : ''}
+                </div>
+                <i class="fa-solid fa-chevron-right text-slate-700 text-xs self-center flex-shrink-0"></i>
+            </div>
+        `;
+        container.appendChild(card);
+    });
+}
+
+// ─── FILTER + SEARCH ──────────────────────────────────────────────────────────
+window.filterDashboard = function(sourceId) {
+    activeFilter = sourceId;
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.filter === sourceId);
+    });
+    applyFilters();
+};
+
+window.handleSearch = function() {
+    searchQuery = document.getElementById('search-input').value;
+    applyFilters();
+};
+
+function applyFilters() {
+    const q = searchQuery.trim().toLowerCase();
+
+    filteredData = masterData.filter(item => {
+        if (activeFilter !== 'all' && item.id_source !== activeFilter) return false;
+        if (!q) return true;
+        return (
+            item.title.toLowerCase().includes(q) ||
+            item.desc.toLowerCase().includes(q)  ||
+            item.location.toLowerCase().includes(q) ||
+            item.tags.some(t => t.toLowerCase().includes(q))
+        );
+    });
+
+    document.getElementById('results-count').textContent =
+        `${filteredData.length} signal${filteredData.length !== 1 ? 's' : ''}`;
+
+    renderFeed(filteredData);
+    renderMap(filteredData);
+}
+
+// ─── CHART ────────────────────────────────────────────────────────────────────
+function renderChart(counts) {
+    const ctx = document.getElementById('donutChart').getContext('2d');
+    if (chartInstance) chartInstance.destroy();
+    chartInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Culture', 'Innovation', 'Nature', 'Artifact'],
+            datasets: [{
+                data: [counts.ich, counts.sti, counts.nexus, counts.artifact],
+                backgroundColor: ['#e879a0', '#38bdf8', '#86efac', '#fbbf24'],
+                borderWidth: 2,
+                borderColor: '#181c27',
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            cutout: '72%',
+            plugins: { legend: { display: false }, tooltip: {
+                callbacks: {
+                    label: ctx => ` ${ctx.label}: ${ctx.raw}`
+                }
+            }}
+        }
+    });
+}
+
+// ─── MODAL ────────────────────────────────────────────────────────────────────
+window.openModal = function(uid) {
+    const item = masterData.find(d => d.uid === uid);
+    if (!item) return;
+    const raw = item.raw;
+    const rc  = riskClass(item.risk_score, item.status);
+
+    // Header
+    const badge = document.getElementById('modal-badge');
+    badge.className = `badge ${item.badgeClass}`;
+    badge.innerHTML = `<i class="fa-solid ${item.icon}" style="font-size:9px"></i> ${item.source_name}`;
+
+    const riskBadge = document.getElementById('modal-risk-badge');
+    if (rc) {
+        riskBadge.className = `risk-pill risk-${rc}`;
+        riskBadge.innerHTML = `<i class="fa-solid fa-triangle-exclamation" style="font-size:9px"></i> ${riskLabel(rc)}${item.risk_score ? ` · ${item.risk_score}/10` : ''}`;
+    } else {
+        riskBadge.className = '';
+        riskBadge.innerHTML = '';
+    }
+
+    document.getElementById('modal-title').textContent = item.title;
+    document.getElementById('modal-location').textContent = item.location;
+    document.getElementById('modal-date').textContent = fmtDate(item.date);
+    document.getElementById('modal-platform').textContent = item.platform ? `@ ${item.platform}` : '';
+
+    // Thumbnail
+    const thumbWrap = document.getElementById('modal-thumb-wrap');
+    const thumb = document.getElementById('modal-thumb');
+    if (item.thumbnail) {
+        thumb.src = item.thumbnail;
+        thumbWrap.classList.remove('hidden');
+    } else {
+        thumbWrap.classList.add('hidden');
+    }
+
+    // Body
+    let body = '';
+
+    // Description
+    body += `<div style="background:var(--surface2);border-radius:8px;padding:14px;border:1px solid var(--border);">
+        <p style="color:#94a3b8;font-size:13px;line-height:1.7;">${item.desc}</p>
+    </div>`;
+
+    // Risk assessment
+    const riskObj = raw.risk_assessment || null;
+    if (rc || riskObj) {
+        const riskType = riskObj?.risk_type ? (Array.isArray(riskObj.risk_type) ? riskObj.risk_type.join(', ') : riskObj.risk_type) : item.status || 'General';
+        const riskExp  = raw.reason || riskObj?.explanation || '';
+        const severity = riskObj?.severity_level || (rc === 'high' ? 'High' : rc === 'med' ? 'Medium' : 'Low');
+        const c = riskColor(rc);
+        body += `
+        <div>
+            <div class="section-title" style="font-size:10px;font-weight:700;letter-spacing:.08em;color:#475569;text-transform:uppercase;margin-bottom:8px;font-family:'Space Mono',monospace;">⚠ Risk Analysis</div>
+            <div style="background:rgba(248,113,113,0.06);border:1px solid rgba(248,113,113,0.15);border-radius:8px;padding:12px;">
+                <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+                    <span style="font-size:10px;font-weight:700;color:${c};background:rgba(255,255,255,0.05);padding:2px 8px;border-radius:4px;">${severity.toUpperCase()}</span>
+                    <span style="font-size:10px;color:#64748b;">${riskType}</span>
+                    ${item.priority_score ? `<span style="font-size:10px;color:#94a3b8;margin-left:auto">Priority: <strong style="color:${c}">${item.priority_score}</strong></span>` : ''}
+                </div>
+                ${riskExp ? `<p style="font-size:12px;color:#94a3b8;line-height:1.6;margin:0;">${riskExp}</p>` : ''}
+            </div>
+        </div>`;
+    }
+
+    // Artifact specifics
+    if (item.id_source === 'artifact' && raw.price_usd !== undefined) {
+        body += `
+        <div>
+            <div style="font-size:10px;font-weight:700;letter-spacing:.08em;color:#475569;text-transform:uppercase;margin-bottom:8px;font-family:'Space Mono',monospace;">Listing Details</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                ${raw.price_usd !== undefined && raw.price_usd !== null ? `<div style="background:var(--surface2);border-radius:6px;padding:10px;border:1px solid var(--border)"><p style="font-size:9px;color:#475569;text-transform:uppercase;margin:0 0 2px">Price (USD)</p><p style="font-size:14px;font-weight:700;color:#fbbf24;margin:0;font-family:'Space Mono',monospace">$${Number(raw.price_usd).toLocaleString()}</p></div>` : ''}
+                ${raw.platform ? `<div style="background:var(--surface2);border-radius:6px;padding:10px;border:1px solid var(--border)"><p style="font-size:9px;color:#475569;text-transform:uppercase;margin:0 0 2px">Platform</p><p style="font-size:12px;font-weight:600;color:#e2e8f0;margin:0;">${raw.platform}</p></div>` : ''}
+                ${raw.provenance_flag !== undefined ? `<div style="background:var(--surface2);border-radius:6px;padding:10px;border:1px solid var(--border)"><p style="font-size:9px;color:#475569;text-transform:uppercase;margin:0 0 2px">Provenance</p><p style="font-size:12px;font-weight:600;color:${raw.provenance_flag ? '#86efac' : '#f87171'};margin:0;">${raw.provenance_flag ? 'Documented' : 'Missing'}</p></div>` : ''}
+                ${raw.keyword_trigger ? `<div style="background:var(--surface2);border-radius:6px;padding:10px;border:1px solid var(--border)"><p style="font-size:9px;color:#475569;text-transform:uppercase;margin:0 0 2px">Trigger</p><p style="font-size:11px;color:#94a3b8;margin:0;">${raw.keyword_trigger}</p></div>` : ''}
+            </div>
+        </div>`;
+    }
+
+    // STI: Process
+    if (raw.process) {
+        if (raw.process.how_it_works) body += `
+        <div>
+            <div style="font-size:10px;font-weight:700;letter-spacing:.08em;color:#475569;text-transform:uppercase;margin-bottom:8px;font-family:'Space Mono',monospace;"><i class="fa-solid fa-gears"></i> How It Works</div>
+            <p style="font-size:12px;color:#94a3b8;line-height:1.7;margin:0;">${raw.process.how_it_works}</p>
+        </div>`;
+
+        if (Array.isArray(raw.process.step_by_step) && raw.process.step_by_step.length) body += `
+        <div>
+            <div style="font-size:10px;font-weight:700;letter-spacing:.08em;color:#475569;text-transform:uppercase;margin-bottom:8px;font-family:'Space Mono',monospace;"><i class="fa-solid fa-list-ol"></i> Steps</div>
+            <ol style="margin:0;padding-left:16px;display:flex;flex-direction:column;gap:4px;">
+                ${raw.process.step_by_step.map(s => `<li style="font-size:12px;color:#94a3b8;line-height:1.6;">${s}</li>`).join('')}
+            </ol>
+        </div>`;
+
+        if (Array.isArray(raw.process.materials_used) && raw.process.materials_used.length) body += `
+        <div>
+            <div style="font-size:10px;font-weight:700;letter-spacing:.08em;color:#475569;text-transform:uppercase;margin-bottom:8px;font-family:'Space Mono',monospace;"><i class="fa-solid fa-toolbox"></i> Materials</div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;">
+                ${raw.process.materials_used.map(m => `<span style="font-size:11px;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:#64748b;padding:2px 8px;border-radius:4px;">${m}</span>`).join('')}
+            </div>
+        </div>`;
+    }
+
+    // Nexus: manifestation & impact
+    if (raw.manifestation?.key_indicators?.length) body += `
+    <div>
+        <div style="font-size:10px;font-weight:700;letter-spacing:.08em;color:#475569;text-transform:uppercase;margin-bottom:8px;font-family:'Space Mono',monospace;"><i class="fa-solid fa-microscope"></i> Key Indicators</div>
+        <ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px;">
+            ${raw.manifestation.key_indicators.map(i => `<li style="font-size:12px;color:#94a3b8;display:flex;gap:6px;align-items:flex-start"><span style="color:#86efac;flex-shrink:0;margin-top:3px;">›</span>${i}</li>`).join('')}
+        </ul>
+    </div>`;
+
+    if (raw.potential_impact?.affected_elements?.length) body += `
+    <div>
+        <div style="font-size:10px;font-weight:700;letter-spacing:.08em;color:#475569;text-transform:uppercase;margin-bottom:8px;font-family:'Space Mono',monospace;"><i class="fa-solid fa-bullseye"></i> Affected Elements</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;">
+            ${raw.potential_impact.affected_elements.map(e => `<span style="font-size:11px;background:rgba(134,239,172,0.07);border:1px solid rgba(134,239,172,0.15);color:#86efac;padding:2px 8px;border-radius:4px;">${e}</span>`).join('')}
+        </div>
+    </div>`;
+
+    if (raw.escalation) body += `
+    <div style="display:flex;gap:8px;">
+        ${raw.escalation.speed ? `<div style="background:var(--surface2);border-radius:6px;padding:10px 14px;border:1px solid var(--border);flex:1;text-align:center"><p style="font-size:9px;color:#475569;text-transform:uppercase;margin:0 0 2px;font-family:'Space Mono',monospace">Escalation Speed</p><p style="font-size:13px;font-weight:700;color:#e2e8f0;margin:0;text-transform:capitalize">${raw.escalation.speed}</p></div>` : ''}
+        ${raw.escalation.urgency ? `<div style="background:var(--surface2);border-radius:6px;padding:10px 14px;border:1px solid var(--border);flex:1;text-align:center"><p style="font-size:9px;color:#475569;text-transform:uppercase;margin:0 0 2px;font-family:'Space Mono',monospace">Urgency</p><p style="font-size:13px;font-weight:700;color:${raw.escalation.urgency === 'high' ? 'var(--red)' : 'var(--artifact)'};margin:0;text-transform:capitalize">${raw.escalation.urgency}</p></div>` : ''}
+    </div>`;
+
+    // ICH: cultural significance
+    if (raw.resume_analisa?.cultural_significance) body += `
+    <div>
+        <div style="font-size:10px;font-weight:700;letter-spacing:.08em;color:#475569;text-transform:uppercase;margin-bottom:8px;font-family:'Space Mono',monospace;"><i class="fa-solid fa-book-open"></i> Cultural Significance</div>
+        <p style="font-size:12px;color:#94a3b8;line-height:1.7;margin:0;">${raw.resume_analisa.cultural_significance}</p>
+    </div>`;
+
+    if (raw.resume_tata_cara?.step_by_step?.length) body += `
+    <div>
+        <div style="font-size:10px;font-weight:700;letter-spacing:.08em;color:#475569;text-transform:uppercase;margin-bottom:8px;font-family:'Space Mono',monospace;"><i class="fa-solid fa-hands-holding-circle"></i> Practice & Procedure</div>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+            ${raw.resume_tata_cara.step_by_step.map(s => `<div style="font-size:11px;color:#94a3b8;line-height:1.6;display:flex;gap:6px;"><span style="color:#e879a0;flex-shrink:0;">›</span>${s}</div>`).join('')}
+        </div>
+    </div>`;
+
+    // Impact (STI)
+    if (raw.impact?.problem_solved) body += `
+    <div>
+        <div style="font-size:10px;font-weight:700;letter-spacing:.08em;color:#475569;text-transform:uppercase;margin-bottom:8px;font-family:'Space Mono',monospace;"><i class="fa-solid fa-bolt"></i> Problem Solved</div>
+        <div style="background:var(--surface2);border-radius:8px;padding:12px;border:1px solid var(--border);">
+            <p style="font-size:12px;color:#94a3b8;margin:0;line-height:1.6;">${raw.impact.problem_solved}</p>
+            ${raw.impact.scale ? `<span style="font-size:9px;font-weight:700;color:#38bdf8;margin-top:8px;display:inline-block;background:rgba(56,189,248,0.1);padding:2px 8px;border-radius:4px;">Scale: ${raw.impact.scale.toUpperCase()}</span>` : ''}
+        </div>
+    </div>`;
+
+    // Tags
+    if (item.tags.length) body += `
+    <div style="display:flex;flex-wrap:wrap;gap:5px;">
+        ${item.tags.map(t => `<span style="font-size:9px;font-weight:700;font-family:'Space Mono',monospace;background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.15);color:#38bdf8;padding:2px 8px;border-radius:4px;">#${t}</span>`).join('')}
+    </div>`;
+
+    // Sources / Links
+    const validUrls = item.urls.filter(u => u && u !== '#');
+    if (validUrls.length) body += `
+    <div style="border-top:1px solid var(--border);padding-top:14px;">
+        <div style="font-size:10px;font-weight:700;letter-spacing:.08em;color:#475569;text-transform:uppercase;margin-bottom:8px;font-family:'Space Mono',monospace;"><i class="fa-solid fa-link"></i> Sources</div>
+        <p style="font-size:9px;color:#334155;margin:0 0 8px;font-style:italic;">Vertex AI Grounding links may require authentication.</p>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+            ${validUrls.map(u => `<a href="${u}" target="_blank" style="font-size:11px;color:#38bdf8;text-decoration:none;background:rgba(56,189,248,0.05);border:1px solid rgba(56,189,248,0.1);padding:6px 10px;border-radius:6px;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;transition:background 0.15s" onmouseover="this.style.background='rgba(56,189,248,0.12)'" onmouseout="this.style.background='rgba(56,189,248,0.05)'"><i class="fa-solid fa-arrow-up-right-from-square" style="font-size:9px;margin-right:4px"></i>${u}</a>`).join('')}
+        </div>
+    </div>`;
+
+    document.getElementById('modal-body').innerHTML = body;
+    document.getElementById('signal-modal').classList.remove('hidden');
+};
+
+window.closeModal = function() {
+    document.getElementById('signal-modal').classList.add('hidden');
+};
+
+document.getElementById('signal-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+});
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+async function initDashboard() {
+    initMap();
+
+    const results = await Promise.all(
+        SOURCES.map(src =>
+            fetch(src.url)
+                .then(r => r.json())
+                .then(data => extractArray(data).map(item => normalize(item, src)))
+                .catch(err => { console.warn(`[${src.name}] fetch failed:`, err); return []; })
+        )
+    );
+
+    const [ichData, stiData, nexusData, artifactData] = results;
+    const counts = { ich: ichData.length, sti: stiData.length, nexus: nexusData.length, artifact: artifactData.length };
+
+    masterData = results.flat().filter(i => i.title !== 'Untitled');
+    masterData.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    // Update sidebar counts
+    const total = masterData.length;
+    document.getElementById('count-total').textContent = total;
+    document.getElementById('cnt-all').textContent      = total;
+    document.getElementById('cnt-ich').textContent      = counts.ich;
+    document.getElementById('cnt-sti').textContent      = counts.sti;
+    document.getElementById('cnt-nexus').textContent    = counts.nexus;
+    document.getElementById('cnt-artifact').textContent = counts.artifact;
+
+    // Stats
+    const highRisk = masterData.filter(i => riskClass(i.risk_score, i.status) === 'high').length;
+    const mapped   = masterData.filter(i => i.lat !== null && i.lon !== null).length;
+    document.getElementById('stat-high-risk').textContent = highRisk;
+    document.getElementById('stat-mapped').textContent    = mapped;
+
+    // Header stats
+    document.getElementById('header-stats').innerHTML = `
+        <span><span class="mono text-white">${total}</span> signals</span>
+        <span><span class="mono" style="color:var(--red)">${highRisk}</span> high-risk</span>
+        <span><span class="mono" style="color:var(--sti)">${mapped}</span> mapped</span>
+    `;
+
+    document.getElementById('last-update').textContent = `Updated ${new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}`;
+
+    renderChart(counts);
+    applyFilters(); // renders feed + map
+}
+
+document.addEventListener('DOMContentLoaded', initDashboard);
+</script>
+</body>
+</html>
