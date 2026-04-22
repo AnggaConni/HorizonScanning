@@ -1,0 +1,760 @@
+import { useState, useEffect } from "react";
+import {
+  Globe, BarChart3, Calculator, Navigation, AlertTriangle,
+  Clock, DollarSign, Shield, TrendingUp, Radio, RefreshCw,
+  Zap, CheckCircle, Map, Truck, FileText, Activity,
+  Route, ChevronRight, Package
+} from "lucide-react";
+
+// ══════════════════════════════════════════════════════
+// STATIC DATA
+// ══════════════════════════════════════════════════════
+
+const SCENARIOS = [
+  {
+    id: "red-sea",
+    chipClass: "bg-rose-100 text-rose-800",
+    activeBorder: "border-rose-400",
+    activeBg: "bg-rose-50",
+    activeTitle: "text-rose-800",
+    accentBar: "bg-rose-600",
+    title: "Red Sea / Houthi Crisis",
+    period: "2024–2025",
+    headline: "95% of container ships globally rerouted — largest maritime disruption since Suez 1956",
+    summary: "Houthi rebel attacks on commercial shipping in the Bab-el-Mandeb strait caused virtually every major carrier to abandon the Suez Canal route. An STD-TSP engine fed by UKMTO and Lloyd's signals recommended Cape of Good Hope routing 72 hours before the first major attack confirmed.",
+    routeA: {
+      label: "Via Red Sea + Suez Canal",
+      badge: "Standard Pre-Crisis",
+      note: "[R] = 30% attack probability × 60-day expected loss equivalent",
+      latency: { d: 14, t: 2, i: 1, b: 1, r: 18 },
+    },
+    routeB: {
+      label: "Via Cape of Good Hope",
+      badge: "Horizon-Scan Optimized",
+      note: "+14 physical days, but R=0. Total L(x) drops from 36 to 29.",
+      latency: { d: 28, t: 1, i: 0, b: 0, r: 0 },
+    },
+    signals: [
+      { level: "medium",   source: "UKMTO",               text: "Maritime Security Advisory issued for Gulf of Aden corridor" },
+      { level: "high",     source: "Lloyd's of London",    text: "Red Sea war-risk insurance premium surges +0.7% — highest since 2005" },
+      { level: "critical", source: "Houthi Media Office",  text: "Expanded 'military operations zone' now includes northern Red Sea" },
+      { level: "medium",   source: "AIS Satellite Data",   text: "Anomalous vessel deviation patterns detected in Bab-el-Mandeb" },
+      { level: "critical", source: "Reuters / AP",         text: "MSC + Maersk announce immediate suspension of all Red Sea transits" },
+    ],
+    stats: [
+      { label: "Ships Rerouted", value: "~95%",   sub: "of global container traffic", Icon: Package },
+      { label: "Extra Days",     value: "+10–14",  sub: "per voyage via Cape",         Icon: Clock },
+      { label: "Extra Fuel",     value: ">$1M",    sub: "per voyage",                  Icon: DollarSign },
+      { label: "Insurance",      value: "+600%",   sub: "war-risk premium spike",      Icon: Shield },
+    ],
+  },
+  {
+    id: "hormuz",
+    chipClass: "bg-amber-100 text-amber-800",
+    activeBorder: "border-amber-400",
+    activeBg: "bg-amber-50",
+    activeTitle: "text-amber-900",
+    accentBar: "bg-amber-500",
+    title: "Strait of Hormuz",
+    period: "Persistent Risk 2019–Present",
+    headline: "20% of world's oil and 30% of global LNG passes through a 21-mile bottleneck",
+    summary: "Iran periodically threatens to close the Strait of Hormuz. Saudi Aramco's East-West Pipeline (5M bpd capacity) provides the only viable strategic bypass via Yanbu. Horizon Scanning on IRGC naval exercise announcements gives a 72-hour routing window before closure risk peaks.",
+    routeA: {
+      label: "Through Strait of Hormuz",
+      badge: "Direct Route",
+      note: "[R] = 25% closure probability × 70-day impact equivalent = 18 days",
+      latency: { d: 3, t: 1, i: 0, b: 2, r: 18 },
+    },
+    routeB: {
+      label: "Aramco E-W Pipeline + Yanbu",
+      badge: "Strategic Bypass",
+      note: "7 days longer physically. R drops to zero — total L(x) drops from 24 to 13.",
+      latency: { d: 10, t: 1, i: 1, b: 1, r: 0 },
+    },
+    signals: [
+      { level: "medium",   source: "IRGC State Media",    text: "Naval exercise announced in Strait of Hormuz — 7 warships deployed" },
+      { level: "high",     source: "US 5th Fleet",         text: "USS Abraham Lincoln carrier group repositioned to Persian Gulf entrance" },
+      { level: "critical", source: "IRGC Commander",      text: "Explicit closure threat issued if new US sanctions enacted" },
+      { level: "medium",   source: "S&P Global Platts",   text: "Brent crude futures spike 4.2% on Hormuz closure fears" },
+      { level: "high",     source: "IMO Bulletin",        text: "Tanker operators advised of heightened seizure and interdiction risk" },
+    ],
+    stats: [
+      { label: "Oil Transits",   value: "20%",    sub: "of global daily flow",   Icon: TrendingUp },
+      { label: "LNG Transits",   value: "30%",    sub: "of global LNG",          Icon: Zap },
+      { label: "Pipeline Cap.",  value: "5M bpd", sub: "Aramco bypass capacity", Icon: Route },
+      { label: "Bypass Adds",    value: "+7–10d", sub: "via pipeline + Yanbu",   Icon: Clock },
+    ],
+  },
+  {
+    id: "panama",
+    chipClass: "bg-blue-100 text-blue-800",
+    activeBorder: "border-blue-400",
+    activeBg: "bg-blue-50",
+    activeTitle: "text-blue-900",
+    accentBar: "bg-blue-600",
+    title: "Panama Canal Drought",
+    period: "Q4 2023 — Q1 2024",
+    headline: "El Niño cut daily transits 36% — 160 vessels queued for 21+ days",
+    summary: "Historic drought dropped Gatun Lake below minimum operating levels. Daily transits fell from 36 to 18. Shippers with 90-day Horizon Scan capability pre-booked Suez Canal slots using NOAA El Niño forecasts and avoided the queue entirely.",
+    routeA: {
+      label: "Panama Canal (Direct)",
+      badge: "Drought-Hit Route",
+      note: "[T] = 21-day queue wait — not traffic, but systemic capacity bottleneck",
+      latency: { d: 14, t: 21, i: 3, b: 4, r: 0 },
+    },
+    routeB: {
+      label: "All-Water via Suez Canal",
+      badge: "Pre-Booked Bypass",
+      note: "Pre-booked 90 days ahead using NOAA El Niño signal. L(x) drops from 42 to 29.",
+      latency: { d: 28, t: 0, i: 0, b: 1, r: 0 },
+    },
+    signals: [
+      { level: "medium",   source: "NOAA",               text: "Strong El Niño declared — Panama rainfall 40% below 30-year average" },
+      { level: "medium",   source: "ACP Authority",      text: "Gatun Lake falls 0.3m below critical threshold for canal operations" },
+      { level: "high",     source: "Panama Canal Auth.", text: "Daily transit slots reduced from 36 to 24 — effective in two weeks" },
+      { level: "critical", source: "Panama Canal Auth.", text: "Further reduction to 18 transits/day. Booking waitlist: 8 weeks" },
+      { level: "critical", source: "Marine Traffic",    text: "Queue reaches 160 vessels. Average wait time: 21 days and rising" },
+    ],
+    stats: [
+      { label: "Transit Cut",  value: "−36%",  sub: "from 36 to 18 per day",  Icon: TrendingUp },
+      { label: "Queue Peak",   value: "160",    sub: "vessels waiting",         Icon: Package },
+      { label: "Wait Time",    value: "21+ d",  sub: "average queue time",      Icon: Clock },
+      { label: "Revenue Lost", value: "$200M+", sub: "canal authority",         Icon: DollarSign },
+    ],
+  },
+  {
+    id: "indonesia",
+    chipClass: "bg-emerald-100 text-emerald-800",
+    activeBorder: "border-emerald-400",
+    activeBg: "bg-emerald-50",
+    activeTitle: "text-emerald-900",
+    accentBar: "bg-emerald-600",
+    title: "Indonesia MSME: Gayo Coffee",
+    period: "Live Case — Aceh to Rotterdam",
+    headline: "Bureaucratic audit converts a 3-day domestic leg into a 45-day cash-flow crisis",
+    summary: "A Gayo specialty coffee MSME faces a surprise inter-ministerial customs audit at Belawan Port. The STD-TSP engine detects the DGCE bulletin 5 days early and reroutes cargo via the Penang Bridge corridor into Port Klang — bypassing the audit and delivering 33 days ahead of schedule.",
+    routeA: {
+      label: "Belawan Port (Direct)",
+      badge: "Standard MSME Route",
+      note: "[B] = 30-day bureaucratic audit — completely invisible to standard routing",
+      latency: { d: 3, t: 7, i: 5, b: 30, r: 0 },
+    },
+    routeB: {
+      label: "Truck → Penang → Port Klang",
+      badge: "Friction-Optimized Bypass",
+      note: "+2 days distance, −33 days friction. Total L(x): 9d vs 45d.",
+      latency: { d: 5, t: 1, i: 1, b: 2, r: 0 },
+    },
+    signals: [
+      { level: "medium", source: "DGCE Bulletin",     text: "Inter-ministerial customs compliance audit announced at Belawan Port" },
+      { level: "high",   source: "BMKG Weather API",  text: "Tropical depression: N. Sumatra provincial roads structurally degraded" },
+      { level: "medium", source: "Pelindo NLE",        text: "Average container dwell time at Belawan rises to 8.5 hours — 3-year high" },
+      { level: "low",    source: "Local Gov. Feed",    text: "Regional ceremony on primary access road to Belawan industrial zone" },
+      { level: "high",   source: "STD-TSP Engine",    text: "Reroute confirmed: L(x)=9d via Penang vs L(x)=45d via Belawan" },
+    ],
+    stats: [
+      { label: "Days Saved",      value: "33 days", sub: "vs standard route",       Icon: Clock },
+      { label: "Cost Avoided",    value: "$4,950",  sub: "$150/day × 33 days",      Icon: DollarSign },
+      { label: "Efficiency Gain", value: "+275%",   sub: "frictional improvement",  Icon: TrendingUp },
+      { label: "Cash Flow",       value: "Intact",  sub: "buyer contract honored",  Icon: CheckCircle },
+    ],
+  },
+];
+
+const VAR_META = [
+  { key: "d", short: "D", name: "Distance",        bar: "bg-blue-500",   text: "text-blue-700",   hex: "#3b82f6", max: 20 },
+  { key: "t", short: "T", name: "Traffic / Wait",  bar: "bg-amber-400",  text: "text-amber-700",  hex: "#f59e0b", max: 20 },
+  { key: "i", short: "I", name: "Infrastructure",  bar: "bg-orange-500", text: "text-orange-700", hex: "#f97316", max: 20 },
+  { key: "b", short: "B", name: "Bureaucracy",     bar: "bg-purple-500", text: "text-purple-700", hex: "#a855f7", max: 50 },
+  { key: "r", short: "R", name: "Risk Exposure",   bar: "bg-rose-600",   text: "text-rose-700",   hex: "#e11d48", max: 30 },
+];
+
+const SIG_CLS = {
+  critical: { wrap: "bg-rose-50 border border-rose-200",   dot: "bg-rose-500",   badge: "bg-rose-100 text-rose-800" },
+  high:     { wrap: "bg-amber-50 border border-amber-200", dot: "bg-amber-500",  badge: "bg-amber-100 text-amber-800" },
+  medium:   { wrap: "bg-blue-50 border border-blue-200",   dot: "bg-blue-400",   badge: "bg-blue-100 text-blue-800" },
+  low:      { wrap: "bg-slate-50 border border-slate-200", dot: "bg-slate-400",  badge: "bg-slate-100 text-slate-600" },
+};
+
+const totalL = (lat) => (lat.d||0)+(lat.t||0)+(lat.i||0)+(lat.b||0)+(lat.r||0);
+
+// ══════════════════════════════════════════════════════
+// APP ROOT
+// ══════════════════════════════════════════════════════
+
+export default function App() {
+  const [tab, setTab] = useState("scenarios");
+  return (
+    <div className="min-h-screen bg-slate-50 font-sans text-slate-800">
+      <style>{`
+        @keyframes sigFade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+        .sig-in{animation:sigFade 0.35s ease forwards}
+        @keyframes pulseRing{0%,100%{opacity:1}50%{opacity:0.4}}
+        .pulse-dot{animation:pulseRing 1.4s ease-in-out infinite}
+      `}</style>
+      <div className="bg-white border-b border-slate-200 sticky top-0 z-20">
+        <div className="max-w-6xl mx-auto px-4 md:px-6 py-3 flex flex-col sm:flex-row items-start sm:items-center gap-3 justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 bg-indigo-600 rounded-xl flex items-center justify-center shrink-0">
+              <Navigation size={18} className="text-white" />
+            </div>
+            <div>
+              <p className="text-sm font-extrabold text-slate-900 leading-tight">Trade Algorithm Simulator</p>
+              <p className="text-xs text-slate-400 leading-tight">STD-TSP × Horizon Scanning</p>
+            </div>
+          </div>
+          <div className="flex bg-slate-100 p-1 rounded-xl gap-0.5">
+            {[["scenarios","Scenarios",Globe],["simulation","Simulation",BarChart3],["calculator","Calculator",Calculator]].map(([id,label,Icon])=>(
+              <button key={id} onClick={()=>setTab(id)}
+                className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold transition-all ${tab===id?"bg-white text-indigo-600 shadow-sm":"text-slate-500 hover:text-slate-700"}`}>
+                <Icon size={13}/>{label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+      <div className="max-w-6xl mx-auto px-4 md:px-6 py-6 md:py-8 space-y-6">
+        {tab==="scenarios"&&<ScenariosTab/>}
+        {tab==="simulation"&&<SimulationTab/>}
+        {tab==="calculator"&&<CalculatorTab/>}
+      </div>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════
+// TAB 1: SCENARIOS
+// ══════════════════════════════════════════════════════
+
+function ScenariosTab() {
+  const [idx, setIdx] = useState(0);
+  const [vis, setVis] = useState(0);
+  const [scanning, setScanning] = useState(false);
+  const sc = SCENARIOS[idx];
+
+  const changeScenario = (i) => { setIdx(i); setVis(0); setScanning(false); };
+  const runScan = () => { setVis(0); setScanning(true); };
+
+  useEffect(() => {
+    if (!scanning) return;
+    if (vis >= sc.signals.length) { setScanning(false); return; }
+    const t = setTimeout(() => setVis(v => v+1), 720);
+    return () => clearTimeout(t);
+  }, [scanning, vis, sc.signals.length]);
+
+  const totA = totalL(sc.routeA.latency);
+  const totB = totalL(sc.routeB.latency);
+  const maxL = Math.max(totA, totB, 1);
+  const saved = totA - totB;
+
+  return (
+    <div className="space-y-5">
+      {/* Scenario Selector */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {SCENARIOS.map((s,i) => (
+          <button key={s.id} onClick={() => changeScenario(i)}
+            className={`text-left p-4 rounded-2xl border-2 transition-all hover:shadow-md ${
+              i===idx ? `${s.activeBorder} ${s.activeBg} shadow-sm` : "border-slate-200 bg-white"
+            }`}>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">{s.period}</p>
+            <p className={`text-sm font-bold leading-tight ${i===idx ? s.activeTitle : "text-slate-700"}`}>{s.title}</p>
+          </button>
+        ))}
+      </div>
+
+      {/* Headline banner */}
+      <div className="bg-white border border-slate-200 rounded-2xl p-5 md:p-6">
+        <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold mb-3 ${sc.chipClass}`}>
+          <Radio size={11}/> LIVE CASE
+        </div>
+        <p className="text-lg md:text-xl font-extrabold text-slate-900 leading-snug mb-2">{sc.headline}</p>
+        <p className="text-sm text-slate-500 leading-relaxed">{sc.summary}</p>
+      </div>
+
+      {/* Route Comparison */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <RoutePanel route={sc.routeA} label="Route A — The Trap" isWinner={saved<0} maxL={maxL} isA={true} />
+        <RoutePanel route={sc.routeB} label="Route B — Optimized" isWinner={saved>0} maxL={maxL} isA={false} />
+      </div>
+
+      {/* Verdict strip */}
+      {saved !== 0 && (
+        <div className={`rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-4 ${
+          saved > 0 ? "bg-emerald-50 border border-emerald-200" : "bg-rose-50 border border-rose-200"
+        }`}>
+          <div className="flex items-center gap-3">
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${saved>0?"bg-emerald-600":"bg-rose-600"}`}>
+              {saved>0 ? <CheckCircle size={20} className="text-white"/> : <AlertTriangle size={20} className="text-white"/>}
+            </div>
+            <div>
+              <p className={`text-sm font-extrabold ${saved>0?"text-emerald-900":"text-rose-900"}`}>
+                {saved>0 ? `Route B saves ${saved} day-equivalents of frictional latency` : `Route A is ${Math.abs(saved)} days faster — no risk asymmetry`}
+              </p>
+              <p className="text-xs text-slate-500 mt-0.5">
+                L(A) = {totA}d  ·  L(B) = {totB}d  ·  Δ = {Math.abs(saved)} days
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-xl border border-slate-200 text-xs font-mono font-bold text-slate-700">
+            L(x) = D + T + I + B + R
+          </div>
+        </div>
+      )}
+
+      {/* Stats grid */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {sc.stats.map((st, i) => (
+          <div key={i} className="bg-white border border-slate-200 rounded-2xl p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <st.Icon size={14} className="text-slate-400"/>
+              <p className="text-xs text-slate-500 font-medium">{st.label}</p>
+            </div>
+            <p className="text-2xl font-extrabold text-slate-900 font-mono leading-none">{st.value}</p>
+            <p className="text-xs text-slate-400 mt-1">{st.sub}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Horizon Scan Feed */}
+      <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 bg-indigo-100 rounded-lg flex items-center justify-center">
+              <Radio size={14} className="text-indigo-600"/>
+            </div>
+            <div>
+              <p className="text-sm font-bold text-slate-900">Horizon Scan Feed</p>
+              <p className="text-xs text-slate-400">Weak signal intelligence — {sc.signals.length} signals detected</p>
+            </div>
+          </div>
+          <button onClick={runScan} disabled={scanning}
+            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-xs font-bold rounded-xl transition-all">
+            {scanning ? <RefreshCw size={13} className="animate-spin"/> : <Zap size={13}/>}
+            {scanning ? "Scanning..." : "Run Scan"}
+          </button>
+        </div>
+        <div className="p-4 space-y-2.5">
+          {vis === 0 && !scanning && (
+            <div className="text-center py-8 text-slate-400">
+              <Radio size={28} className="mx-auto mb-2 opacity-30"/>
+              <p className="text-sm">Press Run Scan to simulate signal detection</p>
+            </div>
+          )}
+          {sc.signals.slice(0, vis).map((sig, i) => {
+            const cls = SIG_CLS[sig.level];
+            return (
+              <div key={`${idx}-${i}`} className={`sig-in flex items-start gap-3 p-3 rounded-xl ${cls.wrap}`}>
+                <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 pulse-dot ${cls.dot}`}/>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap mb-1">
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${cls.badge}`}>{sig.level.toUpperCase()}</span>
+                    <span className="text-xs font-bold text-slate-700">{sig.source}</span>
+                  </div>
+                  <p className="text-xs text-slate-600 leading-relaxed">{sig.text}</p>
+                </div>
+                <ChevronRight size={13} className="text-slate-300 shrink-0 mt-1"/>
+              </div>
+            );
+          })}
+          {scanning && vis < sc.signals.length && (
+            <div className="flex items-center gap-2 px-3 py-2 text-xs text-indigo-600 font-medium">
+              <div className="w-2 h-2 bg-indigo-500 rounded-full pulse-dot"/>
+              Scanning signal sources...
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function RoutePanel({ route, label, isWinner, maxL, isA }) {
+  const tot = totalL(route.latency);
+  const activeVars = VAR_META.filter(v => (route.latency[v.key]||0) > 0);
+  return (
+    <div className={`bg-white border-2 rounded-2xl overflow-hidden ${isWinner ? "border-emerald-400" : "border-slate-200"}`}>
+      <div className={`px-5 py-3 flex items-center justify-between ${isWinner ? "bg-emerald-50" : "bg-rose-50"}`}>
+        <div>
+          <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">{label}</p>
+          <p className="text-sm font-bold text-slate-800 mt-0.5">{route.label}</p>
+        </div>
+        <div className={`text-right`}>
+          <p className={`text-3xl font-extrabold font-mono ${isWinner ? "text-emerald-600" : "text-rose-600"}`}>{tot}</p>
+          <p className="text-xs text-slate-400">day-equiv.</p>
+        </div>
+      </div>
+      <div className="p-5 space-y-4">
+        {/* Stacked bar */}
+        <div className="h-8 w-full bg-slate-100 rounded-xl overflow-hidden flex border border-slate-200">
+          {VAR_META.map(v => {
+            const val = route.latency[v.key]||0;
+            if (!val) return null;
+            const pct = (val / maxL) * 100;
+            return (
+              <div key={v.key} style={{width:`${pct}%`}} title={`${v.name}: ${val}d`}
+                className={`${v.bar} hover:brightness-110 transition-all cursor-pointer relative flex items-center justify-center`}>
+                {pct > 8 && <span className="text-white text-[10px] font-bold">{val}</span>}
+              </div>
+            );
+          })}
+        </div>
+        {/* Variable breakdown */}
+        <div className="space-y-1.5">
+          {activeVars.map(v => {
+            const val = route.latency[v.key]||0;
+            return (
+              <div key={v.key} className="flex items-center gap-2 text-xs">
+                <div className={`w-2 h-2 rounded-sm shrink-0 ${v.bar}`}/>
+                <span className="text-slate-500 w-24 shrink-0">[{v.short}] {v.name}</span>
+                <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                  <div className={`h-full rounded-full ${v.bar}`} style={{width:`${(val/tot)*100}%`}}/>
+                </div>
+                <span className="font-mono font-bold text-slate-700 w-6 text-right">{val}d</span>
+              </div>
+            );
+          })}
+        </div>
+        <p className="text-xs text-slate-400 italic border-t border-slate-100 pt-3">{route.note}</p>
+        <div className={`flex items-center gap-2 text-xs font-bold px-3 py-2 rounded-xl ${
+          isWinner ? "bg-emerald-50 text-emerald-700" : "bg-slate-50 text-slate-500"
+        }`}>
+          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full border" style={{borderColor: isWinner?"#34d399":"#e2e8f0"}}>
+            {route.badge}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════
+// TAB 2: SIMULATION
+// ══════════════════════════════════════════════════════
+
+function SimulationTab() {
+  const [rA, setRA] = useState({ d:3, t:7, i:5, b:30, r:0 });
+  const [rB, setRB] = useState({ d:5, t:1, i:1, b:2,  r:0 });
+  const tA = totalL(rA), tB = totalL(rB);
+  const maxT = Math.max(tA, tB, 1);
+  const saved = tA - tB;
+  const upA = (k,v) => setRA(p=>({...p,[k]:parseInt(v)||0}));
+  const upB = (k,v) => setRB(p=>({...p,[k]:parseInt(v)||0}));
+
+  return (
+    <div className="space-y-5">
+      {/* Equation header */}
+      <div className="bg-indigo-600 rounded-2xl p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div>
+          <p className="text-indigo-200 text-xs font-bold uppercase tracking-widest mb-1">Frictional Latency Equation</p>
+          <p className="text-white font-mono text-2xl font-extrabold tracking-wider">L(x) = D + T + I + B + R</p>
+          <p className="text-indigo-300 text-xs mt-1.5 leading-relaxed">
+            Adjust any variable below. Route B wins when its total L(x) is lower — even if D is higher.
+          </p>
+        </div>
+        <div className="shrink-0 bg-indigo-700 rounded-xl p-4 text-center">
+          <p className="text-indigo-200 text-xs mb-1">Day-Equiv. Saved</p>
+          <p className={`text-3xl font-extrabold font-mono ${saved>0?"text-emerald-300":saved<0?"text-rose-300":"text-white"}`}>
+            {saved>0?"+":""}{saved}
+          </p>
+          <p className="text-indigo-300 text-xs mt-0.5">{saved>0?"Route B wins":saved<0?"Route A wins":"Tied"}</p>
+        </div>
+      </div>
+
+      {/* Route map SVG */}
+      <div className="bg-white border border-slate-200 rounded-2xl p-5">
+        <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Abstract Route Map</p>
+        <RouteMapSVG tA={tA} tB={tB} latA={rA} latB={rB} />
+      </div>
+
+      {/* Main panels */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        <SimPanel label="Route A" emoji="⚠️" total={tA} maxT={maxT} lat={rA} updater={upA} isWinner={tA<tB} />
+        <SimPanel label="Route B" emoji="✓" total={tB} maxT={maxT} lat={rB} updater={upB} isWinner={tB<tA} />
+      </div>
+
+      {/* Legend */}
+      <div className="flex flex-wrap gap-4 justify-center text-xs text-slate-600 py-2">
+        {VAR_META.map(v => (
+          <div key={v.key} className="flex items-center gap-1.5">
+            <div className={`w-3 h-3 rounded-sm ${v.bar}`}/>
+            <span>[{v.short}] {v.name}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function RouteMapSVG({ tA, tB, latA, latB }) {
+  const maxAll = Math.max(tA, tB, 1);
+  const wA = Math.round((tA / maxAll) * 420);
+  const wB = Math.round((tB / maxAll) * 420);
+  return (
+    <svg viewBox="0 0 620 140" className="w-full h-auto" aria-label="Abstract route map comparing Route A and Route B total latency">
+      {/* Labels */}
+      <text x="10" y="32" fontSize="11" fontWeight="700" fill="#64748b">ORIGIN</text>
+      <text x="560" y="32" fontSize="11" fontWeight="700" fill="#64748b" textAnchor="end">DESTINATION</text>
+      {/* Route A track */}
+      <rect x="10" y="42" width="540" height="24" rx="12" fill="#f1f5f9"/>
+      <rect x="10" y="42" width={wA} height="24" rx="12" fill="#e11d48" opacity="0.15"/>
+      {VAR_META.filter(v=>latA[v.key]>0).reduce((acc,v,i,arr)=>{
+        const pct = (arr.slice(0,i).reduce((s,x)=>s+(latA[x.key]||0),0) / Math.max(tA,1));
+        const w = (latA[v.key]||0) / Math.max(tA,1) * wA;
+        const x = 10 + pct * wA;
+        acc.push(<rect key={v.key} x={x} y={42} width={w} height={24} fill={v.hex} opacity="0.9"/>);
+        return acc;
+      },[])}
+      <text x="16" y="57" fontSize="10" fontWeight="700" fill="#334155">Route A  L(x)={tA}d</text>
+      <text x={10+wA+6} y="57" fontSize="11" fontWeight="700" fill="#e11d48">{tA}d</text>
+      {/* Route B track */}
+      <rect x="10" y="96" width="540" height="24" rx="12" fill="#f1f5f9"/>
+      <rect x="10" y="96" width={wB} height="24" rx="12" fill="#10b981" opacity="0.15"/>
+      {VAR_META.filter(v=>latB[v.key]>0).reduce((acc,v,i,arr)=>{
+        const pct = arr.slice(0,i).reduce((s,x)=>s+(latB[x.key]||0),0) / Math.max(tB,1);
+        const w = (latB[v.key]||0) / Math.max(tB,1) * wB;
+        const x = 10 + pct * wB;
+        acc.push(<rect key={v.key} x={x} y={96} width={w} height={24} fill={v.hex} opacity="0.9"/>);
+        return acc;
+      },[])}
+      <text x="16" y="111" fontSize="10" fontWeight="700" fill="#334155">Route B  L(x)={tB}d</text>
+      <text x={10+wB+6} y="111" fontSize="11" fontWeight="700" fill="#10b981">{tB}d</text>
+    </svg>
+  );
+}
+
+function SimPanel({ label, emoji, total, maxT, lat, updater, isWinner }) {
+  return (
+    <div className={`bg-white border-2 rounded-2xl overflow-hidden ${isWinner?"border-emerald-400":"border-slate-200"}`}>
+      <div className={`px-5 py-3 flex items-center justify-between ${isWinner?"bg-emerald-50":"bg-slate-50"}`}>
+        <div>
+          <p className="text-xs font-bold text-slate-500">{emoji} {label}</p>
+          <p className={`text-3xl font-extrabold font-mono ${isWinner?"text-emerald-600":"text-rose-600"}`}>
+            {total} <span className="text-sm font-medium text-slate-400">days</span>
+          </p>
+        </div>
+        {isWinner && (
+          <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-700 bg-emerald-100 px-3 py-1.5 rounded-full">
+            <CheckCircle size={12}/> OPTIMAL
+          </div>
+        )}
+      </div>
+      {/* Stacked bar */}
+      <div className="px-5 pt-4 pb-2">
+        <div className="h-10 w-full bg-slate-100 rounded-xl overflow-hidden flex border border-slate-200">
+          {VAR_META.map(v => {
+            const val = lat[v.key]||0;
+            if (!val) return null;
+            const pct = (val/Math.max(maxT,1))*100;
+            return (
+              <div key={v.key} style={{width:`${pct}%`}} title={`${v.name}: ${val}d`}
+                className={`${v.bar} flex items-center justify-center border-r border-white/20 last:border-0 transition-all hover:brightness-110 cursor-default`}>
+                {pct > 6 && <span className="text-white text-[10px] font-bold leading-none">{val}</span>}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+      {/* Sliders */}
+      <div className="px-5 pb-5 pt-3 space-y-4">
+        {VAR_META.map(v => (
+          <div key={v.key} className="space-y-1.5">
+            <div className="flex justify-between text-xs font-semibold text-slate-600">
+              <span className={v.text}>[{v.short}] {v.name}</span>
+              <span className="font-mono bg-slate-100 px-2 py-0.5 rounded border border-slate-200 text-slate-700">{lat[v.key]||0}d</span>
+            </div>
+            <input type="range" min="0" max={v.max} value={lat[v.key]||0}
+              onChange={e=>updater(v.key,e.target.value)}
+              className="w-full h-1.5 bg-slate-200 rounded-full appearance-none cursor-pointer"/>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════
+// TAB 3: CALCULATOR
+// ══════════════════════════════════════════════════════
+
+function CalculatorTab() {
+  const [params, setParams] = useState({
+    distanceDays: 4, trafficProb: 40, trafficMax: 5,
+    infraProb: 15, infraMax: 7, bStops: 3,
+    delayPerStop: 2.5, riskProb: 0, riskImpact: 0, dailyCost: 150,
+  });
+  const set = (k,v) => setParams(p=>({...p,[k]:parseFloat(v)||0}));
+
+  const expT = (params.trafficProb/100)*params.trafficMax;
+  const expI = (params.infraProb/100)*params.infraMax;
+  const expB = params.bStops * params.delayPerStop;
+  const expR = (params.riskProb/100)*params.riskImpact;
+  const expL = params.distanceDays + expT + expI + expB + expR;
+  const expCost = expL * params.dailyCost;
+
+  const loadPreset = (sc) => {
+    const A = sc.routeA.latency;
+    setParams(p=>({
+      ...p,
+      distanceDays: A.d||0,
+      trafficProb: A.t > 0 ? 80 : 0,
+      trafficMax: A.t||0,
+      infraProb: A.i > 0 ? 60 : 0,
+      infraMax: A.i||0,
+      bStops: Math.round((A.b||0)/3)||1,
+      delayPerStop: A.b > 0 ? 3 : 0,
+      riskProb: A.r > 0 ? 30 : 0,
+      riskImpact: A.r > 0 ? Math.round(A.r/0.3) : 0,
+    }));
+  };
+
+  return (
+    <div className="space-y-5">
+      {/* Preset loader */}
+      <div className="bg-white border border-slate-200 rounded-2xl p-4">
+        <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Quick Load — Route A from Real Scenario</p>
+        <div className="flex flex-wrap gap-2">
+          {SCENARIOS.map(sc => (
+            <button key={sc.id} onClick={() => loadPreset(sc)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${sc.chipClass} hover:opacity-80 border-transparent`}>
+              {sc.title.split("/")[0].trim()}
+            </button>
+          ))}
+          <button onClick={() => setParams({ distanceDays:4,trafficProb:40,trafficMax:5,infraProb:15,infraMax:7,bStops:3,delayPerStop:2.5,riskProb:0,riskImpact:0,dailyCost:150 })}
+            className="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all flex items-center gap-1.5">
+            <RefreshCw size={11}/> Reset
+          </button>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        {/* Inputs */}
+        <div className="lg:col-span-2 bg-white border border-slate-200 rounded-2xl p-6 space-y-6">
+          <div>
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2"><Map size={12}/>Base Metrics</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <CalcInput label="Base Transit Time (days)" name="distanceDays" value={params.distanceDays} onChange={set}
+                hint="Ideal travel time with zero disruptions"/>
+              <CalcInput label="Holding Cost per Day ($)" name="dailyCost" value={params.dailyCost} onChange={set}
+                hint="Fuel, storage, delay penalties, etc."/>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Truck size={12}/>Traffic Variables</p>
+              <CalcInput label="Traffic Delay Probability (%)" name="trafficProb" value={params.trafficProb} max={100} onChange={set}
+                hint="Probability (0–100) of severe congestion"/>
+              <CalcInput label="Max Expected Traffic Delay (d)" name="trafficMax" value={params.trafficMax} onChange={set}
+                hint="Worst-case days if congestion occurs"/>
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2 pt-2"><AlertTriangle size={12}/>Infrastructure Risk</p>
+              <CalcInput label="Infrastructure Failure Prob. (%)" name="infraProb" value={params.infraProb} max={100} onChange={set}
+                hint="Probability of road damage or port issues"/>
+              <CalcInput label="Max Recovery Delay (days)" name="infraMax" value={params.infraMax} onChange={set}
+                hint="Days needed to bypass broken infrastructure"/>
+            </div>
+            <div className="space-y-4">
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><FileText size={12}/>Bureaucratic Friction</p>
+              <CalcInput label="Number of Checkpoints" name="bStops" value={params.bStops} onChange={set}
+                hint="Manual inspections, customs stops, etc."/>
+              <CalcInput label="Average Delay per Stop (d)" name="delayPerStop" value={params.delayPerStop} step="0.5" onChange={set}
+                hint="Average days spent at each checkpoint"/>
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2 pt-2"><Shield size={12}/>Risk Exposure (R)</p>
+              <CalcInput label="Disruption Probability (%)" name="riskProb" value={params.riskProb} max={100} onChange={set}
+                hint="Attack, closure, seizure probability"/>
+              <CalcInput label="Impact if Event Occurs (d)" name="riskImpact" value={params.riskImpact} onChange={set}
+                hint="Expected days of delay if risk materializes"/>
+            </div>
+          </div>
+        </div>
+
+        {/* Output panel */}
+        <div className="space-y-4">
+          <div className="bg-indigo-600 rounded-2xl p-6 text-white relative overflow-hidden">
+            <div className="absolute -top-4 -right-4 opacity-10"><Activity size={100}/></div>
+            <p className="text-indigo-200 text-xs font-bold uppercase tracking-widest mb-1 relative z-10">Expected L(x)</p>
+            <p className="text-indigo-300 text-xs mb-4 relative z-10">Bayesian weighted projection</p>
+            <p className="text-6xl font-extrabold font-mono relative z-10">{expL.toFixed(1)}</p>
+            <p className="text-indigo-200 text-sm mt-1 relative z-10">day-equivalents</p>
+          </div>
+
+          {/* Donut */}
+          <div className="bg-white border border-slate-200 rounded-2xl p-5">
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Latency Breakdown</p>
+            <DonutChart segments={[
+              { label:"Distance",     value: params.distanceDays, color:"#3b82f6" },
+              { label:"Traffic",      value: expT,                color:"#f59e0b" },
+              { label:"Infra",        value: expI,                color:"#f97316" },
+              { label:"Bureaucracy",  value: expB,                color:"#a855f7" },
+              { label:"Risk",         value: expR,                color:"#e11d48" },
+            ].filter(s=>s.value>0)} total={expL} />
+          </div>
+
+          {/* Cost card */}
+          <div className="bg-white border border-slate-200 rounded-2xl p-5">
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Projected Logistics Cost</p>
+            <p className="text-3xl font-extrabold font-mono text-emerald-600">
+              ${expCost.toLocaleString(undefined,{minimumFractionDigits:0,maximumFractionDigits:0})}
+            </p>
+            <p className="text-xs text-slate-400 mt-1">{expL.toFixed(1)}d × ${params.dailyCost}/d</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CalcInput({ label, name, value, onChange, hint, max, step="1" }) {
+  return (
+    <div>
+      <label className="block text-xs font-semibold text-slate-700 mb-0.5">{label}</label>
+      {hint && <p className="text-[10px] text-slate-400 mb-1.5 leading-tight">{hint}</p>}
+      <input type="number" name={name} value={value} onChange={e=>onChange(name,e.target.value)}
+        max={max} step={step}
+        className="w-full border border-slate-300 text-slate-800 text-sm font-medium rounded-xl focus:ring-2 focus:ring-indigo-400/30 focus:border-indigo-500 p-2.5 outline-none transition-all bg-white"/>
+    </div>
+  );
+}
+
+function DonutChart({ segments, total }) {
+  if (!segments.length || total <= 0) return null;
+  const r = 44, cx = 56, cy = 56, stroke = 16;
+  const circ = 2 * Math.PI * r;
+  let offset = -Math.PI / 2;
+  const paths = segments.map(s => {
+    const pct = s.value / total;
+    const angle = pct * Math.PI * 2;
+    const start = offset;
+    offset += angle;
+    const x1 = cx + r * Math.cos(start), y1 = cy + r * Math.sin(start);
+    const x2 = cx + r * Math.cos(start+angle), y2 = cy + r * Math.sin(start+angle);
+    const large = angle > Math.PI ? 1 : 0;
+    return { ...s, pct, d: `M ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2}` };
+  });
+  return (
+    <div className="flex items-center gap-4">
+      <svg width="112" height="112" viewBox="0 0 112 112" className="shrink-0">
+        <circle cx={cx} cy={cy} r={r} fill="none" stroke="#f1f5f9" strokeWidth={stroke}/>
+        {paths.map((p,i) => (
+          <path key={i} d={p.d} fill="none" stroke={p.color} strokeWidth={stroke} strokeLinecap="round"/>
+        ))}
+        <text x={cx} y={cy-3} textAnchor="middle" fontSize="13" fontWeight="700" fill="#1e293b">{total.toFixed(1)}</text>
+        <text x={cx} y={cy+11} textAnchor="middle" fontSize="9" fill="#94a3b8">days</text>
+      </svg>
+      <div className="space-y-2 flex-1">
+        {paths.map((s,i) => (
+          <div key={i}>
+            <div className="flex justify-between text-xs mb-1">
+              <span className="text-slate-600 flex items-center gap-1.5">
+                <span style={{background:s.color}} className="w-2 h-2 rounded-sm inline-block"/>
+                {s.label}
+              </span>
+              <span className="font-mono font-bold text-slate-700">{s.value.toFixed(1)}d</span>
+            </div>
+            <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+              <div style={{width:`${s.pct*100}%`,background:s.color}} className="h-full rounded-full"/>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
