@@ -1,397 +1,1078 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>STD-TSP Trade Algorithm Simulator | Frictional Latency Engine</title>
-  <!-- TailwindCSS v3 + basic interceptions -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- override some tailwind defaults to match original feel -->
-  <style>
-    * { box-sizing: border-box; }
-    body { background: #f8fafc; margin: 0; padding: 0; }
-    /* custom scrollbar and smoothness */
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: #e2e8f0; border-radius: 10px; }
-    ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 10px; }
-    /* custom pulse ring for signal dots */
-    @keyframes sigFade {
-      from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .sig-in {
-      animation: sigFade 0.35s ease forwards;
-    }
-    @keyframes pulseRing {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.4; }
-    }
-    .pulse-dot {
-      animation: pulseRing 1.4s ease-in-out infinite;
-    }
-    /* slider overrides for consistent cross-browser */
-    input[type="range"] {
-      -webkit-appearance: none;
-      background: #e2e8f0;
-      border-radius: 9999px;
-      height: 6px;
-    }
-    input[type="range"]:focus {
-      outline: none;
-    }
-    input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 16px;
-      height: 16px;
-      background: #4f46e5;
-      border-radius: 50%;
-      cursor: pointer;
-      border: 2px solid white;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-    }
-    input[type="range"]::-moz-range-thumb {
-      width: 16px;
-      height: 16px;
-      background: #4f46e5;
-      border-radius: 50%;
-      cursor: pointer;
-      border: 2px solid white;
-    }
-  </style>
-  <!-- React + ReactDOM + Babel for JSX transformation -->
-  <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.development.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.development.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@babel/standalone/babel.min.js"></script>
-  <!-- No external icon library: manual SVG icons (exact lucide paths) to preserve all visuals without changes -->
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Trade Algorithm Simulator — STD-TSP × Horizon Scanning</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0f1117;--ink2:#344155;--ink3:#64748b;--ink4:#94a3b8;
+  --surface:#ffffff;--surface2:#f8fafc;--surface3:#f1f5f9;--surface4:#e2e8f0;
+  --blue:#2563eb;--blue-lt:#eff6ff;--blue-dk:#1d4ed8;
+  --emerald:#059669;--emerald-lt:#ecfdf5;
+  --rose:#e11d48;--rose-lt:#fff1f2;
+  --amber:#d97706;--amber-lt:#fffbeb;
+  --purple:#7c3aed;--purple-lt:#f5f3ff;
+  --indigo:#4f46e5;--indigo-lt:#eef2ff;
+  --orange:#ea580c;
+  --border:#e2e8f0;--border2:#cbd5e1;
+  --radius:10px;--radius-lg:16px;--radius-xl:24px;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
+  --shadow-md:0 4px 6px rgba(0,0,0,.07),0 2px 4px rgba(0,0,0,.05);
+  --shadow-lg:0 10px 15px rgba(0,0,0,.08),0 4px 6px rgba(0,0,0,.05);
+  --font-head:'Syne',sans-serif;
+  --font-mono:'DM Mono',monospace;
+  --font-body:'Syne',sans-serif;
+}
+body{background:var(--surface2);color:var(--ink);font-family:var(--font-body);font-size:14px;line-height:1.6;min-height:100vh}
+
+/* ── GRID BACKGROUND ── */
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:40px 40px;opacity:.35;pointer-events:none;z-index:0}
+#root{position:relative;z-index:1}
+
+/* ── HEADER ── */
+.app-header{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 24px}
+.header-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px;height:60px;flex-wrap:wrap;padding:8px 0}
+.brand{display:flex;align-items:center;gap:12px}
+.brand-icon{width:36px;height:36px;background:var(--indigo);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.brand-icon svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.brand-title{font-family:var(--font-head);font-size:15px;font-weight:800;color:var(--ink);letter-spacing:-.3px}
+.brand-sub{font-family:var(--font-mono);font-size:10px;color:var(--ink4);letter-spacing:.5px}
+.nav-tabs{display:flex;background:var(--surface3);border-radius:12px;padding:4px;gap:2px}
+.nav-tab{display:flex;align-items:center;gap:6px;padding:7px 16px;border-radius:8px;border:none;background:transparent;font-family:var(--font-body);font-size:12px;font-weight:700;color:var(--ink3);cursor:pointer;transition:all .18s}
+.nav-tab:hover{color:var(--ink2);background:var(--border)}
+.nav-tab.active{background:var(--surface);color:var(--indigo);box-shadow:var(--shadow)}
+.nav-tab svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* ── LAYOUT ── */
+.container{max-width:1200px;margin:0 auto;padding:24px}
+.page{display:none}.page.active{display:block}
+
+/* ── CARDS ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;box-shadow:var(--shadow)}
+.card-sm{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}
+
+/* ── LABELS ── */
+.label{font-family:var(--font-mono);font-size:10px;font-weight:500;letter-spacing:.8px;color:var(--ink4);text-transform:uppercase;display:flex;align-items:center;gap:6px}
+.label svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* ── CHIPS ── */
+.chip{display:inline-flex;align-items:center;gap:4px;font-family:var(--font-mono);font-size:10px;font-weight:500;padding:3px 10px;border-radius:999px;letter-spacing:.3px}
+.chip-rose{background:#ffe4e6;color:#9f1239}
+.chip-amber{background:#fef3c7;color:#92400e}
+.chip-blue{background:#dbeafe;color:#1e40af}
+.chip-emerald{background:#d1fae5;color:#065f46}
+.chip-indigo{background:#e0e7ff;color:#3730a3}
+.chip-live{background:var(--rose-lt);color:var(--rose);animation:chipPulse 2s ease-in-out infinite}
+@keyframes chipPulse{0%,100%{opacity:1}50%{opacity:.65}}
+
+/* ── EQUATION BAR ── */
+.eq-bar{background:var(--indigo);border-radius:var(--radius-lg);padding:18px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.eq-formula{font-family:var(--font-mono);font-size:20px;font-weight:500;color:#fff;letter-spacing:2px}
+.eq-right{font-family:var(--font-mono);font-size:11px;color:rgba(255,255,255,.6);text-align:right}
+
+/* ── SCENARIO SELECTOR ── */
+.scenario-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+@media(max-width:700px){.scenario-grid{grid-template-columns:repeat(2,1fr)}}
+.sc-btn{text-align:left;padding:14px 16px;border-radius:var(--radius-lg);border:2px solid var(--border);background:var(--surface);cursor:pointer;transition:all .18s;font-family:var(--font-body)}
+.sc-btn:hover{border-color:var(--indigo);transform:translateY(-1px);box-shadow:var(--shadow-md)}
+.sc-btn.active-red-sea{border-color:#f43f5e;background:#fff1f2}
+.sc-btn.active-hormuz{border-color:#f59e0b;background:#fffbeb}
+.sc-btn.active-panama{border-color:#3b82f6;background:#eff6ff}
+.sc-btn.active-indonesia{border-color:#10b981;background:#ecfdf5}
+.sc-btn-period{font-family:var(--font-mono);font-size:9px;font-weight:500;color:var(--ink4);letter-spacing:.6px;margin-bottom:4px}
+.sc-btn-title{font-size:12px;font-weight:700;color:var(--ink2);line-height:1.3}
+
+/* ── HEADLINE CARD ── */
+.headline-card{border-radius:var(--radius-lg);padding:20px 24px;margin-bottom:16px;border:1px solid var(--border);background:var(--surface)}
+.headline-text{font-family:var(--font-head);font-size:17px;font-weight:700;color:var(--ink);margin:10px 0 8px;line-height:1.4}
+.headline-summary{font-size:13px;color:var(--ink3);line-height:1.7}
+
+/* ── ROUTE PANELS ── */
+.route-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+@media(max-width:680px){.route-grid{grid-template-columns:1fr}}
+.route-panel{border-radius:var(--radius-lg);border:2px solid var(--border);background:var(--surface);overflow:hidden}
+.route-panel.winner{border-color:#10b981}
+.route-panel.loser{border-color:#f43f5e}
+.route-header{padding:14px 18px;display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.route-header-rose{background:#fff1f2}.route-header-emerald{background:#ecfdf5}
+.route-label{font-family:var(--font-mono);font-size:9px;font-weight:500;color:var(--ink4);letter-spacing:.8px;margin-bottom:3px}
+.route-name{font-size:13px;font-weight:700;color:var(--ink2);line-height:1.3}
+.route-total{font-family:var(--font-mono);font-size:32px;font-weight:500;line-height:1;color:var(--ink);text-align:right}
+.route-total.win{color:#059669}.route-total.lose{color:#e11d48}
+.route-total-unit{font-size:11px;color:var(--ink4)}
+.route-body{padding:14px 18px 16px}
+.stacked-bar{height:28px;border-radius:8px;overflow:hidden;display:flex;background:var(--surface3);margin-bottom:12px;border:1px solid var(--border)}
+.bar-seg{height:100%;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:10px;font-weight:500;color:rgba(255,255,255,.9);transition:width .5s cubic-bezier(.4,0,.2,1);border-right:1px solid rgba(255,255,255,.3);cursor:default;position:relative}
+.bar-seg:last-child{border-right:none}
+.bar-seg:hover::after{content:attr(data-tip);position:absolute;top:-30px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;font-family:var(--font-mono);font-size:10px;padding:3px 8px;border-radius:6px;white-space:nowrap;pointer-events:none;z-index:10}
+.var-rows{display:flex;flex-direction:column;gap:7px;margin-bottom:12px}
+.var-row{display:flex;align-items:center;gap:8px;font-size:11px}
+.var-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+.var-name{color:var(--ink3);width:90px;flex-shrink:0}
+.var-bar-wrap{flex:1;height:4px;background:var(--surface3);border-radius:999px;overflow:hidden}
+.var-bar-fill{height:100%;border-radius:999px;transition:width .5s cubic-bezier(.4,0,.2,1)}
+.var-val{font-family:var(--font-mono);font-size:11px;font-weight:500;color:var(--ink2);width:26px;text-align:right;flex-shrink:0}
+.route-note{font-family:var(--font-mono);font-size:10px;color:var(--ink4);border-top:1px solid var(--border);padding-top:10px;line-height:1.5}
+.route-badge{display:inline-flex;align-items:center;font-family:var(--font-mono);font-size:9px;font-weight:500;padding:3px 8px;border-radius:999px;border:1px solid var(--border);color:var(--ink3);margin-top:8px}
+
+/* ── VERDICT STRIP ── */
+.verdict{border-radius:var(--radius);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.verdict.win{background:#ecfdf5;border:1px solid #6ee7b7}
+.verdict.lose{background:#fff1f2;border:1px solid #fda4af}
+.verdict-left{display:flex;align-items:center;gap:12px}
+.verdict-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.verdict-icon svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.verdict-title{font-size:13px;font-weight:700;color:var(--ink)}
+.verdict-sub{font-family:var(--font-mono);font-size:10px;color:var(--ink3);margin-top:2px}
+.verdict-eq{font-family:var(--font-mono);font-size:11px;color:var(--ink3);background:var(--surface);padding:6px 12px;border-radius:8px;border:1px solid var(--border)}
+
+/* ── STATS GRID ── */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+@media(max-width:700px){.stats-grid{grid-template-columns:repeat(2,1fr)}}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px}
+.stat-label{font-family:var(--font-mono);font-size:9px;font-weight:500;color:var(--ink4);letter-spacing:.6px;margin-bottom:6px;display:flex;align-items:center;gap:5px}
+.stat-label svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.stat-val{font-family:var(--font-mono);font-size:22px;font-weight:500;color:var(--ink);line-height:1}
+.stat-sub{font-size:11px;color:var(--ink4);margin-top:3px}
+
+/* ── HORIZON SCAN ── */
+.scan-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border)}
+.scan-title-row{display:flex;align-items:center;gap:10px}
+.scan-icon{width:30px;height:30px;background:var(--indigo-lt);border-radius:8px;display:flex;align-items:center;justify-content:center}
+.scan-icon svg{width:14px;height:14px;stroke:var(--indigo);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.scan-title{font-size:13px;font-weight:700;color:var(--ink)}
+.scan-sub{font-family:var(--font-mono);font-size:10px;color:var(--ink4)}
+.scan-btn{display:flex;align-items:center;gap:6px;padding:8px 16px;background:var(--indigo);color:#fff;border:none;border-radius:8px;font-family:var(--font-body);font-size:12px;font-weight:700;cursor:pointer;transition:all .18s}
+.scan-btn:hover{background:var(--blue-dk)}
+.scan-btn:disabled{opacity:.5;cursor:default}
+.scan-btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.scan-body{padding:16px;display:flex;flex-direction:column;gap:8px;min-height:100px}
+.scan-empty{text-align:center;padding:32px;color:var(--ink4)}
+.scan-empty svg{width:28px;height:28px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;margin:0 auto 8px;display:block;opacity:.4}
+.scan-empty p{font-size:12px}
+.signal{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:10px;opacity:0;transform:translateY(6px);transition:opacity .3s,transform .3s}
+.signal.show{opacity:1;transform:translateY(0)}
+.signal-crit{background:#fff1f2;border:1px solid #fca5a5}
+.signal-high{background:#fffbeb;border:1px solid #fcd34d}
+.signal-med{background:#eff6ff;border:1px solid #93c5fd}
+.signal-low{background:var(--surface3);border:1px solid var(--border)}
+.sig-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.sig-dot-crit{background:#e11d48;animation:pulse 1.4s infinite}
+.sig-dot-high{background:#f59e0b;animation:pulse 1.4s infinite}
+.sig-dot-med{background:#3b82f6}
+.sig-dot-low{background:#94a3b8}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.sig-badge{font-family:var(--font-mono);font-size:9px;font-weight:500;padding:2px 7px;border-radius:999px;letter-spacing:.3px}
+.sig-badge-crit{background:#ffe4e6;color:#9f1239}
+.sig-badge-high{background:#fef3c7;color:#92400e}
+.sig-badge-med{background:#dbeafe;color:#1e40af}
+.sig-badge-low{background:var(--surface4);color:var(--ink4)}
+.sig-source{font-size:11px;font-weight:700;color:var(--ink2)}
+.sig-text{font-size:11px;color:var(--ink3);margin-top:1px;line-height:1.5}
+
+/* ── SIMULATION ── */
+.sim-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:680px){.sim-grid{grid-template-columns:1fr}}
+.sim-panel{border-radius:var(--radius-lg);border:2px solid var(--border);background:var(--surface);overflow:hidden;transition:border-color .3s}
+.sim-panel.sim-win{border-color:#10b981}
+.sim-panel-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.sim-panel-label{font-family:var(--font-mono);font-size:10px;font-weight:500;color:var(--ink4);letter-spacing:.6px;margin-bottom:4px}
+.sim-total{font-family:var(--font-mono);font-size:30px;font-weight:500;line-height:1}
+.sim-total.win-color{color:#059669}
+.sim-total.lose-color{color:#e11d48}
+.sim-total-unit{font-size:11px;color:var(--ink4)}
+.optimal-badge{display:flex;align-items:center;gap:5px;background:#ecfdf5;color:#065f46;font-family:var(--font-mono);font-size:10px;font-weight:500;padding:4px 10px;border-radius:999px;border:1px solid #6ee7b7}
+.optimal-badge svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.sim-panel-body{padding:16px 18px;display:flex;flex-direction:column;gap:14px}
+.slider-group{display:flex;flex-direction:column;gap:5px}
+.slider-row{display:flex;align-items:center;justify-content:space-between;font-size:11px}
+.slider-label{display:flex;align-items:center;gap:5px;color:var(--ink3);font-weight:600}
+.slider-val{font-family:var(--font-mono);font-size:11px;color:var(--ink2);background:var(--surface3);padding:2px 7px;border-radius:5px;border:1px solid var(--border)}
+input[type=range]{width:100%;height:4px;border-radius:999px;appearance:none;background:var(--surface4);outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{appearance:none;width:16px;height:16px;border-radius:50%;background:#fff;border:2px solid var(--indigo);box-shadow:var(--shadow)}
+input[type=range]:hover::-webkit-slider-thumb{border-color:var(--blue-dk);box-shadow:0 0 0 3px rgba(79,70,229,.15)}
+
+/* ── ROUTE MAP SVG ── */
+.routemap-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px 24px;margin-bottom:16px}
+
+/* ── CALCULATOR ── */
+.calc-grid{display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start}
+@media(max-width:800px){.calc-grid{grid-template-columns:1fr}}
+.input-section{margin-bottom:20px}
+.section-label{font-family:var(--font-mono);font-size:10px;font-weight:500;color:var(--ink4);letter-spacing:.8px;text-transform:uppercase;display:flex;align-items:center;gap:6px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.section-label svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.input-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.input-group{display:flex;flex-direction:column;gap:4px}
+.input-label{font-size:11px;font-weight:700;color:var(--ink2)}
+.input-hint{font-family:var(--font-mono);font-size:9px;color:var(--ink4);line-height:1.4;margin-bottom:2px}
+.input-field{border:1px solid var(--border2);border-radius:8px;padding:9px 12px;font-family:var(--font-mono);font-size:13px;color:var(--ink);background:var(--surface);outline:none;transition:border-color .18s;width:100%}
+.input-field:focus{border-color:var(--indigo);box-shadow:0 0 0 3px rgba(79,70,229,.1)}
+
+/* PRESETS */
+.preset-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);align-items:center}
+.preset-label{font-family:var(--font-mono);font-size:10px;color:var(--ink4);letter-spacing:.5px;margin-right:4px}
+.preset-btn{font-family:var(--font-mono);font-size:10px;font-weight:500;padding:4px 12px;border-radius:999px;border:1px solid transparent;cursor:pointer;transition:all .18s}
+.preset-btn:hover{transform:translateY(-1px)}
+.preset-reset{font-family:var(--font-mono);font-size:10px;font-weight:500;padding:4px 12px;border-radius:999px;border:1px solid var(--border);background:var(--surface);color:var(--ink3);cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:5px}
+.preset-reset svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.preset-reset:hover{background:var(--surface3)}
+
+/* RESULT PANEL */
+.result-panel{position:sticky;top:84px;display:flex;flex-direction:column;gap:12px}
+.result-hero{background:var(--indigo);border-radius:var(--radius-lg);padding:24px;color:#fff;position:relative;overflow:hidden}
+.result-hero::before{content:'L(x)';position:absolute;right:-10px;top:10px;font-family:var(--font-mono);font-size:80px;font-weight:500;color:rgba(255,255,255,.07);pointer-events:none}
+.result-hero-label{font-family:var(--font-mono);font-size:10px;color:rgba(255,255,255,.6);letter-spacing:.6px;margin-bottom:4px}
+.result-hero-num{font-family:var(--font-mono);font-size:56px;font-weight:500;line-height:1;letter-spacing:-2px}
+.result-hero-unit{font-family:var(--font-mono);font-size:14px;color:rgba(255,255,255,.6);margin-top:4px}
+.result-score{display:flex;align-items:center;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.15)}
+.score-bar-wrap{flex:1;height:4px;background:rgba(255,255,255,.2);border-radius:999px;overflow:hidden}
+.score-bar{height:100%;border-radius:999px;background:#fff;transition:width .5s cubic-bezier(.4,0,.2,1)}
+.score-label{font-family:var(--font-mono);font-size:10px;color:rgba(255,255,255,.7)}
+.score-num{font-family:var(--font-mono);font-size:13px;color:#fff;font-weight:500}
+/* DONUT */
+.donut-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px}
+.donut-inner{display:flex;align-items:center;gap:16px}
+.donut-legend{flex:1;display:flex;flex-direction:column;gap:8px}
+.donut-row{display:flex;flex-direction:column;gap:3px}
+.donut-row-top{display:flex;justify-content:space-between;align-items:center;font-size:11px}
+.donut-name{display:flex;align-items:center;gap:5px;color:var(--ink3)}
+.donut-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+.donut-val{font-family:var(--font-mono);font-size:11px;font-weight:500;color:var(--ink2)}
+.donut-mini-bar{height:3px;background:var(--surface3);border-radius:999px;overflow:hidden}
+.donut-mini-fill{height:100%;border-radius:999px;transition:width .5s cubic-bezier(.4,0,.2,1)}
+/* COST */
+.cost-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px}
+.cost-label{font-family:var(--font-mono);font-size:10px;color:var(--ink4);letter-spacing:.6px;margin-bottom:4px}
+.cost-val{font-family:var(--font-mono);font-size:28px;font-weight:500;color:#059669;line-height:1}
+.cost-sub{font-family:var(--font-mono);font-size:10px;color:var(--ink4);margin-top:4px}
+/* EFFICIENCY SCORE */
+.efficiency-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px}
+.eff-title{font-family:var(--font-mono);font-size:10px;color:var(--ink4);letter-spacing:.6px;margin-bottom:10px}
+.eff-track{height:8px;background:var(--surface3);border-radius:999px;overflow:hidden;margin-bottom:6px}
+.eff-fill{height:100%;border-radius:999px;transition:width .5s cubic-bezier(.4,0,.2,1)}
+.eff-labels{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:9px;color:var(--ink4)}
+
+/* ── ANIMATION ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.fade-up{animation:fadeUp .3s ease forwards}
+.spin{animation:spinR .7s linear infinite}
+@keyframes spinR{to{transform:rotate(360deg)}}
+
+/* ── FOOTER ── */
+.app-footer{text-align:center;padding:24px;font-family:var(--font-mono);font-size:10px;color:var(--ink4);letter-spacing:.4px;margin-top:8px}
+
+/* ── RESPONSIVE ── */
+@media(max-width:480px){
+  .container{padding:12px}
+  .eq-formula{font-size:15px}
+  .brand-title{font-size:13px}
+  .nav-tab{padding:6px 10px;font-size:11px}
+  .input-grid{grid-template-columns:1fr}
+}
+</style>
 </head>
 <body>
-  <div id="root"></div>
-  
-  <script type="text/babel" data-presets="react">
-    // ------------------------------------------------------------------
-    // 1. Manual Lucide-equivalent Icons (SVG components)
-    //    Preserves all icons from original imports, no logic altered.
-    //    each component accepts "size" prop and standard SVG attrs.
-    // ------------------------------------------------------------------
-    const createIcon = (paths, viewBox = "0 0 24 24") => {
-      return ({ size = 24, color = "currentColor", strokeWidth = 2, ...props }) => {
-        return React.createElement('svg', {
-          xmlns: "http://www.w3.org/2000/svg",
-          width: size,
-          height: size,
-          viewBox: viewBox,
-          fill: "none",
-          stroke: color,
-          strokeWidth: strokeWidth,
-          strokeLinecap: "round",
-          strokeLinejoin: "round",
-          ...props
-        }, paths.map((d, idx) => React.createElement('path', { key: idx, d })));
-      };
-    };
+<div id="root">
 
-    // define all needed icons based on lucide official paths (copied exactly)
-    const Globe = createIcon(["M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z", "M2 12h20", "M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"]);
-    const BarChart3 = createIcon(["M3 3v18h18", "M7 16v-4", "M11 16v-6", "M15 16v-2", "M19 16v-8"]);
-    const Calculator = createIcon(["M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z", "M8 8h8", "M12 12h.01", "M16 12h.01", "M8 12h.01", "M12 16h.01", "M16 16h.01", "M8 16h.01"]);
-    const Navigation = createIcon(["M3 12h18", "M12 3v18", "m12 3 5 5-5 5", "m12 3-5 5 5 5"]);
-    const AlertTriangle = createIcon(["M12 9v4", "M12 17h.01", "M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"]);
-    const Clock = createIcon(["M12 6v6l4 2", "M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"]);
-    const DollarSign = createIcon(["M12 2v20", "M17 7H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"]);
-    const Shield = createIcon(["M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"]);
-    const TrendingUp = createIcon(["M23 6l-7.5 7.5-5-5L3 16", "M17 6h6v6"]);
-    const Radio = createIcon(["M4.9 19.1C2.9 17.1 2 14.5 2 12s.9-5.1 2.9-7.1", "M7.8 16.2c-1.1-1.1-1.8-2.7-1.8-4.2s.7-3.1 1.8-4.2", "M16.2 7.8c1.1 1.1 1.8 2.7 1.8 4.2s-.7 3.1-1.8 4.2", "M19.1 4.9c2 2 2.9 4.6 2.9 7.1s-.9 5.1-2.9 7.1", "M12 12h.01"]);
-    const RefreshCw = createIcon(["M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8", "M21 3v5h-5", "M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16", "M8 16H3v5"]);
-    const Zap = createIcon(["M13 2L3 14h8l-2 8 10-12h-8z"]);
-    const CheckCircle = createIcon(["M22 11.08V12a10 10 0 1 1-5.93-9.14", "M22 4 12 14.01l-3-3"]);
-    const Map = createIcon(["M1 6v16l7-4 8 4 7-4V2l-7 4-8-4-7 4z", "M8 2v16", "M16 6v16"]);
-    const Truck = createIcon(["M5 17h14", "M7 21h.01", "M17 21h.01", "M16 5h3a2 2 0 0 1 2 2v8h-5V5z", "M5 7h8v10H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2z"]);
-    const FileText = createIcon(["M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z", "M14 2v6h6", "M16 13H8", "M16 17H8", "M10 9H8"]);
-    const Activity = createIcon(["M22 12h-4l-3 9L9 3l-3 9H2"]);
-    const Route = createIcon(["M3 3h6v6", "M15 15h6v6", "M9 21h6", "M15 9h6", "M3 15h6", "M12 3v6", "M12 15v6", "M9 3v3", "M15 15v3", "M3 9v3", "M21 9v3"]);
-    const ChevronRight = createIcon(["M9 18l6-6-6-6"]);
-    const Package = createIcon(["M16.5 9.4 7.5 4.2", "M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z", "M12 22V12", "M3.3 7 12 12l8.7-5", "M7.5 4.2 12 7l4.5-2.8"]);
-    
-    // React hooks aliases (original code uses import { useState, useEffect })
-    const { useState, useEffect } = React;
-    
-    // ------------------------------------------------------------------
-    // STATIC DATA (identical to original)
-    // ------------------------------------------------------------------
-    const SCENARIOS = [
-      {
-        id: "red-sea",
-        chipClass: "bg-rose-100 text-rose-800",
-        activeBorder: "border-rose-400",
-        activeBg: "bg-rose-50",
-        activeTitle: "text-rose-800",
-        accentBar: "bg-rose-600",
-        title: "Red Sea / Houthi Crisis",
-        period: "2024–2025",
-        headline: "95% of container ships globally rerouted — largest maritime disruption since Suez 1956",
-        summary: "Houthi rebel attacks on commercial shipping in the Bab-el-Mandeb strait caused virtually every major carrier to abandon the Suez Canal route. An STD-TSP engine fed by UKMTO and Lloyd's signals recommended Cape of Good Hope routing 72 hours before the first major attack confirmed.",
-        routeA: {
-          label: "Via Red Sea + Suez Canal",
-          badge: "Standard Pre-Crisis",
-          note: "[R] = 30% attack probability × 60-day expected loss equivalent",
-          latency: { d: 14, t: 2, i: 1, b: 1, r: 18 },
-        },
-        routeB: {
-          label: "Via Cape of Good Hope",
-          badge: "Horizon-Scan Optimized",
-          note: "+14 physical days, but R=0. Total L(x) drops from 36 to 29.",
-          latency: { d: 28, t: 1, i: 0, b: 0, r: 0 },
-        },
-        signals: [
-          { level: "medium",   source: "UKMTO",               text: "Maritime Security Advisory issued for Gulf of Aden corridor" },
-          { level: "high",     source: "Lloyd's of London",    text: "Red Sea war-risk insurance premium surges +0.7% — highest since 2005" },
-          { level: "critical", source: "Houthi Media Office",  text: "Expanded 'military operations zone' now includes northern Red Sea" },
-          { level: "medium",   source: "AIS Satellite Data",   text: "Anomalous vessel deviation patterns detected in Bab-el-Mandeb" },
-          { level: "critical", source: "Reuters / AP",         text: "MSC + Maersk announce immediate suspension of all Red Sea transits" },
-        ],
-        stats: [
-          { label: "Ships Rerouted", value: "~95%",   sub: "of global container traffic", Icon: Package },
-          { label: "Extra Days",     value: "+10–14",  sub: "per voyage via Cape",         Icon: Clock },
-          { label: "Extra Fuel",     value: ">$1M",    sub: "per voyage",                  Icon: DollarSign },
-          { label: "Insurance",      value: "+600%",   sub: "war-risk premium spike",      Icon: Shield },
-        ],
-      },
-      {
-        id: "hormuz",
-        chipClass: "bg-amber-100 text-amber-800",
-        activeBorder: "border-amber-400",
-        activeBg: "bg-amber-50",
-        activeTitle: "text-amber-900",
-        accentBar: "bg-amber-500",
-        title: "Strait of Hormuz",
-        period: "Persistent Risk 2019–Present",
-        headline: "20% of world's oil and 30% of global LNG passes through a 21-mile bottleneck",
-        summary: "Iran periodically threatens to close the Strait of Hormuz. Saudi Aramco's East-West Pipeline (5M bpd capacity) provides the only viable strategic bypass via Yanbu. Horizon Scanning on IRGC naval exercise announcements gives a 72-hour routing window before closure risk peaks.",
-        routeA: {
-          label: "Through Strait of Hormuz",
-          badge: "Direct Route",
-          note: "[R] = 25% closure probability × 70-day impact equivalent = 18 days",
-          latency: { d: 3, t: 1, i: 0, b: 2, r: 18 },
-        },
-        routeB: {
-          label: "Aramco E-W Pipeline + Yanbu",
-          badge: "Strategic Bypass",
-          note: "7 days longer physically. R drops to zero — total L(x) drops from 24 to 13.",
-          latency: { d: 10, t: 1, i: 1, b: 1, r: 0 },
-        },
-        signals: [
-          { level: "medium",   source: "IRGC State Media",    text: "Naval exercise announced in Strait of Hormuz — 7 warships deployed" },
-          { level: "high",     source: "US 5th Fleet",         text: "USS Abraham Lincoln carrier group repositioned to Persian Gulf entrance" },
-          { level: "critical", source: "IRGC Commander",      text: "Explicit closure threat issued if new US sanctions enacted" },
-          { level: "medium",   source: "S&P Global Platts",   text: "Brent crude futures spike 4.2% on Hormuz closure fears" },
-          { level: "high",     source: "IMO Bulletin",        text: "Tanker operators advised of heightened seizure and interdiction risk" },
-        ],
-        stats: [
-          { label: "Oil Transits",   value: "20%",    sub: "of global daily flow",   Icon: TrendingUp },
-          { label: "LNG Transits",   value: "30%",    sub: "of global LNG",          Icon: Zap },
-          { label: "Pipeline Cap.",  value: "5M bpd", sub: "Aramco bypass capacity", Icon: Route },
-          { label: "Bypass Adds",    value: "+7–10d", sub: "via pipeline + Yanbu",   Icon: Clock },
-        ],
-      },
-      {
-        id: "panama",
-        chipClass: "bg-blue-100 text-blue-800",
-        activeBorder: "border-blue-400",
-        activeBg: "bg-blue-50",
-        activeTitle: "text-blue-900",
-        accentBar: "bg-blue-600",
-        title: "Panama Canal Drought",
-        period: "Q4 2023 — Q1 2024",
-        headline: "El Niño cut daily transits 36% — 160 vessels queued for 21+ days",
-        summary: "Historic drought dropped Gatun Lake below minimum operating levels. Daily transits fell from 36 to 18. Shippers with 90-day Horizon Scan capability pre-booked Suez Canal slots using NOAA El Niño forecasts and avoided the queue entirely.",
-        routeA: {
-          label: "Panama Canal (Direct)",
-          badge: "Drought-Hit Route",
-          note: "[T] = 21-day queue wait — not traffic, but systemic capacity bottleneck",
-          latency: { d: 14, t: 21, i: 3, b: 4, r: 0 },
-        },
-        routeB: {
-          label: "All-Water via Suez Canal",
-          badge: "Pre-Booked Bypass",
-          note: "Pre-booked 90 days ahead using NOAA El Niño signal. L(x) drops from 42 to 29.",
-          latency: { d: 28, t: 0, i: 0, b: 1, r: 0 },
-        },
-        signals: [
-          { level: "medium",   source: "NOAA",               text: "Strong El Niño declared — Panama rainfall 40% below 30-year average" },
-          { level: "medium",   source: "ACP Authority",      text: "Gatun Lake falls 0.3m below critical threshold for canal operations" },
-          { level: "high",     source: "Panama Canal Auth.", text: "Daily transit slots reduced from 36 to 24 — effective in two weeks" },
-          { level: "critical", source: "Panama Canal Auth.", text: "Further reduction to 18 transits/day. Booking waitlist: 8 weeks" },
-          { level: "critical", source: "Marine Traffic",    text: "Queue reaches 160 vessels. Average wait time: 21 days and rising" },
-        ],
-        stats: [
-          { label: "Transit Cut",  value: "−36%",  sub: "from 36 to 18 per day",  Icon: TrendingUp },
-          { label: "Queue Peak",   value: "160",    sub: "vessels waiting",         Icon: Package },
-          { label: "Wait Time",    value: "21+ d",  sub: "average queue time",      Icon: Clock },
-          { label: "Revenue Lost", value: "$200M+", sub: "canal authority",         Icon: DollarSign },
-        ],
-      },
-      {
-        id: "indonesia",
-        chipClass: "bg-emerald-100 text-emerald-800",
-        activeBorder: "border-emerald-400",
-        activeBg: "bg-emerald-50",
-        activeTitle: "text-emerald-900",
-        accentBar: "bg-emerald-600",
-        title: "Indonesia MSME: Gayo Coffee",
-        period: "Live Case — Aceh to Rotterdam",
-        headline: "Bureaucratic audit converts a 3-day domestic leg into a 45-day cash-flow crisis",
-        summary: "A Gayo specialty coffee MSME faces a surprise inter-ministerial customs audit at Belawan Port. The STD-TSP engine detects the DGCE bulletin 5 days early and reroutes cargo via the Penang Bridge corridor into Port Klang — bypassing the audit and delivering 33 days ahead of schedule.",
-        routeA: {
-          label: "Belawan Port (Direct)",
-          badge: "Standard MSME Route",
-          note: "[B] = 30-day bureaucratic audit — completely invisible to standard routing",
-          latency: { d: 3, t: 7, i: 5, b: 30, r: 0 },
-        },
-        routeB: {
-          label: "Truck → Penang → Port Klang",
-          badge: "Friction-Optimized Bypass",
-          note: "+2 days distance, −33 days friction. Total L(x): 9d vs 45d.",
-          latency: { d: 5, t: 1, i: 1, b: 2, r: 0 },
-        },
-        signals: [
-          { level: "medium", source: "DGCE Bulletin",     text: "Inter-ministerial customs compliance audit announced at Belawan Port" },
-          { level: "high",   source: "BMKG Weather API",  text: "Tropical depression: N. Sumatra provincial roads structurally degraded" },
-          { level: "medium", source: "Pelindo NLE",        text: "Average container dwell time at Belawan rises to 8.5 hours — 3-year high" },
-          { level: "low",    source: "Local Gov. Feed",    text: "Regional ceremony on primary access road to Belawan industrial zone" },
-          { level: "high",   source: "STD-TSP Engine",    text: "Reroute confirmed: L(x)=9d via Penang vs L(x)=45d via Belawan" },
-        ],
-        stats: [
-          { label: "Days Saved",      value: "33 days", sub: "vs standard route",       Icon: Clock },
-          { label: "Cost Avoided",    value: "$4,950",  sub: "$150/day × 33 days",      Icon: DollarSign },
-          { label: "Efficiency Gain", value: "+275%",   sub: "frictional improvement",  Icon: TrendingUp },
-          { label: "Cash Flow",       value: "Intact",  sub: "buyer contract honored",  Icon: CheckCircle },
-        ],
-      },
-    ];
+<!-- ══ HEADER ══ -->
+<header class="app-header">
+  <div class="header-inner">
+    <div class="brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      </div>
+      <div>
+        <div class="brand-title">Trade Algorithm Simulator</div>
+        <div class="brand-sub">STD-TSP × HORIZON SCANNING  ·  L(x) = D + T + I + B + R</div>
+      </div>
+    </div>
+    <nav class="nav-tabs">
+      <button class="nav-tab active" onclick="switchTab('scenarios')">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        Scenarios
+      </button>
+      <button class="nav-tab" onclick="switchTab('simulation')">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Simulation
+      </button>
+      <button class="nav-tab" onclick="switchTab('calculator')">
+        <svg viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/></svg>
+        Calculator
+      </button>
+    </nav>
+  </div>
+</header>
 
-    const VAR_META = [
-      { key: "d", short: "D", name: "Distance",        bar: "bg-blue-500",   text: "text-blue-700",   hex: "#3b82f6", max: 20 },
-      { key: "t", short: "T", name: "Traffic / Wait",  bar: "bg-amber-400",  text: "text-amber-700",  hex: "#f59e0b", max: 20 },
-      { key: "i", short: "I", name: "Infrastructure",  bar: "bg-orange-500", text: "text-orange-700", hex: "#f97316", max: 20 },
-      { key: "b", short: "B", name: "Bureaucracy",     bar: "bg-purple-500", text: "text-purple-700", hex: "#a855f7", max: 50 },
-      { key: "r", short: "R", name: "Risk Exposure",   bar: "bg-rose-600",   text: "text-rose-700",   hex: "#e11d48", max: 30 },
-    ];
+<!-- ══ SCENARIOS ══ -->
+<div id="page-scenarios" class="page active">
+<div class="container">
 
-    const SIG_CLS = {
-      critical: { wrap: "bg-rose-50 border border-rose-200",   dot: "bg-rose-500",   badge: "bg-rose-100 text-rose-800" },
-      high:     { wrap: "bg-amber-50 border border-amber-200", dot: "bg-amber-500",  badge: "bg-amber-100 text-amber-800" },
-      medium:   { wrap: "bg-blue-50 border border-blue-200",   dot: "bg-blue-400",   badge: "bg-blue-100 text-blue-800" },
-      low:      { wrap: "bg-slate-50 border border-slate-200", dot: "bg-slate-400",  badge: "bg-slate-100 text-slate-600" },
-    };
+  <!-- Selector -->
+  <div class="scenario-grid" id="sc-selector"></div>
 
-    const totalL = (lat) => (lat.d||0)+(lat.t||0)+(lat.i||0)+(lat.b||0)+(lat.r||0);
-    
-    // ------------------------------------------------------------------
-    // APP ROOT (identical JSX)
-    // ------------------------------------------------------------------
-    function App() {
-      const [tab, setTab] = useState("scenarios");
-      return (
-        <div className="min-h-screen bg-slate-50 font-sans text-slate-800">
-          <div className="bg-white border-b border-slate-200 sticky top-0 z-20">
-            <div className="max-w-6xl mx-auto px-4 md:px-6 py-3 flex flex-col sm:flex-row items-start sm:items-center gap-3 justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 bg-indigo-600 rounded-xl flex items-center justify-center shrink-0">
-                  <Navigation size={18} className="text-white" />
-                </div>
-                <div>
-                  <p className="text-sm font-extrabold text-slate-900 leading-tight">Trade Algorithm Simulator</p>
-                  <p className="text-xs text-slate-400 leading-tight">STD-TSP × Horizon Scanning</p>
-                </div>
-              </div>
-              <div className="flex bg-slate-100 p-1 rounded-xl gap-0.5">
-                {[["scenarios","Scenarios",Globe],["simulation","Simulation",BarChart3],["calculator","Calculator",Calculator]].map(([id,label,Icon])=>(
-                  <button key={id} onClick={()=>setTab(id)}
-                    className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold transition-all ${tab===id?"bg-white text-indigo-600 shadow-sm":"text-slate-500 hover:text-slate-700"}`}>
-                    <Icon size={13}/>{label}
-                  </button>
-                ))}
-              </div>
-            </div>
+  <!-- Headline -->
+  <div id="sc-headline" class="headline-card"></div>
+
+  <!-- Routes -->
+  <div class="route-grid" id="sc-routes"></div>
+
+  <!-- Verdict -->
+  <div id="sc-verdict"></div>
+
+  <!-- Stats -->
+  <div class="stats-grid" id="sc-stats"></div>
+
+  <!-- Horizon Scan -->
+  <div class="card" style="padding:0;overflow:hidden">
+    <div class="scan-header">
+      <div class="scan-title-row">
+        <div class="scan-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"/></svg></div>
+        <div>
+          <div class="scan-title">Horizon Scan Feed</div>
+          <div class="scan-sub" id="scan-sub-label">Weak signal intelligence</div>
+        </div>
+      </div>
+      <button class="scan-btn" id="scan-btn" onclick="runScan()">
+        <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        Run Scan
+      </button>
+    </div>
+    <div class="scan-body" id="scan-body">
+      <div class="scan-empty" id="scan-empty">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"/></svg>
+        <p>Press Run Scan to simulate signal detection</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ══ SIMULATION ══ -->
+<div id="page-simulation" class="page">
+<div class="container">
+
+  <div class="eq-bar" style="margin-bottom:16px">
+    <div>
+      <div style="font-family:var(--font-mono);font-size:10px;color:rgba(255,255,255,.5);letter-spacing:.8px;margin-bottom:4px">FRICTIONAL LATENCY EQUATION</div>
+      <div class="eq-formula">L(x) = D + T + I + B + R</div>
+      <div style="font-family:var(--font-mono);font-size:10px;color:rgba(255,255,255,.5);margin-top:4px">Adjust variables. Route B wins when L(B) &lt; L(A) — even if D is larger.</div>
+    </div>
+    <div style="background:rgba(255,255,255,.1);border-radius:12px;padding:12px 20px;text-align:center;flex-shrink:0">
+      <div style="font-family:var(--font-mono);font-size:10px;color:rgba(255,255,255,.5);margin-bottom:2px">DAY-EQUIV. SAVED</div>
+      <div class="eq-formula" id="sim-saved">0</div>
+      <div style="font-family:var(--font-mono);font-size:10px;color:rgba(255,255,255,.5);margin-top:2px" id="sim-verdict-txt">Tied</div>
+    </div>
+  </div>
+
+  <!-- Route Map -->
+  <div class="routemap-wrap">
+    <div class="label" style="margin-bottom:12px">
+      <svg viewBox="0 0 24 24"><polyline points="3 17 9 11 13 15 21 7"/></svg>
+      ABSTRACT ROUTE MAP — FRICTIONAL LATENCY COMPARISON
+    </div>
+    <svg id="routemap-svg" viewBox="0 0 640 110" style="width:100%;height:auto" role="img" aria-label="Route latency comparison map"></svg>
+  </div>
+
+  <!-- Panels -->
+  <div class="sim-grid" id="sim-panels"></div>
+
+  <!-- Legend -->
+  <div style="display:flex;flex-wrap:wrap;gap:16px;justify-content:center;margin-top:14px">
+    <span class="label"><span class="var-dot" style="background:#3b82f6;display:inline-block"></span>[D] Distance</span>
+    <span class="label"><span class="var-dot" style="background:#f59e0b;display:inline-block"></span>[T] Traffic/Wait</span>
+    <span class="label"><span class="var-dot" style="background:#ea580c;display:inline-block"></span>[I] Infrastructure</span>
+    <span class="label"><span class="var-dot" style="background:#a855f7;display:inline-block"></span>[B] Bureaucracy</span>
+    <span class="label"><span class="var-dot" style="background:#e11d48;display:inline-block"></span>[R] Risk Exposure</span>
+  </div>
+
+</div>
+</div>
+
+<!-- ══ CALCULATOR ══ -->
+<div id="page-calculator" class="page">
+<div class="container">
+
+  <!-- Presets -->
+  <div class="preset-row">
+    <span class="preset-label">LOAD PRESET →</span>
+    <button class="preset-btn chip-rose" onclick="loadPreset(0)">Red Sea Crisis</button>
+    <button class="preset-btn chip-amber" onclick="loadPreset(1)">Hormuz Strait</button>
+    <button class="preset-btn chip-blue" onclick="loadPreset(2)">Panama Drought</button>
+    <button class="preset-btn chip-emerald" onclick="loadPreset(3)">Indonesia MSME</button>
+    <button class="preset-reset" onclick="resetCalc()">
+      <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.17"/></svg>
+      Reset
+    </button>
+  </div>
+
+  <div class="calc-grid">
+
+    <!-- Inputs -->
+    <div class="card">
+
+      <!-- Base -->
+      <div class="input-section">
+        <div class="section-label">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          BASE METRICS
+        </div>
+        <div class="input-grid">
+          <div class="input-group">
+            <label class="input-label">Base Transit Time (days)</label>
+            <div class="input-hint">Ideal travel time — zero disruptions</div>
+            <input class="input-field" type="number" id="c-dist" value="4" min="0" oninput="calcUpdate()"/>
           </div>
-          <div className="max-w-6xl mx-auto px-4 md:px-6 py-6 md:py-8 space-y-6">
-            {tab==="scenarios"&&<ScenariosTab/>}
-            {tab==="simulation"&&<SimulationTab/>}
-            {tab==="calculator"&&<CalculatorTab/>}
+          <div class="input-group">
+            <label class="input-label">Holding Cost per Day ($)</label>
+            <div class="input-hint">Fuel, storage, delay penalties</div>
+            <input class="input-field" type="number" id="c-cost" value="150" min="0" oninput="calcUpdate()"/>
           </div>
         </div>
-      );
-    }
+      </div>
 
-    // The rest of components: ScenariosTab, RoutePanel, SimulationTab, RouteMapSVG, SimPanel, CalculatorTab, CalcInput, DonutChart
-    // (pasted exactly as original but using global icons/hooks)
-    // Due to length, I embed them from original structure (unchanged except removal of imports). 
-    // I will include all remaining components exactly as provided in the problem statement.
-    // (full content inline from user's original component, minus the import lines)
-    // -------------------- begin component definitions (identical) --------------------
-    function ScenariosTab() {
-      const [idx, setIdx] = useState(0);
-      const [vis, setVis] = useState(0);
-      const [scanning, setScanning] = useState(false);
-      const sc = SCENARIOS[idx];
-      const changeScenario = (i) => { setIdx(i); setVis(0); setScanning(false); };
-      const runScan = () => { setVis(0); setScanning(true); };
-      useEffect(() => {
-        if (!scanning) return;
-        if (vis >= sc.signals.length) { setScanning(false); return; }
-        const t = setTimeout(() => setVis(v => v+1), 720);
-        return () => clearTimeout(t);
-      }, [scanning, vis, sc.signals.length]);
-      const totA = totalL(sc.routeA.latency);
-      const totB = totalL(sc.routeB.latency);
-      const maxL = Math.max(totA, totB, 1);
-      const saved = totA - totB;
-      return (
-        <div className="space-y-5">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {SCENARIOS.map((s,i) => (
-              <button key={s.id} onClick={() => changeScenario(i)}
-                className={`text-left p-4 rounded-2xl border-2 transition-all hover:shadow-md ${i===idx ? `${s.activeBorder} ${s.activeBg} shadow-sm` : "border-slate-200 bg-white"}`}>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">{s.period}</p>
-                <p className={`text-sm font-bold leading-tight ${i===idx ? s.activeTitle : "text-slate-700"}`}>{s.title}</p>
-              </button>
-            ))}
-          </div>
-          <div className="bg-white border border-slate-200 rounded-2xl p-5 md:p-6">
-            <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold mb-3 ${sc.chipClass}`}>
-              <Radio size={11}/> LIVE CASE
-            </div>
-            <p className="text-lg md:text-xl font-extrabold text-slate-900 leading-snug mb-2">{sc.headline}</p>
-            <p className="text-sm text-slate-500 leading-relaxed">{sc.summary}</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <RoutePanel route={sc.routeA} label="Route A — The Trap" isWinner={saved<0} maxL={maxL} isA={true} />
-            <RoutePanel route={sc.routeB} label="Route B — Optimized" isWinner={saved>0} maxL={maxL} isA={false} />
-          </div>
-          {saved !== 0 && (
-            <div className={`rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-4 ${saved > 0 ? "bg-emerald-50 border border-emerald-200" : "bg-rose-50 border border-rose-200"}`}>
-              <div className="flex items-center gap-3"><div className={`w-10 h-10 rounded-xl flex items-center justify-center ${saved>0?"bg-emerald-600":"bg-rose-600"}`}>{saved>0 ? <CheckCircle size={20} className="text-white"/> : <AlertTriangle size={20} className="text-white"/>}</div>
-              <div><p className={`text-sm font-extrabold ${saved>0?"text-emerald-900":"text-rose-900"}`}>{saved>0 ? `Route B saves ${saved} day-equivalents of frictional latency` : `Route A is ${Math.abs(saved)} days faster — no risk asymmetry`}</p><p className="text-xs text-slate-500 mt-0.5">L(A) = {totA}d  ·  L(B) = {totB}d  ·  Δ = {Math.abs(saved)} days</p></div></div>
-              <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-xl border border-slate-200 text-xs font-mono font-bold text-slate-700">L(x) = D + T + I + B + R</div>
-            </div>
-          )}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">{sc.stats.map((st, i) => (<div key={i} className="bg-white border border-slate-200 rounded-2xl p-4"><div className="flex items-center gap-2 mb-2"><st.Icon size={14} className="text-slate-400"/><p className="text-xs text-slate-500 font-medium">{st.label}</p></div><p className="text-2xl font-extrabold text-slate-900 font-mono leading-none">{st.value}</p><p className="text-xs text-slate-400 mt-1">{st.sub}</p></div>))}</div>
-          <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden"><div className="flex items-center justify-between px-5 py-4 border-b border-slate-100"><div className="flex items-center gap-2.5"><div className="w-7 h-7 bg-indigo-100 rounded-lg flex items-center justify-center"><Radio size={14} className="text-indigo-600"/></div><div><p className="text-sm font-bold text-slate-900">Horizon Scan Feed</p><p className="text-xs text-slate-400">Weak signal intelligence — {sc.signals.length} signals detected</p></div></div><button onClick={runScan} disabled={scanning} className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-xs font-bold rounded-xl transition-all">{scanning ? <RefreshCw size={13} className="animate-spin"/> : <Zap size={13}/>}{scanning ? "Scanning..." : "Run Scan"}</button></div><div className="p-4 space-y-2.5">{vis === 0 && !scanning && (<div className="text-center py-8 text-slate-400"><Radio size={28} className="mx-auto mb-2 opacity-30"/><p className="text-sm">Press Run Scan to simulate signal detection</p></div>)}{sc.signals.slice(0, vis).map((sig, i) => { const cls = SIG_CLS[sig.level]; return (<div key={`${idx}-${i}`} className={`sig-in flex items-start gap-3 p-3 rounded-xl ${cls.wrap}`}><div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 pulse-dot ${cls.dot}`}/><div className="flex-1 min-w-0"><div className="flex items-center gap-2 flex-wrap mb-1"><span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${cls.badge}`}>{sig.level.toUpperCase()}</span><span className="text-xs font-bold text-slate-700">{sig.source}</span></div><p className="text-xs text-slate-600 leading-relaxed">{sig.text}</p></div><ChevronRight size={13} className="text-slate-300 shrink-0 mt-1"/></div>); })}{scanning && vis < sc.signals.length && (<div className="flex items-center gap-2 px-3 py-2 text-xs text-indigo-600 font-medium"><div className="w-2 h-2 bg-indigo-500 rounded-full pulse-dot"/>Scanning signal sources...</div>)}</div></div>
+      <!-- Traffic -->
+      <div class="input-section">
+        <div class="section-label">
+          <svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+          [T] TRAFFIC VARIABLES
         </div>
-      );
-    }
-    function RoutePanel({ route, label, isWinner, maxL }) { const tot = totalL(route.latency); const activeVars = VAR_META.filter(v => (route.latency[v.key]||0) > 0); return (<div className={`bg-white border-2 rounded-2xl overflow-hidden ${isWinner ? "border-emerald-400" : "border-slate-200"}`}><div className={`px-5 py-3 flex items-center justify-between ${isWinner ? "bg-emerald-50" : "bg-rose-50"}`}><div><p className="text-xs font-bold text-slate-500 uppercase tracking-wider">{label}</p><p className="text-sm font-bold text-slate-800 mt-0.5">{route.label}</p></div><div className="text-right"><p className={`text-3xl font-extrabold font-mono ${isWinner ? "text-emerald-600" : "text-rose-600"}`}>{tot}</p><p className="text-xs text-slate-400">day-equiv.</p></div></div><div className="p-5 space-y-4"><div className="h-8 w-full bg-slate-100 rounded-xl overflow-hidden flex border border-slate-200">{VAR_META.map(v => { const val = route.latency[v.key]||0; if (!val) return null; const pct = (val / maxL) * 100; return (<div key={v.key} style={{width:`${pct}%`}} title={`${v.name}: ${val}d`} className={`${v.bar} hover:brightness-110 transition-all cursor-pointer relative flex items-center justify-center`}>{pct > 8 && <span className="text-white text-[10px] font-bold">{val}</span>}</div>); })}</div><div className="space-y-1.5">{activeVars.map(v => { const val = route.latency[v.key]||0; return (<div key={v.key} className="flex items-center gap-2 text-xs"><div className={`w-2 h-2 rounded-sm shrink-0 ${v.bar}`}/><span className="text-slate-500 w-24 shrink-0">[{v.short}] {v.name}</span><div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden"><div className={`h-full rounded-full ${v.bar}`} style={{width:`${(val/tot)*100}%`}}/></div><span className="font-mono font-bold text-slate-700 w-6 text-right">{val}d</span></div>); })}</div><p className="text-xs text-slate-400 italic border-t border-slate-100 pt-3">{route.note}</p><div className={`flex items-center gap-2 text-xs font-bold px-3 py-2 rounded-xl ${isWinner ? "bg-emerald-50 text-emerald-700" : "bg-slate-50 text-slate-500"}`}><span className="text-[10px] font-bold px-2 py-0.5 rounded-full border" style={{borderColor: isWinner?"#34d399":"#e2e8f0"}}>{route.badge}</span></div></div></div>); }
-    function SimulationTab() { const [rA, setRA] = useState({ d:3, t:7, i:5, b:30, r:0 }); const [rB, setRB] = useState({ d:5, t:1, i:1, b:2,  r:0 }); const tA = totalL(rA), tB = totalL(rB); const maxT = Math.max(tA, tB, 1); const saved = tA - tB; const upA = (k,v) => setRA(p=>({...p,[k]:parseInt(v)||0})); const upB = (k,v) => setRB(p=>({...p,[k]:parseInt(v)||0})); return (<div className="space-y-5"><div className="bg-indigo-600 rounded-2xl p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4"><div><p className="text-indigo-200 text-xs font-bold uppercase tracking-widest mb-1">Frictional Latency Equation</p><p className="text-white font-mono text-2xl font-extrabold tracking-wider">L(x) = D + T + I + B + R</p><p className="text-indigo-300 text-xs mt-1.5 leading-relaxed">Adjust any variable below. Route B wins when its total L(x) is lower — even if D is higher.</p></div><div className="shrink-0 bg-indigo-700 rounded-xl p-4 text-center"><p className="text-indigo-200 text-xs mb-1">Day-Equiv. Saved</p><p className={`text-3xl font-extrabold font-mono ${saved>0?"text-emerald-300":saved<0?"text-rose-300":"text-white"}`}>{saved>0?"+":""}{saved}</p><p className="text-indigo-300 text-xs mt-0.5">{saved>0?"Route B wins":saved<0?"Route A wins":"Tied"}</p></div></div><div className="bg-white border border-slate-200 rounded-2xl p-5"><p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Abstract Route Map</p><RouteMapSVG tA={tA} tB={tB} latA={rA} latB={rB} /></div><div className="grid grid-cols-1 lg:grid-cols-2 gap-5"><SimPanel label="Route A" emoji="⚠️" total={tA} maxT={maxT} lat={rA} updater={upA} isWinner={tA<tB} /><SimPanel label="Route B" emoji="✓" total={tB} maxT={maxT} lat={rB} updater={upB} isWinner={tB<tA} /></div><div className="flex flex-wrap gap-4 justify-center text-xs text-slate-600 py-2">{VAR_META.map(v => (<div key={v.key} className="flex items-center gap-1.5"><div className={`w-3 h-3 rounded-sm ${v.bar}`}/><span>[{v.short}] {v.name}</span></div>))}</div></div>); }
-    function RouteMapSVG({ tA, tB, latA, latB }) { const maxAll = Math.max(tA, tB, 1); const wA = Math.round((tA / maxAll) * 420); const wB = Math.round((tB / maxAll) * 420); return (<svg viewBox="0 0 620 140" className="w-full h-auto"><text x="10" y="32" fontSize="11" fontWeight="700" fill="#64748b">ORIGIN</text><text x="560" y="32" fontSize="11" fontWeight="700" fill="#64748b" textAnchor="end">DESTINATION</text><rect x="10" y="42" width="540" height="24" rx="12" fill="#f1f5f9"/><rect x="10" y="42" width={wA} height="24" rx="12" fill="#e11d48" opacity="0.15"/>{VAR_META.filter(v=>latA[v.key]>0).reduce((acc,v,i,arr)=>{ const pct = (arr.slice(0,i).reduce((s,x)=>s+(latA[x.key]||0),0) / Math.max(tA,1)); const w = (latA[v.key]||0) / Math.max(tA,1) * wA; const x = 10 + pct * wA; acc.push(<rect key={v.key} x={x} y={42} width={w} height={24} fill={v.hex} opacity="0.9"/>); return acc; },[])}<text x="16" y="57" fontSize="10" fontWeight="700" fill="#334155">Route A  L(x)={tA}d</text><text x={10+wA+6} y="57" fontSize="11" fontWeight="700" fill="#e11d48">{tA}d</text><rect x="10" y="96" width="540" height="24" rx="12" fill="#f1f5f9"/><rect x="10" y="96" width={wB} height="24" rx="12" fill="#10b981" opacity="0.15"/>{VAR_META.filter(v=>latB[v.key]>0).reduce((acc,v,i,arr)=>{ const pct = arr.slice(0,i).reduce((s,x)=>s+(latB[x.key]||0),0) / Math.max(tB,1); const w = (latB[v.key]||0) / Math.max(tB,1) * wB; const x = 10 + pct * wB; acc.push(<rect key={v.key} x={x} y={96} width={w} height={24} fill={v.hex} opacity="0.9"/>); return acc; },[])}<text x="16" y="111" fontSize="10" fontWeight="700" fill="#334155">Route B  L(x)={tB}d</text><text x={10+wB+6} y="111" fontSize="11" fontWeight="700" fill="#10b981">{tB}d</text></svg>); }
-    function SimPanel({ label, emoji, total, maxT, lat, updater, isWinner }) { return (<div className={`bg-white border-2 rounded-2xl overflow-hidden ${isWinner?"border-emerald-400":"border-slate-200"}`}><div className={`px-5 py-3 flex items-center justify-between ${isWinner?"bg-emerald-50":"bg-slate-50"}`}><div><p className="text-xs font-bold text-slate-500">{emoji} {label}</p><p className={`text-3xl font-extrabold font-mono ${isWinner?"text-emerald-600":"text-rose-600"}`}>{total} <span className="text-sm font-medium text-slate-400">days</span></p></div>{isWinner && (<div className="flex items-center gap-1.5 text-xs font-bold text-emerald-700 bg-emerald-100 px-3 py-1.5 rounded-full"><CheckCircle size={12}/> OPTIMAL</div>)}</div><div className="px-5 pt-4 pb-2"><div className="h-10 w-full bg-slate-100 rounded-xl overflow-hidden flex border border-slate-200">{VAR_META.map(v => { const val = lat[v.key]||0; if (!val) return null; const pct = (val/Math.max(maxT,1))*100; return (<div key={v.key} style={{width:`${pct}%`}} title={`${v.name}: ${val}d`} className={`${v.bar} flex items-center justify-center border-r border-white/20 last:border-0 transition-all hover:brightness-110 cursor-default`}>{pct > 6 && <span className="text-white text-[10px] font-bold leading-none">{val}</span>}</div>); })}</div></div><div className="px-5 pb-5 pt-3 space-y-4">{VAR_META.map(v => (<div key={v.key} className="space-y-1.5"><div className="flex justify-between text-xs font-semibold text-slate-600"><span className={v.text}>[{v.short}] {v.name}</span><span className="font-mono bg-slate-100 px-2 py-0.5 rounded border border-slate-200 text-slate-700">{lat[v.key]||0}d</span></div><input type="range" min="0" max={v.max} value={lat[v.key]||0} onChange={e=>updater(v.key,e.target.value)} className="w-full h-1.5 bg-slate-200 rounded-full appearance-none cursor-pointer"/></div>))}</div></div>); }
-    function CalculatorTab() { const [params, setParams] = useState({ distanceDays:4, trafficProb:40, trafficMax:5, infraProb:15, infraMax:7, bStops:3, delayPerStop:2.5, riskProb:0, riskImpact:0, dailyCost:150, }); const set = (k,v) => setParams(p=>({...p,[k]:parseFloat(v)||0})); const expT = (params.trafficProb/100)*params.trafficMax; const expI = (params.infraProb/100)*params.infraMax; const expB = params.bStops * params.delayPerStop; const expR = (params.riskProb/100)*params.riskImpact; const expL = params.distanceDays + expT + expI + expB + expR; const expCost = expL * params.dailyCost; const loadPreset = (sc) => { const A = sc.routeA.latency; setParams(p=>({ ...p, distanceDays: A.d||0, trafficProb: A.t > 0 ? 80 : 0, trafficMax: A.t||0, infraProb: A.i > 0 ? 60 : 0, infraMax: A.i||0, bStops: Math.round((A.b||0)/3)||1, delayPerStop: A.b > 0 ? 3 : 0, riskProb: A.r > 0 ? 30 : 0, riskImpact: A.r > 0 ? Math.round(A.r/0.3) : 0, })); }; return (<div className="space-y-5"><div className="bg-white border border-slate-200 rounded-2xl p-4"><p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Quick Load — Route A from Real Scenario</p><div className="flex flex-wrap gap-2">{SCENARIOS.map(sc => (<button key={sc.id} onClick={() => loadPreset(sc)} className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${sc.chipClass} hover:opacity-80 border-transparent`}>{sc.title.split("/")[0].trim()}</button>))}<button onClick={() => setParams({ distanceDays:4,trafficProb:40,trafficMax:5,infraProb:15,infraMax:7,bStops:3,delayPerStop:2.5,riskProb:0,riskImpact:0,dailyCost:150 })} className="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all flex items-center gap-1.5"><RefreshCw size={11}/> Reset</button></div></div><div className="grid grid-cols-1 lg:grid-cols-3 gap-5"><div className="lg:col-span-2 bg-white border border-slate-200 rounded-2xl p-6 space-y-6"><div><p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2"><Map size={12}/>Base Metrics</p><div className="grid grid-cols-1 md:grid-cols-2 gap-4"><CalcInput label="Base Transit Time (days)" name="distanceDays" value={params.distanceDays} onChange={set} hint="Ideal travel time with zero disruptions"/><CalcInput label="Holding Cost per Day ($)" name="dailyCost" value={params.dailyCost} onChange={set} hint="Fuel, storage, delay penalties, etc."/></div></div><div className="grid grid-cols-1 md:grid-cols-2 gap-6"><div className="space-y-4"><p className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Truck size={12}/>Traffic Variables</p><CalcInput label="Traffic Delay Probability (%)" name="trafficProb" value={params.trafficProb} max={100} onChange={set} hint="Probability (0–100) of severe congestion"/><CalcInput label="Max Expected Traffic Delay (d)" name="trafficMax" value={params.trafficMax} onChange={set} hint="Worst-case days if congestion occurs"/><p className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2 pt-2"><AlertTriangle size={12}/>Infrastructure Risk</p><CalcInput label="Infrastructure Failure Prob. (%)" name="infraProb" value={params.infraProb} max={100} onChange={set} hint="Probability of road damage or port issues"/><CalcInput label="Max Recovery Delay (days)" name="infraMax" value={params.infraMax} onChange={set} hint="Days needed to bypass broken infrastructure"/></div><div className="space-y-4"><p className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><FileText size={12}/>Bureaucratic Friction</p><CalcInput label="Number of Checkpoints" name="bStops" value={params.bStops} onChange={set} hint="Manual inspections, customs stops, etc."/><CalcInput label="Average Delay per Stop (d)" name="delayPerStop" value={params.delayPerStop} step="0.5" onChange={set} hint="Average days spent at each checkpoint"/><p className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2 pt-2"><Shield size={12}/>Risk Exposure (R)</p><CalcInput label="Disruption Probability (%)" name="riskProb" value={params.riskProb} max={100} onChange={set} hint="Attack, closure, seizure probability"/><CalcInput label="Impact if Event Occurs (d)" name="riskImpact" value={params.riskImpact} onChange={set} hint="Expected days of delay if risk materializes"/></div></div></div><div className="space-y-4"><div className="bg-indigo-600 rounded-2xl p-6 text-white relative overflow-hidden"><div className="absolute -top-4 -right-4 opacity-10"><Activity size={100}/></div><p className="text-indigo-200 text-xs font-bold uppercase tracking-widest mb-1 relative z-10">Expected L(x)</p><p className="text-indigo-300 text-xs mb-4 relative z-10">Bayesian weighted projection</p><p className="text-6xl font-extrabold font-mono relative z-10">{expL.toFixed(1)}</p><p className="text-indigo-200 text-sm mt-1 relative z-10">day-equivalents</p></div><div className="bg-white border border-slate-200 rounded-2xl p-5"><p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Latency Breakdown</p><DonutChart segments={[{ label:"Distance", value: params.distanceDays, color:"#3b82f6" },{ label:"Traffic", value: expT, color:"#f59e0b" },{ label:"Infra", value: expI, color:"#f97316" },{ label:"Bureaucracy", value: expB, color:"#a855f7" },{ label:"Risk", value: expR, color:"#e11d48" }].filter(s=>s.value>0)} total={expL} /></div><div className="bg-white border border-slate-200 rounded-2xl p-5"><p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Projected Logistics Cost</p><p className="text-3xl font-extrabold font-mono text-emerald-600">${expCost.toLocaleString(undefined,{minimumFractionDigits:0,maximumFractionDigits:0})}</p><p className="text-xs text-slate-400 mt-1">{expL.toFixed(1)}d × ${params.dailyCost}/d</p></div></div></div></div>); }
-    function CalcInput({ label, name, value, onChange, hint, max, step="1" }) { return (<div><label className="block text-xs font-semibold text-slate-700 mb-0.5">{label}</label>{hint && <p className="text-[10px] text-slate-400 mb-1.5 leading-tight">{hint}</p>}<input type="number" name={name} value={value} onChange={e=>onChange(name,e.target.value)} max={max} step={step} className="w-full border border-slate-300 text-slate-800 text-sm font-medium rounded-xl focus:ring-2 focus:ring-indigo-400/30 focus:border-indigo-500 p-2.5 outline-none transition-all bg-white"/></div>); }
-    function DonutChart({ segments, total }) { if (!segments.length || total <= 0) return null; const r = 44, cx = 56, cy = 56, stroke = 16; const circ = 2 * Math.PI * r; let offset = -Math.PI / 2; const paths = segments.map(s => { const pct = s.value / total; const angle = pct * Math.PI * 2; const start = offset; offset += angle; const x1 = cx + r * Math.cos(start), y1 = cy + r * Math.sin(start); const x2 = cx + r * Math.cos(start+angle), y2 = cy + r * Math.sin(start+angle); const large = angle > Math.PI ? 1 : 0; return { ...s, pct, d: `M ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2}` }; }); return (<div className="flex items-center gap-4"><svg width="112" height="112" viewBox="0 0 112 112" className="shrink-0"><circle cx={cx} cy={cy} r={r} fill="none" stroke="#f1f5f9" strokeWidth={stroke}/>{paths.map((p,i) => (<path key={i} d={p.d} fill="none" stroke={p.color} strokeWidth={stroke} strokeLinecap="round"/>))}<text x={cx} y={cy-3} textAnchor="middle" fontSize="13" fontWeight="700" fill="#1e293b">{total.toFixed(1)}</text><text x={cx} y={cy+11} textAnchor="middle" fontSize="9" fill="#94a3b8">days</text></svg><div className="space-y-2 flex-1">{paths.map((s,i) => (<div key={i}><div className="flex justify-between text-xs mb-1"><span className="text-slate-600 flex items-center gap-1.5"><span style={{background:s.color}} className="w-2 h-2 rounded-sm inline-block"/>{s.label}</span><span className="font-mono font-bold text-slate-700">{s.value.toFixed(1)}d</span></div><div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden"><div style={{width:`${s.pct*100}%`,background:s.color}} className="h-full rounded-full"/></div></div>))}</div></div>); }
+        <div class="input-grid">
+          <div class="input-group">
+            <label class="input-label">Traffic Delay Probability (%)</label>
+            <div class="input-hint">Probability (0–100) of severe congestion</div>
+            <input class="input-field" type="number" id="c-tprob" value="40" min="0" max="100" oninput="calcUpdate()"/>
+          </div>
+          <div class="input-group">
+            <label class="input-label">Max Expected Delay (days)</label>
+            <div class="input-hint">Worst-case days if congestion occurs</div>
+            <input class="input-field" type="number" id="c-tmax" value="5" min="0" oninput="calcUpdate()"/>
+          </div>
+        </div>
+      </div>
 
-    // Render app
-    const rootElement = document.getElementById("root");
-    const root = ReactDOM.createRoot(rootElement);
-    root.render(<App />);
-  </script>
+      <!-- Infra -->
+      <div class="input-section">
+        <div class="section-label">
+          <svg viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          [I] INFRASTRUCTURE RISK
+        </div>
+        <div class="input-grid">
+          <div class="input-group">
+            <label class="input-label">Infrastructure Failure Prob. (%)</label>
+            <div class="input-hint">Road damage, port issues probability</div>
+            <input class="input-field" type="number" id="c-iprob" value="15" min="0" max="100" oninput="calcUpdate()"/>
+          </div>
+          <div class="input-group">
+            <label class="input-label">Max Recovery Delay (days)</label>
+            <div class="input-hint">Days needed to bypass damaged infra</div>
+            <input class="input-field" type="number" id="c-imax" value="7" min="0" oninput="calcUpdate()"/>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bureaucracy -->
+      <div class="input-section">
+        <div class="section-label">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          [B] BUREAUCRATIC FRICTION
+        </div>
+        <div class="input-grid">
+          <div class="input-group">
+            <label class="input-label">Number of Checkpoints</label>
+            <div class="input-hint">Manual inspections, customs stops</div>
+            <input class="input-field" type="number" id="c-bstops" value="3" min="0" oninput="calcUpdate()"/>
+          </div>
+          <div class="input-group">
+            <label class="input-label">Avg. Delay per Stop (days)</label>
+            <div class="input-hint">Average processing time per checkpoint</div>
+            <input class="input-field" type="number" id="c-bdelay" value="2.5" min="0" step="0.5" oninput="calcUpdate()"/>
+          </div>
+        </div>
+      </div>
+
+      <!-- Risk -->
+      <div class="input-section" style="margin-bottom:0">
+        <div class="section-label">
+          <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          [R] RISK EXPOSURE (STOCHASTIC)
+        </div>
+        <div class="input-grid">
+          <div class="input-group">
+            <label class="input-label">Disruption Probability (%)</label>
+            <div class="input-hint">Attack, closure, seizure probability</div>
+            <input class="input-field" type="number" id="c-rprob" value="0" min="0" max="100" oninput="calcUpdate()"/>
+          </div>
+          <div class="input-group">
+            <label class="input-label">Impact if Event Occurs (days)</label>
+            <div class="input-hint">Expected delay days if risk materializes</div>
+            <input class="input-field" type="number" id="c-rimpact" value="0" min="0" oninput="calcUpdate()"/>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Result Panel -->
+    <div class="result-panel">
+      <div class="result-hero">
+        <div class="result-hero-label">EXPECTED L(x) — BAYESIAN WEIGHTED</div>
+        <div class="result-hero-num" id="r-total">7.8</div>
+        <div class="result-hero-unit">day-equivalents</div>
+        <div class="result-score">
+          <div class="score-label" id="r-score-label">Efficiency</div>
+          <div class="score-bar-wrap"><div class="score-bar" id="r-score-bar" style="width:80%"></div></div>
+          <div class="score-num" id="r-score-num">80</div>
+        </div>
+      </div>
+
+      <div class="donut-wrap">
+        <div class="label" style="margin-bottom:12px">LATENCY BREAKDOWN</div>
+        <div class="donut-inner">
+          <svg id="donut-svg" width="100" height="100" viewBox="0 0 100 100" style="flex-shrink:0" role="img" aria-label="Latency breakdown donut chart"></svg>
+          <div class="donut-legend" id="donut-legend"></div>
+        </div>
+      </div>
+
+      <div class="cost-card">
+        <div class="cost-label">PROJECTED LOGISTICS COST</div>
+        <div class="cost-val" id="r-cost">$1,170</div>
+        <div class="cost-sub" id="r-cost-sub">7.8d × $150/d</div>
+      </div>
+
+      <div class="efficiency-card">
+        <div class="eff-title">ROUTE EFFICIENCY SCORE</div>
+        <div class="eff-track"><div class="eff-fill" id="eff-fill" style="width:80%;background:#059669"></div></div>
+        <div class="eff-labels">
+          <span>Critical</span><span>Poor</span><span>Fair</span><span>Good</span><span>Optimal</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<div class="app-footer">Trade Algorithm Simulator  ·  STD-TSP × Horizon Scanning  ·  Frictional Latency Framework  ·  L(x) = D + T + I + B + R</div>
+
+</div><!-- /root -->
+
+<script>
+// ══════════════════════════════════════════════════════
+// DATA
+// ══════════════════════════════════════════════════════
+const VARS = [
+  {key:'d',short:'D',name:'Distance',       color:'#3b82f6',max:30},
+  {key:'t',short:'T',name:'Traffic/Wait',   color:'#f59e0b',max:25},
+  {key:'i',short:'I',name:'Infrastructure', color:'#ea580c',max:20},
+  {key:'b',short:'B',name:'Bureaucracy',    color:'#a855f7',max:50},
+  {key:'r',short:'R',name:'Risk Exposure',  color:'#e11d48',max:30},
+];
+const total = (lat) => VARS.reduce((s,v)=>s+(lat[v.key]||0),0);
+
+const SCENARIOS = [
+  {
+    id:'red-sea', activeClass:'active-red-sea',
+    period:'2024–2025', title:'Red Sea / Houthi Crisis',
+    chip:{cls:'chip-rose',text:'LIVE CRISIS'},
+    headline:'95% of container ships globally rerouted — largest maritime disruption since Suez 1956',
+    summary:'Houthi rebel attacks on commercial shipping in the Bab-el-Mandeb strait caused virtually every major carrier to abandon the Suez Canal route. An STD-TSP engine fed by UKMTO and Lloyd\'s signals recommended Cape of Good Hope routing 72 hours before the first major attack confirmed.',
+    routeA:{label:'Via Red Sea + Suez Canal', badge:'Standard Pre-Crisis', note:'[R] = 30% attack probability × 60-day expected loss = 18 day-equivalents',lat:{d:14,t:2,i:1,b:1,r:18}},
+    routeB:{label:'Via Cape of Good Hope',    badge:'Horizon-Scan Optimized', note:'+14 physical days, but R=0. Total L(x) drops from 36 to 29.',lat:{d:28,t:1,i:0,b:0,r:0}},
+    signals:[
+      {level:'medium',  source:'UKMTO',              text:'Maritime Security Advisory issued for Gulf of Aden corridor'},
+      {level:'high',    source:"Lloyd's of London",   text:'Red Sea war-risk insurance premium surges +0.7% — highest since 2005'},
+      {level:'critical',source:'Houthi Media Office', text:"Expanded 'military operations zone' now includes northern Red Sea"},
+      {level:'medium',  source:'AIS Satellite Data',  text:'Anomalous vessel deviation patterns detected in Bab-el-Mandeb'},
+      {level:'critical',source:'Reuters / AP',        text:'MSC + Maersk announce immediate suspension of all Red Sea transits'},
+    ],
+    stats:[
+      {label:'SHIPS REROUTED', val:'~95%',   sub:'of global container traffic', icon:'package'},
+      {label:'EXTRA DAYS',     val:'+10–14', sub:'per voyage via Cape',         icon:'clock'},
+      {label:'EXTRA FUEL',     val:'>$1M',   sub:'per voyage',                  icon:'dollar'},
+      {label:'INSURANCE',      val:'+600%',  sub:'war-risk premium spike',      icon:'shield'},
+    ],
+  },
+  {
+    id:'hormuz', activeClass:'active-hormuz',
+    period:'Persistent Risk 2019–Present', title:'Strait of Hormuz',
+    chip:{cls:'chip-amber',text:'STRATEGIC RISK'},
+    headline:'20% of world\'s oil and 30% of global LNG passes through a 21-mile bottleneck',
+    summary:'Iran periodically threatens to close the Strait of Hormuz. Saudi Aramco\'s East-West Pipeline (5M bpd capacity) provides the only viable strategic bypass via Yanbu. Horizon Scanning on IRGC naval exercise announcements gives a 72-hour routing window before closure risk peaks.',
+    routeA:{label:'Through Strait of Hormuz',      badge:'Direct Route',      note:'[R] = 25% closure probability × 72-day impact = 18 day-equivalents',lat:{d:3,t:1,i:0,b:2,r:18}},
+    routeB:{label:'Aramco E-W Pipeline + Yanbu',   badge:'Strategic Bypass',  note:'7 days longer physically. R drops to zero — total L(x): 13 vs 24.',lat:{d:10,t:1,i:1,b:1,r:0}},
+    signals:[
+      {level:'medium',  source:'IRGC State Media',  text:'Naval exercise announced in Strait of Hormuz — 7 warships deployed'},
+      {level:'high',    source:'US 5th Fleet',       text:'USS Abraham Lincoln carrier group repositioned to Persian Gulf entrance'},
+      {level:'critical',source:'IRGC Commander',     text:'Explicit closure threat issued if new US sanctions enacted'},
+      {level:'medium',  source:'S&P Global Platts',  text:'Brent crude futures spike 4.2% on Hormuz closure fears'},
+      {level:'high',    source:'IMO Bulletin',       text:'Tanker operators advised of heightened seizure and interdiction risk'},
+    ],
+    stats:[
+      {label:'OIL TRANSITS',  val:'20%',    sub:'of global daily flow',    icon:'trending'},
+      {label:'LNG TRANSITS',  val:'30%',    sub:'of global LNG',           icon:'zap'},
+      {label:'PIPELINE CAP',  val:'5M bpd', sub:'Aramco bypass capacity',  icon:'route'},
+      {label:'BYPASS ADDS',   val:'+7–10d', sub:'via pipeline + Yanbu',    icon:'clock'},
+    ],
+  },
+  {
+    id:'panama', activeClass:'active-panama',
+    period:'Q4 2023 — Q1 2024', title:'Panama Canal Drought',
+    chip:{cls:'chip-blue',text:'CLIMATE DISRUPTION'},
+    headline:'El Niño cut daily transits 36% — 160 vessels queued for 21+ days',
+    summary:'Historic drought dropped Gatun Lake below minimum operating levels. Daily transits fell from 36 to 18. Shippers with 90-day Horizon Scan capability pre-booked Suez Canal slots using NOAA El Niño forecasts and avoided the queue entirely.',
+    routeA:{label:'Panama Canal (Direct)',       badge:'Drought-Hit Route',    note:'[T] = 21-day queue wait — systemic capacity bottleneck, not traffic',lat:{d:14,t:21,i:3,b:4,r:0}},
+    routeB:{label:'All-Water via Suez Canal',   badge:'Pre-Booked Bypass',    note:'Pre-booked 90 days ahead via NOAA El Niño signal. L(x): 29 vs 42.',lat:{d:28,t:0,i:0,b:1,r:0}},
+    signals:[
+      {level:'medium',  source:'NOAA',              text:'Strong El Niño declared — Panama rainfall 40% below 30-year average'},
+      {level:'medium',  source:'ACP Authority',     text:'Gatun Lake falls 0.3m below critical threshold for canal operations'},
+      {level:'high',    source:'Panama Canal Auth.',text:'Daily transit slots reduced from 36 to 24 — effective in two weeks'},
+      {level:'critical',source:'Panama Canal Auth.',text:'Further reduction to 18 transits/day. Booking waitlist: 8 weeks'},
+      {level:'critical',source:'Marine Traffic',   text:'Queue reaches 160 vessels. Average wait time: 21 days and rising'},
+    ],
+    stats:[
+      {label:'TRANSIT CUT', val:'−36%',  sub:'from 36 to 18 per day', icon:'trending'},
+      {label:'QUEUE PEAK',  val:'160',    sub:'vessels waiting',        icon:'package'},
+      {label:'WAIT TIME',   val:'21+ d',  sub:'average queue time',     icon:'clock'},
+      {label:'REVENUE LOST',val:'$200M+', sub:'canal authority',        icon:'dollar'},
+    ],
+  },
+  {
+    id:'indonesia', activeClass:'active-indonesia',
+    period:'Live Case — Aceh to Rotterdam', title:'Indonesia MSME: Gayo Coffee',
+    chip:{cls:'chip-emerald',text:'MSME CASE STUDY'},
+    headline:'Bureaucratic audit converts a 3-day domestic leg into a 45-day cash-flow crisis',
+    summary:'A Gayo specialty coffee MSME faces a surprise inter-ministerial customs audit at Belawan Port, N. Sumatra. The STD-TSP engine detects the DGCE bulletin 5 days early and reroutes cargo via the Penang Bridge corridor into Port Klang — bypassing the audit and delivering 33 days ahead of schedule.',
+    routeA:{label:'Belawan Port (Direct)',             badge:'Standard MSME Route',     note:'[B] = 30-day bureaucratic audit — completely invisible to standard routing',lat:{d:3,t:7,i:5,b:30,r:0}},
+    routeB:{label:'Truck → Penang → Port Klang',      badge:'Friction-Optimized Bypass', note:'+2 days distance, −33 days friction. L(x): 9 vs 45.',lat:{d:5,t:1,i:1,b:2,r:0}},
+    signals:[
+      {level:'medium',source:'DGCE Bulletin',    text:'Inter-ministerial customs compliance audit announced at Belawan Port'},
+      {level:'high',  source:'BMKG Weather API', text:'Tropical depression: N. Sumatra provincial roads structurally degraded'},
+      {level:'medium',source:'Pelindo NLE',       text:'Average container dwell time at Belawan rises to 8.5 hours — 3-year high'},
+      {level:'low',   source:'Local Gov. Feed',   text:'Regional ceremony on primary access road to Belawan industrial zone'},
+      {level:'high',  source:'STD-TSP Engine',   text:'Reroute confirmed: L(x)=9d via Penang vs L(x)=45d via Belawan'},
+    ],
+    stats:[
+      {label:'DAYS SAVED',      val:'33 days', sub:'vs standard route',      icon:'clock'},
+      {label:'COST AVOIDED',    val:'$4,950',  sub:'$150/day × 33 days',     icon:'dollar'},
+      {label:'EFFICIENCY GAIN', val:'+275%',   sub:'frictional improvement',  icon:'trending'},
+      {label:'CASH FLOW',       val:'Intact',  sub:'buyer contract honored',  icon:'check'},
+    ],
+  },
+];
+
+// Icon SVG fragments
+function icon(name,cls=''){
+  const i={
+    clock:   'viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+    dollar:  'viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>',
+    shield:  'viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+    package: 'viewBox="0 0 24 24"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>',
+    trending:'viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>',
+    zap:     'viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
+    route:   'viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"/><circle cx="19" cy="5" r="1"/><circle cx="19" cy="19" r="1"/><path d="M6 12h8a4 4 0 0 0 4-4m0 10H6a4 4 0 0 1-4-4"/>',
+    check:   'viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/>',
+  };
+  return `<svg ${i[name]} stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="${cls}" style="width:12px;height:12px"></svg>`;
+}
+
+// ══════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════
+let activeScIdx = 0;
+let scanVisible = 0;
+let scanTimer = null;
+const simState = {
+  A:{d:3,t:7,i:5,b:30,r:0},
+  B:{d:5,t:1,i:1,b:2,r:0},
+};
+
+// ══════════════════════════════════════════════════════
+// TAB SWITCHING
+// ══════════════════════════════════════════════════════
+function switchTab(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+// ══════════════════════════════════════════════════════
+// SCENARIOS
+// ══════════════════════════════════════════════════════
+function buildSelector(){
+  const el = document.getElementById('sc-selector');
+  el.innerHTML = SCENARIOS.map((sc,i)=>`
+    <button class="sc-btn${i===activeScIdx?' '+sc.activeClass:''}" onclick="selectScenario(${i})">
+      <div class="sc-btn-period">${sc.period}</div>
+      <div class="sc-btn-title">${sc.title}</div>
+    </button>
+  `).join('');
+}
+
+function renderScenario(){
+  const sc = SCENARIOS[activeScIdx];
+  buildSelector();
+
+  // Headline
+  document.getElementById('sc-headline').innerHTML=`
+    <div class="chip ${sc.chip.cls}" style="margin-bottom:10px">
+      <svg viewBox="0 0 24 24" width="9" height="9" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49"/></svg>
+      ${sc.chip.text}
+    </div>
+    <div class="headline-text">${sc.headline}</div>
+    <div class="headline-summary">${sc.summary}</div>
+  `;
+
+  // Routes
+  const tA=total(sc.routeA.lat), tB=total(sc.routeB.lat), maxL=Math.max(tA,tB,1);
+  const aWins = tA < tB, bWins = tB < tA;
+  document.getElementById('sc-routes').innerHTML=
+    routePanelHTML(sc.routeA,'A','Route A — The Trap',    aWins?'emerald':'rose', maxL)+
+    routePanelHTML(sc.routeB,'B','Route B — Optimized',   bWins?'emerald':'rose', maxL);
+
+  // Verdict
+  const saved = tA-tB;
+  let vHTML='';
+  if(saved!==0){
+    const win=saved>0;
+    const iconSvg = win
+      ? `<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><polyline points="20 6 9 17 4 12"/></svg>`
+      : `<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`;
+    vHTML=`<div class="verdict ${win?'win':'lose'}">
+      <div class="verdict-left">
+        <div class="verdict-icon" style="background:${win?'#059669':'#e11d48'}">${iconSvg}</div>
+        <div>
+          <div class="verdict-title">${win?`Route B saves ${saved} day-equivalents of frictional latency`:`Route A is ${Math.abs(saved)} days faster — review risk asymmetry`}</div>
+          <div class="verdict-sub">L(A) = ${tA}d · L(B) = ${tB}d · Δ = ${Math.abs(saved)} days</div>
+        </div>
+      </div>
+      <div class="verdict-eq">L(x) = D + T + I + B + R</div>
+    </div>`;
+  }
+  document.getElementById('sc-verdict').innerHTML=vHTML;
+
+  // Stats
+  document.getElementById('sc-stats').innerHTML=sc.stats.map(st=>`
+    <div class="stat-card">
+      <div class="stat-label">${icon(st.icon)} ${st.label}</div>
+      <div class="stat-val">${st.val}</div>
+      <div class="stat-sub">${st.sub}</div>
+    </div>
+  `).join('');
+
+  // Reset scan
+  document.getElementById('scan-sub-label').textContent=`Weak signal intelligence — ${sc.signals.length} signals detected`;
+  resetScan();
+}
+
+function routePanelHTML(route, ab, label, colorScheme, maxL){
+  const tot=total(route.lat);
+  const isGreen=colorScheme==='emerald';
+  const hdrCls = isGreen?'route-header-emerald':'route-header-rose';
+  const totCls = isGreen?'win':'lose';
+  const panelCls= isGreen?'winner':'loser';
+
+  const segs = VARS.map(v=>{
+    const val=route.lat[v.key]||0;
+    if(!val)return'';
+    const pct=Math.round((val/maxL)*100);
+    const showTxt=pct>7;
+    return `<div class="bar-seg" data-tip="${v.name}: ${val}d" style="width:${pct}%;background:${v.color}">${showTxt?val:''}</div>`;
+  }).join('');
+
+  const rows = VARS.map(v=>{
+    const val=route.lat[v.key]||0;
+    if(!val)return'';
+    const pct=Math.round((val/tot)*100);
+    return `<div class="var-row">
+      <div class="var-dot" style="background:${v.color}"></div>
+      <div class="var-name">[${v.short}] ${v.name}</div>
+      <div class="var-bar-wrap"><div class="var-bar-fill" style="width:${pct}%;background:${v.color}"></div></div>
+      <div class="var-val">${val}d</div>
+    </div>`;
+  }).join('');
+
+  return `<div class="route-panel ${panelCls}">
+    <div class="route-header ${hdrCls}">
+      <div>
+        <div class="route-label">${label}</div>
+        <div class="route-name">${route.label}</div>
+      </div>
+      <div>
+        <div class="route-total ${totCls}">${tot}<span class="route-total-unit">d</span></div>
+      </div>
+    </div>
+    <div class="route-body">
+      <div class="stacked-bar">${segs}</div>
+      <div class="var-rows">${rows}</div>
+      <div class="route-note">${route.note}</div>
+      <div class="route-badge">${route.badge}</div>
+    </div>
+  </div>`;
+}
+
+function selectScenario(i){
+  activeScIdx=i;
+  renderScenario();
+}
+
+// ── SCAN ──
+function resetScan(){
+  clearTimeout(scanTimer);
+  scanVisible=0;
+  document.getElementById('scan-body').innerHTML='<div class="scan-empty" id="scan-empty"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"/></svg><p>Press Run Scan to simulate signal detection</p></div>';
+  const btn=document.getElementById('scan-btn');
+  btn.disabled=false;
+  btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Run Scan';
+}
+
+function runScan(){
+  const sc=SCENARIOS[activeScIdx];
+  const btn=document.getElementById('scan-btn');
+  btn.disabled=true;
+  btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;animation:spinR .7s linear infinite"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.17"/></svg> Scanning…';
+  document.getElementById('scan-body').innerHTML='<div id="signals-container" style="display:flex;flex-direction:column;gap:8px"></div><div id="scan-scanning" style="display:flex;align-items:center;gap:8px;padding:6px 4px;font-family:var(--font-mono);font-size:10px;color:var(--indigo)"><div style="width:6px;height:6px;background:var(--indigo);border-radius:50%;animation:pulse 1.4s infinite"></div>Scanning signal sources…</div>';
+  scanVisible=0;
+  tickScan(sc.signals);
+}
+
+function tickScan(signals){
+  if(scanVisible>=signals.length){
+    document.getElementById('scan-scanning').remove();
+    document.getElementById('scan-btn').innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.17"/></svg> Re-scan';
+    document.getElementById('scan-btn').disabled=false;
+    document.getElementById('scan-btn').onclick=()=>{resetScan();setTimeout(runScan,80)};
+    return;
+  }
+  const sig=signals[scanVisible];
+  const lvlMap={critical:['signal-crit','sig-dot-crit','sig-badge-crit'],high:['signal-high','sig-dot-high','sig-badge-high'],medium:['signal-med','sig-dot-med','sig-badge-med'],low:['signal-low','sig-dot-low','sig-badge-low']};
+  const [wCls,dCls,bCls]=lvlMap[sig.level]||lvlMap.low;
+  const el=document.createElement('div');
+  el.className=`signal ${wCls}`;
+  el.innerHTML=`
+    <div class="sig-dot ${dCls}"></div>
+    <div style="flex:1;min-width:0">
+      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px">
+        <span class="sig-badge ${bCls}">${sig.level.toUpperCase()}</span>
+        <span class="sig-source">${sig.source}</span>
+      </div>
+      <div class="sig-text">${sig.text}</div>
+    </div>`;
+  document.getElementById('signals-container').appendChild(el);
+  requestAnimationFrame(()=>el.classList.add('show'));
+  scanVisible++;
+  scanTimer=setTimeout(()=>tickScan(signals),700);
+}
+
+// ══════════════════════════════════════════════════════
+// SIMULATION
+// ══════════════════════════════════════════════════════
+function buildSimPanels(){
+  const el=document.getElementById('sim-panels');
+  el.innerHTML=['A','B'].map(ab=>{
+    const lat=simState[ab];
+    const tot=total(lat);
+    const other=ab==='A'?total(simState.B):total(simState.A);
+    const win=tot<other||(tot===other&&ab==='B');
+    const loseColor=ab==='A'&&tot>=other;
+    const segs=VARS.map(v=>{
+      const val=lat[v.key]||0;
+      if(!val)return'';
+      const mx=Math.max(total(simState.A),total(simState.B),1);
+      const pct=Math.round((val/mx)*100);
+      return `<div class="bar-seg" data-tip="${v.name}: ${val}d" style="width:${pct}%;background:${v.color}">${pct>7?val:''}</div>`;
+    }).join('');
+    const sliders=VARS.map(v=>`
+      <div class="slider-group">
+        <div class="slider-row">
+          <div class="slider-label"><span style="width:8px;height:8px;border-radius:2px;background:${v.color};display:inline-block"></span>[${v.short}] ${v.name}</div>
+          <span class="slider-val" id="sv-${ab}-${v.key}">${lat[v.key]||0}d</span>
+        </div>
+        <input type="range" min="0" max="${v.max}" value="${lat[v.key]||0}" oninput="simSlider('${ab}','${v.key}',this.value)"/>
+      </div>`).join('');
+    return `<div class="sim-panel${win?' sim-win':''}" id="sim-panel-${ab}">
+      <div class="sim-panel-header">
+        <div>
+          <div class="sim-panel-label">ROUTE ${ab} ${ab==='A'?'— STANDARD':'— OPTIMIZED'}</div>
+          <div class="sim-total ${win?'win-color':'lose-color'}" id="sim-tot-${ab}">${tot}<span class="sim-total-unit"> d</span></div>
+        </div>
+        ${win?`<div class="optimal-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px"><polyline points="20 6 9 17 4 12"/></svg> OPTIMAL</div>`:''}
+      </div>
+      <div class="sim-panel-body">
+        <div class="stacked-bar">${segs}</div>
+        ${sliders}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function simSlider(ab,key,val){
+  simState[ab][key]=parseInt(val)||0;
+  document.getElementById(`sv-${ab}-${key}`).textContent=val+'d';
+  updateSimVisuals();
+}
+
+function updateSimVisuals(){
+  const tA=total(simState.A),tB=total(simState.B);
+  const saved=tA-tB;
+  const el=document.getElementById('sim-saved');
+  el.textContent=(saved>0?'+':'')+saved;
+  el.style.color=saved>0?'#6ee7b7':saved<0?'#fca5a5':'#fff';
+  document.getElementById('sim-verdict-txt').textContent=saved>0?'Route B wins':saved<0?'Route A wins':'Tied';
+  // Update totals
+  ['A','B'].forEach(ab=>{
+    const t=total(simState[ab]);
+    const other=ab==='A'?tB:tA;
+    const win=t<=other;
+    const totEl=document.getElementById('sim-tot-'+ab);
+    if(totEl){totEl.textContent=t;totEl.className='sim-total '+(win?'win-color':'lose-color');
+      // re-add unit
+      const span=document.createElement('span');span.className='sim-total-unit';span.textContent=' d';
+      totEl.appendChild(span);
+    }
+    const panel=document.getElementById('sim-panel-'+ab);
+    if(panel)panel.className='sim-panel'+(win?' sim-win':'');
+  });
+  updateRouteMap(tA,tB);
+  // Rebuild panels fully for bars
+  buildSimPanels();
+}
+
+function updateRouteMap(tA,tB){
+  const maxL=Math.max(tA,tB,1);
+  const W=600;
+  let svgA='',svgB='';
+  let offA=0,offB=0;
+  VARS.forEach(v=>{
+    const valA=simState.A[v.key]||0;
+    const valB=simState.B[v.key]||0;
+    if(valA>0){const w=Math.round((valA/maxL)*W);svgA+=`<rect x="${24+offA}" y="30" width="${Math.max(w,1)}" height="22" fill="${v.color}" rx="2"/>`;offA+=w;}
+    if(valB>0){const w=Math.round((valB/maxL)*W);svgB+=`<rect x="${24+offB}" y="72" width="${Math.max(w,1)}" height="22" fill="${v.color}" rx="2"/>`;offB+=w;}
+  });
+  const barWA=Math.round((tA/maxL)*W);
+  const barWB=Math.round((tB/maxL)*W);
+  document.getElementById('routemap-svg').innerHTML=`
+    <rect x="24" y="30" width="${W}" height="22" rx="11" fill="#f1f5f9"/>
+    ${svgA}
+    <text x="16" y="44" font-family="'DM Mono',monospace" font-size="10" fill="#94a3b8" text-anchor="end">A</text>
+    <text x="${28+barWA}" y="43" font-family="'DM Mono',monospace" font-size="11" font-weight="500" fill="#e11d48">${tA}d</text>
+    <rect x="24" y="72" width="${W}" height="22" rx="11" fill="#f1f5f9"/>
+    ${svgB}
+    <text x="16" y="86" font-family="'DM Mono',monospace" font-size="10" fill="#94a3b8" text-anchor="end">B</text>
+    <text x="${28+barWB}" y="85" font-family="'DM Mono',monospace" font-size="11" font-weight="500" fill="#059669">${tB}d</text>
+    <text x="24" y="16" font-family="'DM Mono',monospace" font-size="9" fill="#94a3b8" letter-spacing="0.5">ORIGIN</text>
+    <text x="${W+24}" y="16" font-family="'DM Mono',monospace" font-size="9" fill="#94a3b8" text-anchor="end" letter-spacing="0.5">DESTINATION</text>`;
+}
+
+// ══════════════════════════════════════════════════════
+// CALCULATOR
+// ══════════════════════════════════════════════════════
+const CALC_DEFAULTS={dist:4,cost:150,tprob:40,tmax:5,iprob:15,imax:7,bstops:3,bdelay:2.5,rprob:0,rimpact:0};
+
+function g(id){return parseFloat(document.getElementById('c-'+id).value)||0;}
+function calcUpdate(){
+  const dist=g('dist'),cost=g('cost');
+  const expT=(g('tprob')/100)*g('tmax');
+  const expI=(g('iprob')/100)*g('imax');
+  const expB=g('bstops')*g('bdelay');
+  const expR=(g('rprob')/100)*g('rimpact');
+  const expL=dist+expT+expI+expB+expR;
+  const expCost=expL*cost;
+
+  document.getElementById('r-total').textContent=expL.toFixed(1);
+  document.getElementById('r-cost').textContent='$'+expCost.toLocaleString(undefined,{minimumFractionDigits:0,maximumFractionDigits:0});
+  document.getElementById('r-cost-sub').textContent=`${expL.toFixed(1)}d × $${cost}/d`;
+
+  // Efficiency score: lower latency ratio = better
+  // Score 100 = only base distance, no friction
+  const frictionRatio = expL > 0 ? (dist/expL) : 1;
+  const score = Math.round(Math.min(frictionRatio,1)*100);
+  document.getElementById('r-score-bar').style.width=score+'%';
+  document.getElementById('r-score-num').textContent=score;
+  document.getElementById('r-score-label').textContent='Route Score';
+  document.getElementById('eff-fill').style.width=score+'%';
+  document.getElementById('eff-fill').style.background=score>75?'#059669':score>50?'#d97706':score>25?'#ea580c':'#e11d48';
+
+  // Donut
+  const segs=[
+    {label:'Distance',    val:dist,  color:'#3b82f6'},
+    {label:'Traffic',     val:expT,  color:'#f59e0b'},
+    {label:'Infra',       val:expI,  color:'#ea580c'},
+    {label:'Bureaucracy', val:expB,  color:'#a855f7'},
+    {label:'Risk',        val:expR,  color:'#e11d48'},
+  ].filter(s=>s.val>0);
+  drawDonut(segs,expL);
+}
+
+function drawDonut(segs,total){
+  const r=38,cx=50,cy=50,sw=14;
+  if(!segs.length||total<=0){
+    document.getElementById('donut-svg').innerHTML=`<circle cx="50" cy="50" r="38" fill="none" stroke="#f1f5f9" stroke-width="14"/>`;
+    document.getElementById('donut-legend').innerHTML='<div style="font-family:var(--font-mono);font-size:10px;color:var(--ink4)">No data</div>';
+    return;
+  }
+  let paths=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#f1f5f9" stroke-width="${sw}"/>`;
+  let offset=-(Math.PI/2);
+  segs.forEach(s=>{
+    const pct=s.val/total;
+    const angle=pct*Math.PI*2;
+    const x1=cx+r*Math.cos(offset),y1=cy+r*Math.sin(offset);
+    const x2=cx+r*Math.cos(offset+angle),y2=cy+r*Math.sin(offset+angle);
+    const large=angle>Math.PI?1:0;
+    paths+=`<path d="M${x1} ${y1} A${r} ${r} 0 ${large} 1 ${x2} ${y2}" fill="none" stroke="${s.color}" stroke-width="${sw}" stroke-linecap="round"/>`;
+    offset+=angle;
+  });
+  paths+=`<text x="${cx}" y="${cy-4}" text-anchor="middle" font-family="'DM Mono',monospace" font-size="13" font-weight="500" fill="#1e293b">${total.toFixed(1)}</text>
+           <text x="${cx}" y="${cy+11}" text-anchor="middle" font-family="'DM Mono',monospace" font-size="9" fill="#94a3b8">days</text>`;
+  document.getElementById('donut-svg').innerHTML=paths;
+  document.getElementById('donut-legend').innerHTML=segs.map(s=>{
+    const pct=Math.round((s.val/total)*100);
+    return `<div class="donut-row">
+      <div class="donut-row-top">
+        <div class="donut-name"><span class="donut-dot" style="background:${s.color}"></span>${s.label}</div>
+        <div class="donut-val">${s.val.toFixed(1)}d</div>
+      </div>
+      <div class="donut-mini-bar"><div class="donut-mini-fill" style="width:${pct}%;background:${s.color}"></div></div>
+    </div>`;
+  }).join('');
+}
+
+function loadPreset(i){
+  const sc=SCENARIOS[i];
+  const A=sc.routeA.lat;
+  const set=(id,val)=>{ const el=document.getElementById('c-'+id); if(el){el.value=val;} };
+  set('dist',A.d||0);
+  set('tprob',A.t>0?80:0);
+  set('tmax',A.t||0);
+  set('iprob',A.i>0?60:0);
+  set('imax',A.i||0);
+  set('bstops',Math.max(Math.round((A.b||0)/3),A.b>0?1:0));
+  set('bdelay',A.b>0?3:0);
+  set('rprob',A.r>0?30:0);
+  set('rimpact',A.r>0?Math.round(A.r/0.3):0);
+  calcUpdate();
+}
+
+function resetCalc(){
+  const d=CALC_DEFAULTS;
+  const set=(id,val)=>{const el=document.getElementById('c-'+id);if(el)el.value=val;};
+  set('dist',d.dist);set('cost',d.cost);set('tprob',d.tprob);set('tmax',d.tmax);
+  set('iprob',d.iprob);set('imax',d.imax);set('bstops',d.bstops);set('bdelay',d.bdelay);
+  set('rprob',d.rprob);set('rimpact',d.rimpact);
+  calcUpdate();
+}
+
+// ══════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════
+renderScenario();
+buildSimPanels();
+updateRouteMap(total(simState.A),total(simState.B));
+calcUpdate();
+</script>
 </body>
 </html>
