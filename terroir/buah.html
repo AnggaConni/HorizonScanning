@@ -1,747 +1,1061 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Tropical Fruit Terroir Calculator | Kalkulator Terroir Buah Tropis</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap');
-        
-        * { font-family: 'Inter', sans-serif; }
-        .fruit-hero {
-            background: linear-gradient(105deg, #2d6a4f 0%, #1b4d3e 100%);
-        }
-        .stat-bar {
-            height: 8px;
-            border-radius: 12px;
-            background-color: #e8f5e9;
-            overflow: hidden;
-        }
-        .stat-fill {
-            height: 100%;
-            border-radius: 12px;
-            transition: width 0.45s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-        }
-        .preset-btn {
-            transition: all 0.2s ease;
-        }
-        .preset-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-        }
-        .tooltip-icon {
-            cursor: help;
-            border-bottom: 1px dashed #2d6a4f;
-        }
-        input[type="range"] {
-            accent-color: #2d6a4f;
-        }
-        .card-hover {
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .card-hover:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 20px 25px -12px rgba(0,0,0,0.1);
-        }
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 60px;
-            height: 28px;
-        }
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: 0.3s;
-            border-radius: 28px;
-        }
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 22px;
-            width: 22px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            transition: 0.3s;
-            border-radius: 50%;
-        }
-        input:checked + .slider {
-            background-color: #2d6a4f;
-        }
-        input:checked + .slider:before {
-            transform: translateX(32px);
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tropical Fruit Terroir</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;1,9..144,300&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --green-deep: #12371f;
+      --green-mid: #1e5c35;
+      --green-light: #2d7a4a;
+      --amber: #b8690a;
+      --papaya: #d95220;
+      --cream: #f6f1e8;
+      --card: #ffffff;
+      --text: #1a1208;
+      --muted: #6b7563;
+    }
+    * { font-family: 'Plus Jakarta Sans', sans-serif; }
+    h1, h2, .serif { font-family: 'Fraunces', serif; }
+    body { background: var(--cream); color: var(--text); }
+
+    .header-bg {
+      background: linear-gradient(135deg, var(--green-deep) 0%, #1b4d2e 60%, #2a6040 100%);
+      position: relative; overflow: hidden;
+    }
+    .header-bg::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image: radial-gradient(ellipse at 80% 50%, rgba(255,200,80,0.08) 0%, transparent 60%),
+                        radial-gradient(ellipse at 20% 80%, rgba(100,200,120,0.07) 0%, transparent 50%);
+    }
+    .card { background: var(--card); border-radius: 16px; box-shadow: 0 2px 16px rgba(0,0,0,0.06); border: 1px solid #e5ede5; }
+    .card-hover { transition: transform 0.2s, box-shadow 0.2s; }
+    .card-hover:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+
+    .preset-tab { cursor:pointer; padding:5px 12px; border-radius:20px; font-size:12px; font-weight:600; transition:all 0.2s; color: var(--muted); }
+    .preset-tab.active { background:var(--green-deep); color:white; }
+
+    .preset-btn {
+      border-radius: 10px; padding: 8px 6px; font-size: 11px; font-weight: 600;
+      transition: all 0.18s; cursor: pointer; border: 1.5px solid transparent;
+      display: flex; flex-direction: column; align-items: center; gap: 3px;
+      background: #f0f5f0; color: var(--green-deep);
+    }
+    .preset-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.12); background: var(--green-deep); color: white; }
+    .preset-btn .fruit-emoji { font-size: 20px; }
+
+    .stat-bar-bg { height: 7px; border-radius: 99px; background: #e8ede8; overflow: hidden; }
+    .stat-bar-fill { height: 100%; border-radius: 99px; transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+    input[type="range"] { accent-color: var(--green-mid); }
+    select { background: #f8faf8; border: 1.5px solid #d4e0d4; border-radius: 10px; padding: 10px 12px; outline: none; }
+    select:focus { border-color: var(--green-mid); }
+
+    .rain-btn { padding: 8px 0; border-radius: 10px; border: 1.5px solid #d4e0d4; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s; background:#f8faf8; }
+    .rain-btn.active { background: var(--green-deep); color: white; border-color: var(--green-deep); }
+
+    .toggle-sw { position:relative; display:inline-block; width:48px; height:24px; }
+    .toggle-sw input { opacity:0; width:0; height:0; }
+    .toggle-slider { position:absolute; inset:0; background:#4a6b4a; border-radius:24px; cursor:pointer; transition:0.3s; }
+    .toggle-slider:before { content:''; position:absolute; height:18px; width:18px; left:3px; bottom:3px; background:white; border-radius:50%; transition:0.3s; }
+    .toggle-sw input:checked + .toggle-slider { background: var(--amber); }
+    .toggle-sw input:checked + .toggle-slider:before { transform:translateX(24px); }
+
+    .month-cell {
+      width:100%; aspect-ratio:1; border-radius:6px; font-size:10px; font-weight:700;
+      display:flex; align-items:center; justify-content:center;
+      background: #edf2ed; color: var(--muted); transition: all 0.3s;
+    }
+    .month-cell.active { background: var(--green-mid); color: white; }
+    .month-cell.peak { background: var(--amber); color: white; }
+
+    #radarSvg { transition: all 0.3s; }
+    .radar-polygon { transition: all 0.4s cubic-bezier(0.34, 1.2, 0.64, 1); }
+
+    .score-ring { transition: stroke-dashoffset 0.6s cubic-bezier(0.34, 1.2, 0.64, 1); }
+
+    .market-badge { background: #e8f0e8; color: var(--green-deep); padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 600; }
+
+    .tag-chip {
+      padding: 5px 12px; border-radius: 99px; font-size: 11px; font-weight: 700;
+      letter-spacing: 0.3px; display:inline-flex; align-items:center; gap:4px;
+    }
+
+    @keyframes fadeIn { from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)} }
+    .animate-in { animation: fadeIn 0.4s ease forwards; }
+
+    .compare-badge {
+      background: rgba(180,120,20,0.15); border: 1.5px dashed var(--amber);
+      border-radius: 10px; padding: 8px 12px; font-size: 12px;
+    }
+  </style>
 </head>
-<body class="bg-[#f0f7f0] text-stone-800">
+<body>
 
-    <div class="min-h-screen flex flex-col">
-        <!-- Header dengan toggle bilingual -->
-        <header class="fruit-hero text-white py-7 px-4 shadow-xl">
-            <div class="max-w-6xl mx-auto text-center relative">
-                <div class="absolute right-0 top-0 md:top-2">
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="langToggle">
-                        <span class="slider"></span>
-                    </label>
-                    <span class="ml-2 text-sm font-medium" id="langLabel">EN</span>
-                </div>
-                <h1 class="text-3xl md:text-4xl font-bold mb-3 tracking-tight flex items-center justify-center gap-3">
-                    <i class="fas fa-apple-alt text-green-200"></i> 
-                    <span id="titleText">Tropical Fruit Terroir Calculator</span>
-                </h1>
-                <p class="text-green-100/90 max-w-2xl mx-auto text-sm md:text-base" id="subtitleText">
-                    Soil, climate, and elevation shape fruit flavor. Adjust parameters → predict sweetness, acidity, texture, and aroma based on geographical terroir.
-                </p>
-                <div class="mt-3 text-xs text-green-200/70 flex justify-center gap-4 flex-wrap" id="headerTags">
-                    <span><i class="fas fa-tree"></i> Fruit Type</span>
-                    <span><i class="fas fa-mound"></i> Soil</span>
-                    <span><i class="fas fa-flask"></i> pH</span>
-                    <span><i class="fas fa-sun"></i> Sunlight</span>
-                    <span><i class="fas fa-water"></i> Rainfall</span>
-                </div>
-            </div>
-        </header>
+<!-- HEADER -->
+<header class="header-bg text-white py-7 px-4 shadow-xl relative">
+  <div class="max-w-6xl mx-auto relative z-10">
+    <div class="flex justify-between items-start">
+      <div class="flex-1 text-center">
+        <h1 class="text-3xl md:text-4xl font-bold tracking-tight flex items-center justify-center gap-3">
+          <span style="font-family:Fraunces,serif;font-style:italic;font-weight:300;letter-spacing:-1px" id="titleText">Tropical Fruit Terroir</span>
+        </h1>
+        <p class="text-green-200/80 max-w-xl mx-auto text-sm mt-2" id="subtitleText">Soil · Elevation · Climate → Sweetness · Acidity · Texture · Aroma</p>
+        <div class="mt-2 flex justify-center gap-2 flex-wrap text-xs text-green-200/60" id="headerCrumbs">
+          <span>🌋 Volcanic Soil</span><span>·</span><span>🌄 Elevation</span><span>·</span><span>☀️ Sunlight</span><span>·</span><span>💧 Rainfall</span><span>·</span><span>🧪 Soil pH</span>
+        </div>
+      </div>
+      <div class="flex flex-col items-end gap-1 ml-4 mt-1">
+        <label class="toggle-sw"><input type="checkbox" id="langToggle"><span class="toggle-slider"></span></label>
+        <span class="text-xs font-bold text-green-200/80" id="langLabel">EN</span>
+      </div>
+    </div>
+  </div>
+</header>
 
-        <main class="max-w-6xl mx-auto w-full p-4 md:p-6 grid lg:grid-cols-3 gap-8">
-            
-            <!-- KIRI: Input & Preset Buah -->
-            <div class="lg:col-span-1 space-y-6">
-                <!-- Preset Buah Legendaris Indonesia -->
-                <div class="bg-white rounded-2xl shadow-md border border-green-200 p-5 card-hover">
-                    <div class="flex items-center gap-2 mb-4 border-b border-green-100 pb-2">
-                        <i class="fas fa-globe-asia text-green-700"></i>
-                        <h2 class="font-semibold text-lg" id="presetTitle">Geographical Fruit Presets</h2>
-                        <span class="text-xs bg-green-50 text-green-800 px-2 py-0.5 rounded-full ml-auto" id="presetBadge">terroir icon</span>
-                    </div>
-                    <div class="grid grid-cols-2 gap-2">
-                        <button id="presetSalak" class="preset-btn bg-emerald-800 text-white text-sm py-2 rounded-xl flex items-center justify-center gap-1"><i class="fas fa-mountain"></i> <span id="salakText">Salak Pondok (Sleman)</span></button>
-                        <button id="presetManggis" class="preset-btn bg-purple-800 text-white text-sm py-2 rounded-xl flex items-center justify-center gap-1"><i class="fas fa-fruit"></i> <span id="manggisText">Manggis Wanayasa</span></button>
-                        <button id="presetMango" class="preset-btn bg-amber-700 text-white text-sm py-2 rounded-xl flex items-center justify-center gap-1"><i class="fas fa-mango"></i> <span id="mangoText">Mangga Harum Manis</span></button>
-                        <button id="presetStrawberry" class="preset-btn bg-rose-700 text-white text-sm py-2 rounded-xl flex items-center justify-center gap-1"><i class="fas fa-berry"></i> <span id="strawberryText">Strawberry Lembang</span></button>
-                        <button id="resetDefault" class="preset-btn col-span-2 bg-green-100 text-green-800 border border-green-300 text-sm py-2 rounded-xl flex items-center justify-center gap-1"><i class="fas fa-undo-alt"></i> <span id="resetText">Reset to Default</span></button>
-                    </div>
-                    <p class="text-[11px] text-stone-400 mt-3 text-center" id="presetNote">*Each preset changes fruit type & environmental parameters according to its famous origin</p>
-                </div>
+<main class="max-w-6xl mx-auto p-4 md:p-6 grid lg:grid-cols-3 gap-6">
 
-                <!-- Parameter Lingkungan & Buah -->
-                <div class="bg-white p-6 rounded-2xl shadow-md border border-green-100">
-                    <h2 class="text-xl font-semibold mb-5 flex items-center gap-2"><i class="fas fa-sliders-h text-green-800"></i> <span id="paramsTitle">Fruit & Environmental Parameters</span></h2>
-                    
-                    <div class="space-y-7">
-                        <!-- Jenis Buah -->
-                        <div>
-                            <label class="block text-sm font-medium mb-2 tooltip-icon" id="fruitLabel" title="Different fruits have different genetic potential for sugar, acid, and texture.">🍍 Fruit Type</label>
-                            <select id="fruitType" class="w-full p-3 rounded-xl border border-stone-200 bg-stone-50 focus:ring-2 focus:ring-green-500 outline-none">
-                                <option value="salak" id="fruitSalak">Salak (Snake Fruit)</option>
-                                <option value="manggis" id="fruitManggis">Manggis (Mangosteen)</option>
-                                <option value="mango" id="fruitMango">Mangga (Mango)</option>
-                                <option value="strawberry" id="fruitStrawberry">Stroberi (Strawberry)</option>
-                                <option value="jambu" id="fruitJambu">Jambu Air (Rose Apple)</option>
-                                <option value="nanas" id="fruitNanas">Nanas (Pineapple)</option>
-                                <option value="durian" id="fruitDurian">Durian</option>
-                            </select>
-                        </div>
+<!-- ========= LEFT PANEL ========= -->
+<div class="lg:col-span-1 space-y-5">
 
-                        <!-- Jenis Tanah -->
-                        <div>
-                            <label class="block text-sm font-medium mb-2 tooltip-icon" id="soilLabel" title="Volcanic ash soil (Merapi) gives sharp sweetness without astringency. Alluvial gives balance.">⛰️ Soil Type</label>
-                            <select id="soilType" class="w-full p-3 rounded-xl border border-stone-200 bg-stone-50 focus:ring-2 focus:ring-green-500 outline-none">
-                                <option value="volcanic" id="soilVolcanic">Volcanic Ash (Merapi style)</option>
-                                <option value="alluvial" id="soilAlluvial">Alluvial (River deposit)</option>
-                                <option value="loam" id="soilLoam" selected>Loam (Balanced)</option>
-                                <option value="clay" id="soilClay">Clay (Heavy, moist)</option>
-                                <option value="sandy" id="soilSandy">Sandy (Fast draining)</option>
-                            </select>
-                        </div>
+  <!-- Fruit Presets -->
+  <div class="card p-5 card-hover">
+    <div class="flex items-center justify-between mb-3">
+      <h2 class="font-bold text-base flex items-center gap-2" id="presetTitle"><i class="fas fa-globe-asia text-green-700 text-sm"></i> Geographic Presets</h2>
+    </div>
+    <!-- Tabs -->
+    <div class="flex gap-1 mb-3" id="presetTabs">
+      <span class="preset-tab active" data-tab="all">All</span>
+      <span class="preset-tab" data-tab="java">Java</span>
+      <span class="preset-tab" data-tab="sumatra">Sumatra</span>
+      <span class="preset-tab" data-tab="other">Other</span>
+    </div>
+    <div id="presetGrid" class="grid grid-cols-3 gap-2"></div>
+    <button id="resetDefault" class="mt-2 w-full text-xs py-2 rounded-xl border border-green-200 bg-green-50 text-green-800 font-semibold hover:bg-green-100 transition" id="resetText">↺ Reset</button>
+  </div>
 
-                        <!-- pH Tanah -->
-                        <div>
-                            <div class="flex justify-between text-sm font-medium mb-1">
-                                <label class="tooltip-icon" id="phLabel" title="Fruits prefer slightly acidic to neutral pH (5.5–6.5). Affects mineral uptake.">🧪 Soil pH</label>
-                                <span class="text-green-800 font-bold" id="phValue">6.0</span>
-                            </div>
-                            <input type="range" id="phLevel" min="4.5" max="7.5" value="6.0" step="0.1" class="w-full">
-                            <div class="flex justify-between text-xs text-stone-400"><span id="acidicText">Acidic (4.5)</span><span id="idealText">Ideal (6.0)</span><span id="alkalineText">Alkaline (7.5)</span></div>
-                        </div>
+  <!-- Parameters -->
+  <div class="card p-5">
+    <h2 class="font-bold text-base mb-4 flex items-center gap-2"><i class="fas fa-sliders-h text-green-700 text-sm"></i> <span id="paramsTitle">Parameters</span></h2>
+    <div class="space-y-5">
 
-                        <!-- Elevasi -->
-                        <div>
-                            <div class="flex justify-between text-sm font-medium mb-1">
-                                <label class="tooltip-icon" id="elevLabel" title="Higher elevation slows ripening, increases acidity and complexity.">🌄 Elevation (masl)</label>
-                                <span class="text-green-800 font-bold" id="elevationValue">800 m</span>
-                            </div>
-                            <input type="range" id="elevation" min="0" max="2000" value="800" step="50" class="w-full">
-                            <div class="flex justify-between text-xs text-stone-400 mt-1">
-                                <span id="lowElevText">Lowland (0m)</span>
-                                <span id="highElevText">Highland (2000m)</span>
-                            </div>
-                        </div>
+      <!-- Fruit Type -->
+      <div>
+        <label class="block text-xs font-bold mb-1.5 text-green-800 uppercase tracking-wide" id="fruitLabel">🍍 Fruit Type</label>
+        <select id="fruitType" class="w-full text-sm">
+          <option value="salak">Salak (Snake Fruit)</option>
+          <option value="manggis">Manggis (Mangosteen)</option>
+          <option value="mango">Mangga (Mango)</option>
+          <option value="strawberry">Stroberi (Strawberry)</option>
+          <option value="jambu">Jambu Air (Rose Apple)</option>
+          <option value="nanas">Nanas (Pineapple)</option>
+          <option value="durian">Durian</option>
+          <option value="rambutan">Rambutan</option>
+          <option value="duku">Duku (Langsat)</option>
+          <option value="belimbing">Belimbing (Starfruit)</option>
+          <option value="pepaya">Pepaya (Papaya)</option>
+          <option value="sirsak">Sirsak (Soursop)</option>
+          <option value="buahnaga">Buah Naga (Dragon Fruit)</option>
+          <option value="markisa">Markisa (Passion Fruit)</option>
+          <option value="pisang">Pisang Raja (Banana)</option>
+        </select>
+      </div>
 
-                        <!-- Intensitas Sinar Matahari -->
-                        <div>
-                            <div class="flex justify-between text-sm font-medium mb-1">
-                                <label class="tooltip-icon" id="sunLabel" title="Sunlight intensity affects sugar production. High sun = sweeter, but can reduce acidity.">☀️ Sunlight Intensity</label>
-                                <span class="text-green-800 font-bold" id="sunValue">70%</span>
-                            </div>
-                            <input type="range" id="sunIntensity" min="30" max="100" value="70" step="5" class="w-full">
-                            <div class="flex justify-between text-xs text-stone-400 mt-1">
-                                <span id="shadeText">Shaded (30%)</span>
-                                <span id="sunnyText">Sunny (70%)</span>
-                                <span id="extremeSunText">Extreme (100%)</span>
-                            </div>
-                        </div>
+      <!-- Soil Type -->
+      <div>
+        <label class="block text-xs font-bold mb-1.5 text-green-800 uppercase tracking-wide" id="soilLabel">⛰️ Soil Type</label>
+        <select id="soilType" class="w-full text-sm">
+          <option value="volcanic">Volcanic Ash (Merapi)</option>
+          <option value="alluvial">Alluvial (River Deposit)</option>
+          <option value="loam" selected>Loam (Balanced)</option>
+          <option value="clay">Clay (Heavy, Moist)</option>
+          <option value="sandy">Sandy (Fast Draining)</option>
+          <option value="peat">Peat (Acidic, Humid)</option>
+        </select>
+      </div>
 
-                        <!-- Curah Hujan -->
-                        <div>
-                            <label class="block text-sm font-medium mb-2" id="rainLabel">☔ Annual Rainfall</label>
-                            <div class="grid grid-cols-3 gap-2">
-                                <button class="rain-btn py-2 rounded-xl border transition-all" data-val="low" id="rainLowBtn">🌵 Low</button>
-                                <button class="rain-btn py-2 rounded-xl border transition-all bg-green-800 text-white shadow" data-val="moderate" id="rainModerateBtn">🌿 Moderate</button>
-                                <button class="rain-btn py-2 rounded-xl border transition-all" data-val="high" id="rainHighBtn">💧 High</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Catatan edukasi terroir buah -->
-                <div class="bg-green-50/70 rounded-xl p-4 text-xs text-stone-600 border border-green-200" id="infoBox">
-                    <i class="fas fa-info-circle text-green-600 mr-1"></i> <strong id="infoTitle">Fruit Terroir?</strong> <span id="infoText">Salak Pondok gets its signature sweet-sharp taste without astringency from Merapi's volcanic ash. Manggis Wanayasa has longer shelf life and balanced sweet-sour due to unique microclimate. Every fruit tells a geological story.</span>
-                </div>
-            </div>
+      <!-- pH -->
+      <div>
+        <div class="flex justify-between text-xs font-bold mb-1"><span class="text-green-800 uppercase tracking-wide" id="phLabel">🧪 Soil pH</span><span class="text-amber-700" id="phValue">6.0</span></div>
+        <input type="range" id="phLevel" min="4.5" max="7.5" value="6.0" step="0.1" class="w-full">
+        <div class="flex justify-between text-[10px] text-stone-400 mt-0.5"><span id="acidicText">Acidic 4.5</span><span id="alkalineText">Alkaline 7.5</span></div>
+      </div>
 
-            <!-- KANAN: Hasil & Profil Buah -->
-            <div class="lg:col-span-2 space-y-6">
-                <!-- Skor terroir & label -->
-                <div class="bg-gradient-to-br from-green-50 to-green-100/40 rounded-2xl p-6 border border-green-200 shadow-sm relative overflow-hidden">
-                    <div class="relative z-10 flex flex-col md:flex-row justify-between items-center gap-4">
-                        <div>
-                            <h3 class="text-sm uppercase tracking-wider text-green-800 font-bold" id="scoreLabel">Terroir Quality Score</h3>
-                            <div class="text-6xl font-extrabold text-stone-800" id="totalScore">82</div>
-                            <p class="text-sm mt-1 font-medium" id="qualityLabel">Premium Export Quality</p>
-                        </div>
-                        <div class="bg-white/70 backdrop-blur-sm rounded-xl px-4 py-2 text-center border border-green-200">
-                            <i class="fas fa-chart-simple text-green-600"></i>
-                            <span class="ml-2 text-sm font-semibold" id="insightOneLine">Sharp sweetness, low astringency</span>
-                        </div>
-                    </div>
-                    <i class="fas fa-apple-alt absolute -bottom-5 -right-5 text-8xl text-green-200/50"></i>
-                </div>
+      <!-- Elevation -->
+      <div>
+        <div class="flex justify-between text-xs font-bold mb-1"><span class="text-green-800 uppercase tracking-wide" id="elevLabel">🌄 Elevation</span><span class="text-amber-700" id="elevationValue">800 m</span></div>
+        <input type="range" id="elevation" min="0" max="2000" value="800" step="50" class="w-full">
+        <div class="flex justify-between text-[10px] text-stone-400 mt-0.5"><span id="lowElevText">Sea Level</span><span id="highElevText">2000 m</span></div>
+      </div>
 
-                <!-- Grafik profil rasa buah -->
-                <div class="bg-white p-6 rounded-2xl shadow-md border border-green-100">
-                    <h3 class="font-bold text-lg flex items-center gap-2 mb-5"><i class="fas fa-chart-line text-green-700"></i> <span id="profileTitle">Fruit Flavor Profile</span></h3>
-                    <div class="space-y-5">
-                        <div><div class="flex justify-between text-sm"><span id="sweetnessLabel">🍯 Sweetness</span><span id="sweetnessPercent">0%</span></div><div class="stat-bar"><div id="sweetnessBar" class="stat-fill bg-amber-500" style="width:0%"></div></div></div>
-                        <div><div class="flex justify-between text-sm"><span id="acidityLabel">🍋 Acidity / Sourness</span><span id="acidityPercent">0%</span></div><div class="stat-bar"><div id="acidityBar" class="stat-fill bg-rose-500" style="width:0%"></div></div></div>
-                        <div><div class="flex justify-between text-sm"><span id="textureLabel">🍑 Flesh Texture (Crisp/Juicy)</span><span id="texturePercent">0%</span></div><div class="stat-bar"><div id="textureBar" class="stat-fill bg-stone-500" style="width:0%"></div></div></div>
-                        <div><div class="flex justify-between text-sm"><span id="aromaLabel">🌸 Aroma Complexity</span><span id="aromaPercent">0%</span></div><div class="stat-bar"><div id="aromaBar" class="stat-fill bg-green-600" style="width:0%"></div></div></div>
-                    </div>
-                </div>
+      <!-- Sun -->
+      <div>
+        <div class="flex justify-between text-xs font-bold mb-1"><span class="text-green-800 uppercase tracking-wide" id="sunLabel">☀️ Sunlight</span><span class="text-amber-700" id="sunValue">70%</span></div>
+        <input type="range" id="sunIntensity" min="30" max="100" value="70" step="5" class="w-full">
+        <div class="flex justify-between text-[10px] text-stone-400 mt-0.5"><span id="shadeText">Shaded 30%</span><span id="extremeSunText">Full 100%</span></div>
+      </div>
 
-                <!-- Flavor Notes & wawasan terroir -->
-                <div class="bg-white p-6 rounded-2xl shadow-md border border-green-100">
-                    <h3 class="font-bold text-lg flex items-center gap-2"><i class="fas fa-fruit text-green-700"></i> <span id="notesTitle">Taste & Texture Notes</span></h3>
-                    <div id="flavorNotes" class="flex flex-wrap gap-2 my-4 min-h-[70px]"></div>
-                    <div class="border-t border-green-100 pt-4 mt-1">
-                        <p class="text-xs text-stone-500 flex gap-2"><i class="fas fa-microphone-alt text-green-600"></i> <span id="terroirInsight">Based on selected parameters, this fruit reflects its unique geographical origin.</span></p>
-                    </div>
-                </div>
+      <!-- Rainfall -->
+      <div>
+        <label class="block text-xs font-bold mb-1.5 text-green-800 uppercase tracking-wide" id="rainLabel">☔ Rainfall</label>
+        <div class="grid grid-cols-3 gap-1.5">
+          <button class="rain-btn" data-val="low" id="rainLowBtn">🌵 Low</button>
+          <button class="rain-btn active" data-val="moderate" id="rainModerateBtn">🌿 Med</button>
+          <button class="rain-btn" data-val="high" id="rainHighBtn">💧 High</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
-                <!-- Saran penyimpanan / ekspor -->
-                <div class="bg-stone-800 text-stone-200 rounded-xl p-4 flex items-center gap-3 text-sm">
-                    <i class="fas fa-lightbulb text-green-300 text-xl"></i>
-                    <span id="storageAdvice">📦 Shelf life: Good for local market & short-distance export.</span>
-                </div>
-            </div>
-        </main>
+  <!-- Comparison Mode -->
+  <div class="card p-4">
+    <div class="flex items-center justify-between mb-2">
+      <span class="text-sm font-bold" id="compareTitle">🔀 Compare Fruits</span>
+      <label class="toggle-sw"><input type="checkbox" id="compareToggle"><span class="toggle-slider"></span></label>
+    </div>
+    <div id="comparePanel" class="hidden mt-2">
+      <select id="compareFruitSelect" class="w-full text-sm mb-2">
+        <option value="manggis">Manggis (Mangosteen)</option>
+        <option value="salak">Salak (Snake Fruit)</option>
+        <option value="mango">Mangga (Mango)</option>
+        <option value="durian">Durian</option>
+        <option value="rambutan">Rambutan</option>
+        <option value="strawberry">Stroberi</option>
+        <option value="duku">Duku (Langsat)</option>
+        <option value="belimbing">Belimbing (Starfruit)</option>
+        <option value="markisa">Markisa (Passion Fruit)</option>
+        <option value="sirsak">Sirsak (Soursop)</option>
+        <option value="buahnaga">Dragon Fruit</option>
+        <option value="pisang">Pisang Raja</option>
+        <option value="pepaya">Pepaya</option>
+      </select>
+      <div class="compare-badge text-xs" id="compareNote">Dashed outline on radar = compare fruit baseline</div>
+    </div>
+  </div>
 
-        <footer class="text-center py-6 text-stone-400 text-xs border-t border-stone-200 mt-8">
-            <p id="footerText">📊 Simulation based on fruit agronomy & terroir studies. Volcanic ash, elevation, and microclimate create unique signatures like Salak Pondok & Manggis Wanayasa.</p>
-        </footer>
+  <!-- Info -->
+  <div class="bg-green-900/5 border border-green-200 rounded-xl p-3 text-xs text-stone-600">
+    <i class="fas fa-leaf text-green-600 mr-1"></i> <strong id="infoTitle">What is Terroir?</strong>
+    <span id="infoText"> The combination of soil minerals, microclimate, and elevation that gives each growing region its unique flavor signature.</span>
+  </div>
+</div>
+
+<!-- ========= RIGHT PANEL ========= -->
+<div class="lg:col-span-2 space-y-5">
+
+  <!-- Score + Radar -->
+  <div class="card p-5">
+    <div class="grid md:grid-cols-2 gap-5">
+
+      <!-- Score Ring -->
+      <div class="flex flex-col items-center justify-center">
+        <div class="relative w-40 h-40">
+          <svg viewBox="0 0 140 140" class="w-full h-full -rotate-90">
+            <circle cx="70" cy="70" r="56" fill="none" stroke="#e8ede8" stroke-width="10"/>
+            <circle id="scoreRing" cx="70" cy="70" r="56" fill="none" stroke="var(--green-mid)" stroke-width="10"
+              stroke-linecap="round" stroke-dasharray="352" stroke-dashoffset="352" class="score-ring"/>
+          </svg>
+          <div class="absolute inset-0 flex flex-col items-center justify-center">
+            <div class="text-4xl font-extrabold" style="font-family:Fraunces,serif" id="totalScore">--</div>
+            <div class="text-[10px] font-bold uppercase tracking-wider text-green-700 mt-0.5" id="scoreLabel">Score</div>
+          </div>
+        </div>
+        <div class="mt-2 text-center">
+          <div id="qualityLabel" class="text-sm font-bold"></div>
+          <div id="fruitOriginLine" class="text-[11px] text-stone-500 mt-0.5 flex items-center justify-center gap-1">
+            <i class="fas fa-map-marker-alt text-green-600"></i> <span id="fruitOriginText">—</span>
+          </div>
+        </div>
+        <div id="exportMarketsRow" class="flex flex-wrap gap-1 justify-center mt-2"></div>
+      </div>
+
+      <!-- Radar Chart -->
+      <div class="flex flex-col items-center">
+        <div class="text-xs font-bold uppercase tracking-wide text-green-800 mb-1" id="radarTitle">Flavor Radar</div>
+        <svg id="radarSvg" viewBox="0 0 300 300" class="w-full max-w-[240px]">
+          <!-- Background rings -->
+          <g id="radarBg" opacity="0.35">
+            <polygon id="ring100" points="" fill="none" stroke="#c8d8c8" stroke-width="1"/>
+            <polygon id="ring66" points="" fill="none" stroke="#c8d8c8" stroke-width="0.8"/>
+            <polygon id="ring33" points="" fill="none" stroke="#c8d8c8" stroke-width="0.6"/>
+          </g>
+          <!-- Axis lines -->
+          <g id="radarAxes" stroke="#d0dbd0" stroke-width="0.8" opacity="0.6"></g>
+          <!-- Compare polygon -->
+          <polygon id="comparePolygon" points="" fill="rgba(180,120,20,0.07)" stroke="var(--amber)" stroke-width="1.5" stroke-dasharray="4,3" opacity="0"/>
+          <!-- Main polygon -->
+          <polygon id="mainPolygon" points="" fill="rgba(30,92,53,0.18)" stroke="var(--green-mid)" stroke-width="2" class="radar-polygon"/>
+          <!-- Data dots -->
+          <g id="radarDots"></g>
+          <!-- Labels -->
+          <g id="radarLabels" font-size="9.5" font-family="Plus Jakarta Sans, sans-serif" font-weight="700" fill="#3a5a3a"></g>
+        </svg>
+        <div id="radarLegend" class="flex gap-3 text-[10px] font-semibold mt-1">
+          <span class="flex items-center gap-1"><span style="width:10px;height:3px;background:var(--green-mid);display:inline-block;border-radius:2px"></span><span id="legendMain">Current</span></span>
+          <span id="legendCompare" class="items-center gap-1 hidden"><span style="width:10px;height:3px;background:var(--amber);display:inline-block;border-radius:2px;border-top:1px dashed var(--amber)"></span><span id="legendCompareText">Compare</span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Flavor Bars (6 stats) -->
+  <div class="card p-5">
+    <h3 class="font-bold text-sm uppercase tracking-wide text-green-800 mb-4" id="profileTitle">Flavor Profile</h3>
+    <div class="grid md:grid-cols-2 gap-x-6 gap-y-4">
+      <div><div class="flex justify-between text-xs mb-1.5"><span id="sweetnessLabel">🍯 Sweetness</span><span class="font-bold" id="sweetnessPercent">0%</span></div><div class="stat-bar-bg"><div id="sweetnessBar" class="stat-bar-fill bg-amber-500" style="width:0%"></div></div></div>
+      <div><div class="flex justify-between text-xs mb-1.5"><span id="acidityLabel">🍋 Acidity</span><span class="font-bold" id="acidityPercent">0%</span></div><div class="stat-bar-bg"><div id="acidityBar" class="stat-bar-fill bg-rose-500" style="width:0%"></div></div></div>
+      <div><div class="flex justify-between text-xs mb-1.5"><span id="textureLabel">🍑 Texture / Crunch</span><span class="font-bold" id="texturePercent">0%</span></div><div class="stat-bar-bg"><div id="textureBar" class="stat-bar-fill bg-stone-500" style="width:0%"></div></div></div>
+      <div><div class="flex justify-between text-xs mb-1.5"><span id="aromaLabel">🌸 Aroma</span><span class="font-bold" id="aromaPercent">0%</span></div><div class="stat-bar-bg"><div id="aromaBar" class="stat-bar-fill bg-purple-500" style="width:0%"></div></div></div>
+      <div><div class="flex justify-between text-xs mb-1.5"><span id="juicinessLabel">💦 Juiciness</span><span class="font-bold" id="juicinessPercent">0%</span></div><div class="stat-bar-bg"><div id="juicinessBar" class="stat-bar-fill bg-sky-500" style="width:0%"></div></div></div>
+      <div><div class="flex justify-between text-xs mb-1.5"><span id="mineralLabel">⛰️ Mineral Depth</span><span class="font-bold" id="mineralPercent">0%</span></div><div class="stat-bar-bg"><div id="mineralBar" class="stat-bar-fill bg-teal-600" style="width:0%"></div></div></div>
+    </div>
+  </div>
+
+  <!-- Harvest Calendar + Fun Fact -->
+  <div class="grid md:grid-cols-2 gap-5">
+
+    <!-- Harvest Calendar -->
+    <div class="card p-5">
+      <h3 class="font-bold text-sm uppercase tracking-wide text-green-800 mb-3" id="harvestTitle">🗓 Harvest Season</h3>
+      <div id="harvestGrid" class="grid grid-cols-6 gap-1.5"></div>
+      <div class="mt-3 flex gap-3 text-[10px]">
+        <span class="flex items-center gap-1"><span class="inline-block w-3 h-3 rounded-sm bg-amber-500"></span> <span id="peakText">Peak</span></span>
+        <span class="flex items-center gap-1"><span class="inline-block w-3 h-3 rounded-sm bg-green-600"></span> <span id="seasonText">Season</span></span>
+        <span class="flex items-center gap-1"><span class="inline-block w-3 h-3 rounded-sm bg-gray-200"></span> <span id="offText">Off</span></span>
+      </div>
     </div>
 
-    <script>
-        // ------------------- STATE -------------------
-        let state = {
-            fruitType: 'salak',
-            soilType: 'loam',
-            ph: 6.0,
-            elevation: 800,
-            sunIntensity: 70,
-            rainfall: 'moderate'
-        };
-        let currentLang = 'en';
+    <!-- Fun Fact + Comparison -->
+    <div class="card p-5 flex flex-col gap-3">
+      <div>
+        <h3 class="font-bold text-sm uppercase tracking-wide text-green-800 mb-2" id="factTitle">📖 Fruit Profile</h3>
+        <p class="text-xs text-stone-600 leading-relaxed" id="funFactText">Select a fruit to see its terroir story.</p>
+      </div>
+      <div id="compareStatsBlock" class="hidden">
+        <div class="text-xs font-bold uppercase tracking-wide text-amber-700 mb-2" id="compareStatsTitle">vs Comparison Fruit</div>
+        <div id="compareStatsList" class="space-y-1 text-xs"></div>
+      </div>
+    </div>
+  </div>
 
-        // DOM elements
-        const fruitSelect = document.getElementById('fruitType');
-        const soilSelect = document.getElementById('soilType');
-        const phSlider = document.getElementById('phLevel');
-        const elevationSlider = document.getElementById('elevation');
-        const sunSlider = document.getElementById('sunIntensity');
-        const rainBtns = document.querySelectorAll('.rain-btn');
-        const phVal = document.getElementById('phValue');
-        const elevationVal = document.getElementById('elevationValue');
-        const sunVal = document.getElementById('sunValue');
+  <!-- Taste Notes + Insight -->
+  <div class="card p-5">
+    <h3 class="font-bold text-sm uppercase tracking-wide text-green-800 mb-3" id="notesTitle">Taste & Texture Notes</h3>
+    <div id="flavorNotes" class="flex flex-wrap gap-1.5 mb-4 min-h-[36px]"></div>
+    <div class="bg-green-50/60 rounded-xl p-3 text-xs text-stone-600 leading-relaxed border border-green-100">
+      <i class="fas fa-seedling text-green-600 mr-1"></i>
+      <span id="terroirInsight">Adjust parameters to reveal the terroir story.</span>
+    </div>
+  </div>
 
-        const totalScoreSpan = document.getElementById('totalScore');
-        const qualityLabelSpan = document.getElementById('qualityLabel');
-        const flavorDiv = document.getElementById('flavorNotes');
-        const terroirInsightSpan = document.getElementById('terroirInsight');
-        const storageAdviceSpan = document.getElementById('storageAdvice');
-        const oneLineSpan = document.getElementById('insightOneLine');
+  <!-- Storage / Export Advice -->
+  <div class="flex gap-3">
+    <div class="flex-1 bg-stone-800 text-stone-200 rounded-xl p-4 text-xs flex items-center gap-3">
+      <i class="fas fa-box text-amber-400 text-base flex-shrink-0"></i>
+      <span id="storageAdvice">Loading...</span>
+    </div>
+    <div class="bg-stone-800 text-stone-200 rounded-xl p-4 text-xs flex items-center gap-3 flex-shrink-0">
+      <i class="fas fa-star text-amber-400 text-base"></i>
+      <div>
+        <div class="text-[10px] uppercase tracking-wide text-stone-400 mb-0.5" id="gradeLabel">Grade</div>
+        <div class="font-bold text-sm" id="gradeValue">—</div>
+      </div>
+    </div>
+  </div>
 
-        const profile = {
-            sweetness: { bar: document.getElementById('sweetnessBar'), text: document.getElementById('sweetnessPercent') },
-            acidity: { bar: document.getElementById('acidityBar'), text: document.getElementById('acidityPercent') },
-            texture: { bar: document.getElementById('textureBar'), text: document.getElementById('texturePercent') },
-            aroma: { bar: document.getElementById('aromaBar'), text: document.getElementById('aromaPercent') }
-        };
+</div>
+</main>
 
-        // ---------- DICTIONARY BILINGUAL ----------
-        const translations = {
-            en: {
-                title: "Tropical Fruit Terroir Calculator",
-                subtitle: "Soil, climate, and elevation shape fruit flavor. Adjust parameters → predict sweetness, acidity, texture, and aroma based on geographical terroir.",
-                presetTitle: "Geographical Fruit Presets",
-                presetBadge: "terroir icon",
-                salakText: "Salak Pondok (Sleman)",
-                manggisText: "Manggis Wanayasa",
-                mangoText: "Harum Manis Mango",
-                strawberryText: "Lembang Strawberry",
-                resetText: "Reset to Default",
-                presetNote: "*Each preset changes fruit type & environmental parameters according to its famous origin",
-                paramsTitle: "Fruit & Environmental Parameters",
-                fruitLabel: "🍍 Fruit Type",
-                fruitSalak: "Salak (Snake Fruit)",
-                fruitManggis: "Manggis (Mangosteen)",
-                fruitMango: "Mangga (Mango)",
-                fruitStrawberry: "Stroberi (Strawberry)",
-                fruitJambu: "Jambu Air (Rose Apple)",
-                fruitNanas: "Nanas (Pineapple)",
-                fruitDurian: "Durian",
-                soilLabel: "⛰️ Soil Type",
-                soilVolcanic: "Volcanic Ash (Merapi style)",
-                soilAlluvial: "Alluvial (River deposit)",
-                soilLoam: "Loam (Balanced)",
-                soilClay: "Clay (Heavy, moist)",
-                soilSandy: "Sandy (Fast draining)",
-                phLabel: "🧪 Soil pH",
-                acidicText: "Acidic (4.5)",
-                idealText: "Ideal (6.0)",
-                alkalineText: "Alkaline (7.5)",
-                elevation: "🌄 Elevation (masl)",
-                lowElevText: "Lowland (0m)",
-                highElevText: "Highland (2000m)",
-                sunLabel: "☀️ Sunlight Intensity",
-                shadeText: "Shaded (30%)",
-                sunnyText: "Sunny (70%)",
-                extremeSunText: "Extreme (100%)",
-                rainfall: "☔ Annual Rainfall",
-                rainLow: "🌵 Low",
-                rainModerate: "🌿 Moderate",
-                rainHigh: "💧 High",
-                infoTitle: "Fruit Terroir?",
-                infoText: "Salak Pondok gets its signature sweet-sharp taste without astringency from Merapi's volcanic ash. Manggis Wanayasa has longer shelf life and balanced sweet-sour due to unique microclimate. Every fruit tells a geological story.",
-                scoreLabel: "Terroir Quality Score",
-                profileTitle: "Fruit Flavor Profile",
-                sweetnessLabel: "🍯 Sweetness",
-                acidityLabel: "🍋 Acidity / Sourness",
-                textureLabel: "🍑 Flesh Texture (Crisp/Juicy)",
-                aromaLabel: "🌸 Aroma Complexity",
-                notesTitle: "Taste & Texture Notes",
-                footer: "📊 Simulation based on fruit agronomy & terroir studies. Volcanic ash, elevation, and microclimate create unique signatures like Salak Pondok & Manggis Wanayasa.",
-            },
-            id: {
-                title: "Kalkulator Terroir Buah Tropis",
-                subtitle: "Tanah, iklim, dan ketinggian membentuk rasa buah. Atur parameter → prediksi kemanisan, keasaman, tekstur, dan aroma berdasarkan terroir geografis.",
-                presetTitle: "Preset Buah Geografis",
-                presetBadge: "ikon terroir",
-                salakText: "Salak Pondok (Sleman)",
-                manggisText: "Manggis Wanayasa",
-                mangoText: "Mangga Harum Manis",
-                strawberryText: "Stroberi Lembang",
-                resetText: "Reset ke Standar",
-                presetNote: "*Setiap preset mengubah jenis buah & parameter lingkungan sesuai asal wilayah terkenalnya",
-                paramsTitle: "Parameter Buah & Lingkungan",
-                fruitLabel: "🍍 Jenis Buah",
-                fruitSalak: "Salak (Snake Fruit)",
-                fruitManggis: "Manggis",
-                fruitMango: "Mangga",
-                fruitStrawberry: "Stroberi",
-                fruitJambu: "Jambu Air",
-                fruitNanas: "Nanas",
-                fruitDurian: "Durian",
-                soilLabel: "⛰️ Jenis Tanah",
-                soilVolcanic: "Abu Vulkanik (gaya Merapi)",
-                soilAlluvial: "Aluvial (Endapan sungai)",
-                soilLoam: "Lempung Berpasir (Seimbang)",
-                soilClay: "Lempung Berat (Lembab)",
-                soilSandy: "Pasir (Drainase cepat)",
-                phLabel: "🧪 pH Tanah",
-                acidicText: "Asam (4.5)",
-                idealText: "Ideal (6.0)",
-                alkalineText: "Basa (7.5)",
-                elevation: "🌄 Elevasi (mdpl)",
-                lowElevText: "Dataran Rendah (0m)",
-                highElevText: "Dataran Tinggi (2000m)",
-                sunLabel: "☀️ Intensitas Sinar Matahari",
-                shadeText: "Ternaungi (30%)",
-                sunnyText: "Cerah (70%)",
-                extremeSunText: "Sangat Terik (100%)",
-                rainfall: "☔ Curah Hujan Tahunan",
-                rainLow: "🌵 Rendah",
-                rainModerate: "🌿 Sedang",
-                rainHigh: "💧 Tinggi",
-                infoTitle: "Terroir Buah?",
-                infoText: "Salak Pondok mendapat rasa manis tajam tanpa sepat dari abu vulkanik Merapi. Manggis Wanayasa memiliki daya simpan lebih lama dan keseimbangan asam-manis karena iklim mikro unik. Setiap buah bercerita geologi.",
-                scoreLabel: "Skor Kualitas Terroir",
-                profileTitle: "Profil Rasa Buah",
-                sweetnessLabel: "🍯 Kemanisan",
-                acidityLabel: "🍋 Keasaman",
-                textureLabel: "🍑 Tekstur Daging (Renyah/Juicy)",
-                aromaLabel: "🌸 Kompleksitas Aroma",
-                notesTitle: "Catatan Rasa & Tekstur",
-                footer: "📊 Simulasi berdasarkan agronomi buah & studi terroir. Abu vulkanik, elevasi, dan iklim mikro menciptakan tanda khas seperti Salak Pondok & Manggis Wanayasa.",
-            }
-        };
+<footer class="text-center py-5 text-stone-400 text-xs border-t border-stone-200 mt-4">
+  <span id="footerText">📊 Simulation based on tropical fruit agronomy & terroir research. For educational use.</span>
+</footer>
 
-        function applyLanguage() {
-            const t = translations[currentLang];
-            document.getElementById('titleText').innerText = t.title;
-            document.getElementById('subtitleText').innerText = t.subtitle;
-            document.getElementById('presetTitle').innerText = t.presetTitle;
-            document.getElementById('presetBadge').innerText = t.presetBadge;
-            document.getElementById('salakText').innerText = t.salakText;
-            document.getElementById('manggisText').innerText = t.manggisText;
-            document.getElementById('mangoText').innerText = t.mangoText;
-            document.getElementById('strawberryText').innerText = t.strawberryText;
-            document.getElementById('resetText').innerText = t.resetText;
-            document.getElementById('presetNote').innerText = t.presetNote;
-            document.getElementById('paramsTitle').innerHTML = t.paramsTitle;
-            document.getElementById('fruitLabel').innerHTML = t.fruitLabel;
-            document.getElementById('fruitSalak').innerText = t.fruitSalak;
-            document.getElementById('fruitManggis').innerText = t.fruitManggis;
-            document.getElementById('fruitMango').innerText = t.fruitMango;
-            document.getElementById('fruitStrawberry').innerText = t.fruitStrawberry;
-            document.getElementById('fruitJambu').innerText = t.fruitJambu;
-            document.getElementById('fruitNanas').innerText = t.fruitNanas;
-            document.getElementById('fruitDurian').innerText = t.fruitDurian;
-            document.getElementById('soilLabel').innerHTML = t.soilLabel;
-            document.getElementById('soilVolcanic').innerText = t.soilVolcanic;
-            document.getElementById('soilAlluvial').innerText = t.soilAlluvial;
-            document.getElementById('soilLoam').innerText = t.soilLoam;
-            document.getElementById('soilClay').innerText = t.soilClay;
-            document.getElementById('soilSandy').innerText = t.soilSandy;
-            document.getElementById('phLabel').innerHTML = t.phLabel;
-            document.getElementById('acidicText').innerText = t.acidicText;
-            document.getElementById('idealText').innerText = t.idealText;
-            document.getElementById('alkalineText').innerText = t.alkalineText;
-            document.getElementById('elevLabel').innerHTML = t.elevation;
-            document.getElementById('lowElevText').innerText = t.lowElevText;
-            document.getElementById('highElevText').innerText = t.highElevText;
-            document.getElementById('sunLabel').innerHTML = t.sunLabel;
-            document.getElementById('shadeText').innerText = t.shadeText;
-            document.getElementById('sunnyText').innerText = t.sunnyText;
-            document.getElementById('extremeSunText').innerText = t.extremeSunText;
-            document.getElementById('rainLabel').innerHTML = t.rainfall;
-            document.getElementById('rainLowBtn').innerHTML = t.rainLow;
-            document.getElementById('rainModerateBtn').innerHTML = t.rainModerate;
-            document.getElementById('rainHighBtn').innerHTML = t.rainHigh;
-            document.getElementById('infoTitle').innerHTML = t.infoTitle;
-            document.getElementById('infoText').innerHTML = t.infoText;
-            document.getElementById('scoreLabel').innerHTML = t.scoreLabel;
-            document.getElementById('profileTitle').innerHTML = t.profileTitle;
-            document.getElementById('sweetnessLabel').innerHTML = t.sweetnessLabel;
-            document.getElementById('acidityLabel').innerHTML = t.acidityLabel;
-            document.getElementById('textureLabel').innerHTML = t.textureLabel;
-            document.getElementById('aromaLabel').innerHTML = t.aromaLabel;
-            document.getElementById('notesTitle').innerHTML = t.notesTitle;
-            document.getElementById('footerText').innerHTML = t.footer;
-            document.getElementById('langLabel').innerText = currentLang === 'en' ? 'EN' : 'ID';
-            calculate();
-        }
+<script>
+// ===================== DATA =====================
 
-        function attachEvents() {
-            fruitSelect.addEventListener('change', (e) => { state.fruitType = e.target.value; calculate(); });
-            soilSelect.addEventListener('change', (e) => { state.soilType = e.target.value; calculate(); });
-            phSlider.addEventListener('input', (e) => { state.ph = parseFloat(e.target.value); phVal.innerText = state.ph.toFixed(1); calculate(); });
-            elevationSlider.addEventListener('input', (e) => { state.elevation = parseInt(e.target.value); elevationVal.innerText = state.elevation + " m"; calculate(); });
-            sunSlider.addEventListener('input', (e) => { state.sunIntensity = parseInt(e.target.value); sunVal.innerText = state.sunIntensity + "%"; calculate(); });
-            rainBtns.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    rainBtns.forEach(b => b.classList.remove('bg-green-800', 'text-white', 'shadow'));
-                    btn.classList.add('bg-green-800', 'text-white', 'shadow');
-                    state.rainfall = btn.dataset.val;
-                    calculate();
-                });
-            });
-        }
+const MONTHS = {
+  en: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+  id: ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agt','Sep','Okt','Nov','Des']
+};
 
-        // ---------- Perhitungan Terroir Buah ----------
-        function calculate() {
-            let sweetness = 50;
-            let acidity = 40;
-            let texture = 50; // crisp/juicy
-            let aroma = 40;
+const FRUIT_DATA = {
+  salak: {
+    names: { en: 'Salak (Snake Fruit)', id: 'Salak' },
+    emoji: '🐍', color: '#2d5016',
+    baseline: { sweetness:70, acidity:50, texture:65, aroma:40, juiciness:45, mineral:55 },
+    harvestMonths: [0,1,5,6,7,11], peakMonths: [6,7],
+    origin: { en: 'Sleman, Yogyakarta', id: 'Sleman, Yogyakarta' },
+    variety: { en: 'Salak Pondoh', id: 'Salak Pondoh' },
+    exportMarkets: ['🇸🇬 SG','🇲🇾 MY','🇨🇳 CN'],
+    funFact: { en: "The world's only fruit with snake-skin scales. Volcanic ash from Merapi gives Salak Pondoh its signature sharp sweetness with zero astringency — a result of elevated potassium and low manganese.", id: "Satu-satunya buah bersisik di dunia. Abu vulkanik Merapi memberi rasa manis tajam khas tanpa sepat." }
+  },
+  manggis: {
+    names: { en: 'Manggis (Mangosteen)', id: 'Manggis' },
+    emoji: '🍇', color: '#581c87',
+    baseline: { sweetness:55, acidity:55, texture:70, aroma:62, juiciness:72, mineral:58 },
+    harvestMonths: [3,4,5,6,7], peakMonths: [5,6],
+    origin: { en: 'Wanayasa, Purwakarta', id: 'Wanayasa, Purwakarta' },
+    variety: { en: 'Manggis Wanayasa', id: 'Manggis Wanayasa' },
+    exportMarkets: ['🇨🇳 CN','🇸🇦 SA','🇦🇪 AE'],
+    funFact: { en: "Queen of tropical fruits. Wanayasa mangosteen has 30% longer shelf life than average due to unique alluvial microclimate at 600–900m elevation. Highly demanded in Middle East & China.", id: "Ratu buah tropis. Manggis Wanayasa memiliki daya simpan 30% lebih lama karena iklim mikro aluvial unik di 600–900m." }
+  },
+  mango: {
+    names: { en: 'Mangga (Mango)', id: 'Mangga' },
+    emoji: '🥭', color: '#b45309',
+    baseline: { sweetness:80, acidity:30, texture:60, aroma:68, juiciness:70, mineral:42 },
+    harvestMonths: [9,10,11,0,1], peakMonths: [10,11,0],
+    origin: { en: 'Probolinggo, East Java', id: 'Probolinggo, Jawa Timur' },
+    variety: { en: 'Harum Manis', id: 'Harum Manis' },
+    exportMarkets: ['🇸🇬 SG','🇯🇵 JP','🇦🇪 AE'],
+    funFact: { en: "Harum Manis ('fragrant sweet') is Indonesia's most celebrated export mango. Grown in limestone-influenced lowlands, its high Brix score (18–22°) rivals Thailand's Nam Dok Mai.", id: "Harum Manis adalah mangga ekspor terkemuka Indonesia. Tumbuh di dataran rendah berkapur dengan skor Brix 18-22°." }
+  },
+  strawberry: {
+    names: { en: 'Stroberi (Strawberry)', id: 'Stroberi' },
+    emoji: '🍓', color: '#be123c',
+    baseline: { sweetness:50, acidity:72, texture:75, aroma:58, juiciness:65, mineral:52 },
+    harvestMonths: [0,1,2,6,7,8], peakMonths: [1,2],
+    origin: { en: 'Lembang, West Java', id: 'Lembang, Jawa Barat' },
+    variety: { en: 'Lembang Strawberry', id: 'Stroberi Lembang' },
+    exportMarkets: ['🇸🇬 SG','🇲🇾 MY'],
+    funFact: { en: "At 1,400m on Tangkuban Perahu's volcanic slopes, Lembang strawberries develop intense anthocyanins and acidity. The 15°C night temperature difference creates a natural 'cold stress' that concentrates flavor.", id: "Di lereng vulkanik Tangkuban Perahu 1400m, stroberi Lembang mengembangkan antosianin intensif dan keasaman tinggi." }
+  },
+  jambu: {
+    names: { en: 'Jambu Air (Rose Apple)', id: 'Jambu Air' },
+    emoji: '🍒', color: '#dc2626',
+    baseline: { sweetness:60, acidity:38, texture:85, aroma:35, juiciness:82, mineral:38 },
+    harvestMonths: [0,1,2,8,9,10], peakMonths: [1,9],
+    origin: { en: 'Bekasi, West Java', id: 'Bekasi, Jawa Barat' },
+    variety: { en: 'Jambu Madu', id: 'Jambu Madu' },
+    exportMarkets: ['🇲🇾 MY','🇸🇬 SG'],
+    funFact: { en: "Rose apples are one of Southeast Asia's most refreshing fruits — over 85% water content. The crisp bell-shaped flesh is unique; no other fruit has quite the same snap-and-sip texture.", id: "Kandungan air >85% menjadikan jambu air salah satu buah paling menyegarkan di Asia Tenggara." }
+  },
+  nanas: {
+    names: { en: 'Nanas (Pineapple)', id: 'Nanas' },
+    emoji: '🍍', color: '#ca8a04',
+    baseline: { sweetness:65, acidity:65, texture:70, aroma:48, juiciness:78, mineral:50 },
+    harvestMonths: [0,1,2,3,4,5,6,7,8,9,10,11], peakMonths: [3,4,5],
+    origin: { en: 'Subang, West Java', id: 'Subang, Jawa Barat' },
+    variety: { en: 'Smooth Cayenne', id: 'Smooth Cayenne' },
+    exportMarkets: ['🇯🇵 JP','🇺🇸 US','🇳🇱 NL'],
+    funFact: { en: "Indonesia is a top-10 global pineapple producer. Subang's red alluvial laterite soil provides optimal iron and manganese, giving the pineapple its characteristic sweet-sharp balance.", id: "Indonesia masuk 10 besar produsen nanas dunia. Tanah laterit merah Subang memberi keseimbangan manis-asam khas." }
+  },
+  durian: {
+    names: { en: 'Durian', id: 'Durian' },
+    emoji: '🌵', color: '#854d0e',
+    baseline: { sweetness:75, acidity:25, texture:80, aroma:90, juiciness:70, mineral:65 },
+    harvestMonths: [10,11,0,1,2], peakMonths: [11,0],
+    origin: { en: 'Medan, North Sumatra', id: 'Medan, Sumatera Utara' },
+    variety: { en: 'Durian Medan', id: 'Durian Medan' },
+    exportMarkets: ['🇨🇳 CN','🇸🇬 SG','🇭🇰 HK'],
+    funFact: { en: "King of fruits with the most complex aroma profile of any tropical fruit — over 50 volatile compounds including esters, ketones and sulphur notes. Medan durian is prized for bittersweet creamy flesh.", id: "Raja buah dengan >50 senyawa volatil. Durian Medan terkenal dengan daging krim bittersweet." }
+  },
+  rambutan: {
+    names: { en: 'Rambutan', id: 'Rambutan' },
+    emoji: '🦔', color: '#9f1239',
+    baseline: { sweetness:65, acidity:35, texture:70, aroma:45, juiciness:85, mineral:42 },
+    harvestMonths: [10,11,0,1,2], peakMonths: [11,0],
+    origin: { en: 'Binjai, North Sumatra', id: 'Binjai, Sumatera Utara' },
+    variety: { en: 'Rambutan Binjai', id: 'Rambutan Binjai' },
+    exportMarkets: ['🇨🇳 CN','🇹🇭 TH','🇺🇸 US'],
+    funFact: { en: "Rambutan (from 'rambut' = hair) is named for its distinctive hairy shell. Binjai's red alluvial soil produces fruits with 16–18 Brix — considered among the sweetest commercially grown rambutan.", id: "Rambutan berasal dari kata 'rambut'. Tanah aluvial merah Binjai menghasilkan buah 16-18 Brix." }
+  },
+  duku: {
+    names: { en: 'Duku (Langsat)', id: 'Duku' },
+    emoji: '🍡', color: '#d97706',
+    baseline: { sweetness:60, acidity:45, texture:65, aroma:55, juiciness:70, mineral:50 },
+    harvestMonths: [6,7,8,9,10], peakMonths: [7,8],
+    origin: { en: 'Palembang, South Sumatra', id: 'Palembang, Sumatera Selatan' },
+    variety: { en: 'Duku Palembang', id: 'Duku Palembang' },
+    exportMarkets: ['🇲🇾 MY','🇸🇬 SG','🇧🇳 BN'],
+    funFact: { en: "Duku Palembang grows in the peat-swamp forests of South Sumatra. The acidic peat soil (pH 3.5–5.0) gives it a characteristic bittersweet note and thick skin that protects the delicate flesh.", id: "Duku Palembang tumbuh di hutan gambut Sumatera Selatan. Tanah gambut asam (pH 3.5-5.0) memberi rasa manis-pahit khas." }
+  },
+  belimbing: {
+    names: { en: 'Belimbing (Starfruit)', id: 'Belimbing' },
+    emoji: '⭐', color: '#a16207',
+    baseline: { sweetness:50, acidity:70, texture:75, aroma:40, juiciness:82, mineral:45 },
+    harvestMonths: [0,1,2,3,4,5,6,7,8,9,10,11], peakMonths: [2,3,8,9],
+    origin: { en: 'Demak, Central Java', id: 'Demak, Jawa Tengah' },
+    variety: { en: 'Belimbing Demak', id: 'Belimbing Demak' },
+    exportMarkets: ['🇲🇾 MY','🇸🇬 SG'],
+    funFact: { en: "Named for its star-shaped cross-section. Belimbing Demak from alluvial rice-field soil is sweeter than highland varieties — the clay-loam retains more phosphorus, reducing acidity naturally.", id: "Dinamai dari penampang berbentuk bintang. Belimbing Demak dari tanah aluvial sawah lebih manis karena tanah lempung menahan fosfor." }
+  },
+  pepaya: {
+    names: { en: 'Pepaya (Papaya)', id: 'Pepaya' },
+    emoji: '🍈', color: '#c2410c',
+    baseline: { sweetness:65, acidity:30, texture:55, aroma:52, juiciness:76, mineral:55 },
+    harvestMonths: [0,1,2,3,4,5,6,7,8,9,10,11], peakMonths: [4,5,6],
+    origin: { en: 'Bogor, West Java', id: 'Bogor, Jawa Barat' },
+    variety: { en: 'Pepaya California', id: 'Pepaya California' },
+    exportMarkets: ['🇸🇬 SG','🇯🇵 JP'],
+    funFact: { en: "Papaya contains papain, a proteolytic enzyme used commercially as a meat tenderizer. Bogor's volcanic highland soil and year-round rainfall make it Indonesia's primary papaya belt.", id: "Pepaya mengandung papain, enzim proteolitik yang digunakan sebagai pelunak daging. Bogor adalah pusat pepaya Indonesia." }
+  },
+  sirsak: {
+    names: { en: 'Sirsak (Soursop)', id: 'Sirsak' },
+    emoji: '💚', color: '#166534',
+    baseline: { sweetness:55, acidity:62, texture:58, aroma:72, juiciness:76, mineral:48 },
+    harvestMonths: [10,11,0,1,2,3], peakMonths: [11,0],
+    origin: { en: 'Blitar, East Java', id: 'Blitar, Jawa Timur' },
+    variety: { en: 'Sirsak Ratu', id: 'Sirsak Ratu' },
+    exportMarkets: ['🇳🇱 NL','🇩🇪 DE','🇺🇸 US'],
+    funFact: { en: "Soursop has the most complex flavor matrix of any common fruit — simultaneously sweet, sour, creamy and floral. Its aroma contains over 100 compounds. Used globally in health beverages.", id: "Sirsak memiliki matriks rasa paling kompleks — manis, asam, creamy, dan floral sekaligus, dengan >100 senyawa aroma." }
+  },
+  buahnaga: {
+    names: { en: 'Buah Naga (Dragon Fruit)', id: 'Buah Naga' },
+    emoji: '🌺', color: '#9d174d',
+    baseline: { sweetness:55, acidity:35, texture:65, aroma:30, juiciness:70, mineral:62 },
+    harvestMonths: [4,5,6,7,8,9,10], peakMonths: [6,7,8],
+    origin: { en: 'Banyuwangi, East Java', id: 'Banyuwangi, Jawa Timur' },
+    variety: { en: 'Red Dragon Fruit', id: 'Buah Naga Merah' },
+    exportMarkets: ['🇨🇳 CN','🇯🇵 JP','🇩🇪 DE'],
+    funFact: { en: "Dragon fruit is a cactus-family plant — a tropical oddity. Banyuwangi's black volcanic coastal soil is rich in iron, giving dragon fruit its characteristic deep red pigmentation (betalains, not anthocyanins).", id: "Buah naga adalah tanaman kaktus. Tanah vulkanik hitam Banyuwangi kaya besi, memberi pigmen merah khas (betalain)." }
+  },
+  markisa: {
+    names: { en: 'Markisa (Passion Fruit)', id: 'Markisa' },
+    emoji: '🌸', color: '#7c3aed',
+    baseline: { sweetness:45, acidity:80, texture:40, aroma:88, juiciness:72, mineral:55 },
+    harvestMonths: [3,4,5,6,7,8], peakMonths: [5,6,7],
+    origin: { en: 'Berastagi, North Sumatra', id: 'Berastagi, Sumatera Utara' },
+    variety: { en: 'Markisa Ungu', id: 'Markisa Ungu' },
+    exportMarkets: ['🇳🇱 NL','🇩🇪 DE','🇫🇷 FR'],
+    funFact: { en: "Berastagi passion fruit at 1,300m in the Karo Highlands produces the most aromatic variety in Indonesia. The volcanic Sinabung ash deposits enrich the soil with calcium and sulfur that intensify its signature tropical aroma.", id: "Markisa Berastagi di 1300m Dataran Tinggi Karo menghasilkan varietas paling aromatik di Indonesia." }
+  },
+  pisang: {
+    names: { en: 'Pisang Raja (Banana)', id: 'Pisang Raja' },
+    emoji: '🍌', color: '#ca8a04',
+    baseline: { sweetness:78, acidity:25, texture:52, aroma:62, juiciness:55, mineral:44 },
+    harvestMonths: [0,1,2,3,4,5,6,7,8,9,10,11], peakMonths: [2,3,9,10],
+    origin: { en: 'Lampung, Sumatra', id: 'Lampung, Sumatera' },
+    variety: { en: 'Pisang Raja', id: 'Pisang Raja' },
+    exportMarkets: ['🇸🇬 SG','🇯🇵 JP','🇸🇦 SA'],
+    funFact: { en: "Indonesia has over 230 banana cultivars — more than any country. Pisang Raja ('King Banana') from Lampung's loamy highland soils is prized for its fine, creamy texture and intense vanilla-honey aroma.", id: "Indonesia memiliki >230 kultivar pisang. Pisang Raja Lampung dihargai karena tekstur creamy dan aroma vanilla-madu." }
+  }
+};
 
-            // 1. Fruit type baseline
-            switch(state.fruitType) {
-                case 'salak': sweetness = 70; acidity = 50; texture = 65; aroma = 40; break;
-                case 'manggis': sweetness = 55; acidity = 55; texture = 70; aroma = 60; break;
-                case 'mango': sweetness = 80; acidity = 30; texture = 60; aroma = 65; break;
-                case 'strawberry': sweetness = 50; acidity = 70; texture = 75; aroma = 55; break;
-                case 'jambu': sweetness = 60; acidity = 40; texture = 85; aroma = 35; break;
-                case 'nanas': sweetness = 65; acidity = 65; texture = 70; aroma = 45; break;
-                case 'durian': sweetness = 75; acidity = 25; texture = 80; aroma = 85; break;
-                default: break;
-            }
+const PRESETS = {
+  java: [
+    { key:'salakPondoh', fruit:'salak', soil:'volcanic', ph:6.2, elev:800, sun:70, rain:'moderate', label:{en:'Salak Pondoh',id:'Salak Pondoh'}, sub:'Sleman', emoji:'🐍' },
+    { key:'manggisWanayasa', fruit:'manggis', soil:'alluvial', ph:6.0, elev:600, sun:65, rain:'moderate', label:{en:'Manggis Wanayasa',id:'Manggis Wanayasa'}, sub:'Purwakarta', emoji:'🍇' },
+    { key:'harumManis', fruit:'mango', soil:'loam', ph:6.5, elev:150, sun:85, rain:'moderate', label:{en:'Harum Manis',id:'Harum Manis'}, sub:'Probolinggo', emoji:'🥭' },
+    { key:'lembangStraw', fruit:'strawberry', soil:'volcanic', ph:5.8, elev:1400, sun:75, rain:'moderate', label:{en:'Lembang Berry',id:'Stroberi Lembang'}, sub:'Lembang', emoji:'🍓' },
+    { key:'belimbingDemak', fruit:'belimbing', soil:'alluvial', ph:6.3, elev:80, sun:80, rain:'moderate', label:{en:'Belimbing Demak',id:'Belimbing Demak'}, sub:'Demak', emoji:'⭐' },
+    { key:'durianBlitar', fruit:'durian', soil:'loam', ph:6.5, elev:400, sun:75, rain:'high', label:{en:'Durian Blitar',id:'Durian Blitar'}, sub:'Blitar', emoji:'🌵' },
+  ],
+  sumatra: [
+    { key:'durianMedan', fruit:'durian', soil:'volcanic', ph:6.2, elev:500, sun:70, rain:'high', label:{en:'Durian Medan',id:'Durian Medan'}, sub:'Medan', emoji:'🌵' },
+    { key:'rambutanBinjai', fruit:'rambutan', soil:'alluvial', ph:6.0, elev:80, sun:75, rain:'high', label:{en:'Rambutan Binjai',id:'Rambutan Binjai'}, sub:'Binjai', emoji:'🦔' },
+    { key:'dukuPalembang', fruit:'duku', soil:'peat', ph:4.8, elev:50, sun:65, rain:'high', label:{en:'Duku Palembang',id:'Duku Palembang'}, sub:'Palembang', emoji:'🍡' },
+    { key:'markisaBerastagi', fruit:'markisa', soil:'volcanic', ph:5.8, elev:1300, sun:70, rain:'moderate', label:{en:'Markisa Berastagi',id:'Markisa Berastagi'}, sub:'Berastagi', emoji:'🌸' },
+    { key:'sirsak', fruit:'sirsak', soil:'loam', ph:6.3, elev:300, sun:80, rain:'moderate', label:{en:'Sirsak Ratu',id:'Sirsak Ratu'}, sub:'Blitar', emoji:'💚' },
+  ],
+  other: [
+    { key:'buahnagaNTT', fruit:'buahnaga', soil:'volcanic', ph:6.0, elev:150, sun:90, rain:'low', label:{en:'Dragon Fruit NTT',id:'Buah Naga NTT'}, sub:'Banyuwangi', emoji:'🌺' },
+    { key:'pepayaBogor', fruit:'pepaya', soil:'volcanic', ph:6.2, elev:350, sun:80, rain:'high', label:{en:'Pepaya Bogor',id:'Pepaya Bogor'}, sub:'Bogor', emoji:'🍈' },
+    { key:'pisangLampung', fruit:'pisang', soil:'loam', ph:6.5, elev:200, sun:80, rain:'moderate', label:{en:'Pisang Raja',id:'Pisang Raja'}, sub:'Lampung', emoji:'🍌' },
+    { key:'jambuMadu', fruit:'jambu', soil:'alluvial', ph:6.0, elev:60, sun:75, rain:'moderate', label:{en:'Jambu Madu',id:'Jambu Madu'}, sub:'Bekasi', emoji:'🍒' },
+  ]
+};
 
-            // 2. Soil type impact
-            if (state.soilType === 'volcanic') {
-                sweetness += 15;
-                acidity -= 10;   // reduces astringency
-                texture += 5;
-                aroma += 10;
-            } else if (state.soilType === 'alluvial') {
-                sweetness += 5;
-                texture += 10;
-                aroma += 5;
-            } else if (state.soilType === 'clay') {
-                sweetness -= 5;
-                texture += 10;
-                aroma -= 5;
-            } else if (state.soilType === 'sandy') {
-                sweetness -= 5;
-                acidity += 5;
-                texture -= 10;
-            }
+// ===================== STATE =====================
+let state = {
+  fruitType: 'salak', soilType: 'loam',
+  ph: 6.0, elevation: 800, sunIntensity: 70, rainfall: 'moderate',
+  compare: false, compareFruit: 'manggis'
+};
+let lang = 'en';
 
-            // 3. Soil pH
-            let phOptimal = (state.ph >= 5.5 && state.ph <= 6.5);
-            if (!phOptimal) {
-                let penalty = Math.abs(6.0 - state.ph) * 8;
-                sweetness -= penalty * 0.5;
-                acidity += (state.ph < 5.5 ? 8 : -5);
-                aroma -= penalty * 0.6;
-            } else {
-                sweetness += 5;
-                aroma += 8;
-            }
+// ===================== DOM =====================
+const $ = id => document.getElementById(id);
+const fruitSel = $('fruitType'), soilSel = $('soilType');
+const phSlider = $('phLevel'), elevSlider = $('elevation'), sunSlider = $('sunIntensity');
+const rainBtns = document.querySelectorAll('.rain-btn');
 
-            // 4. Elevation
-            let elevFactor = Math.min(1, Math.max(0, state.elevation / 1800));
-            acidity += elevFactor * 20;
-            sweetness -= elevFactor * 10;
-            aroma += elevFactor * 25;
-            texture += elevFactor * 5;
+// ===================== RADAR MATH =====================
+const CX = 150, CY = 150, R = 98;
+const AXES = ['sweetness','acidity','texture','aroma','juiciness','mineral'];
+const AXIS_LABELS = {
+  en: ['Sweet','Acid','Texture','Aroma','Juicy','Mineral'],
+  id: ['Manis','Asam','Tekstur','Aroma','Juicy','Mineral']
+};
 
-            // 5. Sunlight intensity
-            let sunFactor = (state.sunIntensity - 50) / 50; // -0.4 to +1
-            sweetness += sunFactor * 20;
-            acidity -= sunFactor * 10;
-            texture -= sunFactor * 5;
-            if (state.sunIntensity > 85) aroma -= 10;
-            else if (state.sunIntensity < 50) aroma += 10;
+function polarPoint(i, val) {
+  const angle = (i * 2 * Math.PI / 6) - Math.PI / 2;
+  const r = R * (val / 100);
+  return [CX + r * Math.cos(angle), CY + r * Math.sin(angle)];
+}
+function hexPoints(scale) {
+  return AXES.map((_,i) => polarPoint(i, scale * 100).join(',')).join(' ');
+}
+function labelPoint(i) {
+  const angle = (i * 2 * Math.PI / 6) - Math.PI / 2;
+  const r = R + 18;
+  return [CX + r * Math.cos(angle), CY + r * Math.sin(angle)];
+}
 
-            // 6. Rainfall
-            if (state.rainfall === 'moderate') {
-                sweetness += 5;
-                texture += 10;
-                aroma += 5;
-            } else if (state.rainfall === 'low') {
-                sweetness += 10;
-                acidity += 5;
-                texture -= 5;
-            } else if (state.rainfall === 'high') {
-                sweetness -= 5;
-                acidity -= 5;
-                texture += 5;
-                aroma -= 5;
-            }
+function initRadar() {
+  $('ring100').setAttribute('points', hexPoints(1));
+  $('ring66').setAttribute('points', hexPoints(0.66));
+  $('ring33').setAttribute('points', hexPoints(0.33));
 
-            // Normalize
-            sweetness = Math.min(100, Math.max(20, sweetness));
-            acidity = Math.min(100, Math.max(10, acidity));
-            texture = Math.min(100, Math.max(20, texture));
-            aroma = Math.min(100, Math.max(15, aroma));
+  // Axis lines
+  const axesG = $('radarAxes');
+  axesG.innerHTML = '';
+  AXES.forEach((_,i) => {
+    const [x,y] = polarPoint(i, 100);
+    const l = document.createElementNS('http://www.w3.org/2000/svg','line');
+    l.setAttribute('x1', CX); l.setAttribute('y1', CY);
+    l.setAttribute('x2', x); l.setAttribute('y2', y);
+    axesG.appendChild(l);
+  });
 
-            // Total score: weighted for export quality (balance of sweetness, acidity, shelf life via texture/aroma)
-            let total = Math.round((sweetness * 0.3 + (100 - Math.abs(acidity-50)) * 0.2 + texture * 0.25 + aroma * 0.25));
-            total = Math.min(100, Math.max(40, total));
-            
-            updateBarsAndLabels(sweetness, acidity, texture, aroma, total);
-            generateFlavorAndInsight(sweetness, acidity, texture, aroma, total);
-        }
+  // Labels
+  const labelsG = $('radarLabels');
+  labelsG.innerHTML = '';
+  AXES.forEach((_,i) => {
+    const [lx, ly] = labelPoint(i);
+    const t = document.createElementNS('http://www.w3.org/2000/svg','text');
+    t.setAttribute('x', lx); t.setAttribute('y', ly);
+    t.setAttribute('dominant-baseline','middle');
+    const anchor = lx < CX - 5 ? 'end' : lx > CX + 5 ? 'start' : 'middle';
+    t.setAttribute('text-anchor', anchor);
+    t.setAttribute('class', `radar-axis-label-${i}`);
+    t.textContent = AXIS_LABELS[lang][i];
+    labelsG.appendChild(t);
+  });
+}
 
-        function updateBarsAndLabels(sweetness, acidity, texture, aroma, total) {
-            profile.sweetness.bar.style.width = `${sweetness}%`;
-            profile.sweetness.text.innerText = `${Math.round(sweetness)}%`;
-            profile.acidity.bar.style.width = `${acidity}%`;
-            profile.acidity.text.innerText = `${Math.round(acidity)}%`;
-            profile.texture.bar.style.width = `${texture}%`;
-            profile.texture.text.innerText = `${Math.round(texture)}%`;
-            profile.aroma.bar.style.width = `${aroma}%`;
-            profile.aroma.text.innerText = `${Math.round(aroma)}%`;
-            totalScoreSpan.innerText = total;
-            
-            if (total >= 85) {
-                qualityLabelSpan.innerHTML = currentLang === 'en' ? 
-                    '<span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs">🌟 Premium Export Quality</span>' :
-                    '<span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs">🌟 Kualitas Ekspor Premium</span>';
-                oneLineSpan.innerText = currentLang === 'en' ? "Exceptional balance, long shelf life, high demand" : "Keseimbangan luar biasa, daya simpan panjang, permintaan tinggi";
-            } else if (total >= 75) {
-                qualityLabelSpan.innerHTML = currentLang === 'en' ? 
-                    '<span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs">✅ High Grade Local Market</span>' :
-                    '<span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs">✅ Kelas Atas Pasar Lokal</span>';
-                oneLineSpan.innerText = currentLang === 'en' ? "Good sweetness-acidity, suitable for export" : "Kemanisan-keasaman baik, cocok untuk ekspor";
-            } else if (total >= 65) {
-                qualityLabelSpan.innerHTML = currentLang === 'en' ? 
-                    '<span class="bg-stone-200 text-stone-700 px-3 py-1 rounded-full text-xs">Standard Domestic</span>' :
-                    '<span class="bg-stone-200 text-stone-700 px-3 py-1 rounded-full text-xs">Standar Domestik</span>';
-                oneLineSpan.innerText = currentLang === 'en' ? "Pleasant taste, moderate shelf life" : "Rasa nikmat, daya simpan sedang";
-            } else {
-                qualityLabelSpan.innerHTML = currentLang === 'en' ? 
-                    '<span class="bg-stone-300 text-stone-800 px-3 py-1 rounded-full text-xs">Low Grade / Processing</span>' :
-                    '<span class="bg-stone-300 text-stone-800 px-3 py-1 rounded-full text-xs">Grade Rendah / Olahan</span>';
-                oneLineSpan.innerText = currentLang === 'en' ? "May need processing (jam, juice)" : "Mungkin perlu diolah (selai, jus)";
-            }
-        }
-        
-        function generateFlavorAndInsight(sweetness, acidity, texture, aroma, total) {
-            let notes = new Set();
-            
-            // Fruit-specific notes
-            switch(state.fruitType) {
-                case 'salak':
-                    notes.add(currentLang === 'en' ? "Crispy" : "Renyah");
-                    if (state.soilType === 'volcanic') notes.add(currentLang === 'en' ? "No Astringency" : "Tidak Sepat");
-                    break;
-                case 'manggis':
-                    notes.add(currentLang === 'en' ? "Juicy" : "Berair");
-                    if (state.elevation > 600) notes.add(currentLang === 'en' ? "Longer Shelf Life" : "Daya Simpan Panjang");
-                    break;
-                case 'mango':
-                    notes.add(currentLang === 'en' ? "Buttery" : "Lembut");
-                    if (sweetness > 70) notes.add(currentLang === 'en' ? "Honey-like" : "Seperti Madu");
-                    break;
-                case 'strawberry':
-                    notes.add(currentLang === 'en' ? "Bright" : "Cerah");
-                    break;
-                case 'durian':
-                    notes.add(currentLang === 'en' ? "Custardy" : "Lembut seperti puding");
-                    break;
-                default: break;
-            }
-            
-            // Soil & climate notes
-            if (state.soilType === 'volcanic') notes.add(currentLang === 'en' ? "Volcanic Mineral" : "Mineral Vulkanik");
-            if (state.sunIntensity > 80) notes.add(currentLang === 'en' ? "Sun-drenched" : "Terik Matahari");
-            if (state.rainfall === 'low') notes.add(currentLang === 'en' ? "Concentrated" : "Konsentrat");
-            if (state.elevation > 1000) notes.add(currentLang === 'en' ? "Highland Fresh" : "Segar Dataran Tinggi");
-            
-            // Texture
-            if (texture > 70) notes.add(currentLang === 'en' ? "Crisp/Juicy" : "Renyah/Berair");
-            if (aroma > 70) notes.add(currentLang === 'en' ? "Fragrant" : "Harum");
-            
-            let finalNotes = Array.from(notes).slice(0, 7);
-            flavorDiv.innerHTML = '';
-            const colorPalette = ['bg-green-600', 'bg-amber-600', 'bg-rose-500', 'bg-stone-600', 'bg-purple-600', 'bg-yellow-700', 'bg-teal-600'];
-            finalNotes.forEach((note, idx) => {
-                let span = document.createElement('span');
-                span.className = `px-3 py-1.5 rounded-full text-white text-xs font-medium shadow-sm ${colorPalette[idx % colorPalette.length]}`;
-                span.innerText = note;
-                flavorDiv.appendChild(span);
-            });
-            if (finalNotes.length === 0) flavorDiv.innerHTML = `<span class="text-stone-400 italic">${currentLang === 'en' ? 'Adjust parameters to reveal notes' : 'Atur parameter untuk melihat catatan rasa'}</span>`;
-            
-            let insightText = "";
-            if (state.fruitType === 'salak' && state.soilType === 'volcanic' && state.elevation > 500) {
-                insightText = currentLang === 'en' ?
-                    "🌋 Authentic Salak Pondok profile: Volcanic ash from Merapi + mid elevation creates signature sharp sweetness with zero astringency. Highly prized in local markets." :
-                    "🌋 Profil Salak Pondok asli: Abu vulkanik Merapi + elevasi sedang menciptakan rasa manis tajam khas tanpa sepat. Sangat dihargai di pasar lokal.";
-            } else if (state.fruitType === 'manggis' && state.soilType === 'alluvial' && state.rainfall === 'moderate') {
-                insightText = currentLang === 'en' ?
-                    "🍇 Wanayasa Mangosteen excellence: Alluvial soil + balanced rainfall + mild elevation gives longer shelf life and perfect sweet-sour harmony. Top export to China & Middle East." :
-                    "🍇 Keunggulan Manggis Wanayasa: Tanah aluvial + curah hujan seimbang + elevasi sedang memberikan daya simpan lebih lama dan harmoni asam-manis sempurna. Ekspor terbaik ke Tiongkok & Timur Tengah.";
-            } else if (total > 80) {
-                insightText = currentLang === 'en' ?
-                    "✨ Excellent fruit terroir! Ideal combination of volcanic/alluvial soil, proper sunlight, and elevation creates premium fruit. Consider for export or high-end markets." :
-                    "✨ Terroir buah sangat baik! Kombinasi ideal tanah vulkanik/aluvial, sinar matahari tepat, dan elevasi menciptakan buah premium. Pertimbangkan untuk ekspor atau pasar kelas atas.";
-            } else {
-                insightText = currentLang === 'en' ?
-                    "🍃 This fruit shows potential. For better quality, try volcanic soil (for salak) or alluvial soil (for manggis), adjust sunlight to 60-80%, and keep elevation between 500-1200m." :
-                    "🍃 Buah ini menunjukkan potensi. Untuk kualitas lebih baik, coba tanah vulkanik (untuk salak) atau aluvial (untuk manggis), atur sinar matahari 60-80%, dan elevasi antara 500-1200m.";
-            }
-            terroirInsightSpan.innerText = insightText;
-            
-            // Storage advice
-            if (texture > 70 && acidity > 50) storageAdviceSpan.innerText = currentLang === 'en' ?
-                "📦 Shelf life: 7-10 days (good for export to nearby countries). Store at 10-12°C." :
-                "📦 Daya simpan: 7-10 hari (baik untuk ekspor ke negara terdekat). Simpan pada suhu 10-12°C.";
-            else if (texture > 70) storageAdviceSpan.innerText = currentLang === 'en' ?
-                "📦 Shelf life: 5-7 days. Best for local market or short-distance shipping." :
-                "📦 Daya simpan: 5-7 hari. Terbaik untuk pasar lokal atau pengiriman jarak dekat.";
-            else storageAdviceSpan.innerText = currentLang === 'en' ?
-                "📦 Shelf life: 2-4 days. Consume fresh or process into juice/preserves." :
-                "📦 Daya simpan: 2-4 hari. Konsumsi segar atau olah menjadi jus/selai.";
-        }
-        
-        // ---------- PRESET BUAH ----------
-        function setPreset(fruit, soil, ph, elevation, sun, rainfall) {
-            fruitSelect.value = fruit;
-            soilSelect.value = soil;
-            phSlider.value = ph;
-            elevationSlider.value = elevation;
-            sunSlider.value = sun;
-            rainBtns.forEach(btn => {
-                btn.classList.remove('bg-green-800', 'text-white', 'shadow');
-                if (btn.dataset.val === rainfall) btn.classList.add('bg-green-800', 'text-white', 'shadow');
-            });
-            state.fruitType = fruit;
-            state.soilType = soil;
-            state.ph = ph;
-            state.elevation = elevation;
-            state.sunIntensity = sun;
-            state.rainfall = rainfall;
-            phVal.innerText = ph.toFixed(1);
-            elevationVal.innerText = elevation + " m";
-            sunVal.innerText = sun + "%";
-            calculate();
-        }
-        
-        // Salak Pondok: volcanic soil, pH ~6.2, elevation 800m, sun 70%, moderate rain
-        document.getElementById('presetSalak').addEventListener('click', () => setPreset('salak', 'volcanic', 6.2, 800, 70, 'moderate'));
-        // Manggis Wanayasa: alluvial soil, pH 6.0, elevation 600m, sun 65%, moderate rain
-        document.getElementById('presetManggis').addEventListener('click', () => setPreset('manggis', 'alluvial', 6.0, 600, 65, 'moderate'));
-        // Mangga Harum Manis: loam, pH 6.5, low elevation, high sun, moderate rain
-        document.getElementById('presetMango').addEventListener('click', () => setPreset('mango', 'loam', 6.5, 200, 85, 'moderate'));
-        // Strawberry Lembang: volcanic, pH 5.8, high elevation, high sun, moderate rain
-        document.getElementById('presetStrawberry').addEventListener('click', () => setPreset('strawberry', 'volcanic', 5.8, 1400, 75, 'moderate'));
-        document.getElementById('resetDefault').addEventListener('click', () => setPreset('salak', 'loam', 6.0, 500, 70, 'moderate'));
-        
-        const langToggle = document.getElementById('langToggle');
-        langToggle.addEventListener('change', (e) => {
-            currentLang = e.target.checked ? 'id' : 'en';
-            applyLanguage();
-        });
-        
-        attachEvents();
-        calculate();
-        applyLanguage();
-    </script>
+function updateRadarLabels() {
+  AXES.forEach((_,i) => {
+    const el = document.querySelector(`.radar-axis-label-${i}`);
+    if (el) el.textContent = AXIS_LABELS[lang][i];
+  });
+}
+
+function updateRadarPolygon(stats, polyId, dotGroupId, showDots) {
+  const poly = $(polyId);
+  const pts = AXES.map((ax,i) => polarPoint(i, stats[ax] || 0).join(',')).join(' ');
+  poly.setAttribute('points', pts);
+
+  if (dotGroupId) {
+    const dotsG = $(dotGroupId);
+    dotsG.innerHTML = '';
+    if (showDots) {
+      AXES.forEach((ax,i) => {
+        const [dx,dy] = polarPoint(i, stats[ax] || 0);
+        const c = document.createElementNS('http://www.w3.org/2000/svg','circle');
+        c.setAttribute('cx', dx); c.setAttribute('cy', dy); c.setAttribute('r','3.5');
+        c.setAttribute('fill','var(--green-mid)'); c.setAttribute('stroke','white'); c.setAttribute('stroke-width','1.5');
+        dotsG.appendChild(c);
+      });
+    }
+  }
+}
+
+// ===================== CALCULATE =====================
+function calculate(fruitKey, stateOverride) {
+  const s = stateOverride || state;
+  const fd = FRUIT_DATA[fruitKey];
+  let { sweetness, acidity, texture, aroma, juiciness, mineral } = {...fd.baseline};
+
+  // Soil type
+  const soilFx = {
+    volcanic: { sweetness:+14, acidity:-10, texture:+5, aroma:+10, juiciness:-3, mineral:+18 },
+    alluvial:  { sweetness:+6, acidity:-3, texture:+10, aroma:+5, juiciness:+8, mineral:+6 },
+    loam:      { sweetness:+2, acidity:0, texture:+3, aroma:+2, juiciness:+3, mineral:+2 },
+    clay:      { sweetness:-5, acidity:+3, texture:+8, aroma:-5, juiciness:+6, mineral:-4 },
+    sandy:     { sweetness:-7, acidity:+6, texture:-10, aroma:-4, juiciness:-8, mineral:-8 },
+    peat:      { sweetness:-8, acidity:+12, texture:-5, aroma:+5, juiciness:+5, mineral:-12 }
+  };
+  const sf = soilFx[s.soilType] || {};
+  sweetness += sf.sweetness||0; acidity += sf.acidity||0;
+  texture += sf.texture||0; aroma += sf.aroma||0;
+  juiciness += sf.juiciness||0; mineral += sf.mineral||0;
+
+  // pH
+  if (s.ph >= 5.5 && s.ph <= 6.5) { sweetness += 5; aroma += 7; mineral += 5; }
+  else {
+    const d = Math.abs(s.ph - 6.0);
+    sweetness -= d * 7; aroma -= d * 6; mineral -= d * 5;
+    acidity += (s.ph < 5.5 ? 10 : -4);
+  }
+
+  // Elevation
+  const ef = Math.min(1, Math.max(0, s.elevation / 1800));
+  acidity += ef * 20; sweetness -= ef * 8; aroma += ef * 22;
+  texture += ef * 4; juiciness -= ef * 10; mineral += ef * 12;
+
+  // Sunlight
+  const snf = (s.sunIntensity - 50) / 50;
+  sweetness += snf * 18; acidity -= snf * 8;
+  texture -= snf * 4; juiciness -= snf * 6;
+  if (s.sunIntensity > 85) aroma -= 10; else if (s.sunIntensity < 50) aroma += 8;
+
+  // Rainfall
+  const rFx = {
+    low:      { sweetness:+10, acidity:+5, texture:-5, juiciness:-12, aroma:+3 },
+    moderate: { sweetness:+5, acidity:0, texture:+8, juiciness:+8, aroma:+5 },
+    high:     { sweetness:-6, acidity:-5, texture:+5, juiciness:+14, aroma:-5 }
+  };
+  const rf = rFx[s.rainfall] || {};
+  sweetness += rf.sweetness||0; acidity += rf.acidity||0;
+  texture += rf.texture||0; juiciness += rf.juiciness||0; aroma += rf.aroma||0;
+
+  const clamp = (v, mn=10, mx=100) => Math.min(mx, Math.max(mn, Math.round(v)));
+  return {
+    sweetness: clamp(sweetness, 15),
+    acidity:   clamp(acidity, 10),
+    texture:   clamp(texture, 15),
+    aroma:     clamp(aroma, 12),
+    juiciness: clamp(juiciness, 10),
+    mineral:   clamp(mineral, 10)
+  };
+}
+
+function totalScore(stats) {
+  const { sweetness, acidity, texture, aroma, juiciness, mineral } = stats;
+  const acidBalance = 100 - Math.abs(acidity - 45);
+  return Math.min(100, Math.max(40, Math.round(
+    sweetness*0.25 + acidBalance*0.18 + texture*0.18 + aroma*0.18 + juiciness*0.12 + mineral*0.09
+  )));
+}
+
+// ===================== UPDATE UI =====================
+function updateUI() {
+  const stats = calculate(state.fruitType);
+  const score = totalScore(stats);
+  const fd = FRUIT_DATA[state.fruitType];
+
+  // Score ring
+  const pct = score / 100;
+  const circ = 2 * Math.PI * 56;
+  $('scoreRing').style.strokeDashoffset = circ * (1 - pct);
+  $('scoreRing').style.stroke = score >= 80 ? 'var(--green-mid)' : score >= 65 ? 'var(--amber)' : 'var(--papaya)';
+  $('totalScore').textContent = score;
+
+  // Quality label
+  let ql = '', grade = '';
+  if (score >= 85) { ql = lang==='en'?'🌟 Premium Export':'🌟 Ekspor Premium'; grade='A+'; }
+  else if (score >= 75) { ql = lang==='en'?'✅ Export Ready':'✅ Siap Ekspor'; grade='A'; }
+  else if (score >= 65) { ql = lang==='en'?'Standard Grade':'Grade Standar'; grade='B'; }
+  else { ql = lang==='en'?'Processing Grade':'Grade Olahan'; grade='C'; }
+  $('qualityLabel').textContent = ql;
+  $('gradeValue').textContent = grade;
+  $('fruitOriginText').textContent = fd.origin[lang];
+  $('exportMarketsRow').innerHTML = fd.exportMarkets.map(m=>`<span class="market-badge">${m}</span>`).join('');
+
+  // Bars
+  const bars = [
+    ['sweetness','sweetnessBar','sweetnessPercent'],
+    ['acidity','acidityBar','acidityPercent'],
+    ['texture','textureBar','texturePercent'],
+    ['aroma','aromaBar','aromaPercent'],
+    ['juiciness','juicinessBar','juicinessPercent'],
+    ['mineral','mineralBar','mineralPercent'],
+  ];
+  bars.forEach(([key,barId,pctId]) => {
+    $(barId).style.width = stats[key] + '%';
+    $(pctId).textContent = stats[key] + '%';
+  });
+
+  // Radar
+  updateRadarPolygon(stats, 'mainPolygon', 'radarDots', true);
+
+  // Compare
+  if (state.compare) {
+    const cs = calculate(state.compareFruit, state);
+    updateRadarPolygon(cs, 'comparePolygon', null, false);
+    $('comparePolygon').style.opacity = '1';
+    $('legendCompare').classList.remove('hidden');
+    const cfd = FRUIT_DATA[state.compareFruit];
+    $('legendCompareText').textContent = cfd.names[lang];
+    // Delta table
+    $('compareStatsBlock').classList.remove('hidden');
+    $('compareStatsList').innerHTML = AXES.map(ax => {
+      const d = stats[ax] - cs[ax];
+      const col = d>0?'text-green-700':d<0?'text-rose-600':'text-stone-500';
+      const arrow = d>0?'▲':d<0?'▼':'=';
+      return `<div class="flex justify-between"><span class="capitalize">${ax}</span><span class="${col} font-bold">${arrow} ${Math.abs(d)}</span></div>`;
+    }).join('');
+  } else {
+    $('comparePolygon').style.opacity = '0';
+    $('legendCompare').classList.add('hidden');
+    $('compareStatsBlock').classList.add('hidden');
+  }
+
+  // Harvest calendar
+  const months = MONTHS[lang];
+  const hg = $('harvestGrid');
+  hg.innerHTML = '';
+  months.forEach((m,i) => {
+    const div = document.createElement('div');
+    div.className = 'month-cell' + (fd.peakMonths.includes(i) ? ' peak' : fd.harvestMonths.includes(i) ? ' active' : '');
+    div.textContent = m;
+    hg.appendChild(div);
+  });
+
+  // Fun fact
+  $('funFactText').textContent = fd.funFact[lang];
+
+  // Flavor notes
+  generateNotes(stats, score);
+
+  // Terroir insight
+  generateInsight(stats, score);
+}
+
+function generateNotes(stats, score) {
+  const chips = [];
+  const fd = FRUIT_DATA[state.fruitType];
+  if (state.soilType === 'volcanic') chips.push({ label: lang==='en'?'Volcanic Minerals':'Mineral Vulkanik', bg:'bg-slate-600' });
+  if (stats.sweetness > 72) chips.push({ label: lang==='en'?'Very Sweet':'Sangat Manis', bg:'bg-amber-500' });
+  if (stats.acidity > 65) chips.push({ label: lang==='en'?'Bright Acidity':'Asam Segar', bg:'bg-rose-500' });
+  if (stats.aroma > 70) chips.push({ label: lang==='en'?'Aromatic':'Harum', bg:'bg-purple-600' });
+  if (stats.juiciness > 75) chips.push({ label: lang==='en'?'Very Juicy':'Sangat Berair', bg:'bg-sky-500' });
+  if (stats.texture > 75) chips.push({ label: lang==='en'?'Crisp':'Renyah', bg:'bg-stone-500' });
+  if (state.elevation > 1000) chips.push({ label: lang==='en'?'Highland Complex':'Kompleks Dataran Tinggi', bg:'bg-teal-600' });
+  if (state.soilType === 'alluvial') chips.push({ label: lang==='en'?'Balanced':'Seimbang', bg:'bg-green-600' });
+  if (stats.mineral > 60) chips.push({ label: lang==='en'?'Mineral Rich':'Kaya Mineral', bg:'bg-stone-700' });
+  if (state.rainfall === 'low') chips.push({ label: lang==='en'?'Concentrated':'Terkonsentrasi', bg:'bg-amber-700' });
+  if (state.fruitType === 'salak' && state.soilType === 'volcanic') chips.push({ label: lang==='en'?'No Astringency':'Tidak Sepat', bg:'bg-emerald-600' });
+  if (state.fruitType === 'durian' && stats.aroma > 80) chips.push({ label: lang==='en'?'Pungent':'Beraroma Kuat', bg:'bg-yellow-700' });
+
+  const maxChips = chips.slice(0, 7);
+  $('flavorNotes').innerHTML = maxChips.length
+    ? maxChips.map(c => `<span class="tag-chip text-white ${c.bg}">${c.label}</span>`).join('')
+    : `<span class="text-stone-400 italic text-xs">${lang==='en'?'Adjust parameters to reveal notes':'Atur parameter untuk melihat catatan'}</span>`;
+}
+
+function generateInsight(stats, score) {
+  let insight = '';
+  const f = state.fruitType, s = state.soilType;
+
+  if (f==='salak' && s==='volcanic' && state.elevation > 500)
+    insight = lang==='en'
+      ? '🌋 Classic Salak Pondoh profile: Merapi volcanic ash + 500–900m elevation delivers signature sharp sweetness with zero astringency. Potassium-rich soil suppresses tannin formation — the geological secret behind its premium quality.'
+      : '🌋 Profil Salak Pondoh klasik: Abu vulkanik Merapi + elevasi 500-900m menghasilkan rasa manis tajam khas tanpa sepat. Tanah kaya kalium menekan pembentukan tanin.';
+  else if (f==='manggis' && s==='alluvial')
+    insight = lang==='en'
+      ? '🍇 Wanayasa Mangosteen signature: Alluvial river soil + moderate elevation creates ideal mineral balance. The thick pericarp (rind) that gives longer shelf life is a direct result of calcium-rich alluvial deposits.'
+      : '🍇 Khas Manggis Wanayasa: Tanah aluvial sungai + elevasi sedang menciptakan keseimbangan mineral ideal. Kulit tebal yang memberikan daya simpan panjang adalah hasil endapan aluvial kaya kalsium.';
+  else if (f==='durian' && stats.aroma > 80)
+    insight = lang==='en'
+      ? '👑 Durian King profile active: High aroma score reflects volatile sulfur compounds (diethyl disulfide, propanethiol) concentrated by ideal growing conditions. Rich soil mineral uptake creates the characteristic creamy-bitter-sweet complexity.'
+      : '👑 Profil Raja Durian aktif: Skor aroma tinggi mencerminkan senyawa sulfur volatil yang terkonsentrasi. Penyerapan mineral tanah yang kaya menciptakan kompleksitas creamy-pahit-manis khas.';
+  else if (f==='markisa' && state.elevation > 1000)
+    insight = lang==='en'
+      ? '🌸 Highland Passion Fruit excellence: Above 1,000m, slower fruit development and volcanic soil sulfur create Markisa Berastagi\'s extraordinary aroma complexity — the highest of any Indonesian fruit by compound count.'
+      : '🌸 Keunggulan Markisa Dataran Tinggi: Di atas 1000m, pematangan lebih lambat dan sulfur tanah vulkanik menciptakan kompleksitas aroma Markisa Berastagi yang luar biasa.';
+  else if (score >= 82)
+    insight = lang==='en'
+      ? `✨ Premium terroir achieved! Your ${FRUIT_DATA[f].names.en} shows exceptional character from the combination of ${s} soil, ${state.elevation}m elevation, and ${state.rainfall} rainfall. Consider export certification.`
+      : `✨ Terroir premium tercapai! ${FRUIT_DATA[f].names.id} Anda menunjukkan karakter luar biasa dari kombinasi tanah ${s}, elevasi ${state.elevation}m, dan curah hujan ${state.rainfall}.`;
+  else
+    insight = lang==='en'
+      ? `🍃 Solid terroir for ${FRUIT_DATA[f].names.en}. For higher scores, try matching the optimal soil type for this variety and adjust elevation closer to its native growing range (${FRUIT_DATA[f].origin.en}).`
+      : `🍃 Terroir solid untuk ${FRUIT_DATA[f].names.id}. Untuk skor lebih tinggi, coba sesuaikan jenis tanah optimal dan elevasi mendekati kisaran asal varietas ini.`;
+
+  $('terroirInsight').textContent = insight;
+
+  // Storage advice
+  const { juiciness, texture } = stats;
+  if (juiciness < 50 && texture > 70)
+    $('storageAdvice').textContent = lang==='en'
+      ? '📦 Shelf life: 10–14 days. Excellent for regional & international export. Refrigerate at 10–13°C.'
+      : '📦 Daya simpan: 10-14 hari. Cocok ekspor regional & internasional. Simpan 10-13°C.';
+  else if (juiciness > 70)
+    $('storageAdvice').textContent = lang==='en'
+      ? '📦 Shelf life: 3–5 days (high moisture). Best for local or air-freight export. Consume fresh.'
+      : '📦 Daya simpan: 3-5 hari (kelembaban tinggi). Terbaik untuk pasar lokal atau air freight. Konsumsi segar.';
+  else
+    $('storageAdvice').textContent = lang==='en'
+      ? '📦 Shelf life: 5–8 days. Suitable for domestic market & short-haul export by sea or road.'
+      : '📦 Daya simpan: 5-8 hari. Cocok pasar domestik & ekspor jarak pendek via laut/darat.';
+}
+
+// ===================== PRESETS =====================
+function buildPresets(tab) {
+  const grid = $('presetGrid');
+  grid.innerHTML = '';
+  const list = tab === 'all'
+    ? [...PRESETS.java, ...PRESETS.sumatra, ...PRESETS.other]
+    : PRESETS[tab] || [];
+
+  list.forEach(p => {
+    const btn = document.createElement('button');
+    btn.className = 'preset-btn';
+    btn.innerHTML = `<span class="fruit-emoji">${p.emoji}</span><span>${p.label[lang]}</span><span style="font-size:9px;opacity:0.7">${p.sub}</span>`;
+    btn.addEventListener('click', () => {
+      fruitSel.value = p.fruit;
+      soilSel.value = p.soil;
+      phSlider.value = p.ph; $('phValue').textContent = p.ph.toFixed(1);
+      elevSlider.value = p.elev; $('elevationValue').textContent = p.elev + ' m';
+      sunSlider.value = p.sun; $('sunValue').textContent = p.sun + '%';
+      rainBtns.forEach(b => b.classList.toggle('active', b.dataset.val === p.rain));
+      state = { ...state, fruitType:p.fruit, soilType:p.soil, ph:p.ph, elevation:p.elev, sunIntensity:p.sun, rainfall:p.rain };
+      updateUI();
+    });
+    grid.appendChild(btn);
+  });
+}
+
+// ===================== EVENTS =====================
+function attachEvents() {
+  fruitSel.addEventListener('change', e => { state.fruitType = e.target.value; updateUI(); });
+  soilSel.addEventListener('change', e => { state.soilType = e.target.value; updateUI(); });
+  phSlider.addEventListener('input', e => { state.ph = parseFloat(e.target.value); $('phValue').textContent = state.ph.toFixed(1); updateUI(); });
+  elevSlider.addEventListener('input', e => { state.elevation = parseInt(e.target.value); $('elevationValue').textContent = state.elevation + ' m'; updateUI(); });
+  sunSlider.addEventListener('input', e => { state.sunIntensity = parseInt(e.target.value); $('sunValue').textContent = state.sunIntensity + '%'; updateUI(); });
+  rainBtns.forEach(btn => btn.addEventListener('click', () => {
+    rainBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    state.rainfall = btn.dataset.val; updateUI();
+  }));
+
+  document.querySelectorAll('.preset-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.preset-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      buildPresets(tab.dataset.tab);
+    });
+  });
+
+  $('resetDefault').addEventListener('click', () => {
+    fruitSel.value = 'salak'; soilSel.value = 'loam';
+    phSlider.value = 6.0; $('phValue').textContent = '6.0';
+    elevSlider.value = 800; $('elevationValue').textContent = '800 m';
+    sunSlider.value = 70; $('sunValue').textContent = '70%';
+    rainBtns.forEach(b => b.classList.toggle('active', b.dataset.val === 'moderate'));
+    state = { fruitType:'salak', soilType:'loam', ph:6.0, elevation:800, sunIntensity:70, rainfall:'moderate', compare:state.compare, compareFruit:state.compareFruit };
+    updateUI();
+  });
+
+  $('compareToggle').addEventListener('change', e => {
+    state.compare = e.target.checked;
+    $('comparePanel').classList.toggle('hidden', !state.compare);
+    updateUI();
+  });
+
+  $('compareFruitSelect').addEventListener('change', e => {
+    state.compareFruit = e.target.value; updateUI();
+  });
+
+  $('langToggle').addEventListener('change', e => {
+    lang = e.target.checked ? 'id' : 'en';
+    $('langLabel').textContent = lang.toUpperCase();
+    updateRadarLabels();
+    buildPresets(document.querySelector('.preset-tab.active').dataset.tab);
+    updateUI();
+    applyLangStrings();
+  });
+}
+
+function applyLangStrings() {
+  const t = {
+    en: {
+      presetTitle: '🌏 Geographic Presets', paramsTitle: 'Parameters',
+      fruitLabel: '🍍 Fruit Type', soilLabel: '⛰️ Soil Type',
+      phLabel: '🧪 Soil pH', elevLabel: '🌄 Elevation', sunLabel: '☀️ Sunlight', rainLabel: '☔ Rainfall',
+      acidicText: 'Acidic 4.5', alkalineText: 'Alkaline 7.5',
+      lowElevText: 'Sea Level', highElevText: '2000 m',
+      shadeText: 'Shaded 30%', extremeSunText: 'Full 100%',
+      rainLow: '🌵 Low', rainMed: '🌿 Med', rainHigh: '💧 High',
+      compareTitle: '🔀 Compare Fruits',
+      compareNote: 'Dashed outline on radar = compare fruit baseline',
+      infoTitle: 'What is Terroir?', infoText: ' The combination of soil minerals, microclimate, and elevation that gives each growing region its unique flavor signature.',
+      profileTitle: 'Flavor Profile',
+      sweetnessLabel: '🍯 Sweetness', acidityLabel: '🍋 Acidity', textureLabel: '🍑 Texture / Crunch',
+      aromaLabel: '🌸 Aroma', juicinessLabel: '💦 Juiciness', mineralLabel: '⛰️ Mineral Depth',
+      harvestTitle: '🗓 Harvest Season', factTitle: '📖 Fruit Profile',
+      notesTitle: 'Taste & Texture Notes', radarTitle: 'Flavor Radar',
+      peakText: 'Peak', seasonText: 'Season', offText: 'Off',
+      gradeLabel: 'Grade', scoreLabel: 'Score',
+      footerText: '📊 Simulation based on tropical fruit agronomy & terroir research. For educational use.',
+      compareStatsTitle: 'vs Comparison Fruit',
+      legendMain: 'Current'
+    },
+    id: {
+      presetTitle: '🌏 Preset Geografis', paramsTitle: 'Parameter',
+      fruitLabel: '🍍 Jenis Buah', soilLabel: '⛰️ Jenis Tanah',
+      phLabel: '🧪 pH Tanah', elevLabel: '🌄 Elevasi', sunLabel: '☀️ Sinar Matahari', rainLabel: '☔ Curah Hujan',
+      acidicText: 'Asam 4.5', alkalineText: 'Basa 7.5',
+      lowElevText: 'Permukaan Laut', highElevText: '2000 m',
+      shadeText: 'Ternaungi 30%', extremeSunText: 'Penuh 100%',
+      rainLow: '🌵 Rendah', rainMed: '🌿 Sedang', rainHigh: '💧 Tinggi',
+      compareTitle: '🔀 Bandingkan Buah',
+      compareNote: 'Garis putus = buah pembanding (baseline)',
+      infoTitle: 'Apa itu Terroir?', infoText: ' Kombinasi mineral tanah, iklim mikro, dan elevasi yang memberi setiap daerah cita rasa khasnya.',
+      profileTitle: 'Profil Rasa',
+      sweetnessLabel: '🍯 Kemanisan', acidityLabel: '🍋 Keasaman', textureLabel: '🍑 Tekstur / Renyah',
+      aromaLabel: '🌸 Aroma', juicinessLabel: '💦 Berair', mineralLabel: '⛰️ Kaya Mineral',
+      harvestTitle: '🗓 Musim Panen', factTitle: '📖 Profil Buah',
+      notesTitle: 'Catatan Rasa & Tekstur', radarTitle: 'Radar Rasa',
+      peakText: 'Puncak', seasonText: 'Musim', offText: 'Off',
+      gradeLabel: 'Grade', scoreLabel: 'Skor',
+      footerText: '📊 Simulasi berdasarkan agronomi buah tropis & riset terroir. Untuk tujuan edukatif.',
+      compareStatsTitle: 'vs Buah Pembanding',
+      legendMain: 'Aktif'
+    }
+  };
+  const tr = t[lang];
+  const pairs = [
+    ['presetTitle',tr.presetTitle],['paramsTitle',tr.paramsTitle],
+    ['fruitLabel',tr.fruitLabel],['soilLabel',tr.soilLabel],
+    ['phLabel',tr.phLabel],['elevLabel',tr.elevLabel],
+    ['sunLabel',tr.sunLabel],['rainLabel',tr.rainLabel],
+    ['acidicText',tr.acidicText],['alkalineText',tr.alkalineText],
+    ['lowElevText',tr.lowElevText],['highElevText',tr.highElevText],
+    ['shadeText',tr.shadeText],['extremeSunText',tr.extremeSunText],
+    ['rainLowBtn',tr.rainLow],['rainModerateBtn',tr.rainMed],['rainHighBtn',tr.rainHigh],
+    ['compareTitle',tr.compareTitle],['compareNote',tr.compareNote],
+    ['infoTitle',tr.infoTitle],['infoText',tr.infoText],
+    ['profileTitle',tr.profileTitle],
+    ['sweetnessLabel',tr.sweetnessLabel],['acidityLabel',tr.acidityLabel],
+    ['textureLabel',tr.textureLabel],['aromaLabel',tr.aromaLabel],
+    ['juicinessLabel',tr.juicinessLabel],['mineralLabel',tr.mineralLabel],
+    ['harvestTitle',tr.harvestTitle],['factTitle',tr.factTitle],
+    ['notesTitle',tr.notesTitle],['radarTitle',tr.radarTitle],
+    ['peakText',tr.peakText],['seasonText',tr.seasonText],['offText',tr.offText],
+    ['gradeLabel',tr.gradeLabel],['scoreLabel',tr.scoreLabel],
+    ['footerText',tr.footerText],
+    ['compareStatsTitle',tr.compareStatsTitle],
+    ['legendMain',tr.legendMain]
+  ];
+  pairs.forEach(([id,val])=>{ const el=$(id); if(el) el.textContent=val; });
+
+  // Update fruit select options
+  const fruitOptMap = [
+    ['salak','Salak (Snake Fruit)','Salak (Snake Fruit)'],
+    ['manggis','Manggis (Mangosteen)','Manggis (Mangosteen)'],
+    ['mango','Mangga (Mango)','Mangga (Mango)'],
+    ['strawberry','Stroberi (Strawberry)','Stroberi (Strawberry)'],
+    ['jambu','Jambu Air (Rose Apple)','Jambu Air (Rose Apple)'],
+    ['nanas','Nanas (Pineapple)','Nanas (Pineapple)'],
+    ['durian','Durian','Durian'],
+    ['rambutan','Rambutan','Rambutan'],
+    ['duku','Duku (Langsat)','Duku (Langsat)'],
+    ['belimbing','Belimbing (Starfruit)','Belimbing (Starfruit)'],
+    ['pepaya','Pepaya (Papaya)','Pepaya (Pepaya)'],
+    ['sirsak','Sirsak (Soursop)','Sirsak (Soursop)'],
+    ['buahnaga','Buah Naga (Dragon Fruit)','Buah Naga (Dragon Fruit)'],
+    ['markisa','Markisa (Passion Fruit)','Markisa (Passion Fruit)'],
+    ['pisang','Pisang Raja (Banana)','Pisang Raja (Banana)'],
+  ];
+  Array.from(fruitSel.options).forEach(opt => {
+    const m = fruitOptMap.find(r=>r[0]===opt.value);
+    if (m) opt.textContent = lang==='en'?m[1]:m[2];
+  });
+}
+
+// ===================== INIT =====================
+initRadar();
+buildPresets('all');
+attachEvents();
+applyLangStrings();
+updateUI();
+</script>
 </body>
 </html>
