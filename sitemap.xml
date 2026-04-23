@@ -26,12 +26,6 @@
   </url>
 
   <url>
-    <loc>https://horizon-scanning.org/blog/article/decoding-the-soil-horizon-scanning-for-terroir-driven-commodities-and-flavor-prediction.html</loc>
-    <lastmod>2026-04-23</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://horizon-scanning.org/blog/article/ocean-literacy-foresight-architecting-sustainable-coastal-ecosystems.html</loc>
     <lastmod>2026-04-23</lastmod>
     <changefreq>monthly</changefreq>
@@ -45,6 +39,12 @@
   </url>
   <url>
     <loc>https://horizon-scanning.org/blog/article/sensing-the-unseen-horizon-scanning-in-global-health-and-the-united-nations.html</loc>
+    <lastmod>2026-04-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://horizon-scanning.org/blog/article/decoding-the-soil-horizon-scanning-for-terroir-driven-commodities-and-flavor-prediction.html</loc>
     <lastmod>2026-04-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
