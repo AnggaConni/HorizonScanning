@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Tea Terroir Calculator | Kalkulator Terroir Teh</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap');
+        
+        * { font-family: 'Inter', sans-serif; }
+        .tea-hero {
+            background: linear-gradient(105deg, #2d5a2c 0%, #1a3a1a 100%);
+        }
+        .stat-bar {
+            height: 8px;
+            border-radius: 12px;
+            background-color: #e5f0e5;
+            overflow: hidden;
+        }
+        .stat-fill {
+            height: 100%;
+            border-radius: 12px;
+            transition: width 0.45s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+        .preset-btn {
+            transition: all 0.2s ease;
+        }
+        .preset-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+        .tooltip-icon {
+            cursor: help;
+            border-bottom: 1px dashed #2d6a2f;
+        }
+        input[type="range"] {
+            accent-color: #2d6a2f;
+        }
+        .card-hover {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card-hover:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 25px -12px rgba(0,0,0,0.1);
+        }
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 28px;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.3s;
+            border-radius: 28px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #2d6a2f;
+        }
+        input:checked + .slider:before {
+            transform: translateX(32px);
+        }
+    </style>
+</head>
+<body class="bg-[#f8faf5] text-stone-800">
+
+    <div class="min-h-screen flex flex-col">
+        <!-- Header dengan toggle bilingual -->
+        <header class="tea-hero text-white py-7 px-4 shadow-xl">
+            <div class="max-w-6xl mx-auto text-center relative">
+                <div class="absolute right-0 top-0 md:top-2">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="langToggle">
+                        <span class="slider"></span>
+                    </label>
+                    <span class="ml-2 text-sm font-medium" id="langLabel">EN</span>
+                </div>
+                <h1 class="text-3xl md:text-4xl font-bold mb-3 tracking-tight flex items-center justify-center gap-3">
+                    <i class="fas fa-leaf text-emerald-300"></i> 
+                    <span id="titleText">Tea Terroir Calculator</span>
+                </h1>
+                <p class="text-emerald-100/90 max-w-2xl mx-auto text-sm md:text-base" id="subtitleText">
+                    Discover how environment shapes your cup. Adjust parameters → predict flavor profile, quality score, and unique character based on tea terroir science.
+                </p>
+                <div class="mt-3 text-xs text-emerald-200/70 flex justify-center gap-4 flex-wrap" id="headerTags">
+                    <span><i class="fas fa-arrow-up-wide-short"></i> Elevation</span>
+                    <span><i class="fas fa-flask"></i> Soil pH</span>
+                    <span><i class="fas fa-mound"></i> Soil Type</span>
+                    <span><i class="fas fa-cloud-rain"></i> Rainfall</span>
+                    <span><i class="fas fa-tree"></i> Shade</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="max-w-6xl mx-auto w-full p-4 md:p-6 grid lg:grid-cols-3 gap-8">
+            
+            <!-- KIRI: Input & Preset Wilayah Teh -->
+            <div class="lg:col-span-1 space-y-6">
+                <!-- Preset Daerah Teh -->
+                <div class="bg-white rounded-2xl shadow-md border border-emerald-100 p-5 card-hover">
+                    <div class="flex items-center gap-2 mb-4 border-b border-emerald-100 pb-2">
+                        <i class="fas fa-globe-asia text-emerald-700"></i>
+                        <h2 class="font-semibold text-lg" id="presetTitle">Origin Presets</h2>
+                        <span class="text-xs bg-emerald-50 text-emerald-800 px-2 py-0.5 rounded-full ml-auto" id="presetBadge">instant preset</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button id="presetDarjeeling" class="preset-btn bg-stone-800 text-white text-sm py-2 rounded-xl flex items-center justify-center gap-1"><i class="fas fa-mountain"></i> <span id="darjText">Darjeeling, IN</span></button>
+                        <button id="presetUji" class="preset-btn bg-emerald-700 text-white text-sm py-2 rounded-xl flex items-center justify-center gap-1"><i class="fas fa-tree"></i> <span id="ujiText">Uji, Japan</span></button>
+                        <button id="presetAssam" class="preset-btn bg-amber-800 text-white text-sm py-2 rounded-xl flex items-center justify-center gap-1"><i class="fas fa-water"></i> <span id="assamText">Assam, IN</span></button>
+                        <button id="presetDianhong" class="preset-btn bg-rose-800 text-white text-sm py-2 rounded-xl flex items-center justify-center gap-1"><i class="fas fa-leaf"></i> <span id="dianText">Yunnan, CN</span></button>
+                        <button id="resetDefault" class="preset-btn col-span-2 bg-emerald-100 text-emerald-800 border border-emerald-300 text-sm py-2 rounded-xl flex items-center justify-center gap-1"><i class="fas fa-undo-alt"></i> <span id="resetText">Reset to Default</span></button>
+                    </div>
+                    <p class="text-[11px] text-stone-400 mt-3 text-center" id="presetNote">*Each preset changes all parameters according to the region's real profile</p>
+                </div>
+
+                <!-- Parameter Lingkungan -->
+                <div class="bg-white p-6 rounded-2xl shadow-md border border-emerald-100">
+                    <h2 class="text-xl font-semibold mb-5 flex items-center gap-2"><i class="fas fa-sliders-h text-emerald-800"></i> <span id="paramsTitle">Environmental Parameters</span></h2>
+                    
+                    <div class="space-y-7">
+                        <!-- Elevasi -->
+                        <div>
+                            <div class="flex justify-between text-sm font-medium mb-1">
+                                <label class="tooltip-icon" id="elevLabel" title="Higher elevation (800-2500m) = slower growth, more complex aroma, less astringency">🌄 Elevation (masl)</label>
+                                <span class="text-emerald-800 font-bold" id="elevationValue">1200 m</span>
+                            </div>
+                            <input type="range" id="elevation" min="200" max="2500" value="1200" step="25" class="w-full">
+                            <div class="flex justify-between text-xs text-stone-400 mt-1">
+                                <span id="lowText">Low (200m)</span><span>1200</span><span id="highText">High (2500m)</span>
+                            </div>
+                        </div>
+
+                        <!-- pH Tanah -->
+                        <div>
+                            <div class="flex justify-between text-sm font-medium mb-1">
+                                <label class="tooltip-icon" id="phLabel" title="Tea prefers acidic soil pH 4.5–5.5. Higher pH increases astringency.">🧪 Soil pH</label>
+                                <span class="text-emerald-800 font-bold" id="phValue">5.0</span>
+                            </div>
+                            <input type="range" id="phLevel" min="3.5" max="7.5" value="5.0" step="0.05" class="w-full">
+                            <div class="flex justify-between text-xs text-stone-400"><span id="acidicText">Very Acidic (3.5)</span><span id="idealText">Ideal (5.0)</span><span id="alkalineText">Alkaline (7.5)</span></div>
+                        </div>
+
+                        <!-- Jenis Tanah -->
+                        <div>
+                            <label class="block text-sm font-medium mb-2 tooltip-icon" id="soilLabel" title="Volcanic, loam, clay, sandy – each affects mineral content and drainage">⛰️ Soil Composition</label>
+                            <select id="soilType" class="w-full p-3 rounded-xl border border-stone-200 bg-stone-50 focus:ring-2 focus:ring-emerald-500 outline-none">
+                                <option value="volcanic" id="soilVolcanic">Volcanic (Rich in minerals)</option>
+                                <option value="loam" id="soilLoam" selected>Loam (Balanced, fertile)</option>
+                                <option value="clay" id="soilClay">Clay (Heavy, moisture-retentive)</option>
+                                <option value="sandy" id="soilSandy">Sandy (Fast draining, light)</option>
+                            </select>
+                        </div>
+
+                        <!-- Curah Hujan -->
+                        <div>
+                            <label class="block text-sm font-medium mb-2" id="rainLabel">☔ Annual Rainfall</label>
+                            <div class="grid grid-cols-3 gap-2">
+                                <button class="rain-btn py-2 rounded-xl border transition-all" data-val="low" id="rainLowBtn">🌵 Low</button>
+                                <button class="rain-btn py-2 rounded-xl border transition-all bg-emerald-800 text-white shadow" data-val="moderate" id="rainModerateBtn">🌿 Moderate</button>
+                                <button class="rain-btn py-2 rounded-xl border transition-all" data-val="high" id="rainHighBtn">💧 High</button>
+                            </div>
+                        </div>
+
+                        <!-- Naungan -->
+                        <div>
+                            <label class="block text-sm font-medium mb-2 tooltip-icon" id="shadeLabel" title="Shade increases L-theanine, reduces astringency, enhances umami (matcha, gyokuro)">🌳 Shade Management</label>
+                            <div class="flex gap-5">
+                                <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="shade" value="full-sun" class="accent-emerald-700"> <span id="fullSunText">☀️ Full Sun</span></label>
+                                <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="shade" value="shaded" checked class="accent-emerald-700"> <span id="shadedText">🌳 Shaded</span></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Catatan edukasi terroir -->
+                <div class="bg-emerald-50/50 rounded-xl p-4 text-xs text-stone-600 border border-emerald-200" id="infoBox">
+                    <i class="fas fa-info-circle text-emerald-600 mr-1"></i> <strong id="infoTitle">What is Tea Terroir?</strong> <span id="infoText">The unique combination of elevation, soil, microclimate, and shade that shapes tea character. This calculator simulates their impact on astringency, body, sweetness & umami.</span>
+                </div>
+            </div>
+
+            <!-- KANAN: Hasil & Profil Teh -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Skor terroir & label -->
+                <div class="bg-gradient-to-br from-emerald-50 to-emerald-100/40 rounded-2xl p-6 border border-emerald-200 shadow-sm relative overflow-hidden">
+                    <div class="relative z-10 flex flex-col md:flex-row justify-between items-center gap-4">
+                        <div>
+                            <h3 class="text-sm uppercase tracking-wider text-emerald-800 font-bold" id="scoreLabel">Terroir Potential Score</h3>
+                            <div class="text-6xl font-extrabold text-stone-800" id="totalScore">82</div>
+                            <p class="text-sm mt-1 font-medium" id="qualityLabel">Premium Tea Potential</p>
+                        </div>
+                        <div class="bg-white/70 backdrop-blur-sm rounded-xl px-4 py-2 text-center border border-emerald-200">
+                            <i class="fas fa-chart-simple text-emerald-600"></i>
+                            <span class="ml-2 text-sm font-semibold" id="insightOneLine">Balanced astringency & sweet finish</span>
+                        </div>
+                    </div>
+                    <i class="fas fa-seedling absolute -bottom-5 -right-5 text-8xl text-emerald-200/50"></i>
+                </div>
+
+                <!-- Grafik profil rasa teh -->
+                <div class="bg-white p-6 rounded-2xl shadow-md border border-emerald-100">
+                    <h3 class="font-bold text-lg flex items-center gap-2 mb-5"><i class="fas fa-chart-line text-emerald-700"></i> <span id="profileTitle">Predicted Tea Profile</span></h3>
+                    <div class="space-y-5">
+                        <div><div class="flex justify-between text-sm"><span id="astringencyLabel">🍃 Astringency (Tannins)</span><span id="astringencyPercent">0%</span></div><div class="stat-bar"><div id="astringencyBar" class="stat-fill bg-amber-600" style="width:0%"></div></div></div>
+                        <div><div class="flex justify-between text-sm"><span id="bodyLabel">🍵 Body / Mouthfeel</span><span id="bodyPercent">0%</span></div><div class="stat-bar"><div id="bodyBar" class="stat-fill bg-stone-500" style="width:0%"></div></div></div>
+                        <div><div class="flex justify-between text-sm"><span id="sweetnessLabel">🍯 Sweetness</span><span id="sweetnessPercent">0%</span></div><div class="stat-bar"><div id="sweetnessBar" class="stat-fill bg-emerald-600" style="width:0%"></div></div></div>
+                        <div><div class="flex justify-between text-sm"><span id="umamiLabel">✨ Umami / Complexity</span><span id="umamiPercent">0%</span></div><div class="stat-bar"><div id="umamiBar" class="stat-fill bg-teal-500" style="width:0%"></div></div></div>
+                    </div>
+                </div>
+
+                <!-- Flavor Notes & wawasan terroir -->
+                <div class="bg-white p-6 rounded-2xl shadow-md border border-emerald-100">
+                    <h3 class="font-bold text-lg flex items-center gap-2"><i class="fas fa-mug-hot text-emerald-700"></i> <span id="notesTitle">Prominent Flavor Notes</span></h3>
+                    <div id="flavorNotes" class="flex flex-wrap gap-2 my-4 min-h-[70px]"></div>
+                    <div class="border-t border-emerald-100 pt-4 mt-1">
+                        <p class="text-xs text-stone-500 flex gap-2"><i class="fas fa-microphone-alt text-emerald-600"></i> <span id="terroirInsight">Based on selected parameters, this tea tends to have balanced astringency and natural sweetness.</span></p>
+                    </div>
+                </div>
+
+                <!-- Saran penyajian -->
+                <div class="bg-stone-800 text-stone-200 rounded-xl p-4 flex items-center gap-3 text-sm">
+                    <i class="fas fa-lightbulb text-emerald-300 text-xl"></i>
+                    <span id="brewAdvice">🍃 Recommendation: Brew at 75-85°C to highlight sweetness and umami.</span>
+                </div>
+            </div>
+        </main>
+
+        <footer class="text-center py-6 text-stone-400 text-xs border-t border-stone-200 mt-8">
+            <p id="footerText">📊 Simulation based on tea agronomy & specialty literature. Actual results vary by cultivar, processing, and harvest season.</p>
+        </footer>
+    </div>
+
+    <script>
+        // ------------------- STATE -------------------
+        let state = {
+            elevation: 1200,
+            ph: 5.0,
+            soil: 'loam',
+            rainfall: 'moderate',
+            shade: 'shaded'
+        };
+        let currentLang = 'en'; // 'en' or 'id'
+
+        // DOM elements
+        const elevationSlider = document.getElementById('elevation');
+        const phSlider = document.getElementById('phLevel');
+        const soilSelect = document.getElementById('soilType');
+        const rainBtns = document.querySelectorAll('.rain-btn');
+        const shadeRadios = document.querySelectorAll('input[name="shade"]');
+        const elevationVal = document.getElementById('elevationValue');
+        const phVal = document.getElementById('phValue');
+
+        const totalScoreSpan = document.getElementById('totalScore');
+        const qualityLabelSpan = document.getElementById('qualityLabel');
+        const flavorDiv = document.getElementById('flavorNotes');
+        const terroirInsightSpan = document.getElementById('terroirInsight');
+        const brewAdviceSpan = document.getElementById('brewAdvice');
+        const oneLineSpan = document.getElementById('insightOneLine');
+
+        const profile = {
+            astringency: { bar: document.getElementById('astringencyBar'), text: document.getElementById('astringencyPercent') },
+            body: { bar: document.getElementById('bodyBar'), text: document.getElementById('bodyPercent') },
+            sweetness: { bar: document.getElementById('sweetnessBar'), text: document.getElementById('sweetnessPercent') },
+            umami: { bar: document.getElementById('umamiBar'), text: document.getElementById('umamiPercent') }
+        };
+
+        // ---------- DICTIONARY BILINGUAL ----------
+        const translations = {
+            en: {
+                title: "Tea Terroir Calculator",
+                subtitle: "Discover how environment shapes your cup. Adjust parameters → predict flavor profile, quality score, and unique character based on tea terroir science.",
+                presetTitle: "Origin Presets",
+                presetBadge: "instant preset",
+                darj: "Darjeeling, IN",
+                uji: "Uji, Japan",
+                assam: "Assam, IN",
+                dian: "Yunnan, CN",
+                reset: "Reset to Default",
+                presetNote: "*Each preset changes all parameters according to the region's real profile",
+                paramsTitle: "Environmental Parameters",
+                elevation: "🌄 Elevation (masl)",
+                low: "Low (200m)",
+                high: "High (2500m)",
+                ph: "🧪 Soil pH",
+                acidic: "Very Acidic (3.5)",
+                ideal: "Ideal (5.0)",
+                alkaline: "Alkaline (7.5)",
+                soil: "⛰️ Soil Composition",
+                soilVolcanic: "Volcanic (Rich in minerals)",
+                soilLoam: "Loam (Balanced, fertile)",
+                soilClay: "Clay (Heavy, moisture-retentive)",
+                soilSandy: "Sandy (Fast draining, light)",
+                rainfall: "☔ Annual Rainfall",
+                rainLow: "🌵 Low",
+                rainModerate: "🌿 Moderate",
+                rainHigh: "💧 High",
+                shade: "🌳 Shade Management",
+                fullSun: "☀️ Full Sun",
+                shaded: "🌳 Shaded",
+                infoTitle: "What is Tea Terroir?",
+                infoText: "The unique combination of elevation, soil, microclimate, and shade that shapes tea character. This calculator simulates their impact on astringency, body, sweetness & umami.",
+                scoreLabel: "Terroir Potential Score",
+                profileTitle: "Predicted Tea Profile",
+                astringencyLabel: "🍃 Astringency (Tannins)",
+                bodyLabel: "🍵 Body / Mouthfeel",
+                sweetnessLabel: "🍯 Sweetness",
+                umamiLabel: "✨ Umami / Complexity",
+                notesTitle: "Prominent Flavor Notes",
+                footer: "📊 Simulation based on tea agronomy & specialty literature. Actual results vary by cultivar, processing, and harvest season.",
+            },
+            id: {
+                title: "Kalkulator Terroir Teh",
+                subtitle: "Temukan bagaimana lingkungan membentuk cangkir tehmu. Atur parameter → prediksi profil rasa, skor kualitas, dan karakter unik berdasarkan ilmu terroir teh.",
+                presetTitle: "Preset Wilayah Asal",
+                presetBadge: "preset instan",
+                darj: "Darjeeling, India",
+                uji: "Uji, Jepang",
+                assam: "Assam, India",
+                dian: "Yunnan, Tiongkok",
+                reset: "Reset ke Standar",
+                presetNote: "*Setiap preset mengubah semua parameter sesuai profil asli wilayah tersebut",
+                paramsTitle: "Parameter Lingkungan",
+                elevation: "🌄 Elevasi (mdpl)",
+                low: "Rendah (200m)",
+                high: "Tinggi (2500m)",
+                ph: "🧪 pH Tanah",
+                acidic: "Sangat Asam (3.5)",
+                ideal: "Ideal (5.0)",
+                alkaline: "Basa (7.5)",
+                soil: "⛰️ Komposisi Tanah",
+                soilVolcanic: "Vulkanik (Kaya mineral)",
+                soilLoam: "Lempung Berpasir (Subur)",
+                soilClay: "Lempung Berat (Menahan air)",
+                soilSandy: "Pasir (Drainase cepat)",
+                rainfall: "☔ Curah Hujan Tahunan",
+                rainLow: "🌵 Rendah",
+                rainModerate: "🌿 Sedang",
+                rainHigh: "💧 Tinggi",
+                shade: "🌳 Manajemen Naungan",
+                fullSun: "☀️ Full Sun",
+                shaded: "🌳 Berteduh",
+                infoTitle: "Apa itu Terroir Teh?",
+                infoText: "Kombinasi unik elevasi, tanah, iklim mikro, dan naungan yang membentuk karakter teh. Kalkulator ini mensimulasikan dampaknya terhadap sepat (astringency), body, kemanisan & umami.",
+                scoreLabel: "Skor Potensi Terroir",
+                profileTitle: "Prediksi Profil Teh",
+                astringencyLabel: "🍃 Sepat (Astringency)",
+                bodyLabel: "🍵 Body / Tekstur",
+                sweetnessLabel: "🍯 Kemanisan",
+                umamiLabel: "✨ Umami / Kompleksitas",
+                notesTitle: "Catatan Rasa Unggulan",
+                footer: "📊 Simulasi berdasarkan agronomi teh & literatur spesialti. Hasil aktual bervariasi tergantung kultivar, pengolahan, dan musim panen.",
+            }
+        };
+
+        function applyLanguage() {
+            const t = translations[currentLang];
+            document.getElementById('titleText').innerText = t.title;
+            document.getElementById('subtitleText').innerText = t.subtitle;
+            document.getElementById('presetTitle').innerText = t.presetTitle;
+            document.getElementById('presetBadge').innerText = t.presetBadge;
+            document.getElementById('darjText').innerText = t.darj;
+            document.getElementById('ujiText').innerText = t.uji;
+            document.getElementById('assamText').innerText = t.assam;
+            document.getElementById('dianText').innerText = t.dian;
+            document.getElementById('resetText').innerText = t.reset;
+            document.getElementById('presetNote').innerText = t.presetNote;
+            document.getElementById('paramsTitle').innerText = t.paramsTitle;
+            document.getElementById('elevLabel').innerHTML = t.elevation;
+            document.getElementById('lowText').innerText = t.low;
+            document.getElementById('highText').innerText = t.high;
+            document.getElementById('phLabel').innerHTML = t.ph;
+            document.getElementById('acidicText').innerText = t.acidic;
+            document.getElementById('idealText').innerText = t.ideal;
+            document.getElementById('alkalineText').innerText = t.alkaline;
+            document.getElementById('soilLabel').innerHTML = t.soil;
+            document.getElementById('soilVolcanic').innerText = t.soilVolcanic;
+            document.getElementById('soilLoam').innerText = t.soilLoam;
+            document.getElementById('soilClay').innerText = t.soilClay;
+            document.getElementById('soilSandy').innerText = t.soilSandy;
+            document.getElementById('rainLabel').innerHTML = t.rainfall;
+            document.getElementById('rainLowBtn').innerHTML = t.rainLow;
+            document.getElementById('rainModerateBtn').innerHTML = t.rainModerate;
+            document.getElementById('rainHighBtn').innerHTML = t.rainHigh;
+            document.getElementById('shadeLabel').innerHTML = t.shade;
+            document.getElementById('fullSunText').innerHTML = t.fullSun;
+            document.getElementById('shadedText').innerHTML = t.shaded;
+            document.getElementById('infoTitle').innerHTML = t.infoTitle;
+            document.getElementById('infoText').innerHTML = t.infoText;
+            document.getElementById('scoreLabel').innerHTML = t.scoreLabel;
+            document.getElementById('profileTitle').innerHTML = t.profileTitle;
+            document.getElementById('astringencyLabel').innerHTML = t.astringencyLabel;
+            document.getElementById('bodyLabel').innerHTML = t.bodyLabel;
+            document.getElementById('sweetnessLabel').innerHTML = t.sweetnessLabel;
+            document.getElementById('umamiLabel').innerHTML = t.umamiLabel;
+            document.getElementById('notesTitle').innerHTML = t.notesTitle;
+            document.getElementById('footerText').innerHTML = t.footer;
+            document.getElementById('langLabel').innerText = currentLang === 'en' ? 'EN' : 'ID';
+            calculate();
+        }
+
+        // ---------- Event Listeners ----------
+        function attachEvents() {
+            elevationSlider.addEventListener('input', (e) => { state.elevation = parseInt(e.target.value); elevationVal.innerText = state.elevation + " m"; calculate(); });
+            phSlider.addEventListener('input', (e) => { state.ph = parseFloat(e.target.value); phVal.innerText = state.ph.toFixed(1); calculate(); });
+            soilSelect.addEventListener('change', (e) => { state.soil = e.target.value; calculate(); });
+            rainBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    rainBtns.forEach(b => b.classList.remove('bg-emerald-800', 'text-white', 'shadow'));
+                    btn.classList.add('bg-emerald-800', 'text-white', 'shadow');
+                    state.rainfall = btn.dataset.val;
+                    calculate();
+                });
+            });
+            shadeRadios.forEach(r => {
+                r.addEventListener('change', (e) => { if(e.target.checked) state.shade = e.target.value; calculate(); });
+            });
+        }
+
+        // ---------- Perhitungan Terroir Teh ----------
+        function calculate() {
+            let astringency = 50;
+            let body = 50;
+            let sweetness = 50;
+            let umami = 45;
+
+            // Elevation: higher elevation -> less astringency, more sweetness & umami
+            let elevFactor = (state.elevation - 200) / 2300;
+            elevFactor = Math.min(1, Math.max(0, elevFactor));
+            astringency -= elevFactor * 35;
+            sweetness += elevFactor * 30;
+            umami += elevFactor * 35;
+            body += elevFactor * 10;
+
+            // pH: ideal for tea is 4.5-5.5
+            let phDistance = 0;
+            if(state.ph < 4.5) phDistance = 4.5 - state.ph;
+            if(state.ph > 5.5) phDistance = state.ph - 5.5;
+            let phPenalty = Math.min(30, phDistance * 12);
+            sweetness -= phPenalty;
+            umami -= phPenalty * 0.7;
+            if(state.ph > 6.0) astringency += 15;
+            if(state.ph < 4.0) astringency += 5;
+
+            // Soil type
+            if(state.soil === 'volcanic') {
+                umami += 25;
+                sweetness += 10;
+                body += 5;
+            } else if(state.soil === 'loam') {
+                sweetness += 18;
+                umami += 12;
+                body += 8;
+            } else if(state.soil === 'clay') {
+                body += 25;
+                astringency += 10;
+            } else if(state.soil === 'sandy') {
+                astringency -= 10;
+                body -= 15;
+                sweetness -= 5;
+            }
+
+            // Rainfall
+            if(state.rainfall === 'moderate') {
+                sweetness += 20;
+                umami += 10;
+            } else if(state.rainfall === 'low') {
+                astringency += 15;
+                sweetness -= 12;
+                body += 5;
+            } else if(state.rainfall === 'high') {
+                sweetness -= 8;
+                body -= 10;
+                astringency -= 5;
+            }
+
+            // Shade: increases umami, reduces astringency
+            if(state.shade === 'shaded') {
+                umami += 28;
+                sweetness += 12;
+                astringency -= 15;
+                body -= 5;
+            } else {
+                astringency += 18;
+                sweetness -= 8;
+                umami -= 10;
+                body += 8;
+            }
+
+            // Normalize
+            astringency = Math.min(100, Math.max(10, astringency));
+            body = Math.min(100, Math.max(15, body));
+            sweetness = Math.min(100, Math.max(15, sweetness));
+            umami = Math.min(100, Math.max(10, umami));
+
+            let total = Math.round(( (100 - astringency) + body + sweetness + umami ) / 4);
+            // Adjust total range to 0-100 scale (lower astringency is better)
+            total = Math.min(100, Math.max(30, total));
+            
+            updateBarsAndLabels(astringency, body, sweetness, umami, total);
+            generateFlavorAndInsight(astringency, body, sweetness, umami, total);
+        }
+        
+        function updateBarsAndLabels(astringency, body, sweetness, umami, total) {
+            profile.astringency.bar.style.width = `${astringency}%`;
+            profile.astringency.text.innerText = `${Math.round(astringency)}%`;
+            profile.body.bar.style.width = `${body}%`;
+            profile.body.text.innerText = `${Math.round(body)}%`;
+            profile.sweetness.bar.style.width = `${sweetness}%`;
+            profile.sweetness.text.innerText = `${Math.round(sweetness)}%`;
+            profile.umami.bar.style.width = `${umami}%`;
+            profile.umami.text.innerText = `${Math.round(umami)}%`;
+            totalScoreSpan.innerText = total;
+            
+            if(total >= 85) {
+                qualityLabelSpan.innerHTML = currentLang === 'en' ? 
+                    '<span class="bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full text-xs">🌟 Exceptional Terroir (Rare Tea)</span>' :
+                    '<span class="bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full text-xs">🌟 Terroir Luar Biasa (Teh Langka)</span>';
+                oneLineSpan.innerText = currentLang === 'en' ? "Complex, long finish, high umami" : "Kompleks, aftertaste panjang, umami tinggi";
+            } else if(total >= 75) {
+                qualityLabelSpan.innerHTML = currentLang === 'en' ? 
+                    '<span class="bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full text-xs">✅ Premium Single Origin</span>' :
+                    '<span class="bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full text-xs">✅ Premium Single Origin</span>';
+                oneLineSpan.innerText = currentLang === 'en' ? "Well-balanced, distinctive character" : "Seimbang, karakter khas menonjol";
+            } else if(total >= 65) {
+                qualityLabelSpan.innerHTML = currentLang === 'en' ? 
+                    '<span class="bg-stone-200 text-stone-700 px-3 py-1 rounded-full text-xs">Good Quality Tea</span>' :
+                    '<span class="bg-stone-200 text-stone-700 px-3 py-1 rounded-full text-xs">Teh Kualitas Baik</span>';
+                oneLineSpan.innerText = currentLang === 'en' ? "Suitable for daily drinking, pleasant taste" : "Cocok untuk konsumsi harian, rasa nikmat";
+            } else {
+                qualityLabelSpan.innerHTML = currentLang === 'en' ? 
+                    '<span class="bg-stone-300 text-stone-800 px-3 py-1 rounded-full text-xs">Commercial Grade</span>' :
+                    '<span class="bg-stone-300 text-stone-800 px-3 py-1 rounded-full text-xs">Grade Komersial</span>';
+                oneLineSpan.innerText = currentLang === 'en' ? "May be harsh or flat, adjust parameters" : "Mungkin terasa sepat atau datar, sesuaikan parameter";
+            }
+        }
+        
+        function generateFlavorAndInsight(astringency, body, sweetness, umami, total) {
+            let notes = new Set();
+            
+            // Elevation notes
+            if(state.elevation > 1800) {
+                notes.add(currentLang === 'en' ? "Muscatel" : "Muskatel");
+                notes.add(currentLang === 'en' ? "Floral" : "Bunga");
+                notes.add(currentLang === 'en' ? "Minty" : "Mint");
+            } else if(state.elevation > 1000) {
+                notes.add(currentLang === 'en' ? "Stone Fruit" : "Buah Batu");
+                notes.add(currentLang === 'en' ? "Honey" : "Madu");
+            } else {
+                notes.add(currentLang === 'en' ? "Malty" : "Malt");
+                notes.add(currentLang === 'en' ? "Earthy" : "Tanah");
+            }
+            
+            // pH notes
+            if(state.ph < 4.5) notes.add(currentLang === 'en' ? "Bright" : "Cerah");
+            if(state.ph > 6.0) notes.add(currentLang === 'en' ? "Harsh" : "Kasar");
+            if(state.ph >= 4.5 && state.ph <= 5.5) notes.add(currentLang === 'en' ? "Smooth" : "Halus");
+            
+            // Soil
+            if(state.soil === 'volcanic') notes.add(currentLang === 'en' ? "Mineral" : "Mineral");
+            if(state.soil === 'clay') notes.add(currentLang === 'en' ? "Full-bodied" : "Body penuh");
+            if(state.soil === 'loam') notes.add(currentLang === 'en' ? "Balanced" : "Seimbang");
+            if(state.soil === 'sandy') notes.add(currentLang === 'en' ? "Light & Crisp" : "Ringan & Segar");
+            
+            // Shade
+            if(state.shade === 'shaded') {
+                notes.add(currentLang === 'en' ? "Umami" : "Umami");
+                notes.add(currentLang === 'en' ? "Vegetal" : "Sayuran");
+            } else {
+                notes.add(currentLang === 'en' ? "Sun-dried" : "Jemur matahari");
+            }
+            
+            // Rainfall
+            if(state.rainfall === 'moderate') notes.add(currentLang === 'en' ? "Juicy" : "Berair");
+            if(state.rainfall === 'high') notes.add(currentLang === 'en' ? "Clean" : "Bersih");
+            if(state.rainfall === 'low') notes.add(currentLang === 'en' ? "Concentrated" : "Konsentrat");
+            
+            // Score-based
+            if(astringency > 70) notes.add(currentLang === 'en' ? "Dry" : "Kering");
+            if(sweetness > 70) notes.add(currentLang === 'en' ? "Sweet" : "Manis");
+            if(umami > 70) notes.add(currentLang === 'en' ? "Savory" : "Gurih");
+            
+            let finalNotes = Array.from(notes).slice(0, 7);
+            flavorDiv.innerHTML = '';
+            const colorPalette = ['bg-emerald-600', 'bg-amber-600', 'bg-teal-600', 'bg-stone-600', 'bg-lime-600', 'bg-sky-600', 'bg-rose-600'];
+            finalNotes.forEach((note, idx) => {
+                let span = document.createElement('span');
+                span.className = `px-3 py-1.5 rounded-full text-white text-xs font-medium shadow-sm ${colorPalette[idx % colorPalette.length]}`;
+                span.innerText = note;
+                flavorDiv.appendChild(span);
+            });
+            if(finalNotes.length === 0) flavorDiv.innerHTML = `<span class="text-stone-400 italic">${currentLang === 'en' ? 'No specific notes, try changing parameters' : 'Tidak ada catatan spesifik, coba ubah parameter'}</span>`;
+            
+            let insightText = "";
+            if(total > 80) insightText = currentLang === 'en' ? 
+                "✅ High elevation + ideal pH + shade = premium tea with complex umami and low astringency. Perfect for slow brewing." :
+                "✅ Elevasi tinggi + pH ideal + naungan = teh premium dengan umami kompleks dan sepat rendah. Cocok untuk seduhan lambat.";
+            else if(total > 70) insightText = currentLang === 'en' ?
+                "🍃 Good terroir potential. To enhance umami, increase shade or adjust pH to 4.5-5.5." :
+                "🍃 Potensi terroir baik. Untuk meningkatkan umami, tambah naungan atau atur pH ke 4.5-5.5.";
+            else insightText = currentLang === 'en' ?
+                "📉 Suboptimal conditions. Consider shade management or soil amendment to improve sweetness and reduce astringency." :
+                "📉 Kondisi kurang optimal. Pertimbangkan manajemen naungan atau perbaikan tanah untuk meningkatkan kemanisan dan mengurangi sepat.";
+            
+            if(state.shade === 'shaded' && state.elevation > 1200) insightText = currentLang === 'en' ?
+                "🍵 Classic shaded high-mountain tea: rich umami, low astringency, sweet aftertaste. Similar to Gyokuro or high-end Darjeeling." :
+                "🍵 Teh gunung tinggi berteduh klasik: umami kaya, sepat rendah, aftertaste manis. Mirip dengan Gyokuro atau Darjeeling kelas atas.";
+            
+            terroirInsightSpan.innerText = insightText;
+            
+            // Brew advice
+            if(umami > 65) brewAdviceSpan.innerText = currentLang === 'en' ?
+                "🍃 Recommendation: Low temperature (60-70°C), longer steeping to extract umami without bitterness." :
+                "🍃 Rekomendasi: Suhu rendah (60-70°C), seduh lebih lama untuk mengekstrak umami tanpa pahit.";
+            else if(astringency > 65) brewAdviceSpan.innerText = currentLang === 'en' ?
+                "🍃 Recommendation: Quick rinse, brew at 80°C for short time (1-2 min) to reduce astringency." :
+                "🍃 Rekomendasi: Bilas cepat, seduh pada suhu 80°C sebentar (1-2 menit) untuk mengurangi sepat.";
+            else brewAdviceSpan.innerText = currentLang === 'en' ?
+                "🍃 Recommendation: Brew at 75-85°C, 2-3 minutes for balanced cup." :
+                "🍃 Rekomendasi: Seduh pada suhu 75-85°C selama 2-3 menit untuk cangkir seimbang.";
+        }
+        
+        // ---------- PRESET WILAYAH TEH ----------
+        function setPreset(elev, ph, soil, rainfall, shadeVal) {
+            elevationSlider.value = elev;
+            phSlider.value = ph;
+            soilSelect.value = soil;
+            rainBtns.forEach(btn => {
+                btn.classList.remove('bg-emerald-800', 'text-white', 'shadow');
+                if(btn.dataset.val === rainfall) btn.classList.add('bg-emerald-800', 'text-white', 'shadow');
+            });
+            shadeRadios.forEach(r => { if(r.value === shadeVal) r.checked = true; });
+            state.elevation = elev;
+            state.ph = ph;
+            state.soil = soil;
+            state.rainfall = rainfall;
+            state.shade = shadeVal;
+            elevationVal.innerText = elev + " m";
+            phVal.innerText = ph.toFixed(1);
+            calculate();
+        }
+        
+        document.getElementById('presetDarjeeling').addEventListener('click', () => setPreset(2100, 5.2, 'loam', 'moderate', 'shaded'));
+        document.getElementById('presetUji').addEventListener('click', () => setPreset(400, 4.8, 'volcanic', 'high', 'shaded'));
+        document.getElementById('presetAssam').addEventListener('click', () => setPreset(100, 5.5, 'clay', 'high', 'full-sun'));
+        document.getElementById('presetDianhong').addEventListener('click', () => setPreset(1600, 5.0, 'volcanic', 'moderate', 'full-sun'));
+        document.getElementById('resetDefault').addEventListener('click', () => setPreset(1200, 5.0, 'loam', 'moderate', 'shaded'));
+        
+        // Language Toggle
+        const langToggle = document.getElementById('langToggle');
+        langToggle.addEventListener('change', (e) => {
+            currentLang = e.target.checked ? 'id' : 'en';
+            applyLanguage();
+        });
+        
+        attachEvents();
+        calculate();
+        applyLanguage();
+    </script>
+</body>
+</html>

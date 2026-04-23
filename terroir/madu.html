@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Forest Honey Terroir Calculator | Kalkulator Terroir Madu Hutan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap');
+        
+        * { font-family: 'Inter', sans-serif; }
+        .honey-hero {
+            background: linear-gradient(105deg, #d4a030 0%, #b87c1a 100%);
+        }
+        .stat-bar {
+            height: 8px;
+            border-radius: 12px;
+            background-color: #fef3c7;
+            overflow: hidden;
+        }
+        .stat-fill {
+            height: 100%;
+            border-radius: 12px;
+            transition: width 0.45s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+        .preset-btn {
+            transition: all 0.2s ease;
+        }
+        .preset-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+        .tooltip-icon {
+            cursor: help;
+            border-bottom: 1px dashed #d4a030;
+        }
+        input[type="range"] {
+            accent-color: #d4a030;
+        }
+        .card-hover {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card-hover:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 25px -12px rgba(0,0,0,0.1);
+        }
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 28px;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.3s;
+            border-radius: 28px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #d4a030;
+        }
+        input:checked + .slider:before {
+            transform: translateX(32px);
+        }
+    </style>
+</head>
+<body class="bg-[#fffbeb] text-stone-800">
+
+    <div class="min-h-screen flex flex-col">
+        <!-- Header dengan toggle bilingual -->
+        <header class="honey-hero text-white py-7 px-4 shadow-xl">
+            <div class="max-w-6xl mx-auto text-center relative">
+                <div class="absolute right-0 top-0 md:top-2">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="langToggle">
+                        <span class="slider"></span>
+                    </label>
+                    <span class="ml-2 text-sm font-medium" id="langLabel">EN</span>
+                </div>
+                <h1 class="text-3xl md:text-4xl font-bold mb-3 tracking-tight flex items-center justify-center gap-3">
+                    <i class="fas fa-fan text-amber-200"></i> 
+                    <span id="titleText">Forest Honey Terroir Calculator</span>
+                </h1>
+                <p class="text-amber-100/90 max-w-2xl mx-auto text-sm md:text-base" id="subtitleText">
+                    Honey is liquid terroir. Adjust parameters → predict nectar source influence, texture, acidity, and floral complexity based on forest ecology.
+                </p>
+                <div class="mt-3 text-xs text-amber-200/70 flex justify-center gap-4 flex-wrap" id="headerTags">
+                    <span><i class="fas fa-tree"></i> Forest Type</span>
+                    <span><i class="fas fa-cloud-sun"></i> Climate</span>
+                    <span><i class="fas fa-flask"></i> Soil pH</span>
+                    <span><i class="fas fa-water"></i> Humidity</span>
+                    <span><i class="fas fa-leaf"></i> Nectar Source</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="max-w-6xl mx-auto w-full p-4 md:p-6 grid lg:grid-cols-3 gap-8">
+            
+            <!-- KIRI: Input & Preset Madu -->
+            <div class="lg:col-span-1 space-y-6">
+                <!-- Preset Madu Nusantara -->
+                <div class="bg-white rounded-2xl shadow-md border border-amber-200 p-5 card-hover">
+                    <div class="flex items-center gap-2 mb-4 border-b border-amber-100 pb-2">
+                        <i class="fas fa-globe-asia text-amber-700"></i>
+                        <h2 class="font-semibold text-lg" id="presetTitle">Forest Honey Presets</h2>
+                        <span class="text-xs bg-amber-50 text-amber-800 px-2 py-0.5 rounded-full ml-auto" id="presetBadge">nectar terroir</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button id="presetSumbawa" class="preset-btn bg-amber-800 text-white text-sm py-2 rounded-xl flex items-center justify-center gap-1"><i class="fas fa-cactus"></i> <span id="sumbawaText">Sumbawa (Bidara)</span></button>
+                        <button id="presetOdeng" class="preset-btn bg-emerald-800 text-white text-sm py-2 rounded-xl flex items-center justify-center gap-1"><i class="fas fa-rainbow"></i> <span id="odengText">Ujung Kulon (Odeng)</span></button>
+                        <button id="presetManuka" class="preset-btn bg-stone-700 text-white text-sm py-2 rounded-xl flex items-center justify-center gap-1"><i class="fas fa-leaf"></i> <span id="manukaText">New Zealand (Manuka)</span></button>
+                        <button id="presetAcacia" class="preset-btn bg-yellow-800 text-white text-sm py-2 rounded-xl flex items-center justify-center gap-1"><i class="fas fa-tree"></i> <span id="acaciaText">Acacia (Hungary)</span></button>
+                        <button id="resetDefault" class="preset-btn col-span-2 bg-amber-100 text-amber-800 border border-amber-300 text-sm py-2 rounded-xl flex items-center justify-center gap-1"><i class="fas fa-undo-alt"></i> <span id="resetText">Reset to Default</span></button>
+                    </div>
+                    <p class="text-[11px] text-stone-400 mt-3 text-center" id="presetNote">*Each preset changes all parameters according to the region's floral ecology</p>
+                </div>
+
+                <!-- Parameter Lingkungan Madu -->
+                <div class="bg-white p-6 rounded-2xl shadow-md border border-amber-100">
+                    <h2 class="text-xl font-semibold mb-5 flex items-center gap-2"><i class="fas fa-sliders-h text-amber-800"></i> <span id="paramsTitle">Forest & Nectar Parameters</span></h2>
+                    
+                    <div class="space-y-7">
+                        <!-- Tipe Hutan -->
+                        <div>
+                            <label class="block text-sm font-medium mb-2 tooltip-icon" id="forestLabel" title="Monsoon forest, tropical rainforest, etc. Affects nectar diversity and honey intensity.">🌳 Forest Type</label>
+                            <select id="forestType" class="w-full p-3 rounded-xl border border-stone-200 bg-stone-50 focus:ring-2 focus:ring-amber-500 outline-none">
+                                <option value="dry" id="forestDry">Dry Monsoon Forest (Bidara - Sumbawa)</option>
+                                <option value="rainforest" id="forestRain" selected>Tropical Rainforest (Odeng - Ujung Kulon)</option>
+                                <option value="temperate" id="forestTemp">Temperate Forest</option>
+                                <option value="savanna" id="forestSavanna">Savanna / Scrubland</option>
+                            </select>
+                        </div>
+
+                        <!-- Iklim (Kelembaban & Curah Hujan) -->
+                        <div>
+                            <div class="flex justify-between text-sm font-medium mb-1">
+                                <label class="tooltip-icon" id="humidityLabel" title="Humidity affects nectar concentration and honey fermentation risk.">💧 Relative Humidity</label>
+                                <span class="text-amber-800 font-bold" id="humidityValue">75%</span>
+                            </div>
+                            <input type="range" id="humidity" min="30" max="95" value="75" step="5" class="w-full">
+                            <div class="flex justify-between text-xs text-stone-400 mt-1">
+                                <span id="dryText">Dry (30%)</span>
+                                <span id="humidText">Humid (75%)</span>
+                                <span id="veryHumidText">Very Humid (95%)</span>
+                            </div>
+                        </div>
+
+                        <!-- Sumber Nektar Dominan -->
+                        <div>
+                            <label class="block text-sm font-medium mb-2 tooltip-icon" id="nectarLabel" title="Primary nectar source defines honey's core flavor.">🍯 Dominant Nectar Source</label>
+                            <select id="nectarSource" class="w-full p-3 rounded-xl border border-stone-200 bg-stone-50 focus:ring-2 focus:ring-amber-500 outline-none">
+                                <option value="bidara" id="nectarBidara">Bidara (Ziziphus mauritiana)</option>
+                                <option value="odeng" id="nectarOdeng">Odeng / Mixed Rainforest Flowers</option>
+                                <option value="manuka" id="nectarManuka">Manuka (Leptospermum)</option>
+                                <option value="acacia" id="nectarAcacia" selected>Acacia (Robinia)</option>
+                                <option value="multiflora" id="nectarMulti">Multiflora (Mixed wildflowers)</option>
+                            </select>
+                        </div>
+
+                        <!-- pH Tanah (mempengaruhi mineralitas nektar) -->
+                        <div>
+                            <div class="flex justify-between text-sm font-medium mb-1">
+                                <label class="tooltip-icon" id="phLabel" title="Soil pH influences mineral content in nectar, affecting honey's acidity and aftertaste.">🧪 Soil pH</label>
+                                <span class="text-amber-800 font-bold" id="phValue">6.0</span>
+                            </div>
+                            <input type="range" id="phLevel" min="4.0" max="8.0" value="6.0" step="0.1" class="w-full">
+                            <div class="flex justify-between text-xs text-stone-400"><span id="acidicText">Acidic (4.0)</span><span id="neutralText">Neutral (6.5)</span><span id="alkalineText">Alkaline (8.0)</span></div>
+                        </div>
+
+                        <!-- Ketinggian -->
+                        <div>
+                            <div class="flex justify-between text-sm font-medium mb-1">
+                                <label class="tooltip-icon" id="elevLabel" title="Higher elevation often produces more complex, floral honey.">🌄 Elevation (masl)</label>
+                                <span class="text-amber-800 font-bold" id="elevationValue">500 m</span>
+                            </div>
+                            <input type="range" id="elevation" min="0" max="2000" value="500" step="50" class="w-full">
+                            <div class="flex justify-between text-xs text-stone-400 mt-1">
+                                <span id="lowElevText">Lowland (0m)</span>
+                                <span id="highElevText">Highland (2000m)</span>
+                            </div>
+                        </div>
+
+                        <!-- Intensitas Musim Kemarau (khusus Sumbawa) -->
+                        <div>
+                            <div class="flex justify-between text-sm font-medium mb-1">
+                                <label class="tooltip-icon" id="drySeasonLabel" title="Dry season concentration: longer dry period = more concentrated nectar, unique sour note.">🏜️ Dry Season Intensity</label>
+                                <span class="text-amber-800 font-bold" id="dryIntensityValue">Moderate</span>
+                            </div>
+                            <input type="range" id="dryIntensity" min="0" max="100" value="50" step="10" class="w-full">
+                            <div class="flex justify-between text-xs text-stone-400 mt-1">
+                                <span id="mildText">Mild</span>
+                                <span id="moderateText">Moderate</span>
+                                <span id="extremeText">Extreme (Sumbawa)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Catatan edukasi terroir madu -->
+                <div class="bg-amber-50/70 rounded-xl p-4 text-xs text-stone-600 border border-amber-200" id="infoBox">
+                    <i class="fas fa-info-circle text-amber-600 mr-1"></i> <strong id="infoTitle">Honey as Terroir?</strong> <span id="infoText">Honey captures the essence of flowers, soil, and climate. Sumbawa's bidara honey gets its sour note from dry-season stress; Ujung Kulon's odeng honey is complex due to rainforest biodiversity. No two forests taste the same.</span>
+                </div>
+            </div>
+
+            <!-- KANAN: Hasil & Profil Madu -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Skor terroir & label -->
+                <div class="bg-gradient-to-br from-amber-50 to-amber-100/40 rounded-2xl p-6 border border-amber-200 shadow-sm relative overflow-hidden">
+                    <div class="relative z-10 flex flex-col md:flex-row justify-between items-center gap-4">
+                        <div>
+                            <h3 class="text-sm uppercase tracking-wider text-amber-800 font-bold" id="scoreLabel">Terroir Purity Score</h3>
+                            <div class="text-6xl font-extrabold text-stone-800" id="totalScore">82</div>
+                            <p class="text-sm mt-1 font-medium" id="qualityLabel">Premium Forest Honey</p>
+                        </div>
+                        <div class="bg-white/70 backdrop-blur-sm rounded-xl px-4 py-2 text-center border border-amber-200">
+                            <i class="fas fa-chart-simple text-amber-600"></i>
+                            <span class="ml-2 text-sm font-semibold" id="insightOneLine">Complex, slightly sour undertone</span>
+                        </div>
+                    </div>
+                    <i class="fas fa-fan absolute -bottom-5 -right-5 text-8xl text-amber-200/50"></i>
+                </div>
+
+                <!-- Grafik profil madu -->
+                <div class="bg-white p-6 rounded-2xl shadow-md border border-amber-100">
+                    <h3 class="font-bold text-lg flex items-center gap-2 mb-5"><i class="fas fa-chart-line text-amber-700"></i> <span id="profileTitle">Honey Flavor Profile</span></h3>
+                    <div class="space-y-5">
+                        <div><div class="flex justify-between text-sm"><span id="sweetnessLabel">🍯 Sweetness Intensity</span><span id="sweetnessPercent">0%</span></div><div class="stat-bar"><div id="sweetnessBar" class="stat-fill bg-amber-500" style="width:0%"></div></div></div>
+                        <div><div class="flex justify-between text-sm"><span id="acidityLabel">🍋 Acidity / Sour Note</span><span id="acidityPercent">0%</span></div><div class="stat-bar"><div id="acidityBar" class="stat-fill bg-rose-500" style="width:0%"></div></div></div>
+                        <div><div class="flex justify-between text-sm"><span id="bodyLabel">🍯 Viscosity / Body</span><span id="bodyPercent">0%</span></div><div class="stat-bar"><div id="bodyBar" class="stat-fill bg-stone-500" style="width:0%"></div></div></div>
+                        <div><div class="flex justify-between text-sm"><span id="complexityLabel">🌸 Floral Complexity</span><span id="complexityPercent">0%</span></div><div class="stat-bar"><div id="complexityBar" class="stat-fill bg-emerald-600" style="width:0%"></div></div></div>
+                    </div>
+                </div>
+
+                <!-- Flavor Notes & wawasan terroir -->
+                <div class="bg-white p-6 rounded-2xl shadow-md border border-amber-100">
+                    <h3 class="font-bold text-lg flex items-center gap-2"><i class="fas fa-mug-hot text-amber-700"></i> <span id="notesTitle">Aroma & Taste Notes</span></h3>
+                    <div id="flavorNotes" class="flex flex-wrap gap-2 my-4 min-h-[70px]"></div>
+                    <div class="border-t border-amber-100 pt-4 mt-1">
+                        <p class="text-xs text-stone-500 flex gap-2"><i class="fas fa-microphone-alt text-amber-600"></i> <span id="terroirInsight">Based on selected parameters, this honey reflects its forest origin.</span></p>
+                    </div>
+                </div>
+
+                <!-- Saran penggunaan / pairing -->
+                <div class="bg-stone-800 text-stone-200 rounded-xl p-4 flex items-center gap-3 text-sm">
+                    <i class="fas fa-lightbulb text-amber-300 text-xl"></i>
+                    <span id="useAdvice">🍯 Best for: Drizzling over cheese, herbal teas, or as a natural sweetener.</span>
+                </div>
+            </div>
+        </main>
+
+        <footer class="text-center py-6 text-stone-400 text-xs border-t border-stone-200 mt-8">
+            <p id="footerText">📊 Simulation based on forest ecology & nectar chemistry. Honey is the purest expression of terroir — every drop tells a story of flowers, soil, and climate.</p>
+        </footer>
+    </div>
+
+    <script>
+        // ------------------- STATE -------------------
+        let state = {
+            forestType: 'rainforest',
+            humidity: 75,
+            nectarSource: 'acacia',
+            ph: 6.0,
+            elevation: 500,
+            dryIntensity: 50
+        };
+        let currentLang = 'en';
+
+        // DOM elements
+        const forestSelect = document.getElementById('forestType');
+        const humiditySlider = document.getElementById('humidity');
+        const nectarSelect = document.getElementById('nectarSource');
+        const phSlider = document.getElementById('phLevel');
+        const elevationSlider = document.getElementById('elevation');
+        const drySlider = document.getElementById('dryIntensity');
+        const humidityVal = document.getElementById('humidityValue');
+        const phVal = document.getElementById('phValue');
+        const elevationVal = document.getElementById('elevationValue');
+        const dryIntensityVal = document.getElementById('dryIntensityValue');
+
+        const totalScoreSpan = document.getElementById('totalScore');
+        const qualityLabelSpan = document.getElementById('qualityLabel');
+        const flavorDiv = document.getElementById('flavorNotes');
+        const terroirInsightSpan = document.getElementById('terroirInsight');
+        const useAdviceSpan = document.getElementById('useAdvice');
+        const oneLineSpan = document.getElementById('insightOneLine');
+
+        const profile = {
+            sweetness: { bar: document.getElementById('sweetnessBar'), text: document.getElementById('sweetnessPercent') },
+            acidity: { bar: document.getElementById('acidityBar'), text: document.getElementById('acidityPercent') },
+            body: { bar: document.getElementById('bodyBar'), text: document.getElementById('bodyPercent') },
+            complexity: { bar: document.getElementById('complexityBar'), text: document.getElementById('complexityPercent') }
+        };
+
+        // ---------- DICTIONARY BILINGUAL ----------
+        const translations = {
+            en: {
+                title: "Forest Honey Terroir Calculator",
+                subtitle: "Honey is liquid terroir. Adjust parameters → predict nectar source influence, texture, acidity, and floral complexity based on forest ecology.",
+                presetTitle: "Forest Honey Presets",
+                presetBadge: "nectar terroir",
+                sumbawa: "Sumbawa (Bidara)",
+                odeng: "Ujung Kulon (Odeng)",
+                manuka: "New Zealand (Manuka)",
+                acacia: "Acacia (Hungary)",
+                reset: "Reset to Default",
+                presetNote: "*Each preset changes all parameters according to the region's floral ecology",
+                paramsTitle: "Forest & Nectar Parameters",
+                forestLabel: "🌳 Forest Type",
+                forestDry: "Dry Monsoon Forest (Bidara - Sumbawa)",
+                forestRain: "Tropical Rainforest (Odeng - Ujung Kulon)",
+                forestTemp: "Temperate Forest",
+                forestSavanna: "Savanna / Scrubland",
+                humidityLabel: "💧 Relative Humidity",
+                dryText: "Dry (30%)",
+                humidText: "Humid (75%)",
+                veryHumidText: "Very Humid (95%)",
+                nectarLabel: "🍯 Dominant Nectar Source",
+                nectarBidara: "Bidara (Ziziphus mauritiana)",
+                nectarOdeng: "Odeng / Mixed Rainforest Flowers",
+                nectarManuka: "Manuka (Leptospermum)",
+                nectarAcacia: "Acacia (Robinia)",
+                nectarMulti: "Multiflora (Mixed wildflowers)",
+                phLabel: "🧪 Soil pH",
+                acidicText: "Acidic (4.0)",
+                neutralText: "Neutral (6.5)",
+                alkalineText: "Alkaline (8.0)",
+                elevation: "🌄 Elevation (masl)",
+                lowElevText: "Lowland (0m)",
+                highElevText: "Highland (2000m)",
+                drySeasonLabel: "🏜️ Dry Season Intensity",
+                mildText: "Mild",
+                moderateText: "Moderate",
+                extremeText: "Extreme (Sumbawa)",
+                infoTitle: "Honey as Terroir?",
+                infoText: "Honey captures the essence of flowers, soil, and climate. Sumbawa's bidara honey gets its sour note from dry-season stress; Ujung Kulon's odeng honey is complex due to rainforest biodiversity. No two forests taste the same.",
+                scoreLabel: "Terroir Purity Score",
+                profileTitle: "Honey Flavor Profile",
+                sweetnessLabel: "🍯 Sweetness Intensity",
+                acidityLabel: "🍋 Acidity / Sour Note",
+                bodyLabel: "🍯 Viscosity / Body",
+                complexityLabel: "🌸 Floral Complexity",
+                notesTitle: "Aroma & Taste Notes",
+                footer: "📊 Simulation based on forest ecology & nectar chemistry. Honey is the purest expression of terroir — every drop tells a story of flowers, soil, and climate.",
+            },
+            id: {
+                title: "Kalkulator Terroir Madu Hutan",
+                subtitle: "Madu adalah terroir cair. Atur parameter → prediksi pengaruh sumber nektar, tekstur, keasaman, dan kompleksitas bunga berdasarkan ekologi hutan.",
+                presetTitle: "Preset Madu Hutan",
+                presetBadge: "terroir nektar",
+                sumbawa: "Sumbawa (Bidara)",
+                odeng: "Ujung Kulon (Odeng)",
+                manuka: "Selandia Baru (Manuka)",
+                acacia: "Akasia (Hungaria)",
+                reset: "Reset ke Standar",
+                presetNote: "*Setiap preset mengubah semua parameter sesuai ekologi flora wilayah tersebut",
+                paramsTitle: "Parameter Hutan & Nektar",
+                forestLabel: "🌳 Tipe Hutan",
+                forestDry: "Hutan Musim Kering (Bidara - Sumbawa)",
+                forestRain: "Hutan Hujan Tropis (Odeng - Ujung Kulon)",
+                forestTemp: "Hutan Beriklim Sedang",
+                forestSavanna: "Sabana / Semak Belukar",
+                humidityLabel: "💧 Kelembaban Relatif",
+                dryText: "Kering (30%)",
+                humidText: "Lembab (75%)",
+                veryHumidText: "Sangat Lembab (95%)",
+                nectarLabel: "🍯 Sumber Nektar Dominan",
+                nectarBidara: "Bidara (Ziziphus mauritiana)",
+                nectarOdeng: "Odeng / Bunga Hutan Campuran",
+                nectarManuka: "Manuka (Leptospermum)",
+                nectarAcacia: "Akasia (Robinia)",
+                nectarMulti: "Multiflora (Bunga liar campuran)",
+                phLabel: "🧪 pH Tanah",
+                acidicText: "Asam (4.0)",
+                neutralText: "Netral (6.5)",
+                alkalineText: "Basa (8.0)",
+                elevation: "🌄 Elevasi (mdpl)",
+                lowElevText: "Dataran Rendah (0m)",
+                highElevText: "Dataran Tinggi (2000m)",
+                drySeasonLabel: "🏜️ Intensitas Musim Kemarau",
+                mildText: "Ringan",
+                moderateText: "Sedang",
+                extremeText: "Ekstrem (Sumbawa)",
+                infoTitle: "Madu sebagai Terroir?",
+                infoText: "Madu menangkap esensi bunga, tanah, dan iklim. Madu bidara Sumbawa mendapat rasa asam dari stres musim kemarau; madu odeng Ujung Kulon kompleks karena keanekaragaman hayati hutan hujan. Tidak ada dua hutan yang sama rasanya.",
+                scoreLabel: "Skor Kemurnian Terroir",
+                profileTitle: "Profil Rasa Madu",
+                sweetnessLabel: "🍯 Intensitas Manis",
+                acidityLabel: "🍋 Keasaman / Rasa Asam",
+                bodyLabel: "🍯 Kekentalan / Body",
+                complexityLabel: "🌸 Kompleksitas Bunga",
+                notesTitle: "Catatan Aroma & Rasa",
+                footer: "📊 Simulasi berdasarkan ekologi hutan & kimia nektar. Madu adalah ekspresi terroir paling murni — setiap tetes bercerita tentang bunga, tanah, dan iklim.",
+            }
+        };
+
+        function applyLanguage() {
+            const t = translations[currentLang];
+            document.getElementById('titleText').innerText = t.title;
+            document.getElementById('subtitleText').innerText = t.subtitle;
+            document.getElementById('presetTitle').innerText = t.presetTitle;
+            document.getElementById('presetBadge').innerText = t.presetBadge;
+            document.getElementById('sumbawaText').innerText = t.sumbawa;
+            document.getElementById('odengText').innerText = t.odeng;
+            document.getElementById('manukaText').innerText = t.manuka;
+            document.getElementById('acaciaText').innerText = t.acacia;
+            document.getElementById('resetText').innerText = t.reset;
+            document.getElementById('presetNote').innerText = t.presetNote;
+            document.getElementById('paramsTitle').innerHTML = t.paramsTitle;
+            document.getElementById('forestLabel').innerHTML = t.forestLabel;
+            document.getElementById('forestDry').innerText = t.forestDry;
+            document.getElementById('forestRain').innerText = t.forestRain;
+            document.getElementById('forestTemp').innerText = t.forestTemp;
+            document.getElementById('forestSavanna').innerText = t.forestSavanna;
+            document.getElementById('humidityLabel').innerHTML = t.humidityLabel;
+            document.getElementById('dryText').innerText = t.dryText;
+            document.getElementById('humidText').innerText = t.humidText;
+            document.getElementById('veryHumidText').innerText = t.veryHumidText;
+            document.getElementById('nectarLabel').innerHTML = t.nectarLabel;
+            document.getElementById('nectarBidara').innerText = t.nectarBidara;
+            document.getElementById('nectarOdeng').innerText = t.nectarOdeng;
+            document.getElementById('nectarManuka').innerText = t.nectarManuka;
+            document.getElementById('nectarAcacia').innerText = t.nectarAcacia;
+            document.getElementById('nectarMulti').innerText = t.nectarMulti;
+            document.getElementById('phLabel').innerHTML = t.phLabel;
+            document.getElementById('acidicText').innerText = t.acidicText;
+            document.getElementById('neutralText').innerText = t.neutralText;
+            document.getElementById('alkalineText').innerText = t.alkalineText;
+            document.getElementById('elevLabel').innerHTML = t.elevation;
+            document.getElementById('lowElevText').innerText = t.lowElevText;
+            document.getElementById('highElevText').innerText = t.highElevText;
+            document.getElementById('drySeasonLabel').innerHTML = t.drySeasonLabel;
+            document.getElementById('mildText').innerText = t.mildText;
+            document.getElementById('moderateText').innerText = t.moderateText;
+            document.getElementById('extremeText').innerText = t.extremeText;
+            document.getElementById('infoTitle').innerHTML = t.infoTitle;
+            document.getElementById('infoText').innerHTML = t.infoText;
+            document.getElementById('scoreLabel').innerHTML = t.scoreLabel;
+            document.getElementById('profileTitle').innerHTML = t.profileTitle;
+            document.getElementById('sweetnessLabel').innerHTML = t.sweetnessLabel;
+            document.getElementById('acidityLabel').innerHTML = t.acidityLabel;
+            document.getElementById('bodyLabel').innerHTML = t.bodyLabel;
+            document.getElementById('complexityLabel').innerHTML = t.complexityLabel;
+            document.getElementById('notesTitle').innerHTML = t.notesTitle;
+            document.getElementById('footerText').innerHTML = t.footer;
+            document.getElementById('langLabel').innerText = currentLang === 'en' ? 'EN' : 'ID';
+            // update dynamic label for dry intensity
+            updateDryLabel();
+            calculate();
+        }
+
+        function updateDryLabel() {
+            let val = state.dryIntensity;
+            let text = val < 30 ? (currentLang === 'en' ? 'Mild' : 'Ringan') : (val > 70 ? (currentLang === 'en' ? 'Extreme' : 'Ekstrem') : (currentLang === 'en' ? 'Moderate' : 'Sedang'));
+            dryIntensityVal.innerText = text;
+        }
+
+        function attachEvents() {
+            forestSelect.addEventListener('change', (e) => { state.forestType = e.target.value; calculate(); });
+            humiditySlider.addEventListener('input', (e) => { state.humidity = parseInt(e.target.value); humidityVal.innerText = state.humidity + "%"; calculate(); });
+            nectarSelect.addEventListener('change', (e) => { state.nectarSource = e.target.value; calculate(); });
+            phSlider.addEventListener('input', (e) => { state.ph = parseFloat(e.target.value); phVal.innerText = state.ph.toFixed(1); calculate(); });
+            elevationSlider.addEventListener('input', (e) => { state.elevation = parseInt(e.target.value); elevationVal.innerText = state.elevation + " m"; calculate(); });
+            drySlider.addEventListener('input', (e) => { state.dryIntensity = parseInt(e.target.value); updateDryLabel(); calculate(); });
+        }
+
+        // ---------- Perhitungan Terroir Madu ----------
+        function calculate() {
+            let sweetness = 50;
+            let acidity = 30;
+            let body = 50;
+            let complexity = 40;
+
+            // 1. Forest Type & Nectar Source (dominant)
+            if (state.nectarSource === 'bidara') {
+                sweetness += 10;
+                acidity += 25;   // sour note from dry stress
+                body += 15;      // thicker
+                complexity += 5;
+            } else if (state.nectarSource === 'odeng') {
+                sweetness += 5;
+                acidity -= 5;
+                body -= 5;
+                complexity += 35;  // high biodiversity
+            } else if (state.nectarSource === 'manuka') {
+                sweetness -= 5;
+                acidity += 10;
+                body += 10;
+                complexity += 25;
+            } else if (state.nectarSource === 'acacia') {
+                sweetness += 20;
+                acidity -= 10;
+                body -= 15;
+                complexity += 5;
+            } else if (state.nectarSource === 'multiflora') {
+                sweetness += 5;
+                acidity += 5;
+                body += 0;
+                complexity += 20;
+            }
+
+            // 2. Humidity effect: low humidity = more concentrated, higher body & acidity
+            let humidFactor = (state.humidity - 50) / 45; // -0.44 to +1
+            if (state.humidity < 60) {
+                sweetness += 15;
+                acidity += 12;
+                body += 20;
+            } else if (state.humidity > 80) {
+                sweetness -= 10;
+                acidity -= 5;
+                body -= 10;
+                complexity += 15;
+            }
+
+            // 3. Soil pH: acidic soil gives more mineral/complex, alkaline may reduce acidity
+            if (state.ph < 5.5) {
+                acidity += 10;
+                complexity += 10;
+            } else if (state.ph > 7.0) {
+                acidity -= 8;
+                body += 5;
+            }
+
+            // 4. Elevation: higher = more complex, less sweetness (slower ripening)
+            let elevFactor = Math.min(1, Math.max(0, state.elevation / 1800));
+            complexity += elevFactor * 25;
+            sweetness -= elevFactor * 10;
+            acidity += elevFactor * 5;
+
+            // 5. Dry season intensity (extreme for Sumbawa)
+            if (state.dryIntensity > 70) {
+                acidity += 20;
+                body += 15;
+                sweetness += 5;
+            } else if (state.dryIntensity > 30) {
+                acidity += 5;
+                body += 5;
+            } else {
+                sweetness += 5;
+                acidity -= 5;
+            }
+
+            // 6. Forest type additional
+            if (state.forestType === 'dry') {
+                body += 10;
+                acidity += 5;
+            } else if (state.forestType === 'rainforest') {
+                complexity += 15;
+                body -= 5;
+            }
+
+            // Normalize
+            sweetness = Math.min(100, Math.max(20, sweetness));
+            acidity = Math.min(100, Math.max(10, acidity));
+            body = Math.min(100, Math.max(15, body));
+            complexity = Math.min(100, Math.max(15, complexity));
+
+            // Total score: weighted towards complexity & balance
+            let total = Math.round((sweetness * 0.2 + (100 - Math.abs(acidity-50)) * 0.3 + body * 0.2 + complexity * 0.3));
+            total = Math.min(100, Math.max(40, total));
+            
+            updateBarsAndLabels(sweetness, acidity, body, complexity, total);
+            generateFlavorAndInsight(sweetness, acidity, body, complexity, total);
+        }
+
+        function updateBarsAndLabels(sweetness, acidity, body, complexity, total) {
+            profile.sweetness.bar.style.width = `${sweetness}%`;
+            profile.sweetness.text.innerText = `${Math.round(sweetness)}%`;
+            profile.acidity.bar.style.width = `${acidity}%`;
+            profile.acidity.text.innerText = `${Math.round(acidity)}%`;
+            profile.body.bar.style.width = `${body}%`;
+            profile.body.text.innerText = `${Math.round(body)}%`;
+            profile.complexity.bar.style.width = `${complexity}%`;
+            profile.complexity.text.innerText = `${Math.round(complexity)}%`;
+            totalScoreSpan.innerText = total;
+            
+            if (total >= 85) {
+                qualityLabelSpan.innerHTML = currentLang === 'en' ? 
+                    '<span class="bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-xs">🌟 Rare Forest Honey (Single Origin)</span>' :
+                    '<span class="bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-xs">🌟 Madu Hutan Langka (Single Origin)</span>';
+                oneLineSpan.innerText = currentLang === 'en' ? "Exceptional complexity, distinct terroir signature" : "Kompleksitas luar biasa, ciri khas terroir kuat";
+            } else if (total >= 75) {
+                qualityLabelSpan.innerHTML = currentLang === 'en' ? 
+                    '<span class="bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-xs">✅ Premium Forest Honey</span>' :
+                    '<span class="bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-xs">✅ Madu Hutan Premium</span>';
+                oneLineSpan.innerText = currentLang === 'en' ? "Well-balanced, rich floral notes" : "Seimbang, kaya aroma bunga";
+            } else if (total >= 65) {
+                qualityLabelSpan.innerHTML = currentLang === 'en' ? 
+                    '<span class="bg-stone-200 text-stone-700 px-3 py-1 rounded-full text-xs">Good Wild Honey</span>' :
+                    '<span class="bg-stone-200 text-stone-700 px-3 py-1 rounded-full text-xs">Madu Liar Baik</span>';
+                oneLineSpan.innerText = currentLang === 'en' ? "Pleasant, suitable for daily use" : "Nikmat, cocok untuk konsumsi harian";
+            } else {
+                qualityLabelSpan.innerHTML = currentLang === 'en' ? 
+                    '<span class="bg-stone-300 text-stone-800 px-3 py-1 rounded-full text-xs">Standard Blossom Honey</span>' :
+                    '<span class="bg-stone-300 text-stone-800 px-3 py-1 rounded-full text-xs">Madu Bunga Standar</span>';
+                oneLineSpan.innerText = currentLang === 'en' ? "Mild flavor, may lack complexity" : "Rasa ringan, mungkin kurang kompleks";
+            }
+        }
+        
+        function generateFlavorAndInsight(sweetness, acidity, body, complexity, total) {
+            let notes = new Set();
+            
+            // Nectar source notes
+            if (state.nectarSource === 'bidara') {
+                notes.add(currentLang === 'en' ? "Tangy Sourness" : "Asam Segar");
+                notes.add(currentLang === 'en' ? "Caramel" : "Karamel");
+                notes.add(currentLang === 'en' ? "Herbal" : "Herbal");
+            } else if (state.nectarSource === 'odeng') {
+                notes.add(currentLang === 'en' ? "Tropical Fruits" : "Buah Tropis");
+                notes.add(currentLang === 'en' ? "Honeydew" : "Embun Madu");
+                notes.add(currentLang === 'en' ? "Spicy" : "Pedas");
+            } else if (state.nectarSource === 'manuka') {
+                notes.add(currentLang === 'en' ? "Earthy" : "Tanah");
+                notes.add(currentLang === 'en' ? "Medicinal" : "Medisinal");
+            } else if (state.nectarSource === 'acacia') {
+                notes.add(currentLang === 'en' ? "Vanilla" : "Vanila");
+                notes.add(currentLang === 'en' ? "Clean" : "Bersih");
+            } else {
+                notes.add(currentLang === 'en' ? "Wildflowers" : "Bunga Liar");
+            }
+            
+            // Dry intensity
+            if (state.dryIntensity > 70) notes.add(currentLang === 'en' ? "Concentrated" : "Konsentrat");
+            if (state.humidity > 80) notes.add(currentLang === 'en' ? "Light & Runny" : "Ringan & Encer");
+            if (state.elevation > 1000) notes.add(currentLang === 'en' ? "Mountain Flora" : "Flora Gunung");
+            
+            // pH
+            if (state.ph < 5.5) notes.add(currentLang === 'en' ? "Mineral" : "Mineral");
+            
+            // Score-based
+            if (acidity > 65) notes.add(currentLang === 'en' ? "Zesty" : "Zesty");
+            if (body > 70) notes.add(currentLang === 'en' ? "Thick & Viscous" : "Kental & Lengket");
+            
+            let finalNotes = Array.from(notes).slice(0, 7);
+            flavorDiv.innerHTML = '';
+            const colorPalette = ['bg-amber-600', 'bg-stone-600', 'bg-rose-600', 'bg-emerald-600', 'bg-yellow-700', 'bg-orange-600', 'bg-teal-600'];
+            finalNotes.forEach((note, idx) => {
+                let span = document.createElement('span');
+                span.className = `px-3 py-1.5 rounded-full text-white text-xs font-medium shadow-sm ${colorPalette[idx % colorPalette.length]}`;
+                span.innerText = note;
+                flavorDiv.appendChild(span);
+            });
+            if (finalNotes.length === 0) flavorDiv.innerHTML = `<span class="text-stone-400 italic">${currentLang === 'en' ? 'Adjust parameters to reveal notes' : 'Atur parameter untuk melihat catatan rasa'}</span>`;
+            
+            let insightText = "";
+            if (state.nectarSource === 'bidara' && state.dryIntensity > 70 && state.forestType === 'dry') {
+                insightText = currentLang === 'en' ?
+                    "🍯 Authentic Sumbawa Bidara honey profile: dry forest, extreme dry season, and bidara nectar create a uniquely thick honey with a pleasant sour note. This terroir cannot be replicated elsewhere." :
+                    "🍯 Profil madu Bidara Sumbawa asli: hutan kering, musim kemarau ekstrem, dan nektar bidara menciptakan madu kental unik dengan rasa asam yang menyenangkan. Terroir ini tidak bisa ditiru di tempat lain.";
+            } else if (state.nectarSource === 'odeng' && state.forestType === 'rainforest' && state.humidity > 75) {
+                insightText = currentLang === 'en' ?
+                    "🌿 Ujung Kulon Odeng honey: born from the oldest tropical rainforest in Java. High biodiversity yields a complex, slightly spicy honey with floral and fruity layers. Perfect for connoisseurs." :
+                    "🌿 Madu Odeng Ujung Kulon: lahir dari hutan hujan tropis tertua di Jawa. Keanekaragaman hayati tinggi menghasilkan madu kompleks, sedikit pedas dengan lapisan bunga dan buah. Sempurna untuk penikmat.";
+            } else if (total > 80) {
+                insightText = currentLang === 'en' ?
+                    "✨ Exceptional forest honey! The combination of ideal humidity, diverse nectar, and balanced elevation creates a premium product. Try pairing with blue cheese or warm biscuits." :
+                    "✨ Madu hutan luar biasa! Kombinasi kelembaban ideal, nektar beragam, dan elevasi seimbang menciptakan produk premium. Coba padukan dengan keju biru atau biskuit hangat.";
+            } else {
+                insightText = currentLang === 'en' ?
+                    "🍃 This honey reflects its environment. For a more distinctive character, consider selecting a specific nectar source (bidara or odeng) and adjusting dry season intensity." :
+                    "🍃 Madu ini mencerminkan lingkungannya. Untuk karakter yang lebih khas, pertimbangkan memilih sumber nektar spesifik (bidara atau odeng) dan menyesuaikan intensitas musim kemarau.";
+            }
+            terroirInsightSpan.innerText = insightText;
+            
+            // Usage advice
+            if (acidity > 60) useAdviceSpan.innerText = currentLang === 'en' ?
+                "🍽️ Best for: Salad dressings, marinades, or pairing with salty cheeses." :
+                "🍽️ Terbaik untuk: Saus salad, bumbu marinasi, atau dipadukan dengan keju asin.";
+            else if (body > 70) useAdviceSpan.innerText = currentLang === 'en' ?
+                "🍽️ Best for: Spreading on toast, sweetening herbal teas, or as a natural remedy." :
+                "🍽️ Terbaik untuk: Olesan roti, pemanis teh herbal, atau sebagai obat alami.";
+            else useAdviceSpan.innerText = currentLang === 'en' ?
+                "🍽️ Best for: Drizzling over yogurt, fruits, or baking." :
+                "🍽️ Terbaik untuk: Tuang di atas yogurt, buah, atau untuk kue.";
+        }
+        
+        // ---------- PRESET MADU ----------
+        function setPreset(forest, humidity, nectar, ph, elevation, dryIntensity) {
+            forestSelect.value = forest;
+            humiditySlider.value = humidity;
+            nectarSelect.value = nectar;
+            phSlider.value = ph;
+            elevationSlider.value = elevation;
+            drySlider.value = dryIntensity;
+            
+            state.forestType = forest;
+            state.humidity = humidity;
+            state.nectarSource = nectar;
+            state.ph = ph;
+            state.elevation = elevation;
+            state.dryIntensity = dryIntensity;
+            
+            humidityVal.innerText = humidity + "%";
+            phVal.innerText = ph.toFixed(1);
+            elevationVal.innerText = elevation + " m";
+            updateDryLabel();
+            calculate();
+        }
+        
+        // Sumbawa: dry forest, low humidity (dry), nectar bidara, pH ~6.5, low elevation, extreme dry intensity
+        document.getElementById('presetSumbawa').addEventListener('click', () => setPreset('dry', 45, 'bidara', 6.5, 150, 90));
+        // Ujung Kulon: rainforest, high humidity, nectar odeng, pH acidic, low elevation, moderate dry
+        document.getElementById('presetOdeng').addEventListener('click', () => setPreset('rainforest', 85, 'odeng', 5.5, 100, 40));
+        // Manuka: temperate-ish, moderate humidity, manuka, pH ~5.8, moderate elevation
+        document.getElementById('presetManuka').addEventListener('click', () => setPreset('temperate', 70, 'manuka', 5.8, 300, 50));
+        // Acacia: temperate, moderate humidity, acacia, neutral pH, low elevation
+        document.getElementById('presetAcacia').addEventListener('click', () => setPreset('temperate', 65, 'acacia', 6.8, 200, 30));
+        document.getElementById('resetDefault').addEventListener('click', () => setPreset('rainforest', 75, 'multiflora', 6.0, 500, 50));
+        
+        const langToggle = document.getElementById('langToggle');
+        langToggle.addEventListener('change', (e) => {
+            currentLang = e.target.checked ? 'id' : 'en';
+            applyLanguage();
+        });
+        
+        attachEvents();
+        calculate();
+        applyLanguage();
+    </script>
+</body>
+</html>

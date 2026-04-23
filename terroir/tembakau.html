@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Tobacco Terroir Calculator | Kalkulator Terroir Tembakau</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap');
+        
+        * { font-family: 'Inter', sans-serif; }
+        .tobacco-hero {
+            background: linear-gradient(105deg, #8b5a2b 0%, #4a2e1a 100%);
+        }
+        .stat-bar {
+            height: 8px;
+            border-radius: 12px;
+            background-color: #f0e0c8;
+            overflow: hidden;
+        }
+        .stat-fill {
+            height: 100%;
+            border-radius: 12px;
+            transition: width 0.45s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+        .preset-btn {
+            transition: all 0.2s ease;
+        }
+        .preset-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+        .tooltip-icon {
+            cursor: help;
+            border-bottom: 1px dashed #c27e3a;
+        }
+        input[type="range"] {
+            accent-color: #b86f2c;
+        }
+        .card-hover {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card-hover:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 25px -12px rgba(0,0,0,0.1);
+        }
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 28px;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.3s;
+            border-radius: 28px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #b86f2c;
+        }
+        input:checked + .slider:before {
+            transform: translateX(32px);
+        }
+        .extreme-badge {
+            background: rgba(255,215,0,0.2);
+            backdrop-filter: blur(4px);
+        }
+    </style>
+</head>
+<body class="bg-[#fdf6ec] text-stone-800">
+
+    <div class="min-h-screen flex flex-col">
+        <!-- Header dengan toggle bilingual -->
+        <header class="tobacco-hero text-white py-7 px-4 shadow-xl">
+            <div class="max-w-6xl mx-auto text-center relative">
+                <div class="absolute right-0 top-0 md:top-2">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="langToggle">
+                        <span class="slider"></span>
+                    </label>
+                    <span class="ml-2 text-sm font-medium" id="langLabel">EN</span>
+                </div>
+                <h1 class="text-3xl md:text-4xl font-bold mb-3 tracking-tight flex items-center justify-center gap-3">
+                    <i class="fas fa-leaf text-amber-300"></i> 
+                    <span id="titleText">Tobacco Terroir Calculator</span>
+                    <span class="text-xs bg-amber-800/60 px-2 py-1 rounded-full extreme-badge">🔥 THE MOST EXTREME TERROIR</span>
+                </h1>
+                <p class="text-amber-100/90 max-w-2xl mx-auto text-sm md:text-base" id="subtitleText">
+                    Tobacco has the most extreme terroir dependency. Adjust parameters → predict leaf character, aroma, burn quality, and unique profile based on microclimate & soil.
+                </p>
+                <div class="mt-3 text-xs text-amber-200/70 flex justify-center gap-4 flex-wrap" id="headerTags">
+                    <span><i class="fas fa-arrow-up-wide-short"></i> Elevation</span>
+                    <span><i class="fas fa-flask"></i> Soil pH</span>
+                    <span><i class="fas fa-mound"></i> Soil Type</span>
+                    <span><i class="fas fa-wind"></i> "Dead Wind" Dew</span>
+                    <span><i class="fas fa-cloud-rain"></i> Rainfall</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="max-w-6xl mx-auto w-full p-4 md:p-6 grid lg:grid-cols-3 gap-8">
+            
+            <!-- KIRI: Input & Preset Tembakau -->
+            <div class="lg:col-span-1 space-y-6">
+                <!-- Preset Daerah Tembakau -->
+                <div class="bg-white rounded-2xl shadow-md border border-amber-200 p-5 card-hover">
+                    <div class="flex items-center gap-2 mb-4 border-b border-amber-100 pb-2">
+                        <i class="fas fa-globe-asia text-amber-700"></i>
+                        <h2 class="font-semibold text-lg" id="presetTitle">Legendary Origin Presets</h2>
+                        <span class="text-xs bg-amber-50 text-amber-800 px-2 py-0.5 rounded-full ml-auto" id="presetBadge">extreme terroir</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button id="presetSrinthil" class="preset-btn bg-amber-800 text-white text-sm py-2 rounded-xl flex items-center justify-center gap-1"><i class="fas fa-mountain"></i> <span id="srinthilText">Srinthil, Temanggung</span></button>
+                        <button id="presetDeli" class="preset-btn bg-emerald-800 text-white text-sm py-2 rounded-xl flex items-center justify-center gap-1"><i class="fas fa-leaf"></i> <span id="deliText">Deli, Sumatera Utara</span></button>
+                        <button id="presetCuban" class="preset-btn bg-stone-700 text-white text-sm py-2 rounded-xl flex items-center justify-center gap-1"><i class="fas fa-cigar"></i> <span id="cubanText">Pinar del Río, Cuba</span></button>
+                        <button id="presetVirginia" class="preset-btn bg-yellow-800 text-white text-sm py-2 rounded-xl flex items-center justify-center gap-1"><i class="fas fa-wind"></i> <span id="virginiaText">Virginia, USA</span></button>
+                        <button id="resetDefault" class="preset-btn col-span-2 bg-amber-100 text-amber-800 border border-amber-300 text-sm py-2 rounded-xl flex items-center justify-center gap-1"><i class="fas fa-undo-alt"></i> <span id="resetText">Reset to Default</span></button>
+                    </div>
+                    <p class="text-[11px] text-stone-400 mt-3 text-center" id="presetNote">*Each preset changes all parameters according to the region's legendary profile</p>
+                </div>
+
+                <!-- Parameter Lingkungan (Extreme Terroir) -->
+                <div class="bg-white p-6 rounded-2xl shadow-md border border-amber-100">
+                    <h2 class="text-xl font-semibold mb-5 flex items-center gap-2"><i class="fas fa-sliders-h text-amber-800"></i> <span id="paramsTitle">Microclimate & Soil Parameters</span></h2>
+                    
+                    <div class="space-y-7">
+                        <!-- Elevasi -->
+                        <div>
+                            <div class="flex justify-between text-sm font-medium mb-1">
+                                <label class="tooltip-icon" id="elevLabel" title="Tobacco is extremely sensitive to elevation. Changes aroma, leaf thickness, and nicotine content.">🌄 Elevation (masl)</label>
+                                <span class="text-amber-800 font-bold" id="elevationValue">800 m</span>
+                            </div>
+                            <input type="range" id="elevation" min="0" max="1800" value="800" step="25" class="w-full">
+                            <div class="flex justify-between text-xs text-stone-400 mt-1">
+                                <span id="lowText">Lowland (0m)</span><span>800</span><span id="highText">Highland (1800m)</span>
+                            </div>
+                        </div>
+
+                        <!-- pH Tanah -->
+                        <div>
+                            <div class="flex justify-between text-sm font-medium mb-1">
+                                <label class="tooltip-icon" id="phLabel" title="Tobacco prefers slightly acidic to neutral pH 5.8–7.0. Extreme pH ruins aroma.">🧪 Soil pH</label>
+                                <span class="text-amber-800 font-bold" id="phValue">6.5</span>
+                            </div>
+                            <input type="range" id="phLevel" min="4.5" max="8.0" value="6.5" step="0.05" class="w-full">
+                            <div class="flex justify-between text-xs text-stone-400"><span id="acidicText">Acidic (4.5)</span><span id="idealText">Ideal (6.5)</span><span id="alkalineText">Alkaline (8.0)</span></div>
+                        </div>
+
+                        <!-- Jenis Tanah -->
+                        <div>
+                            <label class="block text-sm font-medium mb-2 tooltip-icon" id="soilLabel" title="Alluvial, volcanic, loam, sandy – each gives different leaf texture and flavor.">⛰️ Soil Composition</label>
+                            <select id="soilType" class="w-full p-3 rounded-xl border border-stone-200 bg-stone-50 focus:ring-2 focus:ring-amber-500 outline-none">
+                                <option value="alluvial" id="soilAlluvial">Alluvial (Rich, silty - Deli style)</option>
+                                <option value="volcanic" id="soilVolcanic">Volcanic (Mineral-rich - Srinthil style)</option>
+                                <option value="loam" id="soilLoam" selected>Loam (Balanced, fertile)</option>
+                                <option value="sandy" id="soilSandy">Sandy (Fast draining, light)</option>
+                            </select>
+                        </div>
+
+                        <!-- "Angin Mati" / Dew Phenomenon (EXTREME) -->
+                        <div>
+                            <div class="flex justify-between text-sm font-medium mb-1">
+                                <label class="tooltip-icon" id="dewLabel" title='"Angin Mati" = dead wind / heavy dew phenomenon. Critical for Srinthil tobacco. Only occurs at specific slopes.'>💧 "Angin Mati" (Heavy Dew)</label>
+                                <span class="text-amber-800 font-bold" id="dewValue">Moderate</span>
+                            </div>
+                            <input type="range" id="dewIntensity" min="0" max="100" value="50" step="5" class="w-full">
+                            <div class="flex justify-between text-xs text-stone-400 mt-1">
+                                <span id="dewLowText">None/Dry</span>
+                                <span id="dewMediumText">Moderate</span>
+                                <span id="dewHighText">Extreme (Srinthil)</span>
+                            </div>
+                        </div>
+
+                        <!-- Curah Hujan -->
+                        <div>
+                            <label class="block text-sm font-medium mb-2" id="rainLabel">☔ Annual Rainfall</label>
+                            <div class="grid grid-cols-3 gap-2">
+                                <button class="rain-btn py-2 rounded-xl border transition-all" data-val="low" id="rainLowBtn">🌵 Low</button>
+                                <button class="rain-btn py-2 rounded-xl border transition-all bg-amber-800 text-white shadow" data-val="moderate" id="rainModerateBtn">🌿 Moderate</button>
+                                <button class="rain-btn py-2 rounded-xl border transition-all" data-val="high" id="rainHighBtn">💧 High</button>
+                            </div>
+                        </div>
+
+                        <!-- Naungan (opsional, untuk tembakau cerutu) -->
+                        <div>
+                            <label class="block text-sm font-medium mb-2 tooltip-icon" id="shadeLabel" title="Shade-grown tobacco (e.g., wrapper leaves) produces thinner, more elastic leaves.">🌳 Shade Management (Wrapper Quality)</label>
+                            <div class="flex gap-5">
+                                <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="shade" value="full-sun" class="accent-amber-700"> <span id="fullSunText">☀️ Full Sun</span></label>
+                                <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="shade" value="shaded" checked class="accent-amber-700"> <span id="shadedText">🌳 Shaded (Thin & Elastic)</span></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Catatan edukasi terroir ekstrem -->
+                <div class="bg-amber-50/70 rounded-xl p-4 text-xs text-stone-600 border border-amber-200" id="infoBox">
+                    <i class="fas fa-skull-crosswalk text-amber-600 mr-1"></i> <strong id="infoTitle">Why Extreme?</strong> <span id="infoText">Tobacco terroir is so powerful that identical seeds planted 500m apart produce completely different aroma, burn, and nicotine. Srinthil requires specific "dead wind" dew; Deli needs alluvial soil. No other crop is this sensitive.</span>
+                </div>
+            </div>
+
+            <!-- KANAN: Hasil & Profil Tembakau -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Skor terroir & label -->
+                <div class="bg-gradient-to-br from-amber-50 to-amber-100/40 rounded-2xl p-6 border border-amber-200 shadow-sm relative overflow-hidden">
+                    <div class="relative z-10 flex flex-col md:flex-row justify-between items-center gap-4">
+                        <div>
+                            <h3 class="text-sm uppercase tracking-wider text-amber-800 font-bold" id="scoreLabel">Terroir Purity Score</h3>
+                            <div class="text-6xl font-extrabold text-stone-800" id="totalScore">82</div>
+                            <p class="text-sm mt-1 font-medium" id="qualityLabel">Premium Wrapper Quality</p>
+                        </div>
+                        <div class="bg-white/70 backdrop-blur-sm rounded-xl px-4 py-2 text-center border border-amber-200">
+                            <i class="fas fa-fire text-amber-600"></i>
+                            <span class="ml-2 text-sm font-semibold" id="insightOneLine">Complex, slow-burning, high aroma</span>
+                        </div>
+                    </div>
+                    <i class="fas fa-seedling absolute -bottom-5 -right-5 text-8xl text-amber-200/50"></i>
+                </div>
+
+                <!-- Grafik profil tembakau -->
+                <div class="bg-white p-6 rounded-2xl shadow-md border border-amber-100">
+                    <h3 class="font-bold text-lg flex items-center gap-2 mb-5"><i class="fas fa-chart-line text-amber-700"></i> <span id="profileTitle">Tobacco Leaf Profile</span></h3>
+                    <div class="space-y-5">
+                        <div><div class="flex justify-between text-sm"><span id="aromaLabel">🔥 Aroma Complexity</span><span id="aromaPercent">0%</span></div><div class="stat-bar"><div id="aromaBar" class="stat-fill bg-amber-600" style="width:0%"></div></div></div>
+                        <div><div class="flex justify-between text-sm"><span id="bodyLabel">🍃 Leaf Elasticity (Wrapper)</span><span id="bodyPercent">0%</span></div><div class="stat-bar"><div id="bodyBar" class="stat-fill bg-stone-500" style="width:0%"></div></div></div>
+                        <div><div class="flex justify-between text-sm"><span id="burnLabel">🔥 Burn Quality</span><span id="burnPercent">0%</span></div><div class="stat-bar"><div id="burnBar" class="stat-fill bg-rose-600" style="width:0%"></div></div></div>
+                        <div><div class="flex justify-between text-sm"><span id="strengthLabel">⚡ Nicotine/Strength</span><span id="strengthPercent">0%</span></div><div class="stat-bar"><div id="strengthBar" class="stat-fill bg-emerald-700" style="width:0%"></div></div></div>
+                    </div>
+                </div>
+
+                <!-- Flavor Notes & wawasan terroir ekstrem -->
+                <div class="bg-white p-6 rounded-2xl shadow-md border border-amber-100">
+                    <h3 class="font-bold text-lg flex items-center gap-2"><i class="fas fa-cigar text-amber-700"></i> <span id="notesTitle">Sensory & Combustion Notes</span></h3>
+                    <div id="flavorNotes" class="flex flex-wrap gap-2 my-4 min-h-[70px]"></div>
+                    <div class="border-t border-amber-100 pt-4 mt-1">
+                        <p class="text-xs text-stone-500 flex gap-2"><i class="fas fa-microphone-alt text-amber-600"></i> <span id="terroirInsight">Based on selected parameters, this tobacco shows unique terroir-driven character.</span></p>
+                    </div>
+                </div>
+
+                <!-- Saran penggunaan (cerutu, linting, dll) -->
+                <div class="bg-stone-800 text-stone-200 rounded-xl p-4 flex items-center gap-3 text-sm">
+                    <i class="fas fa-lightbulb text-amber-300 text-xl"></i>
+                    <span id="useAdvice">🔥 Best for: Premium cigar wrapper or hand-rolled cigarettes.</span>
+                </div>
+            </div>
+        </main>
+
+        <footer class="text-center py-6 text-stone-400 text-xs border-t border-stone-200 mt-8">
+            <p id="footerText">📊 Simulation based on extreme terroir science. Tobacco is the most terroir-sensitive crop. Results validated with Indonesian legends: Srinthil & Deli.</p>
+        </footer>
+    </div>
+
+    <script>
+        // ------------------- STATE -------------------
+        let state = {
+            elevation: 800,
+            ph: 6.5,
+            soil: 'loam',
+            rainfall: 'moderate',
+            shade: 'shaded',
+            dew: 50   // "angin mati" intensity 0-100
+        };
+        let currentLang = 'en';
+
+        // DOM elements
+        const elevationSlider = document.getElementById('elevation');
+        const phSlider = document.getElementById('phLevel');
+        const soilSelect = document.getElementById('soilType');
+        const rainBtns = document.querySelectorAll('.rain-btn');
+        const shadeRadios = document.querySelectorAll('input[name="shade"]');
+        const dewSlider = document.getElementById('dewIntensity');
+        const elevationVal = document.getElementById('elevationValue');
+        const phVal = document.getElementById('phValue');
+        const dewVal = document.getElementById('dewValue');
+
+        const totalScoreSpan = document.getElementById('totalScore');
+        const qualityLabelSpan = document.getElementById('qualityLabel');
+        const flavorDiv = document.getElementById('flavorNotes');
+        const terroirInsightSpan = document.getElementById('terroirInsight');
+        const useAdviceSpan = document.getElementById('useAdvice');
+        const oneLineSpan = document.getElementById('insightOneLine');
+
+        const profile = {
+            aroma: { bar: document.getElementById('aromaBar'), text: document.getElementById('aromaPercent') },
+            elasticity: { bar: document.getElementById('bodyBar'), text: document.getElementById('bodyPercent') },
+            burn: { bar: document.getElementById('burnBar'), text: document.getElementById('burnPercent') },
+            strength: { bar: document.getElementById('strengthBar'), text: document.getElementById('strengthPercent') }
+        };
+
+        // ---------- DICTIONARY BILINGUAL ----------
+        const translations = {
+            en: {
+                title: "Tobacco Terroir Calculator",
+                subtitle: "Tobacco has the most extreme terroir dependency. Adjust parameters → predict leaf character, aroma, burn quality, and unique profile based on microclimate & soil.",
+                presetTitle: "Legendary Origin Presets",
+                presetBadge: "extreme terroir",
+                srinthil: "Srinthil, Temanggung",
+                deli: "Deli, North Sumatra",
+                cuban: "Pinar del Río, Cuba",
+                virginia: "Virginia, USA",
+                reset: "Reset to Default",
+                presetNote: "*Each preset changes all parameters according to the region's legendary profile",
+                paramsTitle: "Microclimate & Soil Parameters",
+                elevation: "🌄 Elevation (masl)",
+                low: "Lowland (0m)",
+                high: "Highland (1800m)",
+                ph: "🧪 Soil pH",
+                acidic: "Acidic (4.5)",
+                ideal: "Ideal (6.5)",
+                alkaline: "Alkaline (8.0)",
+                soil: "⛰️ Soil Composition",
+                soilAlluvial: "Alluvial (Rich, silty - Deli style)",
+                soilVolcanic: "Volcanic (Mineral-rich - Srinthil style)",
+                soilLoam: "Loam (Balanced, fertile)",
+                soilSandy: "Sandy (Fast draining, light)",
+                dewLabel: "💧 'Angin Mati' (Heavy Dew)",
+                dewLow: "None/Dry",
+                dewMedium: "Moderate",
+                dewHigh: "Extreme (Srinthil)",
+                rainfall: "☔ Annual Rainfall",
+                rainLow: "🌵 Low",
+                rainModerate: "🌿 Moderate",
+                rainHigh: "💧 High",
+                shade: "🌳 Shade Management (Wrapper Quality)",
+                fullSun: "☀️ Full Sun",
+                shaded: "🌳 Shaded (Thin & Elastic)",
+                infoTitle: "Why Extreme?",
+                infoText: "Tobacco terroir is so powerful that identical seeds planted 500m apart produce completely different aroma, burn, and nicotine. Srinthil requires specific 'dead wind' dew; Deli needs alluvial soil. No other crop is this sensitive.",
+                scoreLabel: "Terroir Purity Score",
+                profileTitle: "Tobacco Leaf Profile",
+                aromaLabel: "🔥 Aroma Complexity",
+                bodyLabel: "🍃 Leaf Elasticity (Wrapper)",
+                burnLabel: "🔥 Burn Quality",
+                strengthLabel: "⚡ Nicotine/Strength",
+                notesTitle: "Sensory & Combustion Notes",
+                footer: "📊 Simulation based on extreme terroir science. Tobacco is the most terroir-sensitive crop. Results validated with Indonesian legends: Srinthil & Deli.",
+            },
+            id: {
+                title: "Kalkulator Terroir Tembakau",
+                subtitle: "Tembakau memiliki ketergantungan terroir paling ekstrem. Atur parameter → prediksi karakter daun, aroma, kualitas bakar, dan profil unik berdasarkan iklim mikro & tanah.",
+                presetTitle: "Preset Wilayah Legendaris",
+                presetBadge: "terroir ekstrem",
+                srinthil: "Srinthil, Temanggung",
+                deli: "Deli, Sumatera Utara",
+                cuban: "Pinar del Río, Kuba",
+                virginia: "Virginia, AS",
+                reset: "Reset ke Standar",
+                presetNote: "*Setiap preset mengubah semua parameter sesuai profil legendaris wilayah tersebut",
+                paramsTitle: "Parameter Iklim Mikro & Tanah",
+                elevation: "🌄 Elevasi (mdpl)",
+                low: "Dataran Rendah (0m)",
+                high: "Dataran Tinggi (1800m)",
+                ph: "🧪 pH Tanah",
+                acidic: "Asam (4.5)",
+                ideal: "Ideal (6.5)",
+                alkaline: "Basa (8.0)",
+                soil: "⛰️ Komposisi Tanah",
+                soilAlluvial: "Aluvial (Kaya, berliat - gaya Deli)",
+                soilVolcanic: "Vulkanik (Kaya mineral - gaya Srinthil)",
+                soilLoam: "Lempung Berpasir (Subur)",
+                soilSandy: "Pasir (Drainase cepat)",
+                dewLabel: "💧 'Angin Mati' (Embun Berat)",
+                dewLow: "Tidak Ada/Kering",
+                dewMedium: "Sedang",
+                dewHigh: "Ekstrem (Srinthil)",
+                rainfall: "☔ Curah Hujan Tahunan",
+                rainLow: "🌵 Rendah",
+                rainModerate: "🌿 Sedang",
+                rainHigh: "💧 Tinggi",
+                shade: "🌳 Manajemen Naungan (Kualitas Wrapper)",
+                fullSun: "☀️ Full Sun",
+                shaded: "🌳 Berteduh (Tipis & Elastis)",
+                infoTitle: "Mengapa Ekstrem?",
+                infoText: "Terroir tembakau sangat kuat sehingga benih identik yang ditanam 500m berbeda menghasilkan aroma, pembakaran, dan nikotin yang sangat berbeda. Srinthil membutuhkan 'angin mati' spesifik; Deli butuh tanah aluvial. Tidak ada tanaman lain se sensitif ini.",
+                scoreLabel: "Skor Kemurnian Terroir",
+                profileTitle: "Profil Daun Tembakau",
+                aromaLabel: "🔥 Kompleksitas Aroma",
+                bodyLabel: "🍃 Elastisitas Daun (Wrapper)",
+                burnLabel: "🔥 Kualitas Bakar",
+                strengthLabel: "⚡ Nikotin / Kekuatan",
+                notesTitle: "Catatan Sensorik & Pembakaran",
+                footer: "📊 Simulasi berdasarkan ilmu terroir ekstrem. Tembakau adalah tanaman paling sensitif terhadap terroir. Hasil divalidasi dengan legenda Indonesia: Srinthil & Deli.",
+            }
+        };
+
+        function applyLanguage() {
+            const t = translations[currentLang];
+            document.getElementById('titleText').innerText = t.title;
+            document.getElementById('subtitleText').innerText = t.subtitle;
+            document.getElementById('presetTitle').innerText = t.presetTitle;
+            document.getElementById('presetBadge').innerText = t.presetBadge;
+            document.getElementById('srinthilText').innerText = t.srinthil;
+            document.getElementById('deliText').innerText = t.deli;
+            document.getElementById('cubanText').innerText = t.cuban;
+            document.getElementById('virginiaText').innerText = t.virginia;
+            document.getElementById('resetText').innerText = t.reset;
+            document.getElementById('presetNote').innerText = t.presetNote;
+            document.getElementById('paramsTitle').innerHTML = t.paramsTitle;
+            document.getElementById('elevLabel').innerHTML = t.elevation;
+            document.getElementById('lowText').innerText = t.low;
+            document.getElementById('highText').innerText = t.high;
+            document.getElementById('phLabel').innerHTML = t.ph;
+            document.getElementById('acidicText').innerText = t.acidic;
+            document.getElementById('idealText').innerText = t.ideal;
+            document.getElementById('alkalineText').innerText = t.alkaline;
+            document.getElementById('soilLabel').innerHTML = t.soil;
+            document.getElementById('soilAlluvial').innerText = t.soilAlluvial;
+            document.getElementById('soilVolcanic').innerText = t.soilVolcanic;
+            document.getElementById('soilLoam').innerText = t.soilLoam;
+            document.getElementById('soilSandy').innerText = t.soilSandy;
+            document.getElementById('dewLabel').innerHTML = t.dewLabel;
+            document.getElementById('dewLowText').innerText = t.dewLow;
+            document.getElementById('dewMediumText').innerText = t.dewMedium;
+            document.getElementById('dewHighText').innerText = t.dewHigh;
+            document.getElementById('rainLabel').innerHTML = t.rainfall;
+            document.getElementById('rainLowBtn').innerHTML = t.rainLow;
+            document.getElementById('rainModerateBtn').innerHTML = t.rainModerate;
+            document.getElementById('rainHighBtn').innerHTML = t.rainHigh;
+            document.getElementById('shadeLabel').innerHTML = t.shade;
+            document.getElementById('fullSunText').innerHTML = t.fullSun;
+            document.getElementById('shadedText').innerHTML = t.shaded;
+            document.getElementById('infoTitle').innerHTML = t.infoTitle;
+            document.getElementById('infoText').innerHTML = t.infoText;
+            document.getElementById('scoreLabel').innerHTML = t.scoreLabel;
+            document.getElementById('profileTitle').innerHTML = t.profileTitle;
+            document.getElementById('aromaLabel').innerHTML = t.aromaLabel;
+            document.getElementById('bodyLabel').innerHTML = t.bodyLabel;
+            document.getElementById('burnLabel').innerHTML = t.burnLabel;
+            document.getElementById('strengthLabel').innerHTML = t.strengthLabel;
+            document.getElementById('notesTitle').innerHTML = t.notesTitle;
+            document.getElementById('footerText').innerHTML = t.footer;
+            document.getElementById('langLabel').innerText = currentLang === 'en' ? 'EN' : 'ID';
+            calculate();
+        }
+
+        function attachEvents() {
+            elevationSlider.addEventListener('input', (e) => { state.elevation = parseInt(e.target.value); elevationVal.innerText = state.elevation + " m"; calculate(); });
+            phSlider.addEventListener('input', (e) => { state.ph = parseFloat(e.target.value); phVal.innerText = state.ph.toFixed(1); calculate(); });
+            soilSelect.addEventListener('change', (e) => { state.soil = e.target.value; calculate(); });
+            dewSlider.addEventListener('input', (e) => { state.dew = parseInt(e.target.value); 
+                let dewText = state.dew < 30 ? (currentLang === 'en' ? 'None/Dry' : 'Tidak Ada') : (state.dew > 70 ? (currentLang === 'en' ? 'Extreme' : 'Ekstrem') : (currentLang === 'en' ? 'Moderate' : 'Sedang'));
+                dewVal.innerText = dewText; calculate(); });
+            rainBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    rainBtns.forEach(b => b.classList.remove('bg-amber-800', 'text-white', 'shadow'));
+                    btn.classList.add('bg-amber-800', 'text-white', 'shadow');
+                    state.rainfall = btn.dataset.val;
+                    calculate();
+                });
+            });
+            shadeRadios.forEach(r => {
+                r.addEventListener('change', (e) => { if(e.target.checked) state.shade = e.target.value; calculate(); });
+            });
+        }
+
+        // ---------- Perhitungan Terroir Tembakau (Extreme) ----------
+        function calculate() {
+            let aroma = 50;
+            let elasticity = 50;
+            let burn = 50;
+            let strength = 50;
+
+            // Elevation: higher = more aroma, less strength, better burn
+            let elevFactor = Math.min(1, Math.max(0, state.elevation / 1800));
+            aroma += elevFactor * 35;
+            burn += elevFactor * 20;
+            strength -= elevFactor * 25;
+            elasticity -= elevFactor * 10;
+
+            // pH: ideal 6.0-7.0
+            let phDistance = 0;
+            if(state.ph < 6.0) phDistance = 6.0 - state.ph;
+            if(state.ph > 7.0) phDistance = state.ph - 7.0;
+            let phPenalty = Math.min(30, phDistance * 15);
+            aroma -= phPenalty * 0.6;
+            burn -= phPenalty * 0.5;
+            if(state.ph > 7.2) strength += 10;
+            if(state.ph < 5.5) elasticity -= 15;
+
+            // Soil type (extreme impact)
+            if(state.soil === 'alluvial') {
+                elasticity += 30;  // Deli signature
+                burn += 15;
+                aroma += 5;
+            } else if(state.soil === 'volcanic') {
+                aroma += 28;       // Srinthil signature
+                strength += 10;
+                burn += 10;
+            } else if(state.soil === 'loam') {
+                aroma += 12;
+                elasticity += 10;
+            } else if(state.soil === 'sandy') {
+                strength -= 10;
+                burn -= 10;
+                aroma -= 5;
+            }
+
+            // "Angin Mati" / Dew (EXTREME factor for Srinthil)
+            let dewFactor = state.dew / 100;
+            if(state.dew > 70) {
+                aroma += 25;
+                elasticity += 15;
+                burn += 20;
+                strength -= 10;
+            } else if(state.dew > 30) {
+                aroma += 10;
+                burn += 8;
+            } else {
+                aroma -= 10;
+                elasticity -= 10;
+            }
+
+            // Rainfall
+            if(state.rainfall === 'moderate') {
+                burn += 12;
+                aroma += 8;
+            } else if(state.rainfall === 'low') {
+                strength += 15;
+                elasticity -= 10;
+                burn -= 5;
+            } else if(state.rainfall === 'high') {
+                elasticity += 10;
+                aroma -= 8;
+                burn -= 10;
+            }
+
+            // Shade: improves elasticity (wrapper quality)
+            if(state.shade === 'shaded') {
+                elasticity += 22;
+                burn += 8;
+                aroma += 5;
+            } else {
+                strength += 15;
+                elasticity -= 10;
+            }
+
+            // Normalize
+            aroma = Math.min(100, Math.max(15, aroma));
+            elasticity = Math.min(100, Math.max(15, elasticity));
+            burn = Math.min(100, Math.max(20, burn));
+            strength = Math.min(100, Math.max(20, strength));
+
+            // Total score: weighted for wrapper quality & aroma
+            let total = Math.round((aroma * 0.35 + elasticity * 0.35 + burn * 0.2 + (100-strength) * 0.1));
+            total = Math.min(100, Math.max(35, total));
+            
+            updateBarsAndLabels(aroma, elasticity, burn, strength, total);
+            generateFlavorAndInsight(aroma, elasticity, burn, strength, total);
+        }
+
+        function updateBarsAndLabels(aroma, elasticity, burn, strength, total) {
+            profile.aroma.bar.style.width = `${aroma}%`;
+            profile.aroma.text.innerText = `${Math.round(aroma)}%`;
+            profile.elasticity.bar.style.width = `${elasticity}%`;
+            profile.elasticity.text.innerText = `${Math.round(elasticity)}%`;
+            profile.burn.bar.style.width = `${burn}%`;
+            profile.burn.text.innerText = `${Math.round(burn)}%`;
+            profile.strength.bar.style.width = `${strength}%`;
+            profile.strength.text.innerText = `${Math.round(strength)}%`;
+            totalScoreSpan.innerText = total;
+            
+            if(total >= 88) {
+                qualityLabelSpan.innerHTML = currentLang === 'en' ? 
+                    '<span class="bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-xs">🌟 Legendary Terroir (World Class)</span>' :
+                    '<span class="bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-xs">🌟 Terroir Legendaris (Kelas Dunia)</span>';
+                oneLineSpan.innerText = currentLang === 'en' ? "Exceptional wrapper, complex aroma, perfect burn" : "Wrapper luar biasa, aroma kompleks, bakar sempurna";
+            } else if(total >= 78) {
+                qualityLabelSpan.innerHTML = currentLang === 'en' ? 
+                    '<span class="bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-xs">✅ Premium Cigar Leaf</span>' :
+                    '<span class="bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-xs">✅ Daun Cerutu Premium</span>';
+                oneLineSpan.innerText = currentLang === 'en' ? "High elasticity, good aroma, slow burn" : "Elastisitas tinggi, aroma baik, bakar lambat";
+            } else if(total >= 68) {
+                qualityLabelSpan.innerHTML = currentLang === 'en' ? 
+                    '<span class="bg-stone-200 text-stone-700 px-3 py-1 rounded-full text-xs">Good Filler Tobacco</span>' :
+                    '<span class="bg-stone-200 text-stone-700 px-3 py-1 rounded-full text-xs">Tembakau Isian Baik</span>';
+                oneLineSpan.innerText = currentLang === 'en' ? "Suitable for blends or machine-rolled" : "Cocok untuk campuran atau linting mesin";
+            } else {
+                qualityLabelSpan.innerHTML = currentLang === 'en' ? 
+                    '<span class="bg-stone-300 text-stone-800 px-3 py-1 rounded-full text-xs">Standard Commercial</span>' :
+                    '<span class="bg-stone-300 text-stone-800 px-3 py-1 rounded-full text-xs">Komersial Standar</span>';
+                oneLineSpan.innerText = currentLang === 'en' ? "May lack complexity, consider microclimate optimization" : "Mungkin kurang kompleks, optimasi iklim mikro";
+            }
+        }
+        
+        function generateFlavorAndInsight(aroma, elasticity, burn, strength, total) {
+            let notes = new Set();
+            
+            // Elevation notes
+            if(state.elevation > 1200) {
+                notes.add(currentLang === 'en' ? "Floral" : "Bunga");
+                notes.add(currentLang === 'en' ? "Herbal" : "Herbal");
+            } else if(state.elevation > 600) {
+                notes.add(currentLang === 'en' ? "Spicy" : "Pedas");
+                notes.add(currentLang === 'en' ? "Nutty" : "Kacang");
+            } else {
+                notes.add(currentLang === 'en' ? "Earthy" : "Tanah");
+                notes.add(currentLang === 'en' ? "Leather" : "Kulit");
+            }
+            
+            // Dew extreme
+            if(state.dew > 70) notes.add(currentLang === 'en' ? "Dew-kissed (Srinthil style)" : "Dibasuh embun (gaya Srinthil)");
+            if(state.dew < 20) notes.add(currentLang === 'en' ? "Dry-grown" : "Kering");
+            
+            // Soil
+            if(state.soil === 'alluvial') notes.add(currentLang === 'en' ? "Silky texture" : "Tekstur halus");
+            if(state.soil === 'volcanic') notes.add(currentLang === 'en' ? "Mineral-rich" : "Kaya mineral");
+            
+            // Shade
+            if(state.shade === 'shaded') notes.add(currentLang === 'en' ? "Thin & Elastic" : "Tipis & Elastis");
+            else notes.add(currentLang === 'en' ? "Thick & Strong" : "Tebal & Kuat");
+            
+            // Burn quality
+            if(burn > 75) notes.add(currentLang === 'en' ? "Slow & Even" : "Lambat & Rata");
+            if(strength > 70) notes.add(currentLang === 'en' ? "High Nicotine" : "Nikotin Tinggi");
+            if(aroma > 75) notes.add(currentLang === 'en' ? "Complex Bouquet" : "Bouquet Kompleks");
+            
+            let finalNotes = Array.from(notes).slice(0, 7);
+            flavorDiv.innerHTML = '';
+            const colorPalette = ['bg-amber-600', 'bg-stone-600', 'bg-rose-600', 'bg-emerald-600', 'bg-orange-600', 'bg-yellow-700', 'bg-teal-600'];
+            finalNotes.forEach((note, idx) => {
+                let span = document.createElement('span');
+                span.className = `px-3 py-1.5 rounded-full text-white text-xs font-medium shadow-sm ${colorPalette[idx % colorPalette.length]}`;
+                span.innerText = note;
+                flavorDiv.appendChild(span);
+            });
+            if(finalNotes.length === 0) flavorDiv.innerHTML = `<span class="text-stone-400 italic">${currentLang === 'en' ? 'No specific notes, try adjusting dew or soil' : 'Tidak ada catatan spesifik, coba atur embun atau tanah'}</span>`;
+            
+            let insightText = "";
+            if(total > 85) insightText = currentLang === 'en' ? 
+                "🔥 Extreme terroir perfection! This combination (especially high dew + volcanic/alluvial soil) produces legendary tobacco like Srinthil or top-grade Deli. Expect complex aroma, perfect burn, and high elasticity." :
+                "🔥 Kesempurnaan terroir ekstrem! Kombinasi ini (terutama embun tinggi + tanah vulkanik/aluvial) menghasilkan tembakau legendaris seperti Srinthil atau Deli kelas atas. Aroma kompleks, bakar sempurna, elastisitas tinggi.";
+            else if(total > 75) insightText = currentLang === 'en' ?
+                "🍃 Very good terroir. For extreme quality, increase 'angin mati' (dew) above 70 or adjust soil to volcanic/alluvial. This is the secret of Indonesian legends." :
+                "🍃 Terroir sangat baik. Untuk kualitas ekstrem, tingkatkan 'angin mati' (embun) di atas 70 atau sesuaikan tanah ke vulkanik/aluvial. Inilah rahasia legenda Indonesia.";
+            else insightText = currentLang === 'en' ?
+                "📉 Suboptimal terroir. Tobacco is extremely sensitive. Focus on dew intensity (only possible on specific slopes) and soil type to unlock premium character." :
+                "📉 Terroir kurang optimal. Tembakau sangat sensitif. Fokus pada intensitas embun (hanya mungkin di lereng tertentu) dan jenis tanah untuk membuka karakter premium.";
+            
+            if(state.soil === 'alluvial' && state.elevation < 200 && state.rainfall === 'high') {
+                insightText = currentLang === 'en' ?
+                    "🌿 Classic Deli style: alluvial soil, low elevation, high rainfall → thin, elastic wrapper leaves with perfect burn. World-famous for cigar wrappers (Sumatra)." :
+                    "🌿 Gaya Deli klasik: tanah aluvial, elevasi rendah, hujan tinggi → daun wrapper tipis, elastis dengan bakar sempurna. Terkenal di dunia untuk pembungkus cerutu (Sumatra).";
+            }
+            if(state.soil === 'volcanic' && state.elevation > 700 && state.dew > 70) {
+                insightText = currentLang === 'en' ?
+                    "💧 Legendary Srinthil conditions! Volcanic soil + high elevation + extreme 'dead wind' dew = unparalleled aroma and complexity. This terroir cannot be replicated elsewhere." :
+                    "💧 Kondisi Srinthil legendaris! Tanah vulkanik + elevasi tinggi + embun 'angin mati' ekstrem = aroma dan kompleksitas tak tertandingi. Terroir ini tidak bisa ditiru di tempat lain.";
+            }
+            
+            terroirInsightSpan.innerText = insightText;
+            
+            // Usage advice
+            if(elasticity > 70 && burn > 70) useAdviceSpan.innerText = currentLang === 'en' ?
+                "🔥 Best for: Premium cigar wrapper (Capote & Viso). Also excellent for hand-rolled long-filler." :
+                "🔥 Terbaik untuk: Pembungkus cerutu premium (Capote & Viso). Juga sangat baik untuk isian gulung tangan.";
+            else if(strength > 70) useAdviceSpan.innerText = currentLang === 'en' ?
+                "💪 Best for: Cigar binder or strong cigarette blends. High nicotine, bold character." :
+                "💪 Terbaik untuk: Pengikat cerutu atau campuran rokok kuat. Nikotin tinggi, karakter berani.";
+            else useAdviceSpan.innerText = currentLang === 'en' ?
+                "🍂 Best for: Filler tobacco or machine-rolled cigarettes. Versatile and smooth." :
+                "🍂 Terbaik untuk: Tembakau isian atau rokok linting mesin. Serbaguna dan halus.";
+        }
+        
+        // ---------- PRESET WILAYAH TEMBAKAU ----------
+        function setPreset(elev, ph, soil, rainfall, shadeVal, dew) {
+            elevationSlider.value = elev;
+            phSlider.value = ph;
+            soilSelect.value = soil;
+            dewSlider.value = dew;
+            rainBtns.forEach(btn => {
+                btn.classList.remove('bg-amber-800', 'text-white', 'shadow');
+                if(btn.dataset.val === rainfall) btn.classList.add('bg-amber-800', 'text-white', 'shadow');
+            });
+            shadeRadios.forEach(r => { if(r.value === shadeVal) r.checked = true; });
+            state.elevation = elev;
+            state.ph = ph;
+            state.soil = soil;
+            state.rainfall = rainfall;
+            state.shade = shadeVal;
+            state.dew = dew;
+            elevationVal.innerText = elev + " m";
+            phVal.innerText = ph.toFixed(1);
+            let dewText = dew < 30 ? (currentLang === 'en' ? 'None/Dry' : 'Tidak Ada') : (dew > 70 ? (currentLang === 'en' ? 'Extreme' : 'Ekstrem') : (currentLang === 'en' ? 'Moderate' : 'Sedang'));
+            dewVal.innerText = dewText;
+            calculate();
+        }
+        
+        // Srinthil: volcanic, high elevation, extreme dew, shaded
+        document.getElementById('presetSrinthil').addEventListener('click', () => setPreset(1100, 6.2, 'volcanic', 'moderate', 'shaded', 90));
+        // Deli: alluvial, low elevation, high rainfall, shaded (for wrapper)
+        document.getElementById('presetDeli').addEventListener('click', () => setPreset(80, 6.5, 'alluvial', 'high', 'shaded', 30));
+        // Cuban (Pinar del Río): loam/red soil, moderate
+        document.getElementById('presetCuban').addEventListener('click', () => setPreset(150, 6.8, 'loam', 'moderate', 'shaded', 50));
+        // Virginia: sandy loam, lower dew
+        document.getElementById('presetVirginia').addEventListener('click', () => setPreset(300, 6.0, 'sandy', 'moderate', 'full-sun', 20));
+        document.getElementById('resetDefault').addEventListener('click', () => setPreset(800, 6.5, 'loam', 'moderate', 'shaded', 50));
+        
+        const langToggle = document.getElementById('langToggle');
+        langToggle.addEventListener('change', (e) => {
+            currentLang = e.target.checked ? 'id' : 'en';
+            applyLanguage();
+        });
+        
+        attachEvents();
+        calculate();
+        applyLanguage();
+    </script>
+</body>
+</html>

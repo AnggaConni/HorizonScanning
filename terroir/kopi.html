@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Coffee Terroir Calculator | Kalkulator Terroir Kopi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap');
+        
+        * { font-family: 'Inter', sans-serif; }
+        .coffee-hero {
+            background: linear-gradient(105deg, #3b2a1f 0%, #1f140c 100%);
+        }
+        .stat-bar {
+            height: 8px;
+            border-radius: 12px;
+            background-color: #f0e7db;
+            overflow: hidden;
+        }
+        .stat-fill {
+            height: 100%;
+            border-radius: 12px;
+            transition: width 0.45s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+        .preset-btn {
+            transition: all 0.2s ease;
+        }
+        .preset-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+        .tooltip-icon {
+            cursor: help;
+            border-bottom: 1px dashed #b45309;
+        }
+        input[type="range"] {
+            accent-color: #92400e;
+        }
+        .card-hover {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card-hover:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 25px -12px rgba(0,0,0,0.1);
+        }
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 28px;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.3s;
+            border-radius: 28px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #78350f;
+        }
+        input:checked + .slider:before {
+            transform: translateX(32px);
+        }
+        .lang-text {
+            transition: opacity 0.2s;
+        }
+    </style>
+</head>
+<body class="bg-[#fcf8f2] text-stone-800">
+
+    <div class="min-h-screen flex flex-col">
+        <!-- Header dengan toggle bilingual -->
+        <header class="coffee-hero text-white py-7 px-4 shadow-xl">
+            <div class="max-w-6xl mx-auto text-center relative">
+                <div class="absolute right-0 top-0 md:top-2">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="langToggle">
+                        <span class="slider"></span>
+                    </label>
+                    <span class="ml-2 text-sm font-medium" id="langLabel">EN</span>
+                </div>
+                <h1 class="text-3xl md:text-4xl font-bold mb-3 tracking-tight flex items-center justify-center gap-3">
+                    <i class="fas fa-mountain-city text-amber-300"></i> 
+                    <span id="titleText">Coffee Terroir Calculator</span>
+                </h1>
+                <p class="text-amber-100/90 max-w-2xl mx-auto text-sm md:text-base" id="subtitleText">
+                    Every environment tells a story in your cup. Adjust parameters → predict flavor profile, potential score, and unique character based on Terroir science.
+                </p>
+                <div class="mt-3 text-xs text-amber-200/70 flex justify-center gap-4 flex-wrap" id="headerTags">
+                    <span><i class="fas fa-arrow-up-wide-short"></i> Elevation</span>
+                    <span><i class="fas fa-flask"></i> Soil pH</span>
+                    <span><i class="fas fa-mound"></i> Soil Type</span>
+                    <span><i class="fas fa-cloud-rain"></i> Rainfall</span>
+                    <span><i class="fas fa-tree"></i> Shade</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="max-w-6xl mx-auto w-full p-4 md:p-6 grid lg:grid-cols-3 gap-8">
+            
+            <!-- KIRI: Input & Preset Wilayah -->
+            <div class="lg:col-span-1 space-y-6">
+                <!-- Preset Daerah Asal -->
+                <div class="bg-white rounded-2xl shadow-md border border-amber-100 p-5 card-hover">
+                    <div class="flex items-center gap-2 mb-4 border-b border-amber-100 pb-2">
+                        <i class="fas fa-globe-asia text-amber-700"></i>
+                        <h2 class="font-semibold text-lg" id="presetTitle">Origin Presets</h2>
+                        <span class="text-xs bg-amber-50 text-amber-800 px-2 py-0.5 rounded-full ml-auto" id="presetBadge">instant preset</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button id="presetGayo" class="preset-btn bg-stone-800 text-white text-sm py-2 rounded-xl flex items-center justify-center gap-1"><i class="fas fa-mountain"></i> <span id="gayoText">Gayo, Aceh</span></button>
+                        <button id="presetKintamani" class="preset-btn bg-amber-700 text-white text-sm py-2 rounded-xl flex items-center justify-center gap-1"><i class="fas fa-water"></i> <span id="kintamaniText">Kintamani, Bali</span></button>
+                        <button id="presetYirgacheffe" class="preset-btn bg-emerald-800 text-white text-sm py-2 rounded-xl flex items-center justify-center gap-1"><i class="fas fa-leaf"></i> <span id="yirgaText">Yirgacheffe, ET</span></button>
+                        <button id="presetHuila" class="preset-btn bg-sky-800 text-white text-sm py-2 rounded-xl flex items-center justify-center gap-1"><i class="fas fa-chart-line"></i> <span id="huilaText">Huila, Colombia</span></button>
+                        <button id="resetDefault" class="preset-btn col-span-2 bg-amber-100 text-amber-800 border border-amber-300 text-sm py-2 rounded-xl flex items-center justify-center gap-1"><i class="fas fa-undo-alt"></i> <span id="resetText">Reset to Default</span></button>
+                    </div>
+                    <p class="text-[11px] text-stone-400 mt-3 text-center" id="presetNote">*Each preset changes all parameters according to the region's real profile</p>
+                </div>
+
+                <!-- Parameter Lingkungan -->
+                <div class="bg-white p-6 rounded-2xl shadow-md border border-amber-100">
+                    <h2 class="text-xl font-semibold mb-5 flex items-center gap-2"><i class="fas fa-sliders-h text-amber-800"></i> <span id="paramsTitle">Environmental Parameters</span></h2>
+                    
+                    <div class="space-y-7">
+                        <!-- Elevasi -->
+                        <div>
+                            <div class="flex justify-between text-sm font-medium mb-1">
+                                <label class="tooltip-icon" id="elevLabel" title="Higher elevation (1200-2000+ masl) = slower ripening, higher acidity & complexity">🌄 Elevation (masl)</label>
+                                <span class="text-amber-800 font-bold" id="elevationValue">1200 m</span>
+                            </div>
+                            <input type="range" id="elevation" min="500" max="2300" value="1200" step="25" class="w-full">
+                            <div class="flex justify-between text-xs text-stone-400 mt-1">
+                                <span id="lowText">Low (500m)</span><span>1400</span><span id="highText">Ultra High (2300m)</span>
+                            </div>
+                        </div>
+
+                        <!-- pH Tanah -->
+                        <div>
+                            <div class="flex justify-between text-sm font-medium mb-1">
+                                <label class="tooltip-icon" id="phLabel" title="Ideal pH 5.5–6.5. Too acidic (<5) or alkaline (>7) reduces sweetness and complexity">🧪 Soil pH</label>
+                                <span class="text-amber-800 font-bold" id="phValue">6.0</span>
+                            </div>
+                            <input type="range" id="phLevel" min="4.0" max="8.0" value="6.0" step="0.05" class="w-full">
+                            <div class="flex justify-between text-xs text-stone-400"><span id="acidicText">Acidic (4.0)</span><span id="neutralText">Neutral (6.5)</span><span id="alkalineText">Alkaline (8.0)</span></div>
+                        </div>
+
+                        <!-- Jenis Tanah -->
+                        <div>
+                            <label class="block text-sm font-medium mb-2 tooltip-icon" id="soilLabel" title="Volcanic rich in minerals, clay heavy body, loam balanced, sandy light">⛰️ Soil Composition</label>
+                            <select id="soilType" class="w-full p-3 rounded-xl border border-stone-200 bg-stone-50 focus:ring-2 focus:ring-amber-500 outline-none">
+                                <option value="volcanic" id="soilVolcanic">Volcanic (Rich in Minerals)</option>
+                                <option value="clay" id="soilClay">Clay (Dense, slow drainage)</option>
+                                <option value="loam" id="soilLoam">Loam (Balanced, fertile)</option>
+                                <option value="sandy" id="soilSandy">Sandy (Fast drainage)</option>
+                            </select>
+                        </div>
+
+                        <!-- Curah Hujan -->
+                        <div>
+                            <label class="block text-sm font-medium mb-2" id="rainLabel">☔ Annual Rainfall</label>
+                            <div class="grid grid-cols-3 gap-2">
+                                <button class="rain-btn py-2 rounded-xl border transition-all" data-val="low" id="rainLowBtn">🌵 Low</button>
+                                <button class="rain-btn py-2 rounded-xl border transition-all bg-amber-800 text-white shadow" data-val="moderate" id="rainModerateBtn">🌿 Moderate</button>
+                                <button class="rain-btn py-2 rounded-xl border transition-all" data-val="high" id="rainHighBtn">💧 High</button>
+                            </div>
+                        </div>
+
+                        <!-- Naungan -->
+                        <div>
+                            <label class="block text-sm font-medium mb-2 tooltip-icon" id="shadeLabel" title="Shade slows ripening & increases sugar development">🌳 Shade Management</label>
+                            <div class="flex gap-5">
+                                <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="shade" value="full-sun" class="accent-amber-700"> <span id="fullSunText">☀️ Full Sun</span></label>
+                                <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="shade" value="shaded" checked class="accent-amber-700"> <span id="shadedText">🌳 Shaded</span></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Catatan edukasi terroir -->
+                <div class="bg-amber-50/50 rounded-xl p-4 text-xs text-stone-600 border border-amber-200" id="infoBox">
+                    <i class="fas fa-info-circle text-amber-600 mr-1"></i> <strong id="infoTitle">What is Terroir?</strong> <span id="infoText">The unique combination of elevation, soil, microclimate, and shade that shapes coffee character. This calculator simulates their impact on acidity, body, sweetness & complexity.</span>
+                </div>
+            </div>
+
+            <!-- KANAN: Hasil & Profil -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Skor terroir & label -->
+                <div class="bg-gradient-to-br from-amber-50 to-amber-100/40 rounded-2xl p-6 border border-amber-200 shadow-sm relative overflow-hidden">
+                    <div class="relative z-10 flex flex-col md:flex-row justify-between items-center gap-4">
+                        <div>
+                            <h3 class="text-sm uppercase tracking-wider text-amber-800 font-bold" id="scoreLabel">Terroir Potential Score</h3>
+                            <div class="text-6xl font-extrabold text-stone-800" id="totalScore">85</div>
+                            <p class="text-sm mt-1 font-medium" id="qualityLabel">Specialty Grade Environment</p>
+                        </div>
+                        <div class="bg-white/70 backdrop-blur-sm rounded-xl px-4 py-2 text-center border border-amber-200">
+                            <i class="fas fa-chart-simple text-amber-600"></i>
+                            <span class="ml-2 text-sm font-semibold" id="insightOneLine">High acidity & complex potential</span>
+                        </div>
+                    </div>
+                    <i class="fas fa-seedling absolute -bottom-5 -right-5 text-8xl text-amber-200/50"></i>
+                </div>
+
+                <!-- Grafik profil rasa -->
+                <div class="bg-white p-6 rounded-2xl shadow-md border border-amber-100">
+                    <h3 class="font-bold text-lg flex items-center gap-2 mb-5"><i class="fas fa-chart-line text-amber-700"></i> <span id="profileTitle">Predicted Flavor Profile</span></h3>
+                    <div class="space-y-5">
+                        <div><div class="flex justify-between text-sm"><span id="acidityLabel">🍋 Acidity (Brightness)</span><span id="acidityPercent">0%</span></div><div class="stat-bar"><div id="acidityBar" class="stat-fill bg-amber-500" style="width:0%"></div></div></div>
+                        <div><div class="flex justify-between text-sm"><span id="bodyLabel">🍷 Body / Mouthfeel</span><span id="bodyPercent">0%</span></div><div class="stat-bar"><div id="bodyBar" class="stat-fill bg-stone-500" style="width:0%"></div></div></div>
+                        <div><div class="flex justify-between text-sm"><span id="sweetnessLabel">🍯 Sweetness</span><span id="sweetnessPercent">0%</span></div><div class="stat-bar"><div id="sweetnessBar" class="stat-fill bg-amber-600" style="width:0%"></div></div></div>
+                        <div><div class="flex justify-between text-sm"><span id="complexityLabel">✨ Complexity</span><span id="complexityPercent">0%</span></div><div class="stat-bar"><div id="complexityBar" class="stat-fill bg-indigo-400" style="width:0%"></div></div></div>
+                    </div>
+                </div>
+
+                <!-- Flavor Notes & wawasan terroir -->
+                <div class="bg-white p-6 rounded-2xl shadow-md border border-amber-100">
+                    <h3 class="font-bold text-lg flex items-center gap-2"><i class="fas fa-mug-hot text-amber-700"></i> <span id="notesTitle">Prominent Flavor Notes</span></h3>
+                    <div id="flavorNotes" class="flex flex-wrap gap-2 my-4 min-h-[70px]"></div>
+                    <div class="border-t border-amber-100 pt-4 mt-1">
+                        <p class="text-xs text-stone-500 flex gap-2"><i class="fas fa-microphone-alt text-amber-600"></i> <span id="terroirInsight">Based on selected parameters, this coffee tends to have balanced acidity and natural sweetness.</span></p>
+                    </div>
+                </div>
+
+                <!-- Saran penyajian -->
+                <div class="bg-stone-800 text-stone-200 rounded-xl p-4 flex items-center gap-3 text-sm">
+                    <i class="fas fa-lightbulb text-amber-300 text-xl"></i>
+                    <span id="brewAdvice">☕️ Recommendation: Pour-over or Aeropress to highlight acidity and aroma.</span>
+                </div>
+            </div>
+        </main>
+
+        <footer class="text-center py-6 text-stone-400 text-xs border-t border-stone-200 mt-8">
+            <p id="footerText">📊 Simulation based on agronomic parameters & specialty coffee literature. Actual results vary by variety and processing.</p>
+        </footer>
+    </div>
+
+    <script>
+        // ------------------- STATE -------------------
+        let state = {
+            elevation: 1200,
+            ph: 6.0,
+            soil: 'volcanic',
+            rainfall: 'moderate',
+            shade: 'shaded'
+        };
+        let currentLang = 'en'; // 'en' or 'id'
+
+        // DOM elements
+        const elevationSlider = document.getElementById('elevation');
+        const phSlider = document.getElementById('phLevel');
+        const soilSelect = document.getElementById('soilType');
+        const rainBtns = document.querySelectorAll('.rain-btn');
+        const shadeRadios = document.querySelectorAll('input[name="shade"]');
+        const elevationVal = document.getElementById('elevationValue');
+        const phVal = document.getElementById('phValue');
+
+        const totalScoreSpan = document.getElementById('totalScore');
+        const qualityLabelSpan = document.getElementById('qualityLabel');
+        const flavorDiv = document.getElementById('flavorNotes');
+        const terroirInsightSpan = document.getElementById('terroirInsight');
+        const brewAdviceSpan = document.getElementById('brewAdvice');
+        const oneLineSpan = document.getElementById('insightOneLine');
+
+        const profile = {
+            acidity: { bar: document.getElementById('acidityBar'), text: document.getElementById('acidityPercent') },
+            body: { bar: document.getElementById('bodyBar'), text: document.getElementById('bodyPercent') },
+            sweetness: { bar: document.getElementById('sweetnessBar'), text: document.getElementById('sweetnessPercent') },
+            complexity: { bar: document.getElementById('complexityBar'), text: document.getElementById('complexityPercent') }
+        };
+
+        // ---------- DICTIONARY BILINGUAL ----------
+        const translations = {
+            en: {
+                title: "Coffee Terroir Calculator",
+                subtitle: "Every environment tells a story in your cup. Adjust parameters → predict flavor profile, potential score, and unique character based on Terroir science.",
+                presetTitle: "Origin Presets",
+                presetBadge: "instant preset",
+                gayo: "Gayo, Aceh",
+                kintamani: "Kintamani, Bali",
+                yirga: "Yirgacheffe, ET",
+                huila: "Huila, Colombia",
+                reset: "Reset to Default",
+                presetNote: "*Each preset changes all parameters according to the region's real profile",
+                paramsTitle: "Environmental Parameters",
+                elevation: "🌄 Elevation (masl)",
+                low: "Low (500m)",
+                high: "Ultra High (2300m)",
+                ph: "🧪 Soil pH",
+                acidic: "Acidic (4.0)",
+                neutral: "Neutral (6.5)",
+                alkaline: "Alkaline (8.0)",
+                soil: "⛰️ Soil Composition",
+                soilVolcanic: "Volcanic (Rich in Minerals)",
+                soilClay: "Clay (Dense, slow drainage)",
+                soilLoam: "Loam (Balanced, fertile)",
+                soilSandy: "Sandy (Fast drainage)",
+                rainfall: "☔ Annual Rainfall",
+                rainLow: "🌵 Low",
+                rainModerate: "🌿 Moderate",
+                rainHigh: "💧 High",
+                shade: "🌳 Shade Management",
+                fullSun: "☀️ Full Sun",
+                shaded: "🌳 Shaded",
+                infoTitle: "What is Terroir?",
+                infoText: "The unique combination of elevation, soil, microclimate, and shade that shapes coffee character. This calculator simulates their impact on acidity, body, sweetness & complexity.",
+                scoreLabel: "Terroir Potential Score",
+                profileTitle: "Predicted Flavor Profile",
+                acidityLabel: "🍋 Acidity (Brightness)",
+                bodyLabel: "🍷 Body / Mouthfeel",
+                sweetnessLabel: "🍯 Sweetness",
+                complexityLabel: "✨ Complexity",
+                notesTitle: "Prominent Flavor Notes",
+                footer: "📊 Simulation based on agronomic parameters & specialty coffee literature. Actual results vary by variety and processing.",
+                // dynamic text will be generated in code, but static parts are here
+            },
+            id: {
+                title: "Kalkulator Terroir Kopi",
+                subtitle: "Setiap lingkungan bercerita dalam cangkirmu. Atur parameter → prediksi profil rasa, skor potensi, dan karakter unik berdasarkan ilmu Terroir.",
+                presetTitle: "Preset Wilayah Asal",
+                presetBadge: "preset instan",
+                gayo: "Gayo, Aceh",
+                kintamani: "Kintamani, Bali",
+                yirga: "Yirgacheffe, Ethiopia",
+                huila: "Huila, Kolombia",
+                reset: "Reset ke Standar",
+                presetNote: "*Setiap preset mengubah semua parameter sesuai profil asli wilayah tersebut",
+                paramsTitle: "Parameter Lingkungan",
+                elevation: "🌄 Elevasi (mdpl)",
+                low: "Rendah (500m)",
+                high: "Sangat Tinggi (2300m)",
+                ph: "🧪 pH Tanah",
+                acidic: "Asam (4.0)",
+                neutral: "Netral (6.5)",
+                alkaline: "Basa (8.0)",
+                soil: "⛰️ Komposisi Tanah",
+                soilVolcanic: "Vulkanik (Kaya Mineral)",
+                soilClay: "Lempung Berat (Drainase lambat)",
+                soilLoam: "Lempung Berpasir (Subur)",
+                soilSandy: "Pasir (Drainase cepat)",
+                rainfall: "☔ Curah Hujan Tahunan",
+                rainLow: "🌵 Rendah",
+                rainModerate: "🌿 Sedang",
+                rainHigh: "💧 Tinggi",
+                shade: "🌳 Manajemen Naungan",
+                fullSun: "☀️ Full Sun",
+                shaded: "🌳 Berteduh",
+                infoTitle: "Apa itu Terroir?",
+                infoText: "Kombinasi unik elevasi, tanah, iklim mikro, dan naungan yang membentuk karakter kopi. Kalkulator ini mensimulasikan dampaknya terhadap keasaman, body, kemanisan & kompleksitas.",
+                scoreLabel: "Skor Potensi Terroir",
+                profileTitle: "Prediksi Profil Rasa",
+                acidityLabel: "🍋 Keasaman (Acidity)",
+                bodyLabel: "🍷 Body / Tekstur",
+                sweetnessLabel: "🍯 Kemanisan",
+                complexityLabel: "✨ Kompleksitas",
+                notesTitle: "Catatan Rasa Unggulan",
+                footer: "📊 Simulasi berdasarkan parameter agronomi & literatur kopi spesialti. Hasil aktual bervariasi tergantung varietas dan proses.",
+            }
+        };
+
+        function applyLanguage() {
+            const t = translations[currentLang];
+            document.getElementById('titleText').innerText = t.title;
+            document.getElementById('subtitleText').innerText = t.subtitle;
+            document.getElementById('presetTitle').innerText = t.presetTitle;
+            document.getElementById('presetBadge').innerText = t.presetBadge;
+            document.getElementById('gayoText').innerText = t.gayo;
+            document.getElementById('kintamaniText').innerText = t.kintamani;
+            document.getElementById('yirgaText').innerText = t.yirga;
+            document.getElementById('huilaText').innerText = t.huila;
+            document.getElementById('resetText').innerText = t.reset;
+            document.getElementById('presetNote').innerText = t.presetNote;
+            document.getElementById('paramsTitle').innerText = t.paramsTitle;
+            document.getElementById('elevLabel').innerHTML = t.elevation;
+            document.getElementById('lowText').innerText = t.low;
+            document.getElementById('highText').innerText = t.high;
+            document.getElementById('phLabel').innerHTML = t.ph;
+            document.getElementById('acidicText').innerText = t.acidic;
+            document.getElementById('neutralText').innerText = t.neutral;
+            document.getElementById('alkalineText').innerText = t.alkaline;
+            document.getElementById('soilLabel').innerHTML = t.soil;
+            document.getElementById('soilVolcanic').innerText = t.soilVolcanic;
+            document.getElementById('soilClay').innerText = t.soilClay;
+            document.getElementById('soilLoam').innerText = t.soilLoam;
+            document.getElementById('soilSandy').innerText = t.soilSandy;
+            document.getElementById('rainLabel').innerHTML = t.rainfall;
+            document.getElementById('rainLowBtn').innerHTML = t.rainLow;
+            document.getElementById('rainModerateBtn').innerHTML = t.rainModerate;
+            document.getElementById('rainHighBtn').innerHTML = t.rainHigh;
+            document.getElementById('shadeLabel').innerHTML = t.shade;
+            document.getElementById('fullSunText').innerHTML = t.fullSun;
+            document.getElementById('shadedText').innerHTML = t.shaded;
+            document.getElementById('infoTitle').innerHTML = t.infoTitle;
+            document.getElementById('infoText').innerHTML = t.infoText;
+            document.getElementById('scoreLabel').innerHTML = t.scoreLabel;
+            document.getElementById('profileTitle').innerHTML = t.profileTitle;
+            document.getElementById('acidityLabel').innerHTML = t.acidityLabel;
+            document.getElementById('bodyLabel').innerHTML = t.bodyLabel;
+            document.getElementById('sweetnessLabel').innerHTML = t.sweetnessLabel;
+            document.getElementById('complexityLabel').innerHTML = t.complexityLabel;
+            document.getElementById('notesTitle').innerHTML = t.notesTitle;
+            document.getElementById('footerText').innerHTML = t.footer;
+            document.getElementById('langLabel').innerText = currentLang === 'en' ? 'EN' : 'ID';
+            // dynamic quality label and insight are updated by calculate() each time, so they will also need to be translated in that function
+            // We'll call calculate() again to refresh dynamic text
+            calculate();
+        }
+
+        // ---------- Event Listeners ----------
+        function attachEvents() {
+            elevationSlider.addEventListener('input', (e) => { state.elevation = parseInt(e.target.value); elevationVal.innerText = state.elevation + " m"; calculate(); });
+            phSlider.addEventListener('input', (e) => { state.ph = parseFloat(e.target.value); phVal.innerText = state.ph.toFixed(1); calculate(); });
+            soilSelect.addEventListener('change', (e) => { state.soil = e.target.value; calculate(); });
+            rainBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    rainBtns.forEach(b => b.classList.remove('bg-amber-800', 'text-white', 'shadow'));
+                    btn.classList.add('bg-amber-800', 'text-white', 'shadow');
+                    state.rainfall = btn.dataset.val;
+                    calculate();
+                });
+            });
+            shadeRadios.forEach(r => {
+                r.addEventListener('change', (e) => { if(e.target.checked) state.shade = e.target.value; calculate(); });
+            });
+        }
+
+        // ---------- Perhitungan Terroir (sama seperti sebelumnya) ----------
+        function calculate() {
+            let acidity = 50;
+            let body = 50;
+            let sweetness = 50;
+            let complexity = 45;
+
+            let elevFactor = (state.elevation - 500) / 1800;
+            elevFactor = Math.min(1, Math.max(0, elevFactor));
+            acidity += elevFactor * 38;
+            complexity += elevFactor * 42;
+            body -= elevFactor * 30;
+            
+            let phOptimal = (state.ph >= 5.5 && state.ph <= 6.5);
+            let phDistance = 0;
+            if(state.ph < 5.5) phDistance = 5.5 - state.ph;
+            if(state.ph > 6.5) phDistance = state.ph - 6.5;
+            let phPenalty = Math.min(25, phDistance * 12);
+            sweetness -= phPenalty;
+            complexity -= phPenalty * 0.8;
+            if(phDistance > 0.8) acidity -= 8;
+            
+            if(state.soil === 'volcanic') {
+                complexity += 22; acidity += 12; sweetness += 6;
+            } else if(state.soil === 'clay') {
+                body += 28; complexity -= 2;
+            } else if(state.soil === 'loam') {
+                sweetness += 18; complexity += 12; acidity += 4;
+            } else if(state.soil === 'sandy') {
+                acidity += 8; body -= 14; sweetness -= 5;
+            }
+            
+            if(state.rainfall === 'moderate') {
+                sweetness += 22; complexity += 8;
+            } else if(state.rainfall === 'low') {
+                sweetness -= 14; body += 10; complexity += 4;
+            } else if(state.rainfall === 'high') {
+                sweetness -= 6; body -= 12; complexity -= 5;
+            }
+            
+            if(state.shade === 'shaded') {
+                sweetness += 19; complexity += 14; acidity -= 4;
+            } else {
+                acidity += 15; sweetness -= 8; body += 4;
+            }
+            
+            acidity = Math.min(100, Math.max(12, acidity));
+            body = Math.min(100, Math.max(15, body));
+            sweetness = Math.min(100, Math.max(12, sweetness));
+            complexity = Math.min(100, Math.max(10, complexity));
+            
+            let total = Math.round((acidity + body + sweetness + complexity) / 4);
+            
+            updateBarsAndLabels(acidity, body, sweetness, complexity, total);
+            generateFlavorAndInsight(acidity, body, sweetness, complexity, total);
+        }
+        
+        function updateBarsAndLabels(acidity, body, sweetness, complexity, total) {
+            profile.acidity.bar.style.width = `${acidity}%`;
+            profile.acidity.text.innerText = `${Math.round(acidity)}%`;
+            profile.body.bar.style.width = `${body}%`;
+            profile.body.text.innerText = `${Math.round(body)}%`;
+            profile.sweetness.bar.style.width = `${sweetness}%`;
+            profile.sweetness.text.innerText = `${Math.round(sweetness)}%`;
+            profile.complexity.bar.style.width = `${complexity}%`;
+            profile.complexity.text.innerText = `${Math.round(complexity)}%`;
+            totalScoreSpan.innerText = total;
+            
+            // bilingual quality label
+            if(total >= 86) {
+                qualityLabelSpan.innerHTML = currentLang === 'en' ? 
+                    '<span class="bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full text-xs">🌟 Exceptional (SCA 88+)</span>' :
+                    '<span class="bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full text-xs">🌟 Luar Biasa (SCA 88+)</span>';
+                oneLineSpan.innerText = currentLang === 'en' ? "Cupping score >88 | Spectacular complexity" : "Skor cupping >88 | Kompleksitas spektakuler";
+            } else if(total >= 76) {
+                qualityLabelSpan.innerHTML = currentLang === 'en' ? 
+                    '<span class="bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-xs">✅ Specialty Grade (SCA 80+)</span>' :
+                    '<span class="bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-xs">✅ Kopi Spesialti (SCA 80+)</span>';
+                oneLineSpan.innerText = currentLang === 'en' ? "Excellent balance, unique terroir character stands out" : "Keseimbangan sangat baik, karakter terroir unik menonjol";
+            } else if(total >= 66) {
+                qualityLabelSpan.innerHTML = currentLang === 'en' ? 
+                    '<span class="bg-stone-200 text-stone-700 px-3 py-1 rounded-full text-xs">Premium Commercial</span>' :
+                    '<span class="bg-stone-200 text-stone-700 px-3 py-1 rounded-full text-xs">Komersial Premium</span>';
+                oneLineSpan.innerText = currentLang === 'en' ? "Nice flavor, suitable for espresso & blends" : "Rasa nikmat, cocok untuk espresso dan campuran";
+            } else {
+                qualityLabelSpan.innerHTML = currentLang === 'en' ? 
+                    '<span class="bg-stone-300 text-stone-800 px-3 py-1 rounded-full text-xs">Commercial Standard</span>' :
+                    '<span class="bg-stone-300 text-stone-800 px-3 py-1 rounded-full text-xs">Standar Komersial</span>';
+                oneLineSpan.innerText = currentLang === 'en' ? "Needs optimization or better variety selection" : "Perlu optimalisasi lahan atau pilih varietas lebih cocok";
+            }
+        }
+        
+        function generateFlavorAndInsight(acidity, body, sweetness, complexity, total) {
+            let notes = new Set();
+            if(state.elevation > 1600) { notes.add(currentLang === 'en' ? "Jasmine" : "Melati"); notes.add(currentLang === 'en' ? "Lime" : "Jeruk Nipis"); notes.add(currentLang === 'en' ? "Green Grape" : "Anggur Hijau"); }
+            else if(state.elevation > 1100) { notes.add(currentLang === 'en' ? "Chocolate" : "Cokelat"); notes.add(currentLang === 'en' ? "Caramel" : "Karamel"); notes.add(currentLang === 'en' ? "Nutty" : "Kacangan"); }
+            else { notes.add(currentLang === 'en' ? "Earthy" : "Tanah"); notes.add(currentLang === 'en' ? "Spicy" : "Rempah"); notes.add(currentLang === 'en' ? "Tobacco" : "Tembakau"); }
+            
+            if(state.ph < 5.0) notes.add(currentLang === 'en' ? "Sharp Sourness" : "Asam Sengak");
+            if(state.ph > 7.2) notes.add(currentLang === 'en' ? "Bitter / Flat" : "Pahit / Flat");
+            if(state.ph >= 5.5 && state.ph <= 6.5) notes.add(currentLang === 'en' ? "Balanced Sweetness" : "Manis Seimbang");
+            
+            if(state.soil === 'volcanic') { notes.add(currentLang === 'en' ? "Mineral" : "Mineral"); notes.add(currentLang === 'en' ? "Citrus Zest" : "Jeruk Segar"); }
+            if(state.soil === 'clay') { notes.add(currentLang === 'en' ? "Syrupy" : "Sirup Kental"); notes.add(currentLang === 'en' ? "Cocoa" : "Kakao"); }
+            if(state.soil === 'loam') notes.add(currentLang === 'en' ? "Brown Sugar" : "Gula Merah");
+            if(state.soil === 'sandy') notes.add(currentLang === 'en' ? "Black Tea" : "Teh Hitam");
+            
+            if(state.shade === 'shaded') notes.add(currentLang === 'en' ? "Smooth & Sweet" : "Lembut & Manis");
+            if(state.rainfall === 'moderate') notes.add(currentLang === 'en' ? "Fruity" : "Buah-buahan");
+            if(state.rainfall === 'high') notes.add(currentLang === 'en' ? "Clean & Light" : "Bersih & Ramping");
+            if(state.rainfall === 'low') notes.add(currentLang === 'en' ? "Intense & Expressive" : "Ekspresif & Intens");
+            
+            if(acidity > 70) notes.add(currentLang === 'en' ? "Bright Acidity" : "Asam Cerah");
+            if(body > 75) notes.add(currentLang === 'en' ? "Oily Body" : "Body Berminyak");
+            if(sweetness > 70) notes.add(currentLang === 'en' ? "Honey Caramel" : "Karamel Madu");
+            if(complexity > 75) notes.add(currentLang === 'en' ? "Layered" : "Berlapis");
+            
+            let finalNotes = Array.from(notes).slice(0, 7);
+            flavorDiv.innerHTML = '';
+            const colorPalette = ['bg-rose-600', 'bg-amber-600', 'bg-emerald-700', 'bg-indigo-500', 'bg-stone-600', 'bg-orange-600', 'bg-teal-600'];
+            finalNotes.forEach((note, idx) => {
+                let span = document.createElement('span');
+                span.className = `px-3 py-1.5 rounded-full text-white text-xs font-medium shadow-sm ${colorPalette[idx % colorPalette.length]}`;
+                span.innerText = note;
+                flavorDiv.appendChild(span);
+            });
+            if(finalNotes.length === 0) flavorDiv.innerHTML = `<span class="text-stone-400 italic">${currentLang === 'en' ? 'No specific notes, try changing parameters' : 'Tidak ada catatan spesifik, coba ubah parameter'}</span>`;
+            
+            let insightText = "";
+            if(total > 80) insightText = currentLang === 'en' ? 
+                "✅ High elevation & fertile soil create world-class complexity. Structured acidity and long aftertaste." :
+                "✅ Kombinasi elevasi tinggi & tanah subur menciptakan kompleksitas kelas dunia. Keasaman terstruktur dan aftertaste panjang.";
+            else if(total > 70) insightText = currentLang === 'en' ?
+                "🌱 Good terroir potential. Optimize shade or soil pH to enhance natural sweetness." :
+                "🌱 Potensi terroir cukup baik. Optimalkan naungan atau pH tanah untuk meningkatkan kemanisan alami.";
+            else insightText = currentLang === 'en' ?
+                "📉 Parameters less ideal: improve drainage, shade, or choose a more suitable variety." :
+                "📉 Parameter kurang ideal: perbaiki drainase, naungan, atau pilih varietas yang lebih cocok.";
+            
+            if(state.soil === 'volcanic' && state.elevation > 1400) insightText = currentLang === 'en' ?
+                "🌋 Volcanic soil + high altitude create floral complexity and light body. Similar to premium specialty lots." :
+                "🌋 Tanah vulkanik + ketinggian tinggi menciptakan kompleksitas floral dan body ringan. Mirip dengan lot specialty premium.";
+            if(state.rainfall === 'moderate' && state.shade === 'shaded') insightText = currentLang === 'en' ?
+                "🌦 Shade + moderate rainfall = maximum sugar development. Coffee tends to be sweet and juicy." :
+                "🌦 Naungan + curah hujan sedang = pengembangan gula maksimal. Kopi cenderung manis dan juicy.";
+            
+            terroirInsightSpan.innerText = insightText;
+            
+            if(acidity > 70) brewAdviceSpan.innerText = currentLang === 'en' ? 
+                "☕️ Recommendation: Pour-over (V60/Chemex) or Aeropress to highlight acidity & floral notes." :
+                "☕️ Rekomendasi: Pour-over (V60/Chemex) atau Aeropress untuk menonjolkan keasaman & aroma floral.";
+            else if(body > 70) brewAdviceSpan.innerText = currentLang === 'en' ?
+                "☕️ Recommendation: French press or espresso to extract full body and chocolate notes." :
+                "☕️ Rekomendasi: French press atau espresso untuk mengekstrak body penuh dan rasa cokelat.";
+            else if(sweetness > 70) brewAdviceSpan.innerText = currentLang === 'en' ?
+                "☕️ Recommendation: Cold brew or medium-temp drip to highlight natural sweetness." :
+                "☕️ Rekomendasi: Cold brew atau seduh suhu sedang untuk menyorot kemanisan alami.";
+            else brewAdviceSpan.innerText = currentLang === 'en' ?
+                "☕️ Recommendation: Moka pot or traditional brew for a bold, pleasant character." :
+                "☕️ Rekomendasi: Moka pot atau kopi tubruk untuk karakter bold yang menyenangkan.";
+        }
+        
+        // ---------- PRESET WILAYAH (Fix: sekarang benar-benar mengubah state dan UI) ----------
+        function setPreset(elev, ph, soil, rainfall, shadeVal) {
+            elevationSlider.value = elev;
+            phSlider.value = ph;
+            soilSelect.value = soil;
+            // update rainfall buttons
+            rainBtns.forEach(btn => {
+                btn.classList.remove('bg-amber-800', 'text-white', 'shadow');
+                if(btn.dataset.val === rainfall) {
+                    btn.classList.add('bg-amber-800', 'text-white', 'shadow');
+                }
+            });
+            // update shade radio
+            shadeRadios.forEach(r => { if(r.value === shadeVal) r.checked = true; });
+            // update state
+            state.elevation = elev;
+            state.ph = ph;
+            state.soil = soil;
+            state.rainfall = rainfall;
+            state.shade = shadeVal;
+            elevationVal.innerText = elev + " m";
+            phVal.innerText = ph.toFixed(1);
+            calculate();
+        }
+        
+        // Register preset buttons
+        document.getElementById('presetGayo').addEventListener('click', () => setPreset(1550, 6.2, 'volcanic', 'high', 'shaded'));
+        document.getElementById('presetKintamani').addEventListener('click', () => setPreset(1350, 6.4, 'volcanic', 'moderate', 'shaded'));
+        document.getElementById('presetYirgacheffe').addEventListener('click', () => setPreset(1950, 5.9, 'loam', 'moderate', 'shaded'));
+        document.getElementById('presetHuila').addEventListener('click', () => setPreset(1750, 6.0, 'volcanic', 'moderate', 'shaded'));
+        document.getElementById('resetDefault').addEventListener('click', () => setPreset(1200, 6.0, 'volcanic', 'moderate', 'shaded'));
+        
+        // Language Toggle
+        const langToggle = document.getElementById('langToggle');
+        langToggle.addEventListener('change', (e) => {
+            currentLang = e.target.checked ? 'id' : 'en';
+            applyLanguage();
+        });
+        
+        attachEvents();
+        calculate(); // initial
+        applyLanguage(); // set default EN text
+    </script>
+</body>
+</html>
