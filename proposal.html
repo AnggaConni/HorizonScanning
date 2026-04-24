@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proposal Builder Pro AI</title>
+    
+    <!-- Tailwind CSS (Styling) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome (Icons) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- React & ReactDOM -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    
+    <!-- Babel (untuk memproses JSX di browser) -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+        /* CSS Tambahan khusus untuk Print/PDF agar tabel rapi */
+        @media print {
+            body { background: white !important; }
+            .page-break-after-always { page-break-after: always; }
+            .page-break-inside-avoid { page-break-inside: avoid; }
+            .print-hide { display: none !important; }
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useRef, useEffect } = React;
+
+        // --- TRANSLATION DICTIONARY ---
+        const t = {
+            en: {
+                appTitle: "Proposal Builder",
+                aiActive: "Active",
+                aiInactive: "AI Inactive",
+                langEN: "EN",
+                langID: "ID",
+                load: "Load",
+                save: "Save",
+                pdf: "PDF",
+                docx: "DOCX",
+                settingsTitle: "API Keys (BYOK)",
+                settingsDesc: "Enter your API Key. Saved locally in JSON. Execution priority: Gemini > Claude > OpenAI.",
+                close: "Close",
+                navDoc: "Document Navigation",
+                coverPage: "Cover Page",
+                reviseAll: "Revise All (All Sections)",
+                processing: "Processing...",
+                setupCover: "Setup Cover Page",
+                docTitle: "Document Title",
+                subTitle: "Subtitle / Project Name",
+                author: "Prepared By (Organization/Team)",
+                target: "Addressed To (Sponsor)",
+                date: "Date",
+                useEditor: "Use the editor below to write, or ask AI to revise/write.",
+                fillTable: "Fill out the budget table manually or generate it using AI.",
+                addCards: "Add cards for the project methodology or generate automatically via AI.",
+                aiThinking: "AI is thinking...",
+                aiAssist: "AI Assist this Section",
+                aiDisabledInfo: "AI feature is disabled. Enter your API Key in the settings (⚙️) above to enable it.",
+                no: "No.",
+                item: "Description",
+                qty: "Qty",
+                unit: "Unit",
+                price: "Unit Price",
+                total: "Total",
+                action: "Action",
+                grandTotal: "GRAND TOTAL",
+                addRow: "Add Row",
+                addCard: "Add Framework Card",
+                aiFramework: "AI is building the framework...",
+                aiRab: "AI is revising the budget...",
+                alertNoKey: "Please enter your API Key in the settings menu (⚙️) first!",
+                alertReviseAll: "This will revise all text sections one by one. The process may take 1-2 minutes. Continue?",
+                alertDone: "Total Revision Complete!",
+                alertLoadErr: "Invalid file format or error reading file.",
+                loadSample: "Load Sample"
+            },
+            id: {
+                appTitle: "Pembuat Proposal",
+                aiActive: "Aktif",
+                aiInactive: "AI Nonaktif",
+                langEN: "EN",
+                langID: "ID",
+                load: "Muat",
+                save: "Simpan",
+                pdf: "PDF",
+                docx: "DOCX",
+                settingsTitle: "Kunci API (BYOK)",
+                settingsDesc: "Masukkan API Key Anda. Tersimpan lokal di JSON. Prioritas eksekusi: Gemini > Claude > OpenAI.",
+                close: "Tutup",
+                navDoc: "Navigasi Dokumen",
+                coverPage: "Halaman Sampul",
+                reviseAll: "Revisi Total (Semua Bab)",
+                processing: "Memproses...",
+                setupCover: "Pengaturan Halaman Sampul",
+                docTitle: "Judul Dokumen",
+                subTitle: "Subjudul / Nama Proyek",
+                author: "Disusun Oleh (Organisasi/Tim)",
+                target: "Ditujukan Kepada (Sponsor)",
+                date: "Tanggal",
+                useEditor: "Gunakan editor di bawah untuk menulis, atau minta AI untuk merevisi/menulis.",
+                fillTable: "Isi tabel anggaran secara manual atau generate menggunakan AI.",
+                addCards: "Tambahkan kartu untuk metodologi proyek atau susun otomatis via AI.",
+                aiThinking: "AI Berpikir...",
+                aiAssist: "AI Assist Bab Ini",
+                aiDisabledInfo: "Fitur AI tidak aktif. Masukkan API Key di pengaturan (⚙️) di header atas untuk mengaktifkannya.",
+                no: "No",
+                item: "Uraian Kebutuhan",
+                qty: "Qty",
+                unit: "Unit",
+                price: "Harga Satuan",
+                total: "Total",
+                action: "Aksi",
+                grandTotal: "TOTAL KESELURUHAN",
+                addRow: "Tambah Baris",
+                addCard: "Tambah Kartu Framework",
+                aiFramework: "AI menyusun Framework...",
+                aiRab: "AI merevisi RAB...",
+                alertNoKey: "Silakan masukkan API Key di menu pengaturan (⚙️) terlebih dahulu!",
+                alertReviseAll: "Ini akan merevisi seluruh bab teks satu per satu. Proses mungkin memakan waktu 1-2 menit. Lanjutkan?",
+                alertDone: "Revisi Total Selesai!",
+                alertLoadErr: "Format file tidak valid atau error membaca file.",
+                loadSample: "Muat Contoh"
+            }
+        };
+
+        // --- INITIAL TEMPLATES ---
+        const initialDataEN = {
+            apiKeys: { gemini: '', claude: '', openai: '' },
+            cover: { title: 'PROJECT PROPOSAL', subtitle: 'Your Project Title', author: 'Organization Name', target: 'Target Donor/Investor', date: 'Submission Date' },
+            sections: [
+                { id: 'exec', title: 'Executive Summary', type: 'richtext', content: '<p>Summary of the entire proposal...</p>' },
+                { id: 'bab1', title: 'Chapter I - Background', type: 'richtext', content: '<h3>1.1 Background</h3><p>Current condition...</p><h3>1.2 Problem Statement</h3><p>The core problem to be solved...</p>' },
+                { id: 'bab2', title: 'Chapter II - Project Objectives', type: 'richtext', content: '<p>General and specific objectives...</p>' },
+                { id: 'bab3', title: 'Chapter III - Project Benefits', type: 'richtext', content: '<p>Internal, external, and sustainability impacts...</p>' },
+                { id: 'bab4', title: 'Chapter IV - Scope of Work', type: 'richtext', content: '<p>What will and will not be done...</p>' },
+                { id: 'bab5', title: 'Chapter V - Methodology (Framework)', type: 'framework', nodes: [{ id: 1, title: 'Phase 1: Preparation', description: 'Research and licensing' }] },
+                { id: 'bab6', title: 'Chapter VI - Timeline', type: 'richtext', content: '<p>Project execution schedule...</p>' },
+                { id: 'bab7', title: 'Chapter VII - Team Structure', type: 'richtext', content: '<p>Team structure and responsibilities...</p>' },
+                { id: 'bab8', title: 'Chapter VIII - Risk Management', type: 'richtext', content: '<p>Risk identification and mitigation...</p>' },
+                { id: 'bab9', title: 'Chapter IX - Monitoring & Evaluation', type: 'richtext', content: '<p>KPIs and Success Indicators...</p>' },
+                { id: 'bab11', title: 'Chapter X - Budget Plan (RAB)', type: 'rab', rows: [{ id: 1, uraian: 'Project Manager Honorarium', qty: 3, unit: 'Months', harga: 1000 }] },
+                { id: 'bab12', title: 'Chapter XI - Budget Justification', type: 'richtext', content: '<p>Reasons why the funds are needed...</p>' },
+                { id: 'bab13', title: 'Chapter XII - Conclusion', type: 'richtext', content: '<p>Conclusion and call for collaboration...</p>' },
+            ]
+        };
+
+        const initialDataID = {
+            apiKeys: { gemini: '', claude: '', openai: '' },
+            cover: { title: 'PROPOSAL PENGAJUAN PROYEK', subtitle: 'Judul Proyek Anda', author: 'Nama Organisasi', target: 'Nama Donor/Investor', date: 'Tanggal Pengajuan' },
+            sections: [
+                { id: 'exec', title: 'Executive Summary', type: 'richtext', content: '<p>Ringkasan dari seluruh proposal...</p>' },
+                { id: 'bab1', title: 'Bab I - Latar Belakang', type: 'richtext', content: '<h3>1.1 Background</h3><p>Kondisi saat ini...</p><h3>1.2 Problem Statement</h3><p>Masalah yang ingin diselesaikan...</p>' },
+                { id: 'bab2', title: 'Bab II - Tujuan Project', type: 'richtext', content: '<p>Tujuan umum dan spesifik...</p>' },
+                { id: 'bab3', title: 'Bab III - Manfaat Project', type: 'richtext', content: '<p>Manfaat internal, eksternal, dan sustainability...</p>' },
+                { id: 'bab4', title: 'Bab IV - Ruang Lingkup', type: 'richtext', content: '<p>Apa yang dilakukan dan tidak dilakukan...</p>' },
+                { id: 'bab5', title: 'Bab V - Metodologi (Framework)', type: 'framework', nodes: [{ id: 1, title: 'Fase 1: Persiapan', description: 'Riset dan perizinan' }] },
+                { id: 'bab6', title: 'Bab VI - Timeline', type: 'richtext', content: '<p>Jadwal pelaksanaan proyek...</p>' },
+                { id: 'bab7', title: 'Bab VII - Team Structure', type: 'richtext', content: '<p>Struktur tim dan tanggung jawab...</p>' },
+                { id: 'bab8', title: 'Bab VIII - Risk Management', type: 'richtext', content: '<p>Identifikasi risiko dan mitigasi...</p>' },
+                { id: 'bab9', title: 'Bab IX - Monitoring & Evaluasi', type: 'richtext', content: '<p>KPI dan Indikator kesuksesan...</p>' },
+                { id: 'bab11', title: 'Bab X - Rencana Anggaran (RAB)', type: 'rab', rows: [{ id: 1, uraian: 'Honor Project Manager', qty: 3, unit: 'Bulan', harga: 10000000 }] },
+                { id: 'bab12', title: 'Bab XI - Budget Justification', type: 'richtext', content: '<p>Alasan mengapa dana tersebut dibutuhkan...</p>' },
+                { id: 'bab13', title: 'Bab XII - Penutup', type: 'richtext', content: '<p>Kesimpulan dan ajakan kolaborasi...</p>' },
+            ]
+        };
+
+        // --- SAMPLE DATA ---
+const sampleDataEN = {
+    cover: { 
+        title: 'PROJECT PROPOSAL', 
+        subtitle: 'Blue-Food Youth Vanguard: Ocean Literacy & Sustainable Blue Economy for Kaltim', 
+        author: 'Borneo Marine Innovation Hub', 
+        target: 'Global Ocean Resilience Grant', 
+        date: 'October 2026' 
+    },
+    sections: [
+        { 
+            id: 'exec', 
+            title: 'Executive Summary', 
+            type: 'richtext', 
+            content: '<h3>Executive Summary</h3><p>East Kalimantan (Kaltim) is undergoing a massive demographic shift due to the relocation of Indonesia\'s capital (IKN). This rapid population growth poses a critical threat to regional food security. The <strong>Blue-Food Youth Vanguard</strong> initiative tackles this by shifting the paradigm from land-based agriculture to a sustainable <strong>Blue Economy</strong>.</p><p>We target the most critical demographic: <strong>Senior High School (SMA) students</strong>. By integrating comprehensive <em>Ocean Literacy</em> and establishing hands-on <em>Smart Aquaculture Labs</em> in 20 coastal schools, we aim to transform 1,000 youths from passive consumers into proactive "Ecopreneurs." We are seeking <strong>$75,000</strong> to incubate this next generation of marine innovators, ensuring long-term aquatic food security and ecological conservation in East Kalimantan.</p>' 
+        },
+        { 
+            id: 'bab1', 
+            title: 'Chapter I - Background', 
+            type: 'richtext', 
+            content: '<h3>1.1 Background</h3><p>As the new epicenter of Indonesia (IKN), East Kalimantan faces an unprecedented population influx. Traditional land agriculture is insufficient and often leads to deforestation. The region\'s extensive coastline and marine biodiversity present an untapped potential for a resilient <strong>Blue Economy</strong> (sustainable aquaculture, microalgae, and sustainable fisheries) to meet future food demands.</p><h3>1.2 Problem Statement</h3><p>Despite living in coastal areas, youth in Kaltim (specifically SMA students) lack foundational <strong>Ocean Literacy</strong>. The fisheries and marine sectors are heavily stigmatized as "low-income, traditional labor." Without technological integration and educational intervention, there will be a generational gap in marine-based food production, leading to severe food insecurity and environmental degradation.</p>' 
+        },
+        { 
+            id: 'bab2', 
+            title: 'Chapter II - Project Objectives', 
+            type: 'richtext', 
+            content: '<ul><li><strong>Curriculum Integration:</strong> Implement a localized "Ocean Literacy & Blue Food" module for 1,000 SMA students across 20 coastal schools in Balikpapan, Penajam Paser Utara, and Kutai Kartanegara.</li><li><strong>Infrastructure:</strong> Deploy 20 "Mini Smart-Aquaculture Labs" equipped with IoT water sensors to provide hands-on experience in sustainable seafood cultivation (e.g., spirulina, local crustacean hatcheries).</li><li><strong>Capacity Building:</strong> Train 40 biology and entrepreneurship teachers as Master Trainers to ensure program sustainability.</li></ul>' 
+        },
+        { 
+            id: 'bab3', 
+            title: 'Chapter III - Project Benefits', 
+            type: 'richtext', 
+            content: '<h3>Strategic Impacts</h3><p><strong>1. Food Security:</strong> Decentralizes food production by equipping communities to sustainably harvest marine resources, reducing dependency on imported food for the new capital.<br><strong>2. Economic Innovation:</strong> Fosters a new wave of Gen-Z "Blue Ecopreneurs" capable of creating startups in marine biotechnology, sustainable seafood packaging, and zero-waste aquaculture.<br><strong>3. Ecological Preservation:</strong> Promotes a deep understanding of ocean ecosystems, drastically reducing destructive fishing practices and marine pollution through educated community action.</p>' 
+        },
+        { 
+            id: 'bab4', 
+            title: 'Chapter IV - Scope of Work', 
+            type: 'richtext', 
+            content: '<p><strong>In-Scope:</strong> Development of Ocean Literacy modules, Training of Trainers (ToT) for high school teachers, procurement and installation of IoT-based Mini Aquaculture Labs, and hosting a 6-month student incubation program culminating in a Blue Pitching Competition.</p><p><strong>Out-of-Scope:</strong> Commercial-scale land acquisition, deep-sea exploration, and ongoing operational funding for schools beyond the 12-month pilot phase.</p>' 
+        },
+        { 
+            id: 'bab5', 
+            title: 'Chapter V - Methodology (Framework)', 
+            type: 'framework', 
+            nodes: [
+                { id: 1, title: 'Phase 1: Co-Creation', description: 'Designing Ocean Literacy modules with marine biologists & local educators' }, 
+                { id: 2, title: 'Phase 2: Capacity Building', description: 'Intensive ToT for 40 SMA Teachers on Blue Economy & IoT systems' }, 
+                { id: 3, title: 'Phase 3: Lab Deployment', description: 'Installing Mini Smart-Aquaculture Labs in 20 target high schools' },
+                { id: 4, title: 'Phase 4: Youth Incubation', description: '6-month student-led cultivation and business model development' }
+            ] 
+        },
+        { 
+            id: 'bab6', 
+            title: 'Chapter VI - Timeline', 
+            type: 'richtext', 
+            content: '<ul><li><strong>Month 1-2:</strong> Curriculum Design, Stakeholder Alignment (Local Education Agency).</li><li><strong>Month 3-4:</strong> Teacher ToT Workshops & Procurement of Lab Hardware.</li><li><strong>Month 5-6:</strong> Installation of 20 Labs and Program Launch in Schools.</li><li><strong>Month 7-11:</strong> Student Incubation, Cultivation Cycle, and Mentorship.</li><li><strong>Month 12:</strong> "Kaltim Blue Youth Summit" (Harvesting, Startup Pitching, & Evaluation).</li></ul>' 
+        },
+        { 
+            id: 'bab7', 
+            title: 'Chapter VII - Team Structure', 
+            type: 'richtext', 
+            content: '<ul><li><strong>Project Director:</strong> Dr. Aryo Bima, M.Sc (Marine Resilience Expert)</li><li><strong>Youth Education Lead:</strong> Sarah Wijaya, M.Ed (Curriculum Specialist)</li><li><strong>Blue Tech Engineer:</strong> Rian Pratama, S.T. (IoT & Aquaculture Infrastructure)</li><li><strong>M&E Specialist:</strong> Nabila Putri, S.Pi (Impact & Sustainability Analyst)</li></ul>' 
+        },
+        { 
+            id: 'bab8', 
+            title: 'Chapter VIII - Risk Management', 
+            type: 'richtext', 
+            content: '<p><strong>Risk 1: Low student engagement due to complex biological concepts.</strong><br><em>Mitigation:</em> Gamify the learning process and introduce seed-funding rewards for the most innovative student-led business ideas.</p><p><strong>Risk 2: Hardware failure in Aquaculture Labs (water quality crashes).</strong><br><em>Mitigation:</em> Utilize automated IoT alerts directly connected to our technical team\'s server, and train student "Lab Captains" on rapid response protocols.</p>' 
+        },
+        { 
+            id: 'bab9', 
+            title: 'Chapter IX - Monitoring & Evaluation', 
+            type: 'richtext', 
+            content: '<h3>Key Performance Indicators (KPIs)</h3><ul><li><strong>Educational:</strong> Minimum 40% increase in students\' Ocean Literacy assessment scores (pre- vs. post-test).</li><li><strong>Operational:</strong> 100% of the 20 Mini Labs successfully complete at least one harvest cycle.</li><li><strong>Economic:</strong> 50 viable "Blue Economy" canvas models submitted by student teams during the final Summit.</li></ul>' 
+        },
+        { 
+            id: 'bab11', 
+            title: 'Chapter X - Budget Plan (RAB)', 
+            type: 'rab', 
+            rows: [
+                { id: 1, uraian: 'IoT Smart-Aquaculture Lab Modules', qty: 20, unit: 'Schools', harga: 1500 }, 
+                { id: 2, uraian: 'Curriculum Dev & Expert Honorariums', qty: 1, unit: 'Lump Sum', harga: 15000 },
+                { id: 3, uraian: 'Teacher Training Workshops (ToT)', qty: 40, unit: 'Pax', harga: 250 },
+                { id: 4, uraian: 'Youth Summit & Seed Funding Grants', qty: 10, unit: 'Teams', harga: 2000 }
+            ] 
+        },
+        { 
+            id: 'bab12', 
+            title: 'Chapter XI - Budget Justification', 
+            type: 'richtext', 
+            content: '<p>The bulk of the hardware investment (<strong>$30,000</strong>) goes directly into school assets, transforming empty school yards into permanent experiential learning centers. The Seed Funding Grants (<strong>$20,000</strong>) are crucial as they incentivize high schoolers to view the ocean not just academically, but as a viable, modern entrepreneurial career path, directly addressing the core problem.</p>' 
+        },
+        { 
+            id: 'bab13', 
+            title: 'Chapter XII - Conclusion', 
+            type: 'richtext', 
+            content: '<p>The future of East Kalimantan\'s food security lies not in its shrinking forests, but in its vast, intelligent use of the ocean. By funding the <strong>Blue-Food Youth Vanguard</strong>, you are not merely building aquaculture labs; you are cultivating a generation of ocean-literate leaders who will safeguard the ecological and economic future of Indonesia\'s new capital. We invite you to partner with us in this transformative initiative.</p>' 
+        }
+    ]
+};
+
+const sampleDataID = {
+    cover: { 
+        title: 'PROPOSAL PENGAJUAN PROYEK', 
+        subtitle: 'Garda Pemuda Pangan Biru: Literasi Kelautan & Ekonomi Biru Berkelanjutan untuk Kaltim', 
+        author: 'Pusat Inovasi Bahari Borneo', 
+        target: 'Hibah Ketahanan Pangan Nasional', 
+        date: 'Oktober 2026' 
+    },
+    sections: [
+        { 
+            id: 'exec', 
+            title: 'Ringkasan Eksekutif', 
+            type: 'richtext', 
+            content: '<h3>Ringkasan Eksekutif</h3><p>Kalimantan Timur (Kaltim) tengah mengalami lonjakan demografi yang masif seiring dengan pemindahan Ibu Kota Nusantara (IKN). Pertumbuhan populasi yang pesat ini menjadi ancaman serius bagi ketahanan pangan regional. Inisiatif <strong>Garda Pemuda Pangan Biru</strong> hadir untuk mengatasi krisis ini dengan menggeser paradigma dari pertanian berbasis lahan darat menuju <strong>Ekonomi Biru (Blue Economy)</strong> yang berkelanjutan.</p><p>Kami menyasar demografi paling krusial: <strong>Siswa Sekolah Menengah Atas (SMA)</strong>. Melalui integrasi kurikulum <em>Literasi Kelautan (Ocean Literacy)</em> yang komprehensif dan pembangunan <em>Lab Akuakultur Pintar berbasis IoT</em> di 20 sekolah pesisir, kami menargetkan transformasi 1.000 pemuda dari konsumen pasif menjadi "Ecopreneur" bahari yang proaktif. Kami mengajukan dana sebesar <strong>Rp 1.150.000.000</strong> untuk menginkubasi generasi inovator maritim ini, guna memastikan ketahanan pangan perairan jangka panjang dan pelestarian ekologi di Kaltim.</p>' 
+        },
+        { 
+            id: 'bab1', 
+            title: 'Bab I - Latar Belakang', 
+            type: 'richtext', 
+            content: '<h3>1.1 Latar Belakang</h3><p>Sebagai episentrum baru Indonesia (IKN), Kaltim menghadapi arus masuk populasi yang belum pernah terjadi sebelumnya. Pertanian darat tradisional tidak lagi memadai dan seringkali berujung pada deforestasi. Di sisi lain, garis pantai Kaltim yang luas dan keanekaragaman hayati lautnya menawarkan potensi <strong>Ekonomi Biru</strong> (akuakultur berkelanjutan, mikroalga, dan perikanan ramah lingkungan) yang belum tergarap maksimal untuk memenuhi lonjakan permintaan pangan masa depan.</p><h3>1.2 Rumusan Masalah</h3><p>Meski tinggal di wilayah pesisir, generasi muda Kaltim (khususnya anak SMA) sangat kekurangan pemahaman dasar mengenai <strong>Literasi Kelautan</strong>. Sektor perikanan dan kelautan masih menanggung stigma sebagai "pekerjaan tradisional berpenghasilan rendah." Tanpa adanya intervensi edukasi dan integrasi teknologi, Kaltim akan menghadapi jurang regenerasi (generational gap) dalam produksi pangan maritim, yang bermuara pada krisis pangan dan degradasi lingkungan.</p>' 
+        },
+        { 
+            id: 'bab2', 
+            title: 'Bab II - Tujuan Proyek', 
+            type: 'richtext', 
+            content: '<ul><li><strong>Integrasi Kurikulum:</strong> Mengimplementasikan modul lokal "Literasi Kelautan & Pangan Biru" bagi 1.000 siswa SMA di 20 sekolah pesisir (Balikpapan, Penajam Paser Utara, dan Kutai Kartanegara).</li><li><strong>Infrastruktur:</strong> Membangun 20 "Lab Akuakultur Pintar Mini" yang dilengkapi sensor kualitas air IoT guna memberikan pengalaman praktis dalam budidaya hasil laut berkelanjutan (misal: spirulina, pembenihan krustasea lokal).</li><li><strong>Peningkatan Kapasitas (Capacity Building):</strong> Melatih 40 guru Biologi dan Kewirausahaan sebagai Master Trainer untuk menjamin keberlanjutan program jangka panjang.</li></ul>' 
+        },
+        { 
+            id: 'bab3', 
+            title: 'Bab III - Manfaat Proyek', 
+            type: 'richtext', 
+            content: '<h3>Dampak Strategis</h3><p><strong>1. Ketahanan Pangan:</strong> Mendesentralisasi produksi pangan dengan membekali komunitas akar rumput untuk memanen sumber daya laut secara berkelanjutan, menekan ketergantungan pasokan pangan impor untuk wilayah IKN.<br><strong>2. Inovasi Ekonomi:</strong> Melahirkan gelombang baru Gen-Z "Ecopreneur Biru" yang mampu mendirikan startup di bidang bioteknologi kelautan, kemasan hasil laut ramah lingkungan, dan akuakultur minim limbah (zero-waste).<br><strong>3. Pelestarian Ekologi:</strong> Menanamkan kepedulian mendalam terhadap ekosistem laut yang terbukti secara drastis menekan praktik penangkapan ikan merusak (destructive fishing) dan polusi laut melalui aksi komunitas yang teredukasi.</p>' 
+        },
+        { 
+            id: 'bab4', 
+            title: 'Bab IV - Ruang Lingkup', 
+            type: 'richtext', 
+            content: '<p><strong>Cakupan Proyek (In-Scope):</strong> Pengembangan modul Literasi Kelautan, program Training of Trainers (ToT) bagi guru SMA, pengadaan dan instalasi Lab Akuakultur Mini berbasis IoT, serta penyelenggaraan program inkubasi siswa selama 6 bulan yang ditutup dengan Kompetisi Pitching Ekonomi Biru.</p><p><strong>Di Luar Cakupan (Out-of-Scope):</strong> Pembebasan lahan skala komersial industri, eksplorasi laut dalam, dan biaya operasional sekolah rutin pasca fase percontohan (pilot phase) 12 bulan berakhir.</p>' 
+        },
+        { 
+            id: 'bab5', 
+            title: 'Bab V - Metodologi (Framework)', 
+            type: 'framework', 
+            nodes: [
+                { id: 1, title: 'Fase 1: Ko-Kreasi', description: 'Perancangan modul Literasi Kelautan bersama ahli biologi maritim & praktisi pendidikan lokal' }, 
+                { id: 2, title: 'Fase 2: Peningkatan Kapasitas', description: 'ToT Intensif bagi 40 Guru SMA tentang Ekonomi Biru & Penggunaan Sistem IoT' }, 
+                { id: 3, title: 'Fase 3: Penggelaran Lab', description: 'Instalasi Lab Akuakultur Pintar Mini di 20 SMA pesisir yang dituju' },
+                { id: 4, title: 'Fase 4: Inkubasi Pemuda', description: 'Pendampingan 6 bulan siklus budidaya & perancangan model bisnis (Business Canvas) oleh siswa' }
+            ] 
+        },
+        { 
+            id: 'bab6', 
+            title: 'Bab VI - Linimasa', 
+            type: 'richtext', 
+            content: '<ul><li><strong>Bulan 1-2:</strong> Desain Kurikulum dan Penyelarasan Pemangku Kepentingan (Dinas Pendidikan Provinsi).</li><li><strong>Bulan 3-4:</strong> Pelatihan ToT Guru & Pengadaan Perangkat Lab IoT.</li><li><strong>Bulan 5-6:</strong> Instalasi 20 Lab di Sekolah & Peluncuran Program.</li><li><strong>Bulan 7-11:</strong> Masa Inkubasi Siswa, Siklus Budidaya Aktif, dan Mentoring Startup.</li><li><strong>Bulan 12:</strong> "Kaltim Blue Youth Summit" (Panen Raya, Pitching Bisnis Siswa, & Evaluasi Dampak).</li></ul>' 
+        },
+        { 
+            id: 'bab7', 
+            title: 'Bab VII - Struktur Tim', 
+            type: 'richtext', 
+            content: '<ul><li><strong>Direktur Proyek:</strong> Dr. Aryo Bima, M.Sc (Pakar Ketahanan Ekosistem Laut)</li><li><strong>Koordinator Edukasi Pemuda:</strong> Sarah Wijaya, M.Ed (Spesialis Pengembangan Kurikulum)</li><li><strong>Teknisi Blue Tech:</strong> Rian Pratama, S.T. (Ahli IoT & Infrastruktur Akuakultur)</li><li><strong>Spesialis M&E:</strong> Nabila Putri, S.Pi (Analis Dampak Lingkungan & Keberlanjutan)</li></ul>' 
+        },
+        { 
+            id: 'bab8', 
+            title: 'Bab VIII - Manajemen Risiko', 
+            type: 'richtext', 
+            content: '<p><strong>Risiko 1: Rendahnya partisipasi siswa karena konsep biologi yang dianggap membosankan.</strong><br><em>Mitigasi:</em> Menerapkan metode gamifikasi dalam pembelajaran dan menyediakan hadiah "Seed-Funding" (Modal Awal) untuk ide bisnis kelompok yang paling inovatif.</p><p><strong>Risiko 2: Kegagalan perangkat keras pada Lab Akuakultur (kualitas air memburuk mendadak).</strong><br><em>Mitigasi:</em> Memanfaatkan fitur notifikasi darurat IoT yang terhubung langsung ke server teknisi pusat kami, serta melatih "Kapten Lab" dari perwakilan siswa untuk prosedur tanggap darurat.</p>' 
+        },
+        { 
+            id: 'bab9', 
+            title: 'Bab IX - Monitoring & Evaluasi', 
+            type: 'richtext', 
+            content: '<h3>Indikator Kinerja Utama (KPI)</h3><ul><li><strong>Edukasi:</strong> Peningkatan skor asesmen Literasi Kelautan siswa minimal sebesar 40% (perbandingan Pre-Test dan Post-Test).</li><li><strong>Operasional:</strong> 100% dari 20 Lab Mini berhasil menuntaskan sekurang-kurangnya satu siklus panen penuh.</li><li><strong>Ekonomi:</strong> Terkumpulnya 50 proposal "Blue Economy Business Canvas" yang layak jalan dari tim-tim siswa saat Summit penutupan.</li></ul>' 
+        },
+        { 
+            id: 'bab11', 
+            title: 'Bab X - Rencana Anggaran (RAB)', 
+            type: 'rab', 
+            rows: [
+                { id: 1, uraian: 'Modul Lab Akuakultur Cerdas Berbasis IoT', qty: 20, unit: 'Sekolah', harga: 22500000 }, 
+                { id: 2, uraian: 'Pengembangan Kurikulum & Honorarium Pakar', qty: 1, unit: 'Lump Sum', harga: 225000000 },
+                { id: 3, uraian: 'Workshop Pelatihan Guru (ToT)', qty: 40, unit: 'Peserta', harga: 3750000 },
+                { id: 4, uraian: 'Kaltim Youth Summit & Hibah Seed Funding', qty: 10, unit: 'Tim', harga: 30000000 }
+            ] 
+        },
+        { 
+            id: 'bab12', 
+            title: 'Bab XI - Justifikasi Anggaran', 
+            type: 'richtext', 
+            content: '<p>Bagian terbesar dari investasi infrastruktur keras (<strong>Rp 450.000.000</strong>) disalurkan langsung sebagai aset sekolah, menyulap lahan kosong sekolah menjadi pusat pembelajaran berbasis pengalaman yang permanen. Sementara itu, Hibah Modal Awal/Seed Funding (<strong>Rp 300.000.000</strong>) sangat krusial karena ini adalah katalis utama yang memotivasi anak SMA untuk memandang laut bukan hanya sebagai subjek akademis, tetapi sebagai jalur karir kewirausahaan modern yang bergengsi, yang secara langsung menjawab akar permasalahan stigma saat ini.</p>' 
+        },
+        { 
+            id: 'bab13', 
+            title: 'Bab XII - Kesimpulan', 
+            type: 'richtext', 
+            content: '<p>Masa depan ketahanan pangan Kalimantan Timur tidak terletak pada hutan-hutannya yang semakin menyusut, melainkan pada pemanfaatan lautnya yang cerdas dan berwawasan teknologi. Dengan mendanai inisiatif <strong>Garda Pemuda Pangan Biru</strong>, Anda tidak sekadar membangun fasilitas lab akuakultur; Anda sedang menumbuhkan generasi pemimpin melek-laut (ocean-literate) yang akan mengamankan masa depan ekologi sekaligus ekonomi ibu kota baru Indonesia. Kami mengundang Anda untuk berkolaborasi mewujudkan transformasi nyata ini.</p>' 
+        }
+    ]
+};
+
+        // --- AI SERVICE ---
+        // --- AI SERVICE ---
+        const callAI = async (prompt, systemContext, apiKeys) => {
+            let lastError = new Error("No valid API Key.");
+
+            if (apiKeys.gemini) {
+                try {
+                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKeys.gemini}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{ parts: [{ text: prompt }] }],
+                            systemInstruction: { parts: [{ text: systemContext }] }
+                        })
+                    });
+                    if (!res.ok) throw new Error("Gemini API Error");
+                    const data = await res.json();
+                    return data.candidates[0].content.parts[0].text;
+                } catch (err) {
+                    console.warn("Gemini Failed, trying fallback...", err);
+                    lastError = err;
+                }
+            }
+            
+            if (apiKeys.claude) {
+                try {
+                    const res = await fetch('https://api.anthropic.com/v1/messages', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'x-api-key': apiKeys.claude,
+                            'anthropic-version': '2023-06-01',
+                            'anthropic-dangerously-allow-browser': 'true'
+                        },
+                        body: JSON.stringify({
+                            model: 'claude-3-opus-20240229',
+                            max_tokens: 4000,
+                            system: systemContext,
+                            messages: [{ role: 'user', content: prompt }]
+                        })
+                    });
+                    if (!res.ok) throw new Error("Claude API Error (CORS).");
+                    const data = await res.json();
+                    return data.content[0].text;
+                } catch (err) {
+                    console.warn("Claude Failed, trying fallback...", err);
+                    lastError = err;
+                }
+            } 
+            
+            if (apiKeys.openai) {
+                try {
+                    const res = await fetch('https://api.openai.com/v1/chat/completions', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${apiKeys.openai}`
+                        },
+                        body: JSON.stringify({
+                            model: 'gpt-4o',
+                            messages: [
+                                { role: 'system', content: systemContext },
+                                { role: 'user', content: prompt }
+                            ]
+                        })
+                    });
+                    if (!res.ok) throw new Error("OpenAI API Error");
+                    const data = await res.json();
+                    return data.choices[0].message.content;
+                } catch (err) {
+                    console.warn("OpenAI Failed...", err);
+                    lastError = err;
+                }
+            }
+            throw lastError;
+        };
+
+        // --- COMPONENTS ---
+        const MiniRichText = ({ content, onChange, isAiLoading }) => {
+            const editorRef = useRef(null);
+
+            useEffect(() => {
+                if (editorRef.current && editorRef.current.innerHTML !== content) {
+                    editorRef.current.innerHTML = content;
+                }
+            }, [content]);
+
+            const execCommand = (command, value = null) => {
+                document.execCommand(command, false, value);
+                editorRef.current.focus();
+                onChange(editorRef.current.innerHTML);
+            };
+
+            return (
+                <div className={`border rounded-lg overflow-hidden bg-white shadow-sm transition-all ${isAiLoading ? 'border-purple-400 shadow-purple-100' : 'border-slate-200'}`}>
+                    <div className="bg-slate-50 border-b border-slate-200 p-2 flex gap-2">
+                        <button onClick={() => execCommand('bold')} className="p-1.5 hover:bg-slate-200 rounded text-slate-700"><i className="fas fa-bold text-[14px]"></i></button>
+                        <button onClick={() => execCommand('italic')} className="p-1.5 hover:bg-slate-200 rounded text-slate-700"><i className="fas fa-italic text-[14px]"></i></button>
+                        <button onClick={() => execCommand('insertUnorderedList')} className="p-1.5 hover:bg-slate-200 rounded text-slate-700"><i className="fas fa-list-ul text-[14px]"></i></button>
+                        <div className="w-px bg-slate-300 mx-1"></div>
+                        <button onClick={() => execCommand('formatBlock', 'H3')} className="px-2 hover:bg-slate-200 rounded text-slate-700 text-sm font-bold">H3</button>
+                        <button onClick={() => execCommand('formatBlock', 'H4')} className="px-2 hover:bg-slate-200 rounded text-slate-700 text-sm font-bold">H4</button>
+                        <button onClick={() => execCommand('formatBlock', 'P')} className="px-2 hover:bg-slate-200 rounded text-slate-700 text-sm">P</button>
+                    </div>
+                    <div className="relative">
+                        {isAiLoading && (
+                            <div className="absolute inset-0 bg-white/70 flex flex-col items-center justify-center z-10 text-purple-600 backdrop-blur-[1px]">
+                                <i className="fas fa-spinner fa-spin text-3xl mb-2"></i>
+                            </div>
+                        )}
+                        <div 
+                            ref={editorRef}
+                            contentEditable={!isAiLoading}
+                            className="p-4 min-h-[300px] outline-none prose max-w-none text-slate-700"
+                            onBlur={(e) => onChange(e.target.innerHTML)}
+                            onInput={(e) => onChange(e.target.innerHTML)}
+                        />
+                    </div>
+                </div>
+            );
+        };
+
+        const RabEditor = ({ data, onChange, isAiLoading, txt }) => {
+            const addRow = () => {
+                const newRow = { id: Date.now(), uraian: '', qty: 1, unit: 'pcs', harga: 0 };
+                onChange([...data, newRow]);
+            };
+
+            const updateRow = (id, field, value) => {
+                const updated = data.map(row => {
+                    if (row.id === id) {
+                        const val = (field === 'qty' || field === 'harga') ? Number(value) || 0 : value;
+                        return { ...row, [field]: val };
+                    }
+                    return row;
+                });
+                onChange(updated);
+            };
+
+            const removeRow = (id) => onChange(data.filter(r => r.id !== id));
+            const totalKeseluruhan = data.reduce((acc, row) => acc + (row.qty * row.harga), 0);
+
+            return (
+                <div className={`bg-white rounded-lg border shadow-sm overflow-hidden relative ${isAiLoading ? 'border-purple-400' : 'border-slate-200'}`}>
+                    {isAiLoading && (
+                        <div className="absolute inset-0 bg-white/70 flex flex-col items-center justify-center z-10 text-purple-600 backdrop-blur-[1px]">
+                            <i className="fas fa-spinner fa-spin text-3xl mb-2"></i>
+                            <span className="font-bold animate-pulse text-sm">{txt.aiRab}</span>
+                        </div>
+                    )}
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left text-sm text-slate-600">
+                            <thead className="bg-slate-50 text-slate-700 font-semibold border-b border-slate-200">
+                                <tr>
+                                    <th className="p-3 w-12 text-center">{txt.no}</th>
+                                    <th className="p-3">{txt.item}</th>
+                                    <th className="p-3 w-24">{txt.qty}</th>
+                                    <th className="p-3 w-24">{txt.unit}</th>
+                                    <th className="p-3 w-40">{txt.price}</th>
+                                    <th className="p-3 w-40">{txt.total}</th>
+                                    <th className="p-3 w-16 text-center">{txt.action}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {data.map((row, idx) => (
+                                    <tr key={row.id} className="border-b border-slate-100 hover:bg-slate-50/50">
+                                        <td className="p-3 text-center">{idx + 1}</td>
+                                        <td className="p-2"><input type="text" className="w-full p-2 border border-slate-200 rounded outline-none focus:border-blue-500" value={row.uraian} onChange={(e) => updateRow(row.id, 'uraian', e.target.value)} /></td>
+                                        <td className="p-2"><input type="number" className="w-full p-2 border border-slate-200 rounded outline-none focus:border-blue-500" value={row.qty} onChange={(e) => updateRow(row.id, 'qty', e.target.value)} /></td>
+                                        <td className="p-2"><input type="text" className="w-full p-2 border border-slate-200 rounded outline-none focus:border-blue-500" value={row.unit} onChange={(e) => updateRow(row.id, 'unit', e.target.value)} /></td>
+                                        <td className="p-2"><input type="number" className="w-full p-2 border border-slate-200 rounded outline-none focus:border-blue-500" value={row.harga} onChange={(e) => updateRow(row.id, 'harga', e.target.value)} /></td>
+                                        <td className="p-3 font-medium bg-slate-50">{(row.qty * row.harga).toLocaleString()}</td>
+                                        <td className="p-2 text-center">
+                                            <button onClick={() => removeRow(row.id)} className="p-2 text-red-500 hover:bg-red-50 rounded"><i className="fas fa-trash-alt"></i></button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                            <tfoot className="bg-slate-50 font-bold text-slate-800">
+                                <tr>
+                                    <td colSpan="5" className="p-4 text-right">{txt.grandTotal}</td>
+                                    <td className="p-4 text-blue-600">{totalKeseluruhan.toLocaleString()}</td>
+                                    <td></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    <div className="p-4 bg-white border-t border-slate-200">
+                        <button onClick={addRow} className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-medium transition-colors">
+                            <i className="fas fa-plus"></i> {txt.addRow}
+                        </button>
+                    </div>
+                </div>
+            );
+        };
+
+        const FrameworkEditor = ({ nodes, onChange, isAiLoading, txt }) => {
+            const addNode = () => {
+                const newNode = { id: Date.now(), title: 'Phase', description: 'Description...' };
+                onChange([...nodes, newNode]);
+            };
+
+            const updateNode = (id, field, value) => {
+                onChange(nodes.map(n => n.id === id ? { ...n, [field]: value } : n));
+            };
+
+            const removeNode = (id) => onChange(nodes.filter(n => n.id !== id));
+
+            return (
+                <div className={`space-y-4 relative ${isAiLoading ? 'opacity-80' : ''}`}>
+                    {isAiLoading && (
+                        <div className="absolute inset-0 bg-white/70 flex flex-col items-center justify-center z-10 text-purple-600 backdrop-blur-[1px] rounded-xl border border-purple-300">
+                            <i className="fas fa-spinner fa-spin text-3xl mb-2"></i>
+                            <span className="font-bold animate-pulse text-sm">{txt.aiFramework}</span>
+                        </div>
+                    )}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {nodes.map((node, idx) => (
+                            <div key={node.id} className="p-4 bg-white border border-slate-200 rounded-xl shadow-sm relative group">
+                                <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <button onClick={() => removeNode(node.id)} className="p-1.5 text-red-500 hover:bg-red-50 rounded"><i className="fas fa-trash-alt"></i></button>
+                                </div>
+                                <div className="flex items-center gap-3 mb-3">
+                                    <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-sm shrink-0">
+                                        {idx + 1}
+                                    </div>
+                                    <input 
+                                        type="text" 
+                                        className="font-bold text-slate-800 text-lg outline-none w-full border-b border-transparent focus:border-blue-300 pb-1"
+                                        value={node.title} 
+                                        onChange={(e) => updateNode(node.id, 'title', e.target.value)}
+                                    />
+                                </div>
+                                <textarea 
+                                    className="w-full outline-none text-slate-600 text-sm resize-none border border-transparent focus:border-slate-200 rounded p-2 min-h-[80px]"
+                                    value={node.description}
+                                    onChange={(e) => updateNode(node.id, 'description', e.target.value)}
+                                />
+                            </div>
+                        ))}
+                    </div>
+                    <button onClick={addNode} className="flex w-full items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-slate-300 hover:border-blue-400 hover:text-blue-600 text-slate-500 rounded-xl font-medium transition-colors">
+                        <i className="fas fa-plus"></i> {txt.addCard}
+                    </button>
+                </div>
+            );
+        };
+
+        // --- MAIN APP COMPONENT ---
+        const App = () => {
+            const [lang, setLang] = useState('en');
+            const [data, setData] = useState(initialDataEN);
+            const [activeTab, setActiveTab] = useState('cover');
+            const [showSettings, setShowSettings] = useState(false);
+            
+            const [loadingSection, setLoadingSection] = useState(null);
+            const [isRevisingAll, setIsRevisingAll] = useState(false);
+            const [aiStatusMsg, setAiStatusMsg] = useState("");
+
+            const txt = t[lang];
+            
+            const activeModelsList = [];
+            if (data.apiKeys.gemini) activeModelsList.push('Gemini');
+            if (data.apiKeys.claude) activeModelsList.push('Claude');
+            if (data.apiKeys.openai) activeModelsList.push('OpenAI');
+            
+            const activeModel = activeModelsList.length > 0 ? activeModelsList.join(' > ') : txt.aiInactive;
+
+            const toggleLanguage = () => {
+                const newLang = lang === 'en' ? 'id' : 'en';
+                // Automatically switch template content to new language if they haven't written much yet
+                // Or just translate UI. For safety, we keep API keys.
+                const currentKeys = data.apiKeys;
+                const newTemplate = newLang === 'en' ? initialDataEN : initialDataID;
+                setData({ ...newTemplate, apiKeys: currentKeys });
+                setLang(newLang);
+                setActiveTab('cover');
+            };
+
+            const updateCover = (field, value) => setData(prev => ({ ...prev, cover: { ...prev.cover, [field]: value } }));
+            
+            const updateSection = (id, updatedSectionData) => {
+                setData(prev => ({
+                    ...prev,
+                    sections: prev.sections.map(sec => sec.id === id ? { ...sec, ...updatedSectionData } : sec)
+                }));
+            };
+
+            const updateApiKey = (provider, value) => setData(prev => ({ ...prev, apiKeys: { ...prev.apiKeys, [provider]: value } }));
+
+            const handleLoadSample = () => {
+                const sample = lang === 'en' ? sampleDataEN : sampleDataID;
+                setData(prev => ({ ...sample, apiKeys: prev.apiKeys }));
+                setActiveTab('cover');
+            };
+
+            const stripMarkdown = (text) => text.replace(/```html\n|```json\n|```\n|```/g, '').trim();
+
+            const getProposalContext = () => {
+                let ctx = `Title: ${data.cover.title}\nSubtitle: ${data.cover.subtitle}\nAuthor: ${data.cover.author}\nTarget: ${data.cover.target}\n\n`;
+                data.sections.forEach(sec => {
+                    if(sec.type === 'richtext') ctx += `--- ${sec.title} ---\n${sec.content}\n\n`;
+                });
+                return ctx;
+            };
+
+            const handleReviseSection = async (sectionId) => {
+                if (activeModel === txt.aiInactive) return alert(txt.alertNoKey);
+                
+                const section = data.sections.find(s => s.id === sectionId);
+                setLoadingSection(sectionId);
+
+                try {
+                    const context = getProposalContext();
+                    const isEmpty = !section.content || section.content.trim().length < 20;
+                    
+                    const systemContext = lang === 'en' 
+                        ? `You are a world-class proposal maker consultant. Write or revise the proposal section. Keep tone professional, persuasive, and data-driven.`
+                        : `Anda adalah konsultan ahli pembuat proposal kelas dunia berbahasa Indonesia. Tujuan Anda adalah menulis atau merevisi bagian proposal. Jaga nada bicara tetap profesional, persuasif, dan berbasis data.`;
+                    
+                    let prompt = "";
+                    if (section.type === 'richtext') {
+                        if (isEmpty) {
+                            prompt = lang === 'en' 
+                                ? `Here is the proposal context:\n${context}\n\nTask: Write full content for Chapter "${section.title}". Output ONLY basic HTML code (use <h3>, <p>, <ul>). Do not add markdown tags.`
+                                : `Berikut konteks proposal:\n${context}\n\nTugas: Tuliskan konten lengkap untuk Bab "${section.title}". Output HANYA format HTML dasar (<h3>, <p>, <ul>). Jangan tambahkan markdown tags.`;
+                        } else {
+                            prompt = lang === 'en'
+                                ? `Proposal context:\n${context}\n\nTask: Revise, fix grammar, and make the following content more professional for Chapter "${section.title}":\n\nCURRENT CONTENT:\n${section.content}\n\nOutput ONLY basic HTML code.`
+                                : `Konteks proposal:\n${context}\n\nTugas: Revisi, perbaiki tata bahasa, dan buat konten berikut lebih profesional untuk Bab "${section.title}":\n\nKONTEN SAAT INI:\n${section.content}\n\nOutput HANYA format HTML dasar.`;
+                        }
+                        const result = await callAI(prompt, systemContext, data.apiKeys);
+                        updateSection(sectionId, { content: stripMarkdown(result) });
+                    } 
+                    else if (section.type === 'framework') {
+                        prompt = lang === 'en'
+                            ? `Proposal context:\n${context}\n\nTask: Generate a project methodology framework for "${section.title}".\nOutput MUST be a pure JSON array format: [{"id": 1, "title": "Phase Name", "description": "Desc"}]. No other text.`
+                            : `Konteks proposal:\n${context}\n\nTugas: Berikan susunan metodologi framework untuk "${section.title}".\nOutput HARUS JSON array murni: [{"id": 1, "title": "Nama Fase", "description": "Deskripsi"}]. Tanpa teks lain.`;
+                        const result = await callAI(prompt, systemContext, data.apiKeys);
+                        updateSection(sectionId, { nodes: JSON.parse(stripMarkdown(result)) });
+                    }
+                    else if (section.type === 'rab') {
+                        prompt = lang === 'en'
+                            ? `Proposal context:\n${context}\n\nTask: Create a realistic Budget Plan for this proposal.\nOutput MUST be a pure JSON array format: [{"id": 1, "uraian": "Item/Service", "qty": 1, "unit": "Month", "harga": 5000}]. Logical pricing. No other text.`
+                            : `Konteks proposal:\n${context}\n\nTugas: Buatkan estimasi Rencana Anggaran (RAB) realistis.\nOutput HARUS JSON array murni: [{"id": 1, "uraian": "Nama Barang", "qty": 1, "unit": "Bulan", "harga": 5000000}]. Harga logis (Rupiah). Tanpa teks lain.`;
+                        const result = await callAI(prompt, systemContext, data.apiKeys);
+                        updateSection(sectionId, { rows: JSON.parse(stripMarkdown(result)) });
+                    }
+                } catch (err) {
+                    alert("AI Error: " + err.message);
+                } finally {
+                    setLoadingSection(null);
+                }
+            };
+
+            const handleReviseAll = async () => {
+                if (activeModel === txt.aiInactive) return alert(txt.alertNoKey);
+                if (!confirm(txt.alertReviseAll)) return;
+                
+                setIsRevisingAll(true);
+                const textSections = data.sections.filter(s => s.type === 'richtext');
+                
+                for (let i = 0; i < textSections.length; i++) {
+                    const sec = textSections[i];
+                    setAiStatusMsg(`${txt.processing} ${sec.title}...`);
+                    setLoadingSection(sec.id);
+                    setActiveTab(sec.id);
+                    
+                    try {
+                        const context = getProposalContext();
+                        const systemContext = lang === 'en' ? `You are an expert proposal consultant.` : `Anda adalah konsultan proposal ahli.`;
+                        const prompt = lang === 'en'
+                            ? `Context:\n${context}\n\nTask: Revise and polish the wording for "${sec.title}" to be persuasive and professional.\n\nCONTENT:\n${sec.content}\n\nReturn ONLY basic HTML format (<h3>,<p>,<ul>).`
+                            : `Konteks:\n${context}\n\nTugas: Revisi dan perhalus bahasa dari Bab "${sec.title}" agar lebih meyakinkan dan profesional.\n\nKONTEN:\n${sec.content}\n\nKembalikan HANYA format HTML dasar.`;
+                        
+                        const result = await callAI(prompt, systemContext, data.apiKeys);
+                        updateSection(sec.id, { content: stripMarkdown(result) });
+                    } catch (err) { console.error(`Error revising ${sec.title}`, err); }
+                }
+                
+                setAiStatusMsg("");
+                setLoadingSection(null);
+                setIsRevisingAll(false);
+                alert(txt.alertDone);
+            };
+
+            const handleSaveJson = () => {
+                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
+                const a = document.createElement('a');
+                a.href = dataStr;
+                a.download = "proposal_data.json";
+                a.click();
+            };
+
+            const handleLoadJson = (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const loaded = JSON.parse(e.target.result);
+                        if(loaded.cover && loaded.sections) setData(loaded);
+                        else alert(txt.alertLoadErr);
+                    } catch (err) { alert(txt.alertLoadErr); }
+                };
+                reader.readAsText(file);
+            };
+
+            const handleExportDocx = () => {
+                const header = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Export HTML to Word</title><style>body { font-family: 'Calibri', sans-serif; color: #333; } h1 { text-align: center; color: #1e3a8a; } h2 { color: #2563eb; border-bottom: 1px solid #ccc; padding-bottom: 5px; margin-top: 30px;} table { border-collapse: collapse; width: 100%; margin-top: 10px; } th, td { border: 1px solid #ccc; padding: 8px; text-align: left; } th { background-color: #f1f5f9; } .cover { text-align: center; margin-top: 100px; margin-bottom: 100px; page-break-after: always; } .framework-card { border: 1px solid #ccc; padding: 15px; margin-bottom: 15px; background: #f8fafc; }</style></head><body>`;
+                const footer = "</body></html>";
+                
+                let htmlContent = `<div class="cover">
+                    <h1 style="font-size: 36px;">${data.cover.title}</h1>
+                    <h2 style="font-size: 24px; border:none; color: #333;">${data.cover.subtitle}</h2><br><br><br>
+                    <p><strong>${txt.author}:</strong><br>${data.cover.author}</p>
+                    <p><strong>${txt.target}:</strong><br>${data.cover.target}</p><br><br>
+                    <p>${data.cover.date}</p>
+                </div>`;
+
+                data.sections.forEach(sec => {
+                    htmlContent += `<h2>${sec.title}</h2>`;
+                    if (sec.type === 'richtext') htmlContent += `<div>${sec.content}</div>`;
+                    else if (sec.type === 'rab') {
+                        htmlContent += `<table><thead><tr><th>${txt.no}</th><th>${txt.item}</th><th>${txt.qty}</th><th>${txt.unit}</th><th>${txt.price}</th><th>${txt.total}</th></tr></thead><tbody>`;
+                        let total = 0;
+                        sec.rows.forEach((row, i) => {
+                            let rowTotal = row.qty * row.harga;
+                            total += rowTotal;
+                            htmlContent += `<tr><td>${i+1}</td><td>${row.uraian}</td><td>${row.qty}</td><td>${row.unit}</td><td>${row.harga}</td><td>${rowTotal}</td></tr>`;
+                        });
+                        htmlContent += `</tbody><tfoot><tr><td colspan="5" style="text-align:right"><strong>${txt.grandTotal}</strong></td><td><strong>${total}</strong></td></tr></tfoot></table>`;
+                    } else if (sec.type === 'framework') {
+                        sec.nodes.forEach((n, i) => {
+                            htmlContent += `<div class="framework-card"><strong>Phase ${i+1}: ${n.title}</strong><p>${n.description}</p></div>`;
+                        });
+                    }
+                });
+
+                const blob = new Blob(['\ufeff', header + htmlContent + footer], { type: 'application/msword' });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = 'Proposal_Project.doc';
+                a.click();
+            };
+
+            const activeSection = activeTab === 'cover' ? null : data.sections.find(s => s.id === activeTab);
+
+            return (
+                <div className="min-h-screen flex flex-col h-screen">
+                    {/* HEADER */}
+                    <header className="bg-white border-b border-slate-200 px-6 py-3 flex justify-between items-center shadow-sm z-20 print-hide">
+                        <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-2 text-blue-600 font-bold text-xl">
+                                <i className="fas fa-columns"></i> {txt.appTitle} <span className="text-slate-400 font-normal text-sm ml-1">AI PRO</span>
+                            </div>
+                            <div className={`text-xs font-medium px-2 py-1 rounded-full border ${activeModelsList.length > 0 ? 'bg-green-50 text-green-600 border-green-200' : 'bg-slate-100 text-slate-500 border-slate-200'}`}>
+                                {activeModelsList.length > 0 ? <span><i className="fas fa-check-circle mr-1"></i> {activeModel}</span> : txt.aiInactive}
+                            </div>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                            {/* Lang Toggle */}
+                            <button onClick={toggleLanguage} className="flex items-center bg-slate-100 rounded-lg p-1 mr-2 border border-slate-200">
+                                <span className={`text-xs font-bold px-3 py-1.5 rounded-md transition ${lang === 'en' ? 'bg-white shadow-sm text-blue-600' : 'text-slate-400'}`}>EN</span>
+                                <span className={`text-xs font-bold px-3 py-1.5 rounded-md transition ${lang === 'id' ? 'bg-white shadow-sm text-blue-600' : 'text-slate-400'}`}>ID</span>
+                            </button>
+
+                            <button onClick={() => setShowSettings(!showSettings)} className="p-2 text-slate-500 hover:bg-slate-100 rounded-full transition">
+                                <i className="fas fa-cog text-lg"></i>
+                            </button>
+                            <div className="w-px h-6 bg-slate-300 mx-1"></div>
+                            
+                            <button onClick={handleLoadSample} className="flex items-center gap-2 px-3 py-2 bg-green-100 hover:bg-green-200 text-green-700 rounded-lg text-sm font-medium transition border border-green-200">
+                                <i className="fas fa-magic"></i> {txt.loadSample}
+                            </button>
+
+                            <label className="flex items-center gap-2 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-medium cursor-pointer transition">
+                                <i className="fas fa-folder-open"></i> {txt.load}
+                                <input type="file" accept=".json" className="hidden" onChange={handleLoadJson} />
+                            </label>
+                            <button onClick={handleSaveJson} className="flex items-center gap-2 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-medium transition">
+                                <i className="fas fa-save"></i> {txt.save}
+                            </button>
+                            
+                            <div className="w-px h-6 bg-slate-300 mx-1"></div>
+
+                            <button onClick={() => window.print()} className="flex items-center gap-2 px-3 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-sm font-medium transition shadow-sm">
+                                <i className="fas fa-print"></i> {txt.pdf}
+                            </button>
+                            <button onClick={handleExportDocx} className="flex items-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition shadow-sm">
+                                <i className="fas fa-file-word"></i> {txt.docx}
+                            </button>
+                        </div>
+
+                        {/* AI SETTINGS */}
+                        {showSettings && (
+                            <div className="absolute top-14 right-6 w-80 bg-white border border-slate-200 shadow-xl rounded-xl p-5 z-50">
+                                <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2"><i className="fas fa-key"></i> {txt.settingsTitle}</h3>
+                                <p className="text-xs text-slate-500 mb-4">{txt.settingsDesc}</p>
+                                <div className="space-y-3">
+                                    <div><label className="block text-xs font-bold text-slate-600 mb-1">Google Gemini API Key</label><input type="password" value={data.apiKeys.gemini} onChange={e => updateApiKey('gemini', e.target.value)} className="w-full p-2 text-sm border rounded focus:border-blue-500 outline-none" placeholder="AIzaSy..." /></div>
+                                    <div><label className="block text-xs font-bold text-slate-600 mb-1">Anthropic Claude API Key</label><input type="password" value={data.apiKeys.claude} onChange={e => updateApiKey('claude', e.target.value)} className="w-full p-2 text-sm border rounded focus:border-blue-500 outline-none" placeholder="sk-ant-..." /></div>
+                                    <div><label className="block text-xs font-bold text-slate-600 mb-1">OpenAI API Key</label><input type="password" value={data.apiKeys.openai} onChange={e => updateApiKey('openai', e.target.value)} className="w-full p-2 text-sm border rounded focus:border-blue-500 outline-none" placeholder="sk-..." /></div>
+                                </div>
+                                <button onClick={() => setShowSettings(false)} className="w-full mt-4 py-2 bg-blue-50 text-blue-600 font-bold text-sm rounded-lg hover:bg-blue-100">{txt.close}</button>
+                            </div>
+                        )}
+                    </header>
+
+                    <div className="flex flex-1 overflow-hidden print-hide">
+                        {/* SIDEBAR */}
+                        <aside className="w-64 bg-slate-50 border-r border-slate-200 flex flex-col">
+                            <div className="p-4 flex-1 overflow-y-auto space-y-1">
+                                <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 px-3">{txt.navDoc}</div>
+                                <button onClick={() => setActiveTab('cover')} className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'cover' ? 'bg-blue-100 text-blue-700' : 'text-slate-600 hover:bg-slate-200/50'}`}>
+                                    <i className="fas fa-columns w-4"></i> {txt.coverPage}
+                                </button>
+                                {data.sections.map(sec => (
+                                    <button key={sec.id} onClick={() => setActiveTab(sec.id)} className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-left ${activeTab === sec.id ? 'bg-blue-100 text-blue-700' : 'text-slate-600 hover:bg-slate-200/50'}`}>
+                                        <div className="flex items-center gap-3 overflow-hidden">
+                                            {sec.type === 'richtext' && <i className="fas fa-align-left text-slate-400 w-4"></i>}
+                                            {sec.type === 'rab' && <i className="fas fa-calculator text-green-500 w-4"></i>}
+                                            {sec.type === 'framework' && <i className="fas fa-layer-group text-purple-500 w-4"></i>}
+                                            <span className="truncate">{sec.title}</span>
+                                        </div>
+                                        {loadingSection === sec.id && <i className="fas fa-spinner fa-spin text-purple-500 shrink-0"></i>}
+                                    </button>
+                                ))}
+                            </div>
+                            <div className="p-4 border-t border-slate-200 bg-white">
+                                <button onClick={handleReviseAll} disabled={isRevisingAll || activeModel === txt.aiInactive} className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm shadow-sm transition-all ${isRevisingAll ? 'bg-purple-100 text-purple-400 cursor-not-allowed' : activeModel === txt.aiInactive ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white'}`}>
+                                    {isRevisingAll ? <i className="fas fa-spinner fa-spin"></i> : <i className="fas fa-magic"></i>}
+                                    {isRevisingAll ? txt.processing : txt.reviseAll}
+                                </button>
+                                {aiStatusMsg && <p className="text-xs text-center mt-2 text-purple-600 font-medium animate-pulse">{aiStatusMsg}</p>}
+                            </div>
+                        </aside>
+
+                        {/* EDITOR */}
+                        <main className="flex-1 overflow-y-auto p-8 bg-slate-100">
+                            <div className="max-w-4xl mx-auto space-y-6 pb-20">
+                                {activeTab === 'cover' && (
+                                    <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-200">
+                                        <h2 className="text-2xl font-bold mb-6 text-slate-800 flex items-center gap-2"><i className="fas fa-columns"></i> {txt.setupCover}</h2>
+                                        <div className="space-y-4">
+                                            <div><label className="block text-sm font-bold text-slate-600 mb-1">{txt.docTitle}</label><input type="text" className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" value={data.cover.title} onChange={e => updateCover('title', e.target.value)} /></div>
+                                            <div><label className="block text-sm font-bold text-slate-600 mb-1">{txt.subTitle}</label><input type="text" className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" value={data.cover.subtitle} onChange={e => updateCover('subtitle', e.target.value)} /></div>
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div><label className="block text-sm font-bold text-slate-600 mb-1">{txt.author}</label><input type="text" className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" value={data.cover.author} onChange={e => updateCover('author', e.target.value)} /></div>
+                                                <div><label className="block text-sm font-bold text-slate-600 mb-1">{txt.target}</label><input type="text" className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" value={data.cover.target} onChange={e => updateCover('target', e.target.value)} /></div>
+                                            </div>
+                                            <div><label className="block text-sm font-bold text-slate-600 mb-1">{txt.date}</label><input type="text" className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" value={data.cover.date} onChange={e => updateCover('date', e.target.value)} /></div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {activeSection && (
+                                    <div className="animate-in fade-in duration-300">
+                                        <div className="flex items-start justify-between mb-4">
+                                            <div>
+                                                <h2 className="text-2xl font-bold text-slate-800">{activeSection.title}</h2>
+                                                <p className="text-slate-500 text-sm mt-1">
+                                                    {activeSection.type === 'richtext' ? txt.useEditor : activeSection.type === 'rab' ? txt.fillTable : txt.addCards}
+                                                </p>
+                                            </div>
+                                            <button onClick={() => handleReviseSection(activeSection.id)} disabled={loadingSection === activeSection.id || activeModel === txt.aiInactive} className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold shadow-sm transition ${loadingSection === activeSection.id ? 'bg-purple-100 text-purple-400 cursor-not-allowed' : activeModel === txt.aiInactive ? 'bg-slate-200 text-slate-400 cursor-not-allowed' : 'bg-purple-100 text-purple-700 hover:bg-purple-200 hover:text-purple-800 border border-purple-200'}`}>
+                                                {loadingSection === activeSection.id ? <i className="fas fa-spinner fa-spin"></i> : <i className="fas fa-magic"></i>}
+                                                {loadingSection === activeSection.id ? txt.aiThinking : txt.aiAssist}
+                                            </button>
+                                        </div>
+
+                                        {activeModel === txt.aiInactive && (
+                                            <div className="mb-4 p-3 bg-yellow-50 text-yellow-700 text-sm rounded-lg border border-yellow-200 flex items-center gap-2">
+                                                <i className="fas fa-exclamation-circle"></i> {txt.aiDisabledInfo}
+                                            </div>
+                                        )}
+
+                                        {activeSection.type === 'richtext' && <MiniRichText content={activeSection.content} onChange={(content) => updateSection(activeSection.id, { content })} isAiLoading={loadingSection === activeSection.id} />}
+                                        {activeSection.type === 'rab' && <RabEditor data={activeSection.rows} onChange={(rows) => updateSection(activeSection.id, { rows })} isAiLoading={loadingSection === activeSection.id} txt={txt} />}
+                                        {activeSection.type === 'framework' && <FrameworkEditor nodes={activeSection.nodes} onChange={(nodes) => updateSection(activeSection.id, { nodes })} isAiLoading={loadingSection === activeSection.id} txt={txt} />}
+                                    </div>
+                                )}
+                            </div>
+                        </main>
+                    </div>
+
+                    {/* PRINT LAYOUT */}
+                    <div className="hidden print:block bg-white text-black text-sm max-w-4xl mx-auto p-8">
+                        <div className="h-screen flex flex-col justify-center items-center text-center page-break-after-always">
+                            <h1 className="text-4xl font-bold uppercase tracking-widest mb-4">{data.cover.title}</h1>
+                            <h2 className="text-2xl text-slate-600 mb-16">{data.cover.subtitle}</h2>
+                            <div className="mb-8"><p className="font-bold text-slate-500">{txt.author}:</p><p className="text-xl font-bold">{data.cover.author}</p></div>
+                            <div className="mb-16"><p className="font-bold text-slate-500">{txt.target}:</p><p className="text-xl font-bold">{data.cover.target}</p></div>
+                            <p className="text-slate-500">{data.cover.date}</p>
+                        </div>
+                        {data.sections.map((sec, idx) => (
+                            <div key={idx} className="mb-10 page-break-inside-avoid">
+                                <h3 className="text-xl font-bold border-b-2 border-slate-800 pb-2 mb-4 text-blue-900">{sec.title}</h3>
+                                {sec.type === 'richtext' && <div className="prose max-w-none text-justify print:prose-p:my-2 print:prose-h3:text-lg" dangerouslySetInnerHTML={{ __html: sec.content }} />}
+                                {sec.type === 'rab' && (
+                                    <table className="w-full border-collapse mt-4">
+                                        <thead>
+                                            <tr className="bg-slate-200">
+                                                <th className="border border-slate-400 p-2 text-center w-10">{txt.no}</th>
+                                                <th className="border border-slate-400 p-2">{txt.item}</th>
+                                                <th className="border border-slate-400 p-2 text-center">{txt.qty}</th>
+                                                <th className="border border-slate-400 p-2 text-center">{txt.unit}</th>
+                                                <th className="border border-slate-400 p-2 text-right">{txt.price}</th>
+                                                <th className="border border-slate-400 p-2 text-right">{txt.total}</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {sec.rows.map((r, i) => (
+                                                <tr key={r.id}>
+                                                    <td className="border border-slate-400 p-2 text-center">{i+1}</td>
+                                                    <td className="border border-slate-400 p-2">{r.uraian}</td>
+                                                    <td className="border border-slate-400 p-2 text-center">{r.qty}</td>
+                                                    <td className="border border-slate-400 p-2 text-center">{r.unit}</td>
+                                                    <td className="border border-slate-400 p-2 text-right">{r.harga.toLocaleString()}</td>
+                                                    <td className="border border-slate-400 p-2 text-right">{(r.qty * r.harga).toLocaleString()}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                        <tfoot>
+                                            <tr className="bg-slate-100 font-bold">
+                                                <td colSpan="5" className="border border-slate-400 p-2 text-right">{txt.grandTotal}</td>
+                                                <td className="border border-slate-400 p-2 text-right text-blue-800">
+                                                    {sec.rows.reduce((sum, r) => sum + (r.qty*r.harga), 0).toLocaleString()}
+                                                </td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                )}
+                                {sec.type === 'framework' && (
+                                    <div className="flex flex-col gap-4 mt-4">
+                                        {sec.nodes.map((n, i) => (
+                                            <div key={n.id} className="border border-slate-300 p-4 rounded bg-slate-50 flex gap-4">
+                                                <div className="font-bold text-xl text-blue-800 w-8">{i+1}.</div>
+                                                <div><h4 className="font-bold text-lg mb-1">{n.title}</h4><p className="text-slate-700">{n.description}</p></div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
