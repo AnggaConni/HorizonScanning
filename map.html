@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapping Hub | GIS & GovTech Tools</title>
+    <meta name="description" content="Explore free geospatial tools for Cultural GIS, Biodiversity, and Linguistic data visualization.">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='none' stroke='%230d9488' stroke-width='10'/><path d='M30 50 Q50 20 70 50 T110 50' fill='none' stroke='%230d9488' stroke-width='5'/></svg>">
+
+    <!-- Dependencies -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        navy: { 800: '#1e293b', 900: '#0f172a', 950: '#020617' },
+                        teal: { 400: '#2dd4bf', 500: '#14b8a6', 600: '#0d9488' }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        .tool-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .tool-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .bg-grid {
+            background-image: linear-gradient(to right, #80808012 1px, transparent 1px), 
+                              linear-gradient(to bottom, #80808012 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+        .ui-mockup-svg {
+            mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased">
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 glass-nav">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center gap-2">
+                    <i class="ph ph-globe-hemisphere-west text-teal-600 text-2xl"></i>
+                    <span class="font-bold text-xl text-navy-900 tracking-tight">Geospatial<span class="text-teal-600">Hub</span></span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <a href="index.html" class="flex items-center gap-2 text-sm font-bold text-slate-600 hover:text-navy-900 transition-colors">
+                        <i class="ph ph-house"></i>
+                        <span>Back to Home</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="relative pt-32 pb-20 bg-navy-950 overflow-hidden">
+        <div class="absolute inset-0 bg-grid"></div>
+        <div class="absolute top-0 right-0 -z-10 h-[400px] w-[400px] rounded-full bg-teal-500/10 blur-[120px]"></div>
+        
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <span class="inline-flex items-center gap-2 py-1 px-3 rounded-full bg-teal-500/10 text-teal-400 text-xs font-bold tracking-widest uppercase mb-6 border border-teal-500/20">
+                <i class="ph-fill ph-map-trifold"></i> Open Mapping Initiative
+            </span>
+            <h1 class="text-4xl md:text-5xl font-extrabold text-white tracking-tight mb-6">
+                GIS, Data & <span class="text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-emerald-300">Government Tech</span>
+            </h1>
+            <p class="max-w-2xl mx-auto text-lg text-slate-400 leading-relaxed">
+                Access professional-grade geospatial toolkits designed for cultural preservation, biodiversity monitoring, and linguistic advocacy. Powered by open-source data and community-verified repositories.
+            </p>
+        </div>
+    </header>
+
+    <!-- Tools Grid -->
+    <main class="py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                
+                <!-- Tool 1: Foodways -->
+                <div class="tool-card bg-white rounded-3xl border border-slate-200 overflow-hidden flex flex-col">
+                    <div class="h-48 bg-navy-900 relative flex items-center justify-center overflow-hidden">
+                        <svg class="absolute inset-0 w-full h-full opacity-40 ui-mockup-svg" viewBox="0 0 400 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="200" cy="100" r="80" stroke="#2dd4bf" stroke-width="0.5" stroke-dasharray="4 4"/>
+                            <circle cx="200" cy="100" r="40" stroke="#2dd4bf" stroke-width="0.5"/>
+                            <path d="M100 50L200 100L300 150M150 150L200 100L250 40" stroke="#2dd4bf" stroke-width="1.5" stroke-linecap="round"/>
+                            <circle cx="100" cy="50" r="4" fill="#2dd4bf"/>
+                            <circle cx="300" cy="150" r="4" fill="#2dd4bf"/>
+                            <circle cx="150" cy="150" r="4" fill="#2dd4bf"/>
+                            <circle cx="250" cy="40" r="4" fill="#2dd4bf"/>
+                            <circle cx="200" cy="100" r="6" fill="#14b8a6"/>
+                        </svg>
+                        <div class="relative z-10 text-center px-6">
+                            <h3 class="text-white font-bold text-xl mb-1">Foodways</h3>
+                            <p class="text-teal-400 text-[10px] uppercase font-mono tracking-widest">Network Analysis GIS</p>
+                        </div>
+                    </div>
+                    <div class="p-8 flex-1 flex flex-col">
+                        <div class="mb-4">
+                            <span class="bg-teal-50 text-teal-700 text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider">Use Case: Cultural Heritage</span>
+                        </div>
+                        <p class="text-slate-600 text-sm leading-relaxed mb-6">
+                            A serverless GIS engine identifying culinary heritage patterns. Data is cross-referenced with academic archives and Wikipedia to visualize cross-border cultural influences via network analysis.
+                        </p>
+                        <div class="mt-auto pt-6 border-t border-slate-100 flex items-center justify-between">
+                            <span class="text-[10px] font-bold text-slate-400"><i class="ph ph-code"></i> Vanilla JS + GAS</span>
+                            <a href="maps/foodways.html" class="inline-flex items-center gap-2 text-teal-600 font-bold text-sm hover:gap-3 transition-all">
+                                Launch Map <i class="ph-bold ph-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tool 2: Biodiversity -->
+                <div class="tool-card bg-white rounded-3xl border border-slate-200 overflow-hidden flex flex-col">
+                    <div class="h-48 bg-emerald-950 relative flex items-center justify-center overflow-hidden">
+                        <svg class="absolute inset-0 w-full h-full opacity-40 ui-mockup-svg" viewBox="0 0 400 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="50" y="50" width="300" height="100" rx="10" fill="#064e3b" stroke="#10b981" stroke-width="0.5"/>
+                            <circle cx="120" cy="80" r="15" fill="#10b981" fill-opacity="0.3"/>
+                            <circle cx="120" cy="80" r="5" fill="#34d399"/>
+                            <circle cx="280" cy="120" r="25" fill="#10b981" fill-opacity="0.2"/>
+                            <circle cx="280" cy="120" r="8" fill="#34d399"/>
+                            <circle cx="200" cy="70" r="20" fill="#10b981" fill-opacity="0.25"/>
+                            <circle cx="200" cy="70" r="6" fill="#34d399"/>
+                            <path d="M60 140H340" stroke="#065f46" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                        <div class="relative z-10 text-center px-6">
+                            <h3 class="text-white font-bold text-xl mb-1">Biodiversity</h3>
+                            <p class="text-emerald-400 text-[10px] uppercase font-mono tracking-widest">Heatmap Visualization</p>
+                        </div>
+                    </div>
+                    <div class="p-8 flex-1 flex flex-col">
+                        <div class="mb-4">
+                            <span class="bg-emerald-50 text-emerald-700 text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider">Use Case: Environmental GIS</span>
+                        </div>
+                        <p class="text-slate-600 text-sm leading-relaxed mb-6">
+                            An interactive real-time dashboard for global biosphere monitoring. Built using open-access species data and community-verified repositories to monitor ecological shifts and hotspots.
+                        </p>
+                        <div class="mt-auto pt-6 border-t border-slate-100 flex items-center justify-between">
+                            <span class="text-[10px] font-bold text-slate-400"><i class="ph ph-database"></i> Real-time Sync</span>
+                            <a href="maps/bio.html" class="inline-flex items-center gap-2 text-emerald-600 font-bold text-sm hover:gap-3 transition-all">
+                                Open Dashboard <i class="ph-bold ph-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tool 3: Script Explorer -->
+                <div class="tool-card bg-white rounded-3xl border border-slate-200 overflow-hidden flex flex-col">
+                    <div class="h-48 bg-indigo-950 relative flex items-center justify-center overflow-hidden">
+                        <svg class="absolute inset-0 w-full h-full opacity-40 ui-mockup-svg" viewBox="0 0 400 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M100 40C150 40 150 160 200 160C250 160 250 40 300 40" stroke="#818cf8" stroke-width="1" stroke-dasharray="2 4"/>
+                            <text x="80" y="60" fill="#a5b4fc" font-family="serif" font-size="24" font-weight="bold">ꦄ</text>
+                            <text x="200" y="100" fill="#818cf8" font-family="serif" font-size="24" font-weight="bold">あ</text>
+                            <text x="320" y="140" fill="#a5b4fc" font-family="serif" font-size="24" font-weight="bold">Ω</text>
+                        </svg>
+                        <div class="relative z-10 text-center px-6">
+                            <h3 class="text-white font-bold text-xl mb-1">Script Explorer</h3>
+                            <p class="text-indigo-300 text-[10px] uppercase font-mono tracking-widest">Digital Linguistic Mapping</p>
+                        </div>
+                    </div>
+                    <div class="p-8 flex-1 flex flex-col">
+                        <div class="mb-4">
+                            <span class="bg-purple-50 text-purple-700 text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider">Use Case: Digital Advocacy</span>
+                        </div>
+                        <p class="text-slate-600 text-sm leading-relaxed mb-6">
+                            A specialized advocacy tool visualizing the digital health of 60+ indigenous scripts. Database includes linguistic repositories curated from Wikipedia and Unicode Consortium documentation.
+                        </p>
+                        <div class="mt-auto pt-6 border-t border-slate-100 flex items-center justify-between">
+                            <span class="text-[10px] font-bold text-slate-400"><i class="ph ph-bookmarks"></i> Unicode Tracker</span>
+                            <a href="maps/script.html" class="inline-flex items-center gap-2 text-purple-600 font-bold text-sm hover:gap-3 transition-all">
+                                Explore Scripts <i class="ph-bold ph-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Footer Note / Collaboration Section -->
+            <div class="mt-20 text-center">
+                <div class="inline-block p-1 rounded-2xl bg-slate-100 border border-slate-200">
+                    <div class="bg-white px-8 py-10 rounded-xl max-w-3xl mx-auto shadow-sm">
+                        <i class="ph-fill ph-note-pencil text-teal-500 text-4xl mb-4"></i>
+                        <h4 class="text-navy-900 font-bold text-xl mb-4">Data Governance & Collaboration</h4>
+                        <div class="text-slate-600 text-sm leading-relaxed space-y-4 text-left max-w-2xl mx-auto">
+                            <p>
+                                <strong class="text-navy-900">Information Sources:</strong> The mapping databases utilize open-access information from various repositories, including extensive documentation curated from <strong>Wikipedia</strong> to ensure public verifiability and cross-border knowledge exchange.
+                            </p>
+                            <p>
+                                <strong class="text-navy-900">Edit Access:</strong> We strive for maximum accuracy in our geospatial data. If you have corrections, additional data points, or wish to contribute as a data curator, please contact us via email to request editing permissions.
+                            </p>
+                            <div class="flex flex-col sm:flex-row gap-4 pt-4 justify-center">
+                                <a href="mailto:contact@horizon-scanning.org" class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-navy-900 text-white rounded-xl font-bold hover:bg-teal-600 transition-all text-sm">
+                                    <i class="ph ph-envelope"></i> Request Edit Access
+                                </a>
+                                <a href="https://www.linkedin.com/in/anggaconni/" target="_blank" class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white border border-slate-200 text-navy-900 rounded-xl font-bold hover:border-navy-900 transition-all text-sm">
+                                    <i class="ph ph-linkedin-logo text-blue-600"></i> Connect on LinkedIn
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-navy-950 text-slate-500 py-12 border-t border-slate-900">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="text-xs uppercase tracking-widest font-bold mb-4">HorizonScan AI Ecosystem</p>
+            <div class="flex justify-center gap-6 text-sm mb-8">
+                <a href="index.html" class="hover:text-white transition-colors">Home</a>
+                <a href="blog.html" class="hover:text-white transition-colors">Articles</a>
+                <a href="tool.html" class="hover:text-white transition-colors">Foresight Tool</a>
+            </div>
+            <p class="text-[10px]">© 2026 Geospatial Hub | Curated by <a href="https://www.linkedin.com/in/anggaconni/" class="text-teal-500 hover:underline">Angga Conni Saputra</a></p>
+        </div>
+    </footer>
+
+</body>
+</html>
