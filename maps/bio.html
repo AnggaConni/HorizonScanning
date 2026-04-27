@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Biodiversity & Biosphere 2026</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    
+    <!-- Libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <!-- Custom Styles -->
+    <style>
+        :root {
+            --primary-blue: #0077D4; --secondary-blue: #0ea5e9; --accent-gold: #F59E0B;
+            --bio-green: #10B981; --bio-dark: #047857;
+            --glass-bg: rgba(255, 255, 255, 0.98); --glass-border: rgba(226, 232, 240, 0.8);
+            --text-main: #1e293b;
+        }
+        body { background-color: #f1f5f9; color: var(--text-main); font-family: 'Inter', sans-serif; overflow: hidden; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+
+        .glass-panel { background: var(--glass-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--glass-border); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+        .section-view { display: none; opacity: 0; transition: opacity 0.4s ease-in-out; }
+        .section-view.active { display: flex; opacity: 1; }
+        .z-modal { z-index: 2000; } .z-picker { z-index: 3000; }
+        
+        .picker-mode { cursor: crosshair !important; }
+        .picker-mode path.leaflet-interactive, .picker-mode .leaflet-image-layer, .picker-mode .leaflet-pane > svg path { pointer-events: none !important; }
+        .picker-mode .leaflet-marker-icon { pointer-events: auto !important; cursor: pointer !important; }
+        .picker-mode .leaflet-biospherePane-pane, .picker-mode .leaflet-nodesPane-pane, .picker-mode .leaflet-orangePane-pane { opacity: 0.7; transition: opacity 0.3s; }
+
+        .custom-tooltip { background: white; border: 1px solid var(--primary-blue); color: var(--primary-blue); border-radius: 6px; font-weight: bold; padding: 6px 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); font-size: 11px; }
+        .bio-tooltip { border-color: var(--bio-green); color: var(--bio-dark); }
+        .leaflet-tooltip-top:before { display: none; }
+
+        .geo-marker-icon { background-color: var(--primary-blue); border: 2px solid white; border-radius: 50%; box-shadow: 0 0 10px rgba(0, 119, 212, 0.5); }
+        .bio-marker-icon { background-color: var(--bio-green); border: 2px solid white; border-radius: 50%; box-shadow: 0 0 10px rgba(16, 185, 129, 0.5); }
+        
+        .nav-btn { position: absolute; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; background: rgba(0,0,0,0.6); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; z-index: 20; border: 1px solid rgba(255,255,255,0.3); }
+        .nav-btn:hover { background: var(--primary-blue); border-color: transparent; }
+        .nav-prev { left: 10px; } .nav-next { right: 10px; }
+        .force-hidden { display: none !important; }
+
+        .rt-toolbar { display: flex; gap: 4px; padding: 4px; background: #f1f5f9; border-bottom: 1px solid #e2e8f0; border-radius: 8px 8px 0 0; }
+        .rt-btn { padding: 4px 8px; font-size: 10px; font-weight: bold; background: white; border: 1px solid #cbd5e1; border-radius: 4px; cursor: pointer; color: #475569; }
+        .rt-btn:hover { background: #e2e8f0; color: #1e293b; }
+
+        @keyframes breath { 0%,100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); } 70% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); } }
+        .mascot-btn { animation: breath 2s infinite; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .fade-in { animation: fadeIn 0.4s ease-out; }
+
+        .map-badge { position: absolute; bottom: 20px; right: 20px; background: rgba(255,255,255,0.95); padding: 8px 12px; border-radius: 8px; font-size: 11px; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.1); color: #475569; z-index: 1000; border: 1px solid #cbd5e1; display: flex; flex-direction: column; gap: 4px; }
+        .legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+        
+        .yt-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.1); transition: background 0.3s; cursor: pointer; }
+        .yt-overlay:hover { background: rgba(0,0,0,0.3); }
+        .yt-btn { width: 48px; height: 48px; background: #ff0000; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: transform 0.2s; }
+        .yt-overlay:hover .yt-btn { transform: scale(1.1); }
+
+        .suggestion-item { padding: 8px 12px; cursor: pointer; border-bottom: 1px solid #f1f5f9; font-size: 11px; }
+        .suggestion-item:hover { background-color: #eff6ff; color: var(--primary-blue); }
+        .suggestion-item:last-child { border-bottom: none; }
+
+        #pdf-loading-overlay { position: fixed; inset: 0; background: rgba(255, 255, 255, 0.98); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        #pdf-loading-overlay.active { display: flex; }
+        .loading-progress-bar { width: 240px; height: 4px; background: #e2e8f0; margin-top: 20px; }
+        .loading-progress-fill { height: 100%; background: #000; width: 0%; transition: width 0.3s ease-out; }
+        
+        #pdf-ghost-container { position: fixed; top: 0; left: -9999px; width: 800px; background: white; z-index: -100; padding: 40px; font-family: 'Inter', sans-serif; }
+        .pdf-header { border-bottom: 3px solid #000; padding-bottom: 20px; margin-bottom: 30px; }
+        .pdf-title { font-size: 32px; font-weight: 900; color: #000; text-transform: uppercase; line-height: 1.1; margin-bottom: 5px; }
+        .pdf-subtitle { font-size: 18px; font-style: italic; color: #475569; font-weight: 500; }
+        .pdf-meta { font-size: 12px; font-weight: 800; color: #000; margin-top: 8px; text-transform: uppercase; letter-spacing: 1px; }
+        .pdf-section-title { font-size: 14px; font-weight: 800; text-transform: uppercase; color: #000; border-bottom: 1px solid #000; padding-bottom: 5px; margin-bottom: 15px; margin-top: 30px; }
+        .pdf-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
+        .pdf-img { width: 100%; height: 200px; object-fit: cover; border: 1px solid #000; }
+        .pdf-row { display: flex; justify-content: space-between; border-bottom: 1px solid #e2e8f0; padding: 8px 0; font-size: 12px; }
+        .pdf-row-label { font-weight: bold; color: #334155; }
+        #pdf-ghost-map { width: 100%; height: 300px; border: 1px solid #000; margin-bottom: 20px; background: #f8fafc; }
+        .pdf-desc { font-size: 12px; line-height: 1.6; color: #000; text-align: justify; white-space: pre-wrap; font-weight: 500; }
+        .pdf-footer { margin-top: 50px; padding-top: 15px; border-top: 3px solid #000; font-size: 10px; color: #475569; }
+        .pdf-link { display: block; margin-bottom: 2px; color: #2563eb; text-decoration: none; font-family: monospace; }
+        
+        /* Dashboard Cards Compact */
+        .dash-stat-card { padding: 1rem; border-radius: 1rem; display: flex; flex-direction: column; justify-content: center; height: 100%; }
+        .chart-container-compact { height: 160px; width: 100%; position: relative; }
+
+        /* Guide Tabs */
+        .guide-tab { padding: 8px 16px; font-size: 12px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: all 0.2s; color: #64748b; background: #f1f5f9; border: 1px solid transparent; }
+        .guide-tab.active { background: #0077D4; color: white; box-shadow: 0 4px 6px -1px rgba(0, 119, 212, 0.3); }
+        .guide-content-item { display: none; animation: fadeIn 0.3s ease-out; }
+        .guide-content-item.active { display: block; }
+    </style>
+</head>
+<body class="h-screen w-screen flex flex-col bg-slate-100">
+
+    <!-- PDF LOADING OVERLAY -->
+    <div id="pdf-loading-overlay"><div class="text-3xl font-black text-black mb-1">EXPORTING PDF</div><div class="text-xs text-slate-500 font-mono uppercase tracking-widest" id="pdf-loading-text">Initializing...</div><div class="loading-progress-bar"><div id="pdf-progress-fill" class="loading-progress-fill"></div></div></div>
+
+    <!-- PDF GHOST -->
+    <div id="pdf-ghost-container"><div class="pdf-header"><h1 class="pdf-title" id="pdf-out-name">Title</h1><div class="pdf-subtitle" id="pdf-out-latin">Latin Name</div><div class="pdf-meta" id="pdf-out-country">Country</div></div><div class="pdf-body"><div class="pdf-section-title">Visual Documentation</div><div class="pdf-grid" id="pdf-out-images"></div><div class="pdf-section-title">Ecological Interaction</div><div class="pdf-row"><span class="pdf-row-label">Affected By (Local Name)</span><span id="pdf-out-aff-local">-</span></div><div class="pdf-row"><span class="pdf-row-label">Affected By (Latin Name)</span><span id="pdf-out-aff-latin" class="italic">-</span></div><div class="pdf-section-title">Geographic Context</div><div id="pdf-ghost-map"></div><div class="pdf-section-title">Description</div><div class="pdf-desc" id="pdf-out-desc"></div></div><div class="pdf-footer"><div style="font-weight: bold; margin-bottom: 5px; text-transform: uppercase;">Research & References</div><div id="pdf-out-links"></div><div style="margin-top: 15px; text-align: right; font-weight: bold;">GENERATED BY GLOBAL BIODIVERSITY & BIOSPHERE 2026</div></div></div>
+
+    <!-- LANDING -->
+    <div id="landing-page" class="section-view active h-full w-full relative z-50 bg-slate-900 items-center justify-center flex-col">
+        <div class="absolute inset-0 z-0 opacity-90 bg-[url('https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=2000&q=85')] bg-cover bg-center"></div>
+        <div class="absolute inset-0 z-0 bg-gradient-to-b from-black/30 via-black/50 to-slate-900"></div>
+        <div class="z-10 text-center space-y-8 glass-panel p-16 rounded-3xl max-w-3xl border-t border-white/20 shadow-2xl mx-4 flex flex-col items-center backdrop-blur-xl bg-white/10">
+            <div class="mb-2 w-24 h-24 bg-white/20 rounded-full flex items-center justify-center text-white shadow-inner mx-auto border border-white/30 backdrop-blur-md"><i class="fas fa-globe-asia text-5xl"></i></div>
+            <h1 class="text-4xl md:text-6xl font-black text-white mb-2 leading-tight drop-shadow-lg">Global Biodiversity<br><span class="text-emerald-400 text-3xl md:text-5xl">& Biosphere Reserves</span></h1>
+            <p class="text-xl text-emerald-200 tracking-[0.3em] uppercase font-light drop-shadow">Integrated Ecosystem Data</p>
+            <div id="loading-container" class="mt-8 flex flex-col justify-center h-20 items-center"><i class="fas fa-circle-notch fa-spin text-white text-3xl"></i><span class="mt-3 text-white font-mono text-sm">Synchronizing Data Layers...</span></div>
+            <div id="entry-buttons" class="hidden flex-col items-center justify-center gap-4 mt-8 w-full">
+                <button onclick="BioApp.enterAsGuest()" class="w-72 py-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-full font-bold text-lg shadow-xl shadow-emerald-900/50 flex items-center justify-center gap-3 transition transform hover:scale-105 mx-auto border border-emerald-400">EXPLORE MAP <i class="fas fa-arrow-right"></i></button>
+                <button onclick="BioApp.enterAsContributor()" class="text-xs text-emerald-200 hover:text-white underline mt-2 flex items-center gap-1"><i class="fas fa-user-lock"></i> Contributor Login</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APP -->
+    <div id="main-app" class="section-view h-full w-full overflow-hidden flex-row relative">
+        <aside class="w-72 bg-white border-r border-slate-200 flex flex-col justify-between z-40 shadow-xl relative">
+            <div>
+                <div class="h-28 flex flex-col items-center justify-center border-b border-slate-100 bg-gradient-to-br from-emerald-50 to-white p-4 text-center">
+                    <div class="text-xl font-black text-slate-800 tracking-tighter leading-none">BIO<span class="text-emerald-600">SPHERE</span></div>
+                    <div class="text-[9px] text-slate-400 tracking-widest uppercase mt-2">Data Management System</div>
+                </div>
+                <nav class="p-4 space-y-2">
+                    <button onclick="BioApp.switchTab('map')" id="nav-map" class="w-full text-left p-3 rounded-xl hover:bg-blue-50 text-slate-500 hover:text-blue-600 transition flex items-center text-sm font-bold bg-blue-50 text-blue-600"><i class="fas fa-map w-8 text-center"></i> Global Map</button>
+                    <button onclick="BioApp.switchTab('dashboard')" id="nav-dashboard" class="w-full text-left p-3 rounded-xl hover:bg-blue-50 text-slate-500 hover:text-blue-600 transition flex items-center text-sm font-bold"><i class="fas fa-chart-pie w-8 text-center"></i> Dashboard & Stats</button>
+                </nav>
+            </div>
+            <div class="p-4 border-t border-slate-100 bg-slate-50/50 flex flex-col gap-2">
+                <div id="auth-status-ui" class="mb-2">
+                    <div id="status-guest" class="w-full"><div class="p-2 bg-slate-200 text-slate-500 text-center rounded-lg border border-slate-300 mb-2 text-[10px] font-bold tracking-wider">GUEST MODE</div><button onclick="BioApp.enterAsContributor()" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-xs font-bold transition text-center shadow-md">Login</button></div>
+                    <div id="status-admin" class="hidden w-full"><div class="p-2 bg-emerald-100 text-emerald-700 text-center rounded-lg border border-emerald-200 mb-3 text-[10px] font-bold tracking-wider">ADMIN</div><button onclick="BioApp.showAddChoice()" class="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold transition mb-2 shadow-md"><i class="fas fa-plus mr-1"></i> Add Data</button><button onclick="BioApp.logout()" class="w-full py-2 text-red-500 hover:text-red-700 text-xs transition border border-red-100 rounded-lg">Sign Out</button></div>
+                </div>
+                
+                <button onclick="ui.openModal('help-modal'); BioApp.renderHelp();" class="mascot-btn w-full py-2 bg-emerald-500 text-white rounded-lg text-xs font-bold shadow hover:bg-emerald-600 transition flex justify-center items-center gap-2 mb-2"><i class="fas fa-paw"></i> Help / Guide</button>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="BioApp.showExportChoice('csv')" class="py-2 bg-white border border-slate-200 hover:bg-blue-50 text-slate-600 hover:text-blue-600 rounded-lg text-[10px] font-bold transition flex justify-center items-center gap-1 shadow-sm"><i class="fas fa-file-csv"></i> Export CSV</button>
+                    <button onclick="BioApp.showExportChoice('dcmi')" class="py-2 bg-white border border-slate-200 hover:bg-purple-50 text-slate-600 hover:text-purple-600 rounded-lg text-[10px] font-bold transition flex justify-center items-center gap-1 shadow-sm"><i class="fas fa-code"></i> Export DCMI</button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- CONTENT -->
+        <main class="flex-1 relative overflow-hidden bg-slate-100 flex flex-col">
+            <div id="picker-notification" class="absolute top-6 left-1/2 -translate-x-1/2 z-[3000] hidden flex-col items-center w-auto"><div class="bg-blue-600 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-4 border-2 border-white animate-pulse cursor-pointer hover:bg-blue-700 transition" onclick="BioApp.cancelPicker()"><i class="fas fa-crosshairs"></i> <span class="text-sm font-bold" id="picker-msg">Select Location</span> <div class="bg-white/20 w-6 h-6 rounded-full flex items-center justify-center text-xs"><i class="fas fa-times"></i></div></div></div>
+
+            <!-- MAP VIEW -->
+            <div id="view-map" class="absolute inset-0">
+                <div id="map-container" class="h-full w-full bg-slate-100 outline-none z-0"></div>
+                <div class="absolute top-6 left-6 z-[400] flex flex-col gap-3">
+                    <div class="relative shadow-xl"><input type="text" id="map-search" placeholder="Search Biodiversity or Biosphere..." class="pl-10 bg-white/90 border border-slate-200 rounded-xl px-4 py-3 text-sm w-80 backdrop-blur-md outline-none focus:ring-2 focus:ring-blue-500 transition" oninput="BioApp.updateMapFilter(this.value)"><i class="fas fa-search absolute left-4 top-3.5 text-slate-400"></i></div>
+                    <div class="bg-white/90 backdrop-blur-md rounded-xl shadow-xl p-1 flex border border-slate-200">
+                        <button onclick="BioApp.setLayerFilter('all')" id="btn-filter-all" class="flex-1 px-3 py-1.5 text-[10px] font-bold rounded-lg bg-slate-800 text-white shadow-sm transition">ALL</button>
+                        <button onclick="BioApp.setLayerFilter('nodes')" id="btn-filter-nodes" class="flex-1 px-3 py-1.5 text-[10px] font-bold rounded-lg text-slate-500 hover:bg-blue-50 hover:text-blue-600 transition">BIODIVERSITY</button>
+                        <button onclick="BioApp.setLayerFilter('biosphere')" id="btn-filter-biosphere" class="flex-1 px-3 py-1.5 text-[10px] font-bold rounded-lg text-slate-500 hover:bg-emerald-50 hover:text-emerald-600 transition">BIOSPHERE</button>
+                    </div>
+                </div>
+                <div class="absolute bottom-8 left-8 z-[400] glass-panel p-4 rounded-xl shadow-2xl bg-white/95 text-xs border border-slate-200 space-y-2">
+                    <div class="font-bold text-slate-500 mb-2 uppercase tracking-wider text-[10px]">Layer Stack</div>
+                    <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-[#0077D4] border border-white shadow"></span> <span class="font-bold text-blue-700">Biodiversity (Point)</span></div>
+                    <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-[#F59E0B] border border-white shadow"></span> <span class="font-medium text-orange-600">Factors (Orange)</span></div>
+                    <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-[#10B981] opacity-50 border border-[#10B981]"></span> <span class="font-bold text-emerald-700">Biosphere Zones</span></div>
+                    <div class="flex items-center gap-2"><span class="w-6 h-0 border-t-2 border-dashed border-slate-500"></span> <span class="font-medium">Interaction</span></div>
+                </div>
+            </div>
+
+            <!-- DASHBOARD VIEW -->
+            <div id="view-dashboard" class="absolute inset-0 p-8 overflow-y-auto hidden bg-slate-100">
+                 <header class="flex justify-between items-end pb-4 border-b border-slate-200 mb-6 bg-white p-6 rounded-2xl shadow-sm">
+                    <div>
+                        <h2 class="text-3xl font-black text-slate-800">Analytics Dashboard</h2>
+                        <p class="text-slate-500 text-sm mt-1">Combined data for Biodiversity and Biosphere Reserves.</p>
+                    </div>
+                    <div class="text-right">
+                         <div class="text-xs font-bold text-slate-400 uppercase">Total Data Points</div>
+                         <div class="text-2xl font-black text-blue-600" id="total-points">0</div>
+                    </div>
+                </header>
+                
+                <!-- SPLIT LAYOUT -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                    
+                    <!-- LEFT: BIODIVERSITY COLUMN -->
+                    <div class="space-y-6">
+                        <div class="flex items-center gap-2 mb-2">
+                             <div class="w-2 h-6 bg-blue-600 rounded-full"></div>
+                             <h3 class="text-lg font-bold text-slate-700">Biodiversity Analytics</h3>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <!-- KPI 1 -->
+                            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-between h-24 relative overflow-hidden">
+                                <div class="z-10">
+                                    <div class="text-3xl font-black text-blue-600" id="kpi-nodes">0</div>
+                                    <div class="text-[10px] text-slate-400 font-bold uppercase mt-1">Total Species</div>
+                                </div>
+                                <i class="fas fa-leaf absolute bottom-[-10px] right-[-10px] text-6xl text-blue-50 opacity-50 z-0"></i>
+                            </div>
+                            <!-- KPI 2 -->
+                            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-between h-24 relative overflow-hidden">
+                                <div class="z-10">
+                                    <div class="text-3xl font-black text-indigo-600" id="kpi-countries-bio">0</div>
+                                    <div class="text-[10px] text-slate-400 font-bold uppercase mt-1">Countries (Bio)</div>
+                                </div>
+                                <i class="fas fa-flag absolute bottom-[-10px] right-[-10px] text-6xl text-indigo-50 opacity-50 z-0"></i>
+                            </div>
+                        </div>
+
+                        <!-- CHARTS COMPACT -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                                <h4 class="text-[10px] font-bold text-slate-400 uppercase mb-2">IUCN Red List</h4>
+                                <div class="chart-container-compact"><canvas id="chart-iucn"></canvas></div>
+                            </div>
+                            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                                <h4 class="text-[10px] font-bold text-slate-400 uppercase mb-2">Top Countries (Species)</h4>
+                                <div class="chart-container-compact"><canvas id="chart-bio-country"></canvas></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT: BIOSPHERE COLUMN -->
+                    <div class="space-y-6">
+                        <div class="flex items-center gap-2 mb-2">
+                             <div class="w-2 h-6 bg-emerald-600 rounded-full"></div>
+                             <h3 class="text-lg font-bold text-slate-700">Biosphere Analytics</h3>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <!-- KPI 3 -->
+                            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-between h-24 relative overflow-hidden">
+                                <div class="z-10">
+                                    <div class="text-3xl font-black text-emerald-600" id="kpi-bio">0</div>
+                                    <div class="text-[10px] text-slate-400 font-bold uppercase mt-1">Biosphere Reserves</div>
+                                </div>
+                                <i class="fas fa-globe absolute bottom-[-10px] right-[-10px] text-6xl text-emerald-50 opacity-50 z-0"></i>
+                            </div>
+                            <!-- KPI 4 -->
+                            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-between h-24 relative overflow-hidden">
+                                <div class="z-10">
+                                    <div class="text-3xl font-black text-orange-600" id="kpi-area">0</div>
+                                    <div class="text-[10px] text-slate-400 font-bold uppercase mt-1">Total Area (M Ha)</div>
+                                </div>
+                                <i class="fas fa-ruler-combined absolute bottom-[-10px] right-[-10px] text-6xl text-orange-50 opacity-50 z-0"></i>
+                            </div>
+                        </div>
+
+                        <!-- CHARTS COMPACT -->
+                        <div class="grid grid-cols-2 gap-4">
+                             <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                                <h4 class="text-[10px] font-bold text-slate-400 uppercase mb-2">Reserve Status</h4>
+                                <div class="chart-container-compact"><canvas id="chart-bio-status"></canvas></div>
+                            </div>
+                            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                                <h4 class="text-[10px] font-bold text-slate-400 uppercase mb-2">Insight: Bio vs Species</h4>
+                                <div class="chart-container-compact"><canvas id="chart-scatter-insight"></canvas></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TABLE SECTION -->
+                <div class="glass-panel rounded-2xl overflow-hidden border border-slate-200 bg-white shadow-sm flex flex-col">
+                    <div class="p-4 bg-slate-50 border-b border-slate-200 flex flex-col md:flex-row gap-4 items-center justify-between">
+                        <div class="font-bold text-slate-700">Data Registry</div>
+                        <div class="flex flex-wrap gap-2 w-full md:w-auto">
+                            <input type="text" id="filter-search" placeholder="Search name..." class="bg-white border border-slate-300 rounded-lg px-3 py-1.5 text-xs outline-none focus:ring-1 focus:ring-blue-500 w-full md:w-48" oninput="BioApp.updateDashboard(true)">
+                            <select id="filter-type" class="bg-white border border-slate-300 rounded-lg px-3 py-1.5 text-xs outline-none w-full md:w-32" onchange="BioApp.updateDashboard(true)">
+                                <option value="all">All Types</option>
+                                <option value="biodiversity">Biodiversity</option>
+                                <option value="biosphere">Biosphere</option>
+                            </select>
+                            <select id="filter-country" class="bg-white border border-slate-300 rounded-lg px-3 py-1.5 text-xs outline-none w-full md:w-32" onchange="BioApp.updateDashboard(true)">
+                                <option value="all">All Countries</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto min-h-[300px]">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-white text-slate-400 uppercase font-bold border-b border-slate-100 sticky top-0"><tr><th class="p-3">Type</th><th class="p-3">Name</th><th class="p-3">Country</th><th class="p-3">Status</th></tr></thead>
+                            <tbody id="dash-table-body" class="divide-y divide-slate-55"></tbody>
+                        </table>
+                    </div>
+                    <div class="p-3 bg-slate-50 border-t border-slate-200 flex justify-between items-center">
+                        <span class="text-xs text-slate-500" id="pagination-info">Showing 0-0 of 0</span>
+                        <div class="flex gap-2"><button onclick="BioApp.prevPage()" id="btn-prev" class="px-3 py-1 bg-white border border-slate-300 rounded text-xs hover:bg-slate-100 disabled:opacity-50 font-bold">Previous</button><button onclick="BioApp.nextPage()" id="btn-next" class="px-3 py-1 bg-white border border-slate-300 rounded text-xs hover:bg-slate-100 disabled:opacity-50 font-bold">Next</button></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODALS (Hidden by default) -->
+    <!-- CHOICE -->
+    <div id="choice-modal" class="fixed inset-0 z-modal hidden flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4"><div class="glass-panel w-96 p-8 rounded-3xl bg-white shadow-2xl text-center"><h3 class="text-xl font-bold text-slate-800 mb-6">Select Data Type</h3><div class="space-y-3"><button onclick="BioApp.initAdd('nodes')" class="w-full py-4 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-xl flex items-center justify-center gap-3 text-blue-700 font-bold transition"><div class="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center"><i class="fas fa-leaf"></i></div> Add Biodiversity</button><button onclick="BioApp.initAdd('biosphere')" class="w-full py-4 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-xl flex items-center justify-center gap-3 text-emerald-700 font-bold transition"><div class="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center"><i class="fas fa-globe"></i></div> Add Biosphere Reserve</button></div><button onclick="ui.closeModal('choice-modal')" class="mt-6 text-slate-400 hover:text-slate-600 text-xs font-bold">Cancel</button></div></div>
+    <!-- EXPORT -->
+    <div id="export-modal" class="fixed inset-0 z-modal hidden flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4"><div class="glass-panel w-80 p-6 rounded-2xl bg-white shadow-2xl text-center"><h3 class="text-lg font-bold text-slate-800 mb-2">Export Data</h3><p class="text-xs text-slate-500 mb-6" id="export-msg">Select dataset to download</p><div class="space-y-2"><button onclick="BioApp.executeExport('nodes')" class="w-full py-3 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-xl flex items-center justify-center gap-2 text-blue-700 font-bold text-xs transition"><i class="fas fa-leaf"></i> Biodiversity Data</button><button onclick="BioApp.executeExport('biosphere')" class="w-full py-3 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-xl flex items-center justify-center gap-2 text-emerald-700 font-bold text-xs transition"><i class="fas fa-globe"></i> Biosphere Data</button></div><button onclick="ui.closeModal('export-modal')" class="mt-4 text-slate-400 hover:text-slate-600 text-xs font-bold">Cancel</button></div></div>
+    <!-- LOGIN -->
+    <div id="login-modal" class="fixed inset-0 z-modal hidden flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4"><div class="glass-panel w-80 p-6 rounded-2xl bg-white shadow-xl"><h3 class="font-bold text-center mb-4">Contributor Login</h3><input id="login-user" class="w-full mb-2 p-2 border rounded text-sm" placeholder="Username"><input id="login-pass" type="password" class="w-full mb-4 p-2 border rounded text-sm" placeholder="Password"><button onclick="BioApp.login()" id="btn-login" class="w-full bg-blue-600 text-white py-2 rounded font-bold text-sm">Login</button><button onclick="ui.closeModal('login-modal')" class="w-full mt-2 text-xs text-slate-400">Cancel</button></div></div>
+    
+    <!-- UPDATE: DYNAMIC HELP MODAL -->
+    <div id="help-modal" class="fixed inset-0 z-modal hidden flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+        <div class="glass-panel w-full max-w-3xl p-0 rounded-3xl bg-white shadow-xl relative overflow-hidden flex flex-col h-[70vh]">
+            <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                <h2 class="text-2xl font-black text-emerald-600">User Guide</h2>
+                <button onclick="ui.closeModal('help-modal')" class="text-slate-400 hover:text-red-500 transition"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            
+            <div class="flex flex-1 overflow-hidden">
+                <!-- Left: Tabs -->
+                <div class="w-1/4 bg-slate-50 border-r border-slate-100 p-4 space-y-2 overflow-y-auto" id="help-tabs-container">
+                    <!-- Dynamic Tabs -->
+                    <div class="text-center text-xs text-slate-400 mt-10">Loading...</div>
+                </div>
+                
+                <!-- Right: Content -->
+                <div class="w-3/4 p-8 overflow-y-auto bg-white custom-scrollbar">
+                    <div id="help-content-container" class="prose prose-sm max-w-none text-slate-600">
+                        <div class="flex flex-col items-center justify-center h-full text-slate-300">
+                            <i class="fas fa-book-open text-4xl mb-2"></i>
+                            <span class="text-xs">Select a guide topic</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- INPUT MODAL -->
+    <div id="input-modal" class="fixed inset-0 z-modal hidden flex items-center justify-center bg-slate-900/80 backdrop-blur-sm p-4"><div class="glass-panel w-full max-w-4xl h-[90vh] rounded-3xl flex flex-col relative bg-white shadow-2xl"><div class="p-6 border-b border-slate-200 flex justify-between items-center bg-slate-50 rounded-t-3xl"><div><h3 id="input-title" class="text-xl font-bold text-slate-800">Add Entry</h3><p class="text-xs text-slate-500" id="input-subtitle">Filling data...</p></div><button onclick="ui.closeModal('input-modal')" class="text-slate-400 hover:text-red-500 transition"><i class="fas fa-times text-xl"></i></button></div><div class="p-8 overflow-y-auto custom-scrollbar space-y-6 flex-1 bg-white"><input type="hidden" id="inp-id"><input type="hidden" id="inp-type"><div class="grid grid-cols-1 md:grid-cols-2 gap-6"><div><label class="text-xs text-slate-500 font-bold block mb-1">Name</label><input type="text" id="inp-name" class="w-full rounded-xl p-3 shadow-sm border border-slate-200 text-sm focus:border-blue-500 outline-none"></div><div><label class="text-xs text-slate-500 font-bold block mb-1">Country</label><input type="text" id="inp-country" class="w-full rounded-xl p-3 shadow-sm border border-slate-200 text-sm"></div></div><div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 shadow-sm"><div class="flex justify-between items-center mb-4"><label class="text-sm text-slate-700 font-bold flex items-center gap-2"><i class="fas fa-map-marker-alt"></i> Location & Geometry</label><div class="flex gap-2"><button id="btn-set-point" type="button" onclick="BioApp.pickLocation('main')" class="text-[10px] bg-blue-600 hover:bg-blue-700 px-3 py-1.5 rounded-lg text-white font-bold transition">Set Point</button><button id="btn-draw-area" type="button" onclick="geoEditor.start()" class="text-[10px] bg-purple-600 hover:bg-purple-700 px-3 py-1.5 rounded-lg text-white font-bold transition">Draw Area (GIS)</button></div></div><div id="coord-inputs" class="grid grid-cols-2 gap-4 mb-4"><input type="text" id="inp-lat" placeholder="Latitude" class="bg-white border border-slate-300 rounded-xl p-3 text-xs"><input type="text" id="inp-lng" placeholder="Longitude" class="bg-white border border-slate-300 rounded-xl p-3 text-xs"></div><textarea id="inp-geometry" rows="1" class="w-full bg-white border border-slate-300 rounded-xl p-3 text-slate-400 text-[10px] font-mono" placeholder="GIS Geometry JSON" readonly></textarea></div><div id="section-nodes" class="space-y-6 border-l-4 border-blue-500 pl-4 bg-blue-50/50 p-4 rounded-r-xl"><div class="text-xs font-bold text-blue-500 uppercase">Biodiversity Specific</div><div class="grid grid-cols-2 gap-6"><div><label class="text-xs text-slate-500 font-bold block mb-1">Latin Name</label><input type="text" id="inp-latin" class="w-full rounded-xl p-3 shadow-sm border border-slate-200 text-sm italic"></div><div><label class="text-xs text-slate-500 font-bold block mb-1">Status (IUCN)</label><input type="text" id="inp-nodes-status" class="w-full rounded-xl p-3 shadow-sm border border-slate-200 text-sm"></div></div><div><label class="text-xs text-slate-500 font-bold block mb-1">Contact / Organization</label><input type="text" id="inp-contact" class="w-full rounded-xl p-3 shadow-sm border border-slate-200 text-sm"></div><div class="bg-orange-50 p-4 rounded-xl border border-orange-100 relative"><div class="flex justify-between items-center mb-2"><label class="text-xs text-orange-600 font-bold"><i class="fas fa-cube"></i> Affected By</label><button type="button" onclick="BioApp.pickLocation('origin')" class="text-[9px] bg-orange-500 text-white px-2 py-1 rounded">Set Loc</button></div><div class="grid grid-cols-2 gap-2 mb-2"><div class="relative w-full"><input type="text" id="inp-aff-name" placeholder="Name" class="w-full rounded p-2 text-xs border border-orange-200" oninput="BioApp.suggestConnections(this.value)"><div id="suggestion-list" class="absolute top-full left-0 w-full bg-white border border-slate-200 rounded-b-xl shadow-lg max-h-40 overflow-y-auto z-50 hidden custom-scrollbar"></div></div><input type="text" id="inp-conn-type" placeholder="Interaction Type" class="w-full rounded p-2 text-xs border border-orange-200"></div><div class="hidden"><input id="inp-aff-lat"><input id="inp-aff-lng"></div></div></div><div id="section-biosphere" class="hidden space-y-6 border-l-4 border-emerald-500 pl-4 bg-emerald-50/50 p-4 rounded-r-xl"><div class="text-xs font-bold text-emerald-500 uppercase">Biosphere Reserve Specific</div><div class="grid grid-cols-2 gap-6"><div><label class="text-xs text-slate-500 font-bold block mb-1">Region</label><input type="text" id="inp-region" class="w-full rounded-xl p-3 shadow-sm border border-slate-200 text-sm"></div><div><label class="text-xs text-slate-500 font-bold block mb-1">UNESCO Year</label><input type="text" id="inp-year" class="w-full rounded-xl p-3 shadow-sm border border-slate-200 text-sm"></div></div><div class="grid grid-cols-2 gap-6"><div><label class="text-xs text-slate-500 font-bold block mb-1">Status (e.g. Active)</label><input type="text" id="inp-bio-status" class="w-full rounded-xl p-3 shadow-sm border border-slate-200 text-sm"></div><div><label class="text-xs text-slate-500 font-bold block mb-1">Area Total (Ha)</label><input type="text" id="inp-area" class="w-full rounded-xl p-3 shadow-sm border border-slate-200 text-sm"></div></div></div><div><label class="text-xs text-slate-500 font-bold block mb-1">Description</label><div class="w-full rounded-xl border border-slate-200 overflow-hidden shadow-sm focus-within:ring-2 ring-blue-100"><div class="rt-toolbar"><button type="button" class="rt-btn font-bold" onclick="BioApp.insertTag('<b>', '</b>')">B</button><button type="button" class="rt-btn italic" onclick="BioApp.insertTag('<i>', '</i>')">I</button><button type="button" class="rt-btn" onclick="BioApp.insertTag('<h3>', '</h3>')">H3</button><button type="button" class="rt-btn" onclick="BioApp.insertTag('<ul>\n<li>', '</li>\n</ul>')">List</button><button type="button" class="rt-btn" onclick="BioApp.insertTag('<br>', '')">Enter</button></div><textarea id="inp-desc" rows="4" class="w-full p-3 text-sm outline-none resize-none"></textarea></div></div><div class="grid grid-cols-1 md:grid-cols-3 gap-4"><div><label class="text-xs text-slate-500 font-bold block mb-1">Image URLs (,)</label><input type="text" id="inp-image" class="w-full rounded-xl p-2 border border-slate-200 text-xs"></div><div><label class="text-xs text-slate-500 font-bold block mb-1">YouTube URLs (,)</label><input type="text" id="inp-youtube" class="w-full rounded-xl p-2 border border-slate-200 text-xs"></div><div><label class="text-xs text-slate-500 font-bold block mb-1">Research Links (,)</label><input type="text" id="inp-links" class="w-full rounded-xl p-2 border border-slate-200 text-xs"></div></div></div><div class="p-6 border-t border-slate-200 bg-slate-50 rounded-b-3xl flex justify-between items-center"><button id="btn-delete" onclick="BioApp.deleteData()" class="hidden text-red-500 text-xs font-bold hover:underline">Delete Entry</button><div class="flex gap-4 ml-auto"><button onclick="ui.closeModal('input-modal')" class="px-6 py-2 text-slate-500 font-bold hover:text-slate-700">Cancel</button><button onclick="BioApp.saveData()" id="btn-save" class="px-8 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold shadow-lg">Save</button></div></div></div></div>
+
+    <!-- DETAIL MODAL -->
+    <div id="detail-modal" class="fixed inset-0 z-modal hidden flex items-center justify-center bg-slate-900/80 backdrop-blur-md p-4"><div class="glass-panel w-full max-w-5xl h-[90vh] rounded-3xl flex flex-col relative bg-white shadow-2xl overflow-hidden"><button onclick="ui.closeModal('detail-modal')" class="absolute top-4 right-4 z-50 w-8 h-8 bg-slate-100 rounded-full hover:bg-red-100 text-slate-400 hover:text-red-500 flex items-center justify-center transition shadow"><i class="fas fa-times"></i></button><div class="grid grid-cols-1 md:grid-cols-2 h-full"><div class="bg-black relative group h-1/2 md:h-full overflow-hidden"><div id="img-carousel" class="w-full h-full relative"></div><button id="img-prev" class="nav-btn nav-prev force-hidden" onclick="ui.prevMedia('img')"><i class="fas fa-chevron-left"></i></button><button id="img-next" class="nav-btn nav-next force-hidden" onclick="ui.nextMedia('img')"><i class="fas fa-chevron-right"></i></button><div class="absolute bottom-0 left-0 w-full p-6 bg-gradient-to-t from-black/90 via-black/50 to-transparent pointer-events-none"><div class="flex gap-2 mb-2"><span id="dt-tag-type" class="px-2 py-1 rounded text-[9px] font-bold bg-blue-600 text-white shadow">BIODIVERSITY</span><!-- FIXED: Better contrast background --><span id="dt-tag-country" class="px-2 py-1 rounded text-[9px] font-bold bg-black/60 text-white backdrop-blur shadow border border-white/20">COUNTRY</span></div><h2 id="dt-title" class="text-3xl font-black text-white leading-tight drop-shadow-md">Title</h2><p id="dt-subtitle" class="text-slate-300 italic text-sm mt-1">Subtitle</p></div></div><div class="p-8 overflow-y-auto bg-slate-50 h-1/2 md:h-full custom-scrollbar"><div class="flex flex-wrap gap-2 mb-4"><div id="dt-admin-btn" class="hidden"><button onclick="BioApp.editCurrent()" class="text-[10px] bg-amber-100 text-amber-600 px-3 py-1 rounded-full font-bold hover:bg-amber-200 border border-amber-200 flex items-center gap-1"><i class="fas fa-edit"></i> EDIT DATA</button></div><button onclick="BioApp.exportCurrentGeoJSON()" class="text-[10px] bg-blue-50 text-blue-600 px-3 py-1 rounded-full font-bold hover:bg-blue-100 border border-blue-200 flex items-center gap-1"><i class="fas fa-file-export"></i> EXPORT GEOJSON</button><button onclick="BioApp.exportPDF()" class="text-[10px] bg-red-50 text-red-600 px-3 py-1 rounded-full font-bold hover:bg-red-100 border border-red-200 flex items-center gap-1"><i class="fas fa-file-pdf"></i> EXPORT PDF</button></div><div id="vid-section" class="mb-6 hidden"><div class="text-[10px] font-bold text-slate-400 uppercase mb-2">Media & Observation</div><div class="relative bg-black rounded-xl overflow-hidden shadow-lg aspect-video border border-slate-200"><div id="vid-carousel" class="w-full h-full relative"></div><button id="vid-prev" class="nav-btn nav-prev force-hidden" onclick="ui.prevMedia('vid')"><i class="fas fa-chevron-left"></i></button><button id="vid-next" class="nav-btn nav-next force-hidden" onclick="ui.nextMedia('vid')"><i class="fas fa-chevron-right"></i></button></div></div><div class="prose prose-sm text-slate-600 mb-6 border-b border-slate-200 pb-6"><h3 class="text-xs font-bold text-slate-800 uppercase mb-2">Description</h3><div id="dt-desc" class="whitespace-pre-wrap leading-relaxed text-justify">Description...</div></div><div class="mb-6"><div class="flex justify-between items-center mb-2"><h3 class="text-xs font-bold text-slate-800 uppercase">Geographic Context</h3><span id="map-legend-label" class="text-[9px] bg-purple-100 text-purple-700 px-2 py-0.5 rounded font-bold">GIS Multi-Layer View</span></div><div id="detail-mini-map" class="w-full h-48 bg-slate-200 rounded-xl overflow-hidden shadow-inner border border-slate-300 z-0 relative"><div class="map-badge"><div class="flex items-center"><span class="legend-dot bg-[#9333ea]"></span> Current</div><div class="flex items-center"><span class="legend-dot bg-[#F59E0B]"></span> Factor</div></div></div><div class="mt-2 text-[10px] text-slate-400 italic" id="map-context-note">*Layers: Orange (Ecosystem Network) vs Purple (Selected Species).</div></div><div id="dt-extra-info" class="grid grid-cols-2 gap-4 mb-6 text-xs text-slate-500 bg-white p-4 rounded-xl border border-slate-200 shadow-sm"></div><div class="mb-6"><h3 class="text-xs font-bold text-slate-800 uppercase mb-3">Research & References</h3><div id="dt-links-area" class="space-y-3"></div></div></div></div></div></div>
+
+    <!-- GEO EDITOR -->
+    <div id="geo-editor" class="fixed inset-0 z-picker hidden bg-slate-100"><div id="geo-map" class="w-full h-full"></div><div class="fixed bottom-12 left-1/2 -translate-x-1/2 bg-white px-6 py-3 rounded-full shadow-2xl flex gap-6 text-sm font-bold z-[9999] border-2 border-slate-200 items-center"><span class="text-purple-600 flex items-center"><i class="fas fa-pen-nib mr-2"></i> DRAWING</span><button onclick="geoEditor.clear()" class="text-red-500 hover:text-red-700 border-r border-slate-200 pr-6 mr-2"><i class="fas fa-trash-alt mr-1"></i> RESET MAP</button><button onclick="geoEditor.finish()" class="text-green-600 hover:text-green-800 uppercase tracking-wide">Save Geometry</button><button onclick="geoEditor.cancel()" class="text-slate-400 hover:text-slate-600">Cancel</button></div></div>
+
+    <script>
+        const GAS_URL = 'https://script.google.com/macros/s/AKfycbxq2TOvwVBD12hIfm4H4Fu7PNOaodDN-7iQXYlDY4KwmZCcgRRwRcJYj62IjAlM2wDIpg/exec';
+        const state = { nodes: [], biosphere: [], notes: [], role: 'guest', currentDetail: null, currentType: null, inputMode: 'nodes', media: { imgIdx: 0, vidIdx: 0, images: [], videos: [] }, charts: { iucn: null, bioCountry: null, bioStatus: null, scatterInsight: null }, pagination: { currentPage: 1, itemsPerPage: 15 }, filters: { search: '', type: 'all', country: 'all' }, currentExportFormat: 'csv', layerFilter: 'all', pickerMode: null };
+
+        function sanitizeHTML(str) { if (!str) return ''; return str.replace(/<script\b[^>]*>([\s\S]*?)<\/script>/gm, "").replace(/on\w+="[^"]*"/g, "").replace(/javascript:/g, ""); }
+        function safeURL(url) { try { const parsed = new URL(url.trim()); if (['http:', 'https:'].includes(parsed.protocol)) return parsed.href; } catch (e) { try { const parsed = new URL('https://' + url.trim()); if (['http:', 'https:'].includes(parsed.protocol)) return parsed.href; } catch (e2) {} } return null; }
+        function getYouTubeId(url) { if (!url) return null; const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/; const match = url.match(regExp); return (match && match[2].length === 11) ? match[2] : null; }
+        function robustParse(val) { if (!val) return null; let str = String(val).trim().replace(',', '.'); let n = parseFloat(str); if (isNaN(n)) return null; if (Math.abs(n) > 100000) { while (Math.abs(n) > 180) n /= 10; } return n; }
+        function isValidLatLng(lat, lng) { return lat !== null && lng !== null && !isNaN(lat) && !isNaN(lng) && Math.abs(lat) <= 90 && Math.abs(lng) <= 180; }
+
+        const ui = {
+            openModal: (id) => document.getElementById(id).classList.remove('hidden'), closeModal: (id) => document.getElementById(id).classList.add('hidden'),
+            renderAuth: () => { const isAdmin = state.role === 'admin'; const guestEl = document.getElementById('status-guest'); const adminEl = document.getElementById('status-admin'); const adminBtn = document.getElementById('dt-admin-btn'); if(guestEl) guestEl.classList.toggle('hidden', isAdmin); if(adminEl) adminEl.classList.toggle('hidden', !isAdmin); if(adminBtn) adminBtn.classList.toggle('hidden', !isAdmin); },
+            renderMedia: (type) => {
+                const isImg = type === 'img'; const items = isImg ? state.media.images : state.media.videos; const idx = isImg ? state.media.imgIdx : state.media.vidIdx; const container = document.getElementById(isImg ? 'img-carousel' : 'vid-carousel'); const prev = document.getElementById(isImg ? 'img-prev' : 'vid-prev'); const next = document.getElementById(isImg ? 'img-next' : 'vid-next');
+                container.innerHTML = ''; if(items.length === 0) { container.innerHTML = `<div class="w-full h-full flex items-center justify-center text-slate-500 text-xs flex-col"><i class="fas fa-${isImg?'image':'video'} text-2xl mb-2 opacity-50"></i>No ${isImg?'Images':'Videos'}</div>`; prev.classList.add('force-hidden'); next.classList.add('force-hidden'); return; }
+                if(items.length > 1) { prev.classList.remove('force-hidden'); next.classList.remove('force-hidden'); } else { prev.classList.add('force-hidden'); next.classList.add('force-hidden'); }
+                if(isImg) { const img = document.createElement('img'); img.src = items[idx]; img.className = "w-full h-full object-cover fade-in"; img.onerror = () => { img.src = 'https://via.placeholder.com/400x300?text=No+Image'; }; container.appendChild(img); } 
+                else { const vidId = getYouTubeId(items[idx]); if (vidId) { const thumbUrl = `https://img.youtube.com/vi/${vidId}/hqdefault.jpg`; container.innerHTML = `<div class="relative w-full h-full cursor-pointer group fade-in" onclick="this.innerHTML='<iframe width=\\'100%\\' height=\\'100%\\' src=\\'https://www.youtube.com/embed/${vidId}?autoplay=1\\' frameborder=\\'0\\' allow=\\'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture\\' allowfullscreen></iframe>'"><img src="${thumbUrl}" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/480x360?text=Video+Unavailable'"><div class="yt-overlay"><div class="yt-btn"><i class="fas fa-play text-xl ml-1"></i></div></div></div>`; } else { container.innerHTML = `<div class="w-full h-full flex items-center justify-center text-red-500 text-xs flex-col"><i class="fas fa-exclamation-triangle text-2xl mb-2"></i>Invalid Video URL</div>`; } }
+            },
+            nextMedia: (type) => { const len = type==='img'?state.media.images.length:state.media.videos.length; if(type==='img') state.media.imgIdx=(state.media.imgIdx+1)%len; else state.media.vidIdx=(state.media.vidIdx+1)%len; ui.renderMedia(type); },
+            prevMedia: (type) => { const len = type==='img'?state.media.images.length:state.media.videos.length; if(type==='img') state.media.imgIdx=(state.media.imgIdx-1+len)%len; else state.media.vidIdx=(state.media.vidIdx-1+len)%len; ui.renderMedia(type); }
+        };
+
+        const mapLogic = {
+            map: null, detailMap: null, layers: [],
+            init: () => { mapLogic.map = L.map('map-container', {zoomControl: false}).setView([0,0], 2); L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(mapLogic.map); L.control.zoom({position: 'topright'}).addTo(mapLogic.map); mapLogic.map.createPane('biospherePane').style.zIndex = 400; mapLogic.map.createPane('linesPane').style.zIndex = 450; mapLogic.map.createPane('nodesPolyPane').style.zIndex = 460; mapLogic.map.createPane('orangePane').style.zIndex = 500; mapLogic.map.createPane('nodesPane').style.zIndex = 600; },
+            initDetailMap: () => { if(mapLogic.detailMap) { mapLogic.detailMap.remove(); } mapLogic.detailMap = L.map('detail-mini-map', {zoomControl: false, preferCanvas: true}); L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(mapLogic.detailMap); mapLogic.detailMap.createPane('factors'); mapLogic.detailMap.getPane('factors').style.zIndex = 400; mapLogic.detailMap.createPane('current'); mapLogic.detailMap.getPane('current').style.zIndex = 650; },
+            render: () => {
+                mapLogic.layers.forEach(l => mapLogic.map.removeLayer(l)); mapLogic.layers = [];
+                const search = document.getElementById('map-search').value.toLowerCase();
+                
+                const sortedBiosphere = [...state.biosphere].sort((a, b) => {
+                    const areaA = parseFloat(a.area_total_ha) || 0;
+                    const areaB = parseFloat(b.area_total_ha) || 0;
+                    return areaB - areaA;
+                });
+
+                if(state.layerFilter === 'all' || state.layerFilter === 'biosphere') {
+                    sortedBiosphere.forEach(b => {
+                        if(search && !b.name_bio.toLowerCase().includes(search) && !b.country.toLowerCase().includes(search)) return;
+                        let layer; let geo = BioApp.getGeometry(b);
+                        if(geo) { const start = geo.indexOf('['); const end = geo.lastIndexOf(']'); if(start !== -1 && end !== -1) geo = geo.substring(start, end + 1); }
+                        if(geo) { try { const pts = JSON.parse(geo); layer = L.polygon(pts, { pane: 'biospherePane', color: '#10B981', weight: 1, fillOpacity: 0.4 }); } catch(e) {} }
+                        if(layer) { layer.addTo(mapLogic.map); layer.on('click', () => BioApp.showDetail(b, 'biosphere')); layer.bindTooltip(b.name_bio, {className: 'custom-tooltip bio-tooltip', direction: 'center', permanent: false}); mapLogic.layers.push(layer); }
+                    });
+                }
+                if(state.layerFilter === 'all' || state.layerFilter === 'nodes') {
+                    state.nodes.forEach(n => {
+                        if(search && !n.local_name.toLowerCase().includes(search)) return;
+                        if(!isValidLatLng(n.lat, n.lng)) return;
+                        
+                        // FIX: Added logging to debug missing lines
+                        // If coordinates exist, draw dashed line
+                        if(isValidLatLng(n.affectedby_lat, n.affectedby_lng)) {
+                            const line = L.polyline([[n.affectedby_lat, n.affectedby_lng], [n.lat, n.lng]], { pane: 'linesPane', color: '#64748b', weight: 1, dashArray: '4,4' }).addTo(mapLogic.map);
+                            const orange = L.marker([n.affectedby_lat, n.affectedby_lng], { pane: 'orangePane', icon: L.divIcon({ className: 'geo-marker-icon', html: '<div style="background:#F59E0B; width:100%; height:100%; border-radius:50%; border:2px solid white;"></div>', iconSize: [10,10] }) }).addTo(mapLogic.map);
+                            orange.bindTooltip(n.affectedby_local_name || 'Factor', {className: 'custom-tooltip'}); mapLogic.layers.push(line, orange);
+                        }
+                        
+                        const marker = L.marker([n.lat, n.lng], { pane: 'nodesPane', icon: L.divIcon({ className: 'geo-marker-icon', iconSize: [14,14] }) }).addTo(mapLogic.map);
+                        marker.on('click', (e) => { if (state.pickerMode === 'origin') { L.DomEvent.stopPropagation(e); BioApp.selectConnection(n); BioApp.cancelPicker(); return; } BioApp.showDetail(n, 'nodes'); });
+                        marker.bindTooltip(n.local_name, {className: 'custom-tooltip'}); mapLogic.layers.push(marker);
+                    });
+                }
+            }
+        };
+
+        const geoEditor = {
+            map: null, layer: null, points: [], markers: [],
+            start: () => { ui.closeModal('input-modal'); document.getElementById('geo-editor').classList.remove('hidden'); if(!geoEditor.map) { geoEditor.map = L.map('geo-map', {zoomControl: false}).setView([0,0], 2); L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(geoEditor.map); geoEditor.map.on('click', e => geoEditor.addPoint(e.latlng)); } setTimeout(()=>geoEditor.map.invalidateSize(), 200); geoEditor.reset(); const existing = document.getElementById('inp-geometry').value; if(existing) { try { const pts = JSON.parse(existing); pts.forEach(p => geoEditor.addPoint({lat: p[0], lng: p[1]})); if(pts.length > 0) { const bounds = L.latLngBounds(pts); geoEditor.map.fitBounds(bounds, {padding: [50,50]}); } } catch(e){} } },
+            reset: () => { geoEditor.points = []; geoEditor.markers.forEach(m => geoEditor.map.removeLayer(m)); geoEditor.markers = []; if(geoEditor.layer) geoEditor.map.removeLayer(geoEditor.layer); },
+            clear: () => { geoEditor.reset(); },
+            addPoint: (latlng) => { const m = L.marker(latlng, {draggable: true}).addTo(geoEditor.map); m.on('drag', () => geoEditor.updatePoly()); geoEditor.markers.push(m); geoEditor.updatePoly(); },
+            updatePoly: () => { geoEditor.points = geoEditor.markers.map(m => [m.getLatLng().lat, m.getLatLng().lng]); if(geoEditor.layer) geoEditor.map.removeLayer(geoEditor.layer); if(geoEditor.points.length > 2) geoEditor.layer = L.polygon(geoEditor.points, {color:'#9333ea'}).addTo(geoEditor.map); },
+            finish: () => { if(geoEditor.points.length > 0) document.getElementById('inp-geometry').value = JSON.stringify(geoEditor.points); if(geoEditor.points.length === 0) document.getElementById('inp-geometry').value = ''; geoEditor.cancel(); },
+            cancel: () => { document.getElementById('geo-editor').classList.add('hidden'); ui.openModal('input-modal'); }
+        };
+
+        const BioApp = {
+            init: () => { ui.renderAuth(); BioApp.fetchData(); },
+            getGeometry: (d) => { if (!d) return null; if (d.geo_json) return d.geo_json; if (d.geometry_json) return d.geometry_json; if (d.geometry) return d.geometry; if (d.GEOMETRY_JSON) return d.GEOMETRY_JSON; const key = Object.keys(d).find(k => /geo(metry|_json)/i.test(k)); return key ? d[key] : null; },
+            
+            // --- NEW: FETCH LITE DATA ---
+            fetchData: () => {
+                document.getElementById('loading-container').classList.remove('hidden');
+                // Use action=get_map_lite for lightweight data
+                fetch(GAS_URL + '?action=get_map_lite&t=' + new Date().getTime())
+                .then(r => r.json())
+                .then(d => {
+                    if(d.status === 'success') {
+                        // Map Lite Data (Short keys: n=name, c=country, s=status, a=area, g=geo) to Application State
+                        state.nodes = d.nodes.map(n => ({
+                            id: n.id,
+                            local_name: n.n,
+                            country: n.c,
+                            lat: robustParse(n.lat),
+                            lng: robustParse(n.lng),
+                            unesco_status: n.s,
+                            // FIX: Added mapping for interaction lines
+                            // Checks for both short keys (alat) or long keys (affectedby_lat)
+                            affectedby_lat: robustParse(n.alat || n.affectedby_lat), 
+                            affectedby_lng: robustParse(n.alng || n.affectedby_lng),
+                            // Updated: Added n.aff based on your GAS code
+                            affectedby_local_name: n.aff || n.an || n.affectedby_local_name
+                        }));
+
+                        state.biosphere = d.biosphere.map(b => ({
+                            id: b.id,
+                            name_bio: b.n,
+                            country: b.c,
+                            region: b.r,
+                            status: b.s,
+                            area_total_ha: b.a,
+                            geometry_json: b.g, // Keep geojson for map rendering
+                        }));
+
+                        state.notes = d.notes || [];
+
+                        document.getElementById('loading-container').classList.add('hidden');
+                        document.getElementById('entry-buttons').classList.remove('hidden');
+                        
+                        BioApp.populateFilters();
+                        if(!mapLogic.map) mapLogic.init();
+                        mapLogic.render(); // Render map with lite data
+                        BioApp.updateDashboard(); // Render dashboard with lite data
+                    } else {
+                        alert('Database Error: ' + d.message);
+                        document.getElementById('loading-container').innerHTML = `<span class="text-red-400 font-bold">${d.message}</span>`;
+                    }
+                }).catch(e => {
+                    console.error(e);
+                    alert('Network Error');
+                    document.getElementById('loading-container').innerHTML = `<span class="text-red-400 font-bold">Connection Failed</span>`;
+                });
+            },
+
+            populateFilters: () => { const countries = new Set([...state.nodes.map(x=>x.country), ...state.biosphere.map(x=>x.country)]); const sel = document.getElementById('filter-country'); sel.innerHTML = '<option value="all">All Countries</option>'; Array.from(countries).sort().forEach(c => { if(c) sel.innerHTML += `<option value="${c}">${c}</option>`; }); },
+            enterAsGuest: () => { document.getElementById('landing-page').style.display = 'none'; document.getElementById('main-app').classList.add('active'); setTimeout(()=>mapLogic.map.invalidateSize(), 500); },
+            enterAsContributor: () => ui.openModal('login-modal'),
+            login: () => { const btn = document.getElementById('btn-login'); btn.innerText = 'Checking...'; const f = new URLSearchParams(); f.append('action','login'); f.append('username', document.getElementById('login-user').value); f.append('password', document.getElementById('login-pass').value); fetch(GAS_URL, {method:'POST', body:f}).then(r=>r.json()).then(d=>{ if(d.status==='success') { state.role='admin'; ui.closeModal('login-modal'); ui.renderAuth(); if(document.getElementById('landing-page').style.display!=='none') BioApp.enterAsGuest(); } else alert(d.message); }).finally(()=>btn.innerText='Login'); },
+            logout: () => { state.role='guest'; ui.renderAuth(); alert('Logged Out'); },
+            switchTab: (t) => { document.getElementById('view-map').classList.toggle('hidden', t!=='map'); document.getElementById('view-dashboard').classList.toggle('hidden', t!=='dashboard'); document.getElementById('nav-map').className = t==='map' ? "w-full text-left p-3 rounded-xl flex items-center text-sm font-bold bg-blue-50 text-blue-600" : "w-full text-left p-3 rounded-xl hover:bg-blue-50 text-slate-500 hover:text-blue-600 transition flex items-center text-sm font-bold"; document.getElementById('nav-dashboard').className = t==='dashboard' ? "w-full text-left p-3 rounded-xl flex items-center text-sm font-bold bg-blue-50 text-blue-600" : "w-full text-left p-3 rounded-xl hover:bg-blue-50 text-slate-500 hover:text-blue-600 transition flex items-center text-sm font-bold"; if(t==='map') setTimeout(()=>mapLogic.map.invalidateSize(), 200); },
+            updateMapFilter: () => mapLogic.render(),
+            setLayerFilter: (type) => { state.layerFilter = type; const btns = { 'all': document.getElementById('btn-filter-all'), 'nodes': document.getElementById('btn-filter-nodes'), 'biosphere': document.getElementById('btn-filter-biosphere') }; Object.values(btns).forEach(b => { b.className = "flex-1 px-3 py-1.5 text-[10px] font-bold rounded-lg text-slate-500 hover:bg-slate-100 transition"; }); if (type === 'all') btns['all'].className = "flex-1 px-3 py-1.5 text-[10px] font-bold rounded-lg bg-slate-800 text-white shadow-sm transition"; else if (type === 'nodes') btns['nodes'].className = "flex-1 px-3 py-1.5 text-[10px] font-bold rounded-lg bg-blue-600 text-white shadow-sm transition"; else if (type === 'biosphere') btns['biosphere'].className = "flex-1 px-3 py-1.5 text-[10px] font-bold rounded-lg bg-emerald-600 text-white shadow-sm transition"; mapLogic.render(); },
+            suggestConnections: (val) => { const list = document.getElementById('suggestion-list'); list.innerHTML = ''; if (!val || val.length < 2) { list.classList.add('hidden'); return; } const search = val.toLowerCase(); const matches = state.nodes.filter(n => (n.local_name && n.local_name.toLowerCase().includes(search)) || (n.latin_name && n.latin_name.toLowerCase().includes(search))).slice(0, 8); if (matches.length === 0) { list.classList.add('hidden'); return; } matches.forEach(m => { const div = document.createElement('div'); div.className = 'suggestion-item'; div.innerHTML = `<strong>${m.local_name}</strong> <span class="text-slate-400">(${m.country})</span><div class="text-[9px] text-slate-400 font-mono">Coords: ${m.lat}, ${m.lng}</div>`; div.onclick = () => BioApp.selectConnection(m); list.appendChild(div); }); list.classList.remove('hidden'); },
+            selectConnection: (node) => { document.getElementById('inp-aff-name').value = node.local_name; document.getElementById('inp-aff-lat').value = node.lat; document.getElementById('inp-aff-lng').value = node.lng; document.getElementById('suggestion-list').classList.add('hidden'); },
+            showAddChoice: () => ui.openModal('choice-modal'),
+            initAdd: (type) => { ui.closeModal('choice-modal'); state.currentDetail = null; state.inputMode = type; BioApp.resetInputForm(); ui.openModal('input-modal'); },
+            resetInputForm: () => { document.querySelectorAll('#input-modal input, #input-modal textarea').forEach(e=>e.value=''); const isBio = state.inputMode === 'biosphere'; document.getElementById('section-nodes').classList.toggle('hidden', isBio); document.getElementById('section-biosphere').classList.toggle('hidden', !isBio); document.getElementById('input-title').innerText = isBio ? 'Add Biosphere Reserve' : 'Add Biodiversity'; document.getElementById('input-title').className = isBio ? "text-xl font-bold text-emerald-600" : "text-xl font-bold text-blue-600"; document.getElementById('coord-inputs').classList.toggle('hidden', isBio); document.getElementById('btn-set-point').classList.toggle('hidden', isBio); document.getElementById('btn-delete').classList.add('hidden'); document.getElementById('inp-type').value = state.inputMode; document.getElementById('suggestion-list').classList.add('hidden'); },
+            editCurrent: () => { const d = state.currentDetail; const type = state.currentType; state.inputMode = type; BioApp.resetInputForm(); document.getElementById('inp-id').value = d.id; document.getElementById('inp-name').value = type==='nodes' ? d.local_name : d.name_bio; document.getElementById('inp-country').value = d.country; document.getElementById('inp-youtube').value = d.youtube_url; document.getElementById('inp-image').value = d.image_url; document.getElementById('inp-links').value = d.research_links; document.getElementById('inp-desc').value = d.description; document.getElementById('inp-geometry').value = BioApp.getGeometry(d); if(type === 'nodes') { document.getElementById('inp-lat').value = d.lat; document.getElementById('inp-lng').value = d.lng; document.getElementById('inp-latin').value = d.latin_name; document.getElementById('inp-nodes-status').value = d.unesco_status; document.getElementById('inp-contact').value = d.contact; document.getElementById('inp-aff-name').value = d.affectedby_local_name; document.getElementById('inp-conn-type').value = d.connection_type; document.getElementById('inp-aff-lat').value = d.affectedby_lat; document.getElementById('inp-aff-lng').value = d.affectedby_lng; } else { document.getElementById('inp-region').value = d.region; document.getElementById('inp-year').value = d.unesco_year; document.getElementById('inp-bio-status').value = d.status; document.getElementById('inp-area').value = d.area_total_ha; } document.getElementById('btn-delete').classList.remove('hidden'); ui.closeModal('detail-modal'); ui.openModal('input-modal'); },
+            insertTag: (open, close) => { const el = document.getElementById('inp-desc'); const start = el.selectionStart; const end = el.selectionEnd; const txt = el.value; el.value = txt.substring(0, start) + open + txt.substring(start, end) + close + txt.substring(end); el.focus(); el.selectionStart = el.selectionEnd = start + open.length + (end - start); },
+            saveData: () => { const type = state.inputMode; const id = document.getElementById('inp-id').value; const isBio = type === 'biosphere'; const payload = { id: id, country: document.getElementById('inp-country').value, description: document.getElementById('inp-desc').value, image_url: document.getElementById('inp-image').value, youtube_url: document.getElementById('inp-youtube').value, research_links: document.getElementById('inp-links').value, geo_json: document.getElementById('inp-geometry').value }; if(isBio) { payload.name_bio = document.getElementById('inp-name').value; payload.region = document.getElementById('inp-region').value; payload.unesco_year = document.getElementById('inp-year').value; payload.status = document.getElementById('inp-bio-status').value; payload.area_total_ha = document.getElementById('inp-area').value; } else { payload.local_name = document.getElementById('inp-name').value; payload.latin_name = document.getElementById('inp-latin').value; payload.lat = document.getElementById('inp-lat').value; payload.lng = document.getElementById('inp-lng').value; payload.unesco_status = document.getElementById('inp-nodes-status').value; payload.contact = document.getElementById('inp-contact').value; payload.affectedby_local_name = document.getElementById('inp-aff-name').value; payload.connection_type = document.getElementById('inp-conn-type').value; payload.affectedby_lat = document.getElementById('inp-aff-lat').value; payload.affectedby_lng = document.getElementById('inp-aff-lng').value; } const btn = document.getElementById('btn-save'); btn.innerText = 'Saving...'; const f = new URLSearchParams(); f.append('action', id ? 'update' : 'insert'); f.append('type', type); f.append('data', JSON.stringify(payload)); fetch(GAS_URL, {method:'POST', body:f}).then(r=>r.json()).then(d=>{ if(d.status==='success') { alert('Saved!'); ui.closeModal('input-modal'); BioApp.fetchData(); } else alert(d.message); }).finally(()=>btn.innerText='Save'); },
+            deleteData: () => { if(!confirm('Delete this entry?')) return; const f = new URLSearchParams(); f.append('action', 'delete'); f.append('type', state.inputMode); f.append('id', document.getElementById('inp-id').value); fetch(GAS_URL, {method:'POST', body:f}).then(r=>r.json()).then(d=>{ if(d.status==='success') { alert('Deleted'); ui.closeModal('input-modal'); BioApp.fetchData(); } else alert(d.message); }) },
+            
+            showExportChoice: (format) => { state.currentExportFormat = format; document.getElementById('export-msg').innerText = `Select dataset to download as ${format.toUpperCase()}`; ui.openModal('export-modal'); },
+            executeExport: (type) => { ui.closeModal('export-modal'); const data = type === 'nodes' ? state.nodes : state.biosphere; const fmt = state.currentExportFormat; const ts = new Date().toISOString().slice(0,10); if (data.length === 0) { alert('No data to export.'); return; } if (fmt === 'csv') { BioApp.generateCSV(data, `BioApp_${type}_${ts}.csv`); } else { BioApp.generateDCMI(data, type, `BioApp_${type}_${ts}_dcmi.xml`); } },
+            exportCurrentGeoJSON: () => { const d = state.currentDetail; if(!d) return; let rawGeo = BioApp.getGeometry(d); let geoType = 'Point'; let coordinates = [0,0]; if(rawGeo) { try { rawGeo = rawGeo.replace(/^(GEOMETRY_JSON|geometry_json)\s*=?\s*/i, '').trim(); let parsed = JSON.parse(rawGeo); if (Array.isArray(parsed)) { geoType = 'Polygon'; if (Array.isArray(parsed[0]) && typeof parsed[0][0] === 'number') { let ring = parsed.map(p => [p[1], p[0]]); if (ring.length > 0) { const first = ring[0]; const last = ring[ring.length-1]; if (first[0] !== last[0] || first[1] !== last[1]) ring.push(first); } coordinates = [ring]; } else if (Array.isArray(parsed[0]) && Array.isArray(parsed[0][0])) { coordinates = parsed.map(ring => { let r = ring.map(p => [p[1], p[0]]); if (r.length > 0) { const first = r[0]; const last = r[r.length-1]; if (first[0] !== last[0] || first[1] !== last[1]) r.push(first); } return r; }); } } } catch(e) { rawGeo = null; } } if (!rawGeo) { if (isValidLatLng(d.lat, d.lng)) { geoType = 'Point'; coordinates = [d.lng, d.lat]; } else { alert('No valid location data found.'); return; } } const feature = { "type": "Feature", "properties": { "id": d.id, "name": state.currentType === 'nodes' ? d.local_name : d.name_bio, "country": d.country, "description": d.description, "category": state.currentType }, "geometry": { "type": geoType, "coordinates": coordinates } }; const featureCollection = { "type": "FeatureCollection", "features": [feature] }; BioApp.downloadFile(JSON.stringify(featureCollection, null, 2), `${state.currentType}_${d.id}_gis.geojson`, 'application/geo+json'); },
+            exportPDF: async () => { const d = state.currentDetail; if(!d) return; const { jsPDF } = window.jspdf; const loadingEl = document.getElementById('pdf-loading-overlay'); const progressEl = document.getElementById('pdf-progress-fill'); const textEl = document.getElementById('pdf-loading-text'); loadingEl.classList.add('active'); progressEl.style.width = '10%'; textEl.innerText = "Preparing..."; document.getElementById('pdf-out-name').innerText = state.currentType === 'nodes' ? d.local_name : d.name_bio; document.getElementById('pdf-out-latin').innerText = state.currentType === 'nodes' ? d.latin_name : d.region; document.getElementById('pdf-out-country').innerText = d.country || 'Global'; document.getElementById('pdf-out-desc').innerHTML = sanitizeHTML(d.description || 'No description.'); const linkContainer = document.getElementById('pdf-out-links'); linkContainer.innerHTML = ''; if(d.research_links) { d.research_links.split(',').forEach(l => { const clean = safeURL(l); if(clean) linkContainer.innerHTML += `<a href="${clean}" class="pdf-link">${clean}</a>`; }); } else { linkContainer.innerHTML = 'No references available.'; } document.getElementById('pdf-out-aff-local').innerText = d.affectedby_local_name || 'None'; document.getElementById('pdf-out-aff-latin').innerText = 'None'; const imgContainer = document.getElementById('pdf-out-images'); imgContainer.innerHTML = ''; if(d.image_url) { d.image_url.split(/[,;]/).map(s=>s.trim()).filter(s=>s).slice(0, 4).forEach(url => { imgContainer.innerHTML += `<img src="${url}" class="pdf-img" crossorigin="anonymous" onerror="this.style.display='none'">`; }); } progressEl.style.width = '30%'; const ghostMapDiv = document.getElementById('pdf-ghost-map'); ghostMapDiv.innerHTML = ''; const ghostMap = L.map('pdf-ghost-map', {zoomControl: false, attributionControl: false, preferCanvas: true}); L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(ghostMap); let bounds = L.latLngBounds([]); let hasGeo = false; const rawGeo = BioApp.getGeometry(d); if(rawGeo) { try { const cleanGeo = rawGeo.replace(/^(GEOMETRY_JSON|geometry_json)\s*=?\s*/i, '').trim(); const parsed = JSON.parse(cleanGeo); const style = { color: '#000', weight: 2, fillOpacity: 0.2, fillColor: '#000' }; if (Array.isArray(parsed)) { if (parsed.length > 0 && Array.isArray(parsed[0]) && parsed[0].length > 0 && Array.isArray(parsed[0][0])) { parsed.forEach(r => { const p = L.polygon(r, style).addTo(ghostMap); bounds.extend(p.getBounds()); }); } else { const p = L.polygon(parsed, style).addTo(ghostMap); bounds.extend(p.getBounds()); } hasGeo = true; } } catch(e) {} } if(!hasGeo && isValidLatLng(d.lat, d.lng)) { L.marker([d.lat, d.lng]).addTo(ghostMap); ghostMap.setView([d.lat, d.lng], 9); } else if (hasGeo) { ghostMap.fitBounds(bounds, {padding:[20,20]}); } else { ghostMap.setView([0,0], 2); } await new Promise(r => setTimeout(r, 1500)); progressEl.style.width = '60%'; const element = document.getElementById('pdf-ghost-container'); window.scrollTo(0,0); try { const canvas = await html2canvas(element, { useCORS: true, scale: 2, logging: false, windowWidth: element.scrollWidth, windowHeight: element.scrollHeight }); progressEl.style.width = '80%'; const imgData = canvas.toDataURL('image/jpeg', 0.95); const pdf = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' }); const pdfWidth = pdf.internal.pageSize.getWidth(); const pdfHeight = pdf.internal.pageSize.getHeight(); const imgProps = pdf.getImageProperties(imgData); const imgHeight = (imgProps.height * pdfWidth) / imgProps.width; let heightLeft = imgHeight; let position = 0; pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeight); heightLeft -= pdfHeight; while (heightLeft >= 0) { position = position - pdfHeight; pdf.addPage(); pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeight); heightLeft -= pdfHeight; } progressEl.style.width = '100%'; pdf.save(`Report_${d.local_name || d.name_bio}.pdf`); } catch (err) { alert("Failed to generate PDF."); } finally { ghostMap.remove(); loadingEl.classList.remove('active'); } },
+            downloadFile: (content, fileName, mimeType) => { const blob = new Blob([content], { type: mimeType }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = fileName; document.body.appendChild(a); a.click(); document.body.removeChild(a); },
+            generateCSV: (data, fileName) => { if(!data || !data.length) return; const keys = Object.keys(data[0]).filter(k => !k.startsWith('_')); const csvContent = [ keys.join(','), ...data.map(row => keys.map(k => { let val = row[k] === null || row[k] === undefined ? '' : String(row[k]); val = val.replace(/"/g, '""'); if (val.search(/("|,|\n)/g) >= 0) val = `"${val}"`; return val; }).join(',')) ].join('\n'); BioApp.downloadFile(csvContent, fileName, 'text/csv;charset=utf-8;'); },
+            generateDCMI: (data, type, fileName) => { let xml = '<?xml version="1.0" encoding="UTF-8"?>\n<metadata xmlns:dc="http://purl.org/dc/elements/1.1/">\n'; data.forEach(item => { xml += '  <record>\n'; const title = type === 'nodes' ? item.local_name : item.name_bio; const altTitle = type === 'nodes' ? item.latin_name : ''; const desc = item.description || ''; const date = type === 'biosphere' ? item.unesco_year : ''; xml += `    <dc:title>${sanitizeHTML(title)}</dc:title>\n`; if(altTitle) xml += `    <dc:alternative>${sanitizeHTML(altTitle)}</dc:alternative>\n`; xml += `    <dc:identifier>${item.id}</dc:identifier>\n`; if(desc) xml += `    <dc:description>${sanitizeHTML(desc)}</dc:description>\n`; xml += `    <dc:coverage>${item.country}</dc:coverage>\n`; if(item.region) xml += `    <dc:coverage>${item.region}</dc:coverage>\n`; if(date) xml += `    <dc:date>${date}</dc:date>\n`; if(item.image_url) xml += `    <dc:relation>${item.image_url}</dc:relation>\n`; xml += '  </record>\n'; }); xml += '</metadata>'; BioApp.downloadFile(xml, fileName, 'application/xml;charset=utf-8;'); },
+            
+            // --- NEW: LAZY LOAD DETAIL ---
+            showDetail: async (lightData, type) => {
+                // Show modal first with loading state
+                ui.openModal('detail-modal');
+                const isBio = type === 'biosphere';
+                document.getElementById('dt-title').innerText = isBio ? lightData.name_bio : lightData.local_name;
+                document.getElementById('dt-desc').innerHTML = '<div class="flex items-center gap-2 text-blue-600 font-bold justify-center p-8"><i class="fas fa-circle-notch fa-spin"></i> Loading full details from database...</div>';
+                
+                // Clear media areas
+                document.getElementById('img-carousel').innerHTML = '';
+                document.getElementById('dt-links-area').innerHTML = '';
+
+                // Try fetch full details
+                try {
+                    const response = await fetch(`${GAS_URL}?action=get_detail&id=${lightData.id}&type=${type}`);
+                    const result = await response.json();
+
+                    if (result.status === 'success') {
+                        const fullData = result.data;
+                        // Update cache in state
+                        if(type === 'nodes') {
+                            const idx = state.nodes.findIndex(n => n.id == fullData.id);
+                            if(idx !== -1) state.nodes[idx] = {...state.nodes[idx], ...fullData};
+                        } else {
+                            const idx = state.biosphere.findIndex(b => b.id == fullData.id);
+                            if(idx !== -1) state.biosphere[idx] = {...state.biosphere[idx], ...fullData};
+                        }
+                        BioApp.renderDetailContent(fullData, type);
+                    } else {
+                        document.getElementById('dt-desc').innerText = "Failed to load details. " + result.message;
+                    }
+                } catch (e) {
+                    console.error(e);
+                    document.getElementById('dt-desc').innerText = "Network error loading details.";
+                }
+            },
+
+            renderDetailContent: (d, type) => {
+                state.currentDetail = d;
+                state.currentType = type;
+                const isBio = type === 'biosphere';
+                
+                document.getElementById('dt-tag-type').innerText = isBio ? 'BIOSPHERE' : 'BIODIVERSITY';
+                document.getElementById('dt-tag-type').className = isBio ? "px-2 py-1 rounded text-[9px] font-bold bg-emerald-600 text-white shadow" : "px-2 py-1 rounded text-[9px] font-bold bg-blue-600 text-white shadow";
+                document.getElementById('dt-title').innerText = isBio ? d.name_bio : d.local_name;
+                document.getElementById('dt-subtitle').innerText = isBio ? d.region : d.latin_name;
+                document.getElementById('dt-desc').innerHTML = sanitizeHTML(d.description || 'No description');
+                document.getElementById('dt-tag-country').innerText = d.country || 'Unknown';
+
+                state.media.images = d.image_url ? d.image_url.split(/[,;]/).map(s => s.trim()).filter(s => s) : [];
+                state.media.videos = d.youtube_url ? d.youtube_url.split(/[,;]/).map(s => s.trim()).filter(s => s) : [];
+                state.media.imgIdx = 0;
+                state.media.vidIdx = 0;
+                
+                ui.renderMedia('img');
+                ui.renderMedia('vid');
+                document.getElementById('vid-section').classList.toggle('hidden', state.media.videos.length === 0);
+                
+                mapLogic.initDetailMap();
+                document.getElementById('map-legend-label').innerText = isBio ? 'Biosphere Zone' : 'Ecological Overlap';
+                const contextNote = document.getElementById('map-context-note');
+                contextNote.innerHTML = '*Layers: Orange (Ecosystem Network) vs Purple (Selected Species).';
+                
+                const bounds = L.latLngBounds([]);
+                let hasPolygon = false;
+                
+                // Network traversal for nodes
+                if (!isBio) {
+                    const connectedNodes = [];
+                    const queue = [d];
+                    const visited = new Set([d.id]);
+                    let safety = 0;
+                    while(queue.length > 0 && safety < 100) {
+                        const curr = queue.shift();
+                        safety++;
+                        if(curr.affectedby_local_name) {
+                            const targets = curr.affectedby_local_name.split(',').map(s=>s.trim());
+                            targets.forEach(tName => {
+                                const targetNode = state.nodes.find(n => n.local_name && n.local_name.toLowerCase() === tName.toLowerCase()) || 
+                                                   state.biosphere.find(b => b.name_bio && b.name_bio.toLowerCase() === tName.toLowerCase());
+                                if(targetNode && !visited.has(targetNode.id)) {
+                                    visited.add(targetNode.id);
+                                    connectedNodes.push(targetNode);
+                                    queue.push(targetNode);
+                                }
+                            });
+                        }
+                        const currName = (curr.local_name || curr.name_bio).toLowerCase();
+                        [...state.nodes, ...state.biosphere].forEach(cand => {
+                            if(cand.id !== curr.id && cand.affectedby_local_name) {
+                                const links = cand.affectedby_local_name.split(',').map(s=>s.trim().toLowerCase());
+                                if(links.includes(currName)) {
+                                    if(!visited.has(cand.id)) {
+                                        visited.add(cand.id);
+                                        connectedNodes.push(cand);
+                                        queue.push(cand);
+                                    }
+                                }
+                            }
+                        });
+                    }
+                    connectedNodes.forEach(fNode => {
+                        const color = '#F59E0B';
+                        let fGeo = BioApp.getGeometry(fNode);
+                        if (fGeo) {
+                            try { fGeo = fGeo.replace(/^GEOMETRY_JSON/i, '').trim(); let parsed = JSON.parse(fGeo); if (Array.isArray(parsed)) { const poly = L.polygon(parsed, { pane: 'factors', color: color, weight: 2, dashArray: '5,5', fillOpacity: 0.3, fillColor: color }).addTo(mapLogic.detailMap); poly.bringToBack(); bounds.extend(poly.getBounds()); } } catch(e){}
+                        } else if (fNode && isValidLatLng(fNode.lat, fNode.lng)) {
+                            const marker = L.circleMarker([fNode.lat, fNode.lng], { pane: 'factors', color: color, radius: 6 }).addTo(mapLogic.detailMap).bindTooltip(`Network: ${fNode.local_name || fNode.name_bio}`); marker.bringToBack(); bounds.extend([fNode.lat, fNode.lng]);
+                        }
+                    });
+                }
+                
+                let targetGeo = BioApp.getGeometry(d);
+                if(targetGeo) {
+                    try {
+                        targetGeo = targetGeo.replace(/^(GEOMETRY_JSON|geometry_json)\s*=?\s*/i, '').trim();
+                        let parsed = JSON.parse(targetGeo);
+                        const style = { color: isBio?'#10B981':'#9333ea', weight: 3, fillOpacity: 0.6 };
+                        if (Array.isArray(parsed)) {
+                            if (parsed.length > 0 && Array.isArray(parsed[0]) && parsed[0].length > 0 && Array.isArray(parsed[0][0])) {
+                                parsed.forEach(polyCoords => { const poly = L.polygon(polyCoords, { pane: 'current', ...style }).addTo(mapLogic.detailMap); poly.bringToFront(); bounds.extend(poly.getBounds()); });
+                            } else {
+                                const poly = L.polygon(parsed, { pane: 'current', ...style }).addTo(mapLogic.detailMap); poly.bringToFront(); bounds.extend(poly.getBounds());
+                            }
+                            hasPolygon = true;
+                            contextNote.innerHTML += ` <span class="text-green-600 font-bold ml-2 text-[9px]">[DATA FOUND]</span>`;
+                        }
+                    } catch(e){ contextNote.innerHTML += ` <span class="text-red-500 font-bold ml-2">(GIS ERROR)</span>`; }
+                } else { contextNote.innerHTML += ` <span class="text-slate-400 ml-2">(No GIS Data)</span>`; }
+                
+                if(!hasPolygon && isValidLatLng(d.lat, d.lng)) {
+                    const m = L.marker([d.lat, d.lng], {zIndexOffset: 1000}).addTo(mapLogic.detailMap);
+                    bounds.extend([d.lat, d.lng]);
+                }
+                
+                const grid = document.getElementById('dt-extra-info');
+                grid.innerHTML = '';
+                const addInfo = (lbl, val) => { if(val) grid.innerHTML += `<div><div class="font-bold text-slate-400 uppercase text-[10px]">${lbl}</div><div class="font-medium text-slate-700">${val}</div></div>`; };
+                addInfo('Country', d.country);
+                if(isBio) {
+                    addInfo('Established', d.unesco_year); addInfo('Status', d.status); addInfo('Area (Ha)', d.area_total_ha);
+                } else {
+                    addInfo('IUCN Status', d.unesco_status); addInfo('Affected By', d.affectedby_local_name); addInfo('Interaction', d.connection_type);
+                }
+                
+                const linkArea = document.getElementById('dt-links-area');
+                linkArea.innerHTML = '';
+                if(d.research_links) {
+                    d.research_links.split(',').forEach(l => {
+                        const cleanUrl = safeURL(l);
+                        if(cleanUrl) {
+                            const urlObj = new URL(cleanUrl);
+                            const domain = urlObj.hostname;
+                            const pathSegments = urlObj.pathname.split('/').filter(p => p.trim() !== '');
+                            const pseudoTitle = pathSegments.length > 0 ? pathSegments[pathSegments.length - 1].replace(/[-_]/g, ' ') : 'Home';
+                            linkArea.innerHTML += `<a href="${cleanUrl}" target="_blank" rel="noopener noreferrer" class="block bg-slate-100 p-3 rounded-xl text-xs text-slate-600 hover:bg-blue-50 hover:text-blue-600 transition border border-slate-200 group"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-white flex items-center justify-center text-slate-400 shadow-sm border border-slate-100 group-hover:text-blue-500"><i class="fas fa-globe"></i></div><div class="overflow-hidden"><div class="font-bold truncate text-slate-700 group-hover:text-blue-700 capitalize">${pseudoTitle}</div><div class="truncate text-[10px] text-slate-400">${domain}</div></div><i class="fas fa-external-link-alt ml-auto text-slate-300 group-hover:text-blue-400"></i></div></a>`;
+                        }
+                    });
+                } else {
+                    linkArea.innerHTML = '<div class="text-slate-400 text-[10px] italic">No research links available.</div>';
+                }
+                
+                ui.openModal('detail-modal');
+                setTimeout(() => {
+                    mapLogic.detailMap.invalidateSize();
+                    if(bounds.isValid()) {
+                        mapLogic.detailMap.fitBounds(bounds, { padding: [50, 50], maxZoom: 10, animate: false });
+                    } else if (isValidLatLng(d.lat, d.lng)) {
+                        mapLogic.detailMap.setView([d.lat, d.lng], 8);
+                    } else {
+                        mapLogic.detailMap.setView([0,0], 2);
+                    }
+                }, 300);
+            },
+            
+            updateDashboard: (resetPage = false) => {
+                const search = document.getElementById('filter-search').value.toLowerCase();
+                const type = document.getElementById('filter-type').value;
+                const country = document.getElementById('filter-country').value;
+                if (resetPage) state.pagination.currentPage = 1;
+
+                let all = [...state.nodes.map(x=>({...x, _type:'nodes'})), ...state.biosphere.map(x=>({...x, _type:'biosphere'}))];
+                all = all.filter(x => {
+                    const isBio = x._type === 'biosphere';
+                    const name = (isBio ? x.name_bio : x.local_name).toLowerCase();
+                    const ctry = (x.country || '').toLowerCase();
+                    if (search && !name.includes(search)) return false;
+                    if (type !== 'all' && ((type === 'biodiversity' && isBio) || (type === 'biosphere' && !isBio))) return false;
+                    if (country !== 'all' && ctry !== country.toLowerCase()) return false;
+                    return true;
+                });
+
+                document.getElementById('total-points').innerText = all.length;
+                document.getElementById('kpi-nodes').innerText = state.nodes.length;
+                document.getElementById('kpi-bio').innerText = state.biosphere.length;
+                
+                const bioCountries = new Set(state.nodes.map(x=>x.country)).size;
+                document.getElementById('kpi-countries-bio').innerText = bioCountries;
+                
+                let totalArea = state.biosphere.reduce((acc, curr) => acc + (parseFloat(curr.area_total_ha) || 0), 0);
+                document.getElementById('kpi-area').innerText = (totalArea / 1000000).toFixed(2) + "M";
+
+                // 1. IUCN Chart (Doughnut)
+                const iucnCounts = {};
+                state.nodes.forEach(x => { const s = (x.unesco_status || 'Unknown').trim(); iucnCounts[s] = (iucnCounts[s] || 0) + 1; });
+                if(state.charts.iucn) state.charts.iucn.destroy();
+                state.charts.iucn = new Chart(document.getElementById('chart-iucn'), {
+                    type: 'doughnut', data: { labels: Object.keys(iucnCounts), datasets: [{ data: Object.values(iucnCounts), backgroundColor: ['#ef4444', '#f97316', '#eab308', '#22c55e', '#64748b'], borderWidth: 0 }] }, options: { maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { boxWidth: 8, font: {size: 9} } } } }
+                });
+
+                // 2. Biodiversity by Country (Horizontal Bar - Ranked)
+                const nodeCountries = {};
+                state.nodes.forEach(x => { const c = (x.country || 'Unknown').trim(); nodeCountries[c] = (nodeCountries[c] || 0) + 1; });
+                const sortedNodeC = Object.entries(nodeCountries).sort((a,b)=>b[1]-a[1]).slice(0,5);
+                const barColors = sortedNodeC.map((_, i) => i === 0 ? '#F59E0B' : '#3B82F6'); 
+
+                if(state.charts.bioCountry) state.charts.bioCountry.destroy();
+                state.charts.bioCountry = new Chart(document.getElementById('chart-bio-country'), {
+                    type: 'bar',
+                    data: { 
+                        labels: sortedNodeC.map(x=>x[0]), 
+                        datasets: [{ 
+                            label: 'Species', 
+                            data: sortedNodeC.map(x=>x[1]), 
+                            backgroundColor: barColors, 
+                            borderRadius: 4,
+                            barPercentage: 0.6
+                        }] 
+                    },
+                    options: { 
+                        indexAxis: 'y', 
+                        maintainAspectRatio: false, 
+                        plugins: { 
+                            legend: { display: false },
+                            tooltip: { callbacks: { label: function(context) { let val = context.raw; let total = state.nodes.length; let pct = Math.round((val/total)*100); return `${val} Species (${pct}%)`; } } }
+                        }, 
+                        scales: { x: { grid: {display:false}, ticks: {font:{size:9}} }, y: { grid: {display:false} } } 
+                    }
+                });
+
+                // 3. Biosphere Status (Pie)
+                const bioStatusCounts = {};
+                state.biosphere.forEach(x => { const s = (x.status || 'Active').trim(); bioStatusCounts[s] = (bioStatusCounts[s] || 0) + 1; });
+                if(state.charts.bioStatus) state.charts.bioStatus.destroy();
+                state.charts.bioStatus = new Chart(document.getElementById('chart-bio-status'), {
+                    type: 'pie', data: { labels: Object.keys(bioStatusCounts), datasets: [{ data: Object.values(bioStatusCounts), backgroundColor: ['#059669', '#10b981', '#34d399'], borderWidth: 0 }] }, options: { maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { boxWidth: 8, font: {size: 9} } } } }
+                });
+                
+                // 4. Insight: Scatter
+                const countryStats = {};
+                [...state.nodes, ...state.biosphere].forEach(item => { const c = (item.country || 'Unknown').trim(); if(!countryStats[c]) countryStats[c] = { nodes: 0, bio: 0 }; });
+                state.nodes.forEach(n => { const c = (n.country || 'Unknown').trim(); if(countryStats[c]) countryStats[c].nodes++; });
+                state.biosphere.forEach(b => { const c = (b.country || 'Unknown').trim(); if(countryStats[c]) countryStats[c].bio++; });
+                const scatterData = Object.keys(countryStats).map(c => ({ x: countryStats[c].nodes, y: countryStats[c].bio, country: c })).filter(d => d.x > 0 || d.y > 0);
+
+                if(state.charts.scatterInsight) state.charts.scatterInsight.destroy();
+                state.charts.scatterInsight = new Chart(document.getElementById('chart-scatter-insight'), {
+                    type: 'scatter',
+                    data: { datasets: [{ label: 'Country Correlation', data: scatterData, backgroundColor: '#10B981', pointRadius: 6, pointHoverRadius: 8 }] },
+                    options: {
+                        maintainAspectRatio: false,
+                        scales: { x: { title: { display: true, text: 'Total Species' }, grid: { display: false } }, y: { title: { display: true, text: 'Biosphere Reserves' }, grid: { color: '#f3f4f6' } } },
+                        plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(context) { const pt = context.raw; return `${pt.country}: ${pt.x} Species, ${pt.y} Reserves`; } } } }
+                    }
+                });
+
+                // PAGINATION LOGIC
+                const start = (state.pagination.currentPage - 1) * state.pagination.itemsPerPage;
+                const end = start + state.pagination.itemsPerPage;
+                const paginatedData = all.slice(start, end);
+                const tbody = document.getElementById('dash-table-body');
+                tbody.innerHTML = '';
+                
+                paginatedData.forEach(x => {
+                    const isBio = x._type === 'biosphere';
+                    const name = isBio ? x.name_bio : x.local_name;
+                    const status = isBio ? x.status : x.unesco_status;
+                    // Detail On Click: Pass the lightweight object 'x'
+                    // showDetail will then fetch the full data using x.id
+                    tbody.innerHTML += `<tr class="border-b border-slate-50 hover:bg-slate-100 cursor-pointer" onclick="BioApp.showDetail(state.${isBio?'biosphere':'nodes'}.find(i=>i.id=='${x.id}'), '${isBio?'biosphere':'nodes'}')"><td class="p-3"><span class="w-2 h-2 rounded-full ${isBio?'bg-emerald-500':'bg-blue-500'} inline-block mr-2"></span>${isBio?'Biosphere':'Biodiversity'}</td><td class="p-3 font-bold text-slate-700">${name}</td><td class="p-3 text-slate-500">${x.country}</td><td class="p-3"><span class="px-2 py-0.5 rounded bg-slate-200 text-slate-600 text-[10px] font-bold">${status||'-'}</span></td></tr>`;
+                });
+                
+                document.getElementById('pagination-info').innerText = `Showing ${Math.min(start + 1, all.length)}-${Math.min(end, all.length)} of ${all.length}`;
+                document.getElementById('btn-prev').disabled = state.pagination.currentPage === 1;
+                document.getElementById('btn-next').disabled = end >= all.length;
+            },
+            nextPage: () => { state.pagination.currentPage++; BioApp.updateDashboard(); },
+            prevPage: () => { if (state.pagination.currentPage > 1) { state.pagination.currentPage--; BioApp.updateDashboard(); } },
+            pickLocation: (target) => { ui.closeModal('input-modal'); BioApp.switchTab('map'); state.pickerMode = target; document.getElementById('picker-notification').classList.remove('hidden'); document.getElementById('picker-msg').innerText = target === 'main' ? "Click map to set location" : "Click map OR Blue Node to connect"; const existingLat = document.getElementById(target === 'main' ? 'inp-lat' : 'inp-aff-lat').value; const existingLng = document.getElementById(target === 'main' ? 'inp-lng' : 'inp-aff-lng').value; if(isValidLatLng(existingLat, existingLng)) { mapLogic.map.setView([existingLat, existingLng], 12); } const handler = (e) => { const lat = e.latlng.lat.toFixed(6); const lng = e.latlng.lng.toFixed(6); if(target === 'main') { document.getElementById('inp-lat').value = lat; document.getElementById('inp-lng').value = lng; } else { document.getElementById('inp-aff-lat').value = lat; document.getElementById('inp-aff-lng').value = lng; } mapLogic.map.off('click', handler); BioApp.cancelPicker(); }; mapLogic.map.on('click', handler); document.getElementById('map-container').classList.add('picker-mode'); },
+            cancelPicker: () => { state.pickerMode = null; document.getElementById('picker-notification').classList.add('hidden'); document.getElementById('map-container').classList.remove('picker-mode'); ui.openModal('input-modal'); },
+            
+            renderHelp: () => {
+                const container = document.getElementById('help-tabs-container');
+                const content = document.getElementById('help-content-container');
+                const data = state.notes || [];
+                container.innerHTML = '';
+                if (data.length === 0) {
+                      content.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-slate-300"><i class="fas fa-info-circle text-4xl mb-2"></i><span class="text-xs">No guide data available</span></div>`;
+                    return;
+                }
+                data.forEach((item, index) => {
+                    if(!item.page) return;
+                    const isActive = index === 0;
+                    const btn = document.createElement('div');
+                    btn.className = `guide-tab ${isActive ? 'active' : ''}`;
+                    btn.innerText = item.page;
+                    btn.onclick = () => {
+                        document.querySelectorAll('.guide-tab').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        document.querySelectorAll('.guide-content-item').forEach(c => c.classList.remove('active'));
+                        document.getElementById(`guide-content-${index}`).classList.add('active');
+                    };
+                    container.appendChild(btn);
+                });
+                content.innerHTML = '';
+                data.forEach((item, index) => {
+                    if(!item.page) return;
+                    const isActive = index === 0;
+                    const div = document.createElement('div');
+                    div.id = `guide-content-${index}`;
+                    div.className = `guide-content-item ${isActive ? 'active' : ''}`;
+                    let formattedDesc = sanitizeHTML(item.desc || '').replace(/\n/g, '<br>').replace(/([^:]+):/g, '<strong>$1:</strong>');
+                    div.innerHTML = `<h3 class="text-xl font-bold text-slate-800 mb-4 border-b border-slate-100 pb-2">${item.page}</h3><div class="leading-relaxed text-sm">${formattedDesc}</div>`;
+                    content.appendChild(div);
+                });
+            }
+        };
+        document.addEventListener('DOMContentLoaded', BioApp.init);
+    </script>
+</body>
+</html>
