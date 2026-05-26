@@ -683,13 +683,34 @@ const sampleDataID = {
 
             const stripMarkdown = (text) => text.replace(/```html\n|```json\n|```\n|```/g, '').trim();
 
-            const getProposalContext = () => {
-                let ctx = `Title: ${data.cover.title}\nSubtitle: ${data.cover.subtitle}\nAuthor: ${data.cover.author}\nTarget: ${data.cover.target}\n\n`;
-                data.sections.forEach(sec => {
-                    if(sec.type === 'richtext') ctx += `--- ${sec.title} ---\n${sec.content}\n\n`;
-                });
-                return ctx;
-            };
+        const getProposalContext = () => {
+            let ctx = `Title: ${data.cover.title}\nSubtitle: ${data.cover.subtitle}\nAuthor: ${data.cover.author}\nTarget: ${data.cover.target}\n\n`;
+            
+            data.sections.forEach(sec => {
+                ctx += `--- ${sec.title} ---\n`;
+                
+                if (sec.type === 'richtext') {
+                    // Ambil teks dari editor
+                    ctx += `${sec.content}\n\n`;
+                } 
+                else if (sec.type === 'framework') {
+                    // Ekstrak data dari kartu framework menjadi list text agar mudah dibaca AI
+                    sec.nodes.forEach((n, i) => {
+                        ctx += `Fase ${i + 1}: ${n.title} - ${n.description}\n`;
+                    });
+                    ctx += `\n\n`;
+                } 
+                else if (sec.type === 'rab') {
+                    // Ekstrak data dari tabel RAB menjadi list text
+                    sec.rows.forEach(r => {
+                        ctx += `- ${r.uraian}: ${r.qty} ${r.unit} x ${r.harga}\n`;
+                    });
+                    ctx += `\n\n`;
+                }
+            });
+            
+            return ctx;
+        };
 
             // Tambahkan utility penundaan (delay) untuk mencegah Error 429
             const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
