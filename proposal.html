@@ -704,35 +704,36 @@ const sampleDataID = {
                     const context = getProposalContext();
                     const isEmpty = !section.content || section.content.trim().length < 20;
                     
+                    // Tambahkan ATURAN KRITIS (CRITICAL RULE) pada System Context
                     const systemContext = lang === 'en' 
-                        ? `You are a world-class proposal maker consultant. Write or revise the proposal section. Keep tone professional, persuasive, and data-driven.`
-                        : `Anda adalah konsultan ahli pembuat proposal kelas dunia berbahasa Indonesia. Tujuan Anda adalah menulis atau merevisi bagian proposal. Jaga nada bicara tetap profesional, persuasif, dan berbasis data.`;
-                    
+                        ? `You are a world-class proposal maker system. Your output is consumed directly by an application pipeline.\n\nCRITICAL RULE: Output EXACTLY the requested format (raw HTML or pure JSON). NO greetings, NO explanations, NO conversational text, and NO markdown code blocks (do not use \`\`\`html or \`\`\`json). Return ONLY the raw code or data.`
+                        : `Anda adalah sistem pembuat proposal kelas dunia. Output Anda akan dibaca langsung oleh sistem aplikasi.\n\nATURAN KRITIS: Output HARUS TEPAT seperti format yang diminta (HTML mentah atau JSON murni). DILARANG KERAS menyertakan sapaan, penjelasan, kalimat pengantar, penutup, atau blok kode markdown (jangan gunakan \`\`\`html atau \`\`\`json). Kembalikan HANYA kode atau datanya saja.`;
+
                     let prompt = "";
                     if (section.type === 'richtext') {
                         if (isEmpty) {
                             prompt = lang === 'en' 
-                                ? `Here is the proposal context:\n${context}\n\nTask: Write full content for Chapter "${section.title}". Output ONLY basic HTML code (use <h3>, <p>, <ul>). Do not add markdown tags.`
-                                : `Berikut konteks proposal:\n${context}\n\nTugas: Tuliskan konten lengkap untuk Bab "${section.title}". Output HANYA format HTML dasar (<h3>, <p>, <ul>). Jangan tambahkan markdown tags.`;
+                                ? `Proposal context:\n${context}\n\nTask: Write full content for Chapter "${section.title}".\nOutput ONLY basic HTML tags (<h3>, <p>, <ul>, <li>). Do not wrap in markdown.`
+                                : `Konteks proposal:\n${context}\n\nTugas: Tulis konten lengkap untuk Bab "${section.title}".\nOutput HANYA tag HTML dasar (<h3>, <p>, <ul>, <li>). Jangan bungkus dengan markdown.`;
                         } else {
                             prompt = lang === 'en'
-                                ? `Proposal context:\n${context}\n\nTask: Revise, fix grammar, and make the following content more professional for Chapter "${section.title}":\n\nCURRENT CONTENT:\n${section.content}\n\nOutput ONLY basic HTML code.`
-                                : `Konteks proposal:\n${context}\n\nTugas: Revisi, perbaiki tata bahasa, dan buat konten berikut lebih profesional untuk Bab "${section.title}":\n\nKONTEN SAAT INI:\n${section.content}\n\nOutput HANYA format HTML dasar.`;
+                                ? `Proposal context:\n${context}\n\nTask: Revise, fix grammar, and make the following content professional for Chapter "${section.title}":\n\nCURRENT CONTENT:\n${section.content}\n\nOutput ONLY basic HTML tags. Do not wrap in markdown.`
+                                : `Konteks proposal:\n${context}\n\nTugas: Revisi, perbaiki tata bahasa, dan buat konten berikut lebih profesional untuk Bab "${section.title}":\n\nKONTEN SAAT INI:\n${section.content}\n\nOutput HANYA tag HTML dasar. Jangan bungkus dengan markdown.`;
                         }
                         const result = await callAI(prompt, systemContext, data.apiKeys);
                         updateSection(sectionId, { content: stripMarkdown(result) });
                     } 
                     else if (section.type === 'framework') {
                         prompt = lang === 'en'
-                            ? `Proposal context:\n${context}\n\nTask: Generate a project methodology framework for "${section.title}".\nOutput MUST be a pure JSON array format: [{"id": 1, "title": "Phase Name", "description": "Desc"}]. No other text.`
-                            : `Konteks proposal:\n${context}\n\nTugas: Berikan susunan metodologi framework untuk "${section.title}".\nOutput HARUS JSON array murni: [{"id": 1, "title": "Nama Fase", "description": "Deskripsi"}]. Tanpa teks lain.`;
+                            ? `Proposal context:\n${context}\n\nTask: Generate a project methodology framework for "${section.title}".\nOutput MUST be pure JSON array format EXACTLY like this example: [{"id": 1, "title": "Phase Name", "description": "Desc"}].`
+                            : `Konteks proposal:\n${context}\n\nTugas: Berikan metodologi framework untuk "${section.title}".\nOutput HARUS berupa JSON array murni PERSIS seperti contoh ini: [{"id": 1, "title": "Nama Fase", "description": "Deskripsi"}].`;
                         const result = await callAI(prompt, systemContext, data.apiKeys);
                         updateSection(sectionId, { nodes: JSON.parse(stripMarkdown(result)) });
                     }
                     else if (section.type === 'rab') {
                         prompt = lang === 'en'
-                            ? `Proposal context:\n${context}\n\nTask: Create a realistic Budget Plan for this proposal.\nOutput MUST be a pure JSON array format: [{"id": 1, "uraian": "Item/Service", "qty": 1, "unit": "Month", "harga": 5000}]. Logical pricing. No other text.`
-                            : `Konteks proposal:\n${context}\n\nTugas: Buatkan estimasi Rencana Anggaran (RAB) realistis.\nOutput HARUS JSON array murni: [{"id": 1, "uraian": "Nama Barang", "qty": 1, "unit": "Bulan", "harga": 5000000}]. Harga logis (Rupiah). Tanpa teks lain.`;
+                            ? `Proposal context:\n${context}\n\nTask: Create a realistic Budget Plan for this proposal.\nOutput MUST be pure JSON array format EXACTLY like this example: [{"id": 1, "uraian": "Item/Service Name", "qty": 1, "unit": "Month", "harga": 5000}]. Pricing must be logical numbers only.`
+                            : `Konteks proposal:\n${context}\n\nTugas: Buatkan estimasi Rencana Anggaran (RAB) realistis.\nOutput HARUS berupa JSON array murni PERSIS seperti contoh ini: [{"id": 1, "uraian": "Nama Barang", "qty": 1, "unit": "Bulan", "harga": 5000000}]. Harga berupa angka logis (Rupiah).`;
                         const result = await callAI(prompt, systemContext, data.apiKeys);
                         updateSection(sectionId, { rows: JSON.parse(stripMarkdown(result)) });
                     }
@@ -762,11 +763,13 @@ const sampleDataID = {
                     
                     try {
                         const context = getProposalContext();
-                        const systemContext = lang === 'en' ? `You are an expert proposal consultant.` : `Anda adalah konsultan proposal ahli.`;
+                        const systemContext = lang === 'en' 
+                            ? `You are an automated expert proposal system. CRITICAL RULE: You must output ONLY raw HTML tags (<h3>, <p>, <ul>). NO greetings, NO chat text, NO markdown code blocks (\`\`\`html).` 
+                            : `Anda adalah sistem proposal ahli otomatis. ATURAN KRITIS: Anda HARUS mengembalikan HANYA tag HTML mentah (<h3>, <p>, <ul>). DILARANG ADA sapaan, kalimat obrolan, atau blok markdown (\`\`\`html).`;
+
                         const prompt = lang === 'en'
-                            ? `Context:\n${context}\n\nTask: Revise and polish the wording for "${sec.title}" to be persuasive and professional.\n\nCONTENT:\n${sec.content}\n\nReturn ONLY basic HTML format (<h3>,<p>,<ul>).`
-                            : `Konteks:\n${context}\n\nTugas: Revisi dan perhalus bahasa dari Bab "${sec.title}" agar lebih meyakinkan dan profesional.\n\nKONTEN:\n${sec.content}\n\nKembalikan HANYA format HTML dasar.`;
-                        
+                            ? `Context:\n${context}\n\nTask: Revise and polish the wording for "${sec.title}" to be persuasive and professional.\n\nCONTENT:\n${sec.content}\n\nOutput only the HTML.`
+                            : `Konteks:\n${context}\n\nTugas: Revisi dan perhalus bahasa dari Bab "${sec.title}" agar lebih meyakinkan dan profesional.\n\nKONTEN:\n${sec.content}\n\nOutput hanya HTML-nya saja.`;
                         const result = await callAI(prompt, systemContext, data.apiKeys);
                         updateSection(sec.id, { content: stripMarkdown(result) });
                     } catch (err) { 
