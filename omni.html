@@ -26,6 +26,7 @@
             --sti: #38bdf8;
             --nexus: #86efac;
             --artifact: #fbbf24;
+            --edu: #818cf8;
             --red: #f87171;
         }
 
@@ -142,6 +143,7 @@
         .signal-card.sti::before { background: var(--sti); }
         .signal-card.nexus::before { background: var(--nexus); }
         .signal-card.artifact::before { background: var(--artifact); }
+        .signal-card.edu::before { background: var(--edu); }
         .signal-card:hover { border-color: var(--border-bright); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
         .signal-card .thumbnail { width: 72px; height: 54px; border-radius: 6px; object-fit: cover; flex-shrink: 0; background: var(--surface2); border: 1px solid var(--border); }
 
@@ -161,6 +163,7 @@
         .badge-sti { background: rgba(56, 189, 248, 0.15); color: var(--sti); }
         .badge-nexus { background: rgba(134, 239, 172, 0.15); color: var(--nexus); }
         .badge-artifact { background: rgba(251, 191, 36, 0.15); color: var(--artifact); }
+        .badge-edu { background: rgba(129, 140, 248, 0.15); color: var(--edu); }
         .badge-risk-high { background: rgba(248, 113, 113, 0.15); color: var(--red); }
         .badge-risk-med { background: rgba(251, 191, 36, 0.12); color: var(--artifact); }
 
@@ -287,6 +290,11 @@
                     <span class="dot" style="background:var(--artifact)"></span>
                     <i class="fa-solid fa-gem text-[var(--artifact)] w-3"></i> Artifact Risk
                     <span class="ml-auto mono text-[10px]" id="cnt-artifact">—</span>
+                </button>
+                <button onclick="filterDashboard('edu')" class="filter-btn" data-filter="edu">
+                    <span class="dot" style="background:var(--edu)"></span>
+                    <i class="fa-solid fa-book text-[var(--edu)] w-3"></i> EDU Innovation
+                    <span class="ml-auto mono text-[10px]" id="cnt-edu">—</span>
                 </button>
             </div>
 
@@ -415,8 +423,9 @@
 const SOURCES = [
     { id: 'ich',      name: 'Culture & ICH',   url: 'https://anggaconni.github.io/ICH-Radar/data.json',      color: '#e879a0', icon: 'fa-landmark',  badgeClass: 'badge-ich'      },
     { id: 'sti',      name: 'Innovation & STI', url: 'https://anggaconni.github.io/GSI-Radar/data.json',      color: '#38bdf8', icon: 'fa-microchip', badgeClass: 'badge-sti'      },
-    { id: 'nexus',    name: 'Nature & DRR',     url: 'https://anggaconni.github.io/Nexus-Radar/data.json',    color: '#86efac', icon: 'fa-leaf',       badgeClass: 'badge-nexus'    },
-    { id: 'artifact', name: 'Artifact Risk',    url: 'https://anggaconni.github.io/artifact-radar/data.json', color: '#fbbf24', icon: 'fa-gem',        badgeClass: 'badge-artifact' },
+    { id: 'nexus',    name: 'Nature & DRR',     url: 'https://anggaconni.github.io/Nexus-Radar/data.json',    color: '#86efac', icon: 'fa-leaf',        badgeClass: 'badge-nexus'    },
+    { id: 'artifact', name: 'Artifact Risk',    url: 'https://anggaconni.github.io/artifact-radar/data.json', color: '#fbbf24', icon: 'fa-gem',         badgeClass: 'badge-artifact' },
+    { id: 'edu',      name: 'EDU Innovation',   url: 'https://raw.githubusercontent.com/AnggaConni/EDU-Innovation/refs/heads/main/data.json', color: '#818cf8', icon: 'fa-book', badgeClass: 'badge-edu' },
 ];
 
 // ─── STATE ────────────────────────────────────────────────────────────────────
@@ -699,10 +708,10 @@ function renderChart(counts) {
     chartInstance = new Chart(ctx, {
         type: 'doughnut',
         data: {
-            labels: ['Culture', 'Innovation', 'Nature', 'Artifact'],
+            labels: ['Culture', 'Innovation', 'Nature', 'Artifact', 'Education'],
             datasets: [{
-                data: [counts.ich, counts.sti, counts.nexus, counts.artifact],
-                backgroundColor: ['#e879a0', '#38bdf8', '#86efac', '#fbbf24'],
+                data: [counts.ich, counts.sti, counts.nexus, counts.artifact, counts.edu],
+                backgroundColor: ['#e879a0', '#38bdf8', '#86efac', '#fbbf24', '#818cf8'],
                 borderWidth: 2,
                 borderColor: '#181c27',
             }]
@@ -914,8 +923,8 @@ async function initDashboard() {
         )
     );
 
-    const [ichData, stiData, nexusData, artifactData] = results;
-    const counts = { ich: ichData.length, sti: stiData.length, nexus: nexusData.length, artifact: artifactData.length };
+    const [ichData, stiData, nexusData, artifactData, eduData] = results;
+    const counts = { ich: ichData.length, sti: stiData.length, nexus: nexusData.length, artifact: artifactData.length, edu: eduData.length };
 
     masterData = results.flat().filter(i => i.title !== 'Untitled');
     masterData.sort((a, b) => new Date(b.date) - new Date(a.date));
@@ -928,6 +937,7 @@ async function initDashboard() {
     document.getElementById('cnt-sti').textContent      = counts.sti;
     document.getElementById('cnt-nexus').textContent    = counts.nexus;
     document.getElementById('cnt-artifact').textContent = counts.artifact;
+    document.getElementById('cnt-edu').textContent = counts.edu;
 
     // Stats
     const highRisk = masterData.filter(i => riskClass(i.risk_score, i.status) === 'high').length;
