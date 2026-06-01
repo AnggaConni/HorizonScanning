@@ -275,19 +275,35 @@
                         }
                         
                         const data = await res.json(); 
-                        
+
                         // 1. Jika bentuknya Array langsung
                         if (Array.isArray(data)) return data;
-                        
-                        // 2. Cek berbagai kemungkinan Key JSON
+
+                        // 2. Cek berbagai kemungkinan Key JSON standar dari repo lain
                         if (data.inventory) return data.inventory;
-                        if (data.data) return data.data;           // Sering digunakan di API
-                        if (data.items) return data.items;         // Sering digunakan di list
-                        if (data.features) return data.features;   // Sering digunakan di GeoJSON
-                        
-                        // 3. Jika strukturnya tetap tidak dikenali
+                        if (data.data) return data.data;           
+                        if (data.items) return data.items;         
+                        if (data.features) return data.features;   
+
+                        // 3. PENANGANAN KHUSUS DATA ARTIFACT RADAR (Membaca dari "listings")
+                        if (data.listings && Array.isArray(data.listings)) {
+                            console.log(`✅ Data Artifact Radar berhasil dibaca! Total: ${data.listings.length}`);
+                            
+                            // Transformasi data agar sesuai dengan standar AI Assistant (title, summary, dll)
+                            return data.listings.map(item => ({
+                                title: item.original_title || "Untitled Artifact",
+                                summary: item.reason || "No reason provided",
+                                // Menggabungkan platform dan status risiko ke dalam kategori
+                                category: [item.platform || "Marketplace", item.status || "Unknown Status"],
+                                location: { country: item.origin_region || "Unknown" },
+                                url: item.url || "",
+                                source: 'local' // Penanda database internal
+                            }));
+                        }
+
+                        // 4. Jika strukturnya tetap tidak dikenali
                         console.warn(`❓ Struktur JSON tidak dikenali di URL: ${u}`, data);
-                        return []; 
+                        return [];
                         
                     } catch(e) { 
                         console.error(`❌ Error sistem saat fetch URL ${u}:`, e);
