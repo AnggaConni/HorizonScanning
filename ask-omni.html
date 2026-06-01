@@ -56,6 +56,9 @@
         .scite-worldbank:hover { background-color: #fef08a; transform: translateY(-1px); }
         .scite-undata { background-color: #f0fdf4; color: #16a34a; border-color: #bbf7d0; }
         .scite-undata:hover { background-color: #bbf7d0; transform: translateY(-1px); }
+        /* WHO Style */
+        .scite-who { background-color: #f0f9ff; color: #0284c7; border-color: #bae6fd; }
+        .scite-who:hover { background-color: #bae6fd; transform: translateY(-1px); }
 
         /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 6px; }
@@ -104,6 +107,11 @@
                     <div id="api-worldbank-indicator" class="w-full py-2 px-3 bg-slate-50 text-slate-400 border border-slate-200 rounded-lg text-xs font-bold flex items-center justify-between shadow-sm transition-all duration-300">
                         <div class="flex items-center gap-2"><i class="ph-bold ph-globe-hemisphere-west"></i> World Bank</div>
                         <div id="api-worldbank-badge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-200 text-slate-500">STANDBY</div>
+                    </div>
+                    <!-- WHO -->
+                    <div id="api-who-indicator" class="w-full py-2 px-3 bg-slate-50 text-slate-400 border border-slate-200 rounded-lg text-xs font-bold flex items-center justify-between shadow-sm transition-all duration-300">
+                        <div class="flex items-center gap-2"><i class="ph-bold ph-heartbeat"></i> WHO Data</div>
+                        <div id="api-who-badge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-200 text-slate-500">STANDBY</div>
                     </div>
                     <!-- UN Data -->
                     <div id="api-undata-indicator" class="w-full py-2 px-3 bg-slate-50 text-slate-400 border border-slate-200 rounded-lg text-xs font-bold flex items-center justify-between shadow-sm transition-all duration-300">
@@ -409,14 +417,15 @@
         }
 
         function parseSciteCitations(text) {
-            return text.replace(/\[\[(Supporting|Contrasting|Mentioning|External|UNESDOC|WorldBank|UNData):\s*(.+?)\]\]/gi, (match, type, title) => {
+            return text.replace(/\[\[(Supporting|Contrasting|Mentioning|External|UNESDOC|WorldBank|UNData|WHO):\s*(.+?)\]\]/gi, (match, type, title) => {
                 let lowerType = type.toLowerCase();
                 let icon = lowerType === 'supporting' ? '<i class="ph-bold ph-check-circle"></i>' : 
                         lowerType === 'contrasting' ? '<i class="ph-bold ph-x-circle"></i>' : 
                         lowerType === 'external' ? '<i class="ph-bold ph-globe"></i>' : 
                         lowerType === 'unesdoc' ? '<i class="ph-bold ph-books"></i>' : 
                         lowerType === 'worldbank' ? '<i class="ph-bold ph-globe-hemisphere-west"></i>' : 
-                        lowerType === 'undata' ? '<i class="ph-bold ph-chart-polar"></i>' : '<i class="ph-bold ph-quotes"></i>';
+                        lowerType === 'undata' ? '<i class="ph-bold ph-chart-polar"></i>' : 
+                        lowerType === 'who' ? '<i class="ph-bold ph-heartbeat"></i>' : '<i class="ph-bold ph-quotes"></i>';
                 
                 let safeTitle = title.replace(/'/g, "\\'").replace(/"/g, "&quot;");
                 return `<span class="scite-badge scite-${lowerType}" title="${title} (${type})" onclick="highlightEvidence('${safeTitle}')">${icon} ${title}</span>`;
@@ -469,20 +478,39 @@
                     linkEl.innerHTML = 'Go to Web Source <i class="ph-bold ph-arrow-up-right"></i>';
                     linkEl.className = "px-4 py-2 text-sm font-bold text-white bg-purple-600 rounded-lg shadow-md hover:bg-purple-700 transition-all flex items-center gap-2";
                 }
-                    else if (foundEvd.type === 'unesdoc') { 
-                    badgeEl.innerHTML = '<span class="text-blue-600 flex items-center gap-1"><i class="ph-bold ph-bank"></i> UNESDOC Publication</span>';
+                else if (foundEvd.type === 'unesdoc') { 
+                    badgeEl.innerHTML = '<span class="text-blue-600 flex items-center gap-1"><i class="ph-bold ph-books"></i> UNESDOC Publication</span>';
                     linkEl.href = foundEvd.url;
                     linkEl.innerHTML = 'Read on UNESDOC <i class="ph-bold ph-arrow-up-right"></i>';
                     linkEl.className = "px-4 py-2 text-sm font-bold text-white bg-blue-600 rounded-lg shadow-md hover:bg-blue-700 transition-all flex items-center gap-2";
                 } 
-                
+                else if (foundEvd.type === 'worldbank') { 
+                    badgeEl.innerHTML = '<span class="text-amber-600 flex items-center gap-1"><i class="ph-bold ph-globe-hemisphere-west"></i> World Bank Data</span>';
+                    linkEl.href = foundEvd.url;
+                    linkEl.innerHTML = 'View on World Bank <i class="ph-bold ph-arrow-up-right"></i>';
+                    linkEl.className = "px-4 py-2 text-sm font-bold text-white bg-amber-600 rounded-lg shadow-md hover:bg-amber-700 transition-all flex items-center gap-2";
+                } 
+                else if (foundEvd.type === 'undata') { 
+                    badgeEl.innerHTML = '<span class="text-green-600 flex items-center gap-1"><i class="ph-bold ph-chart-polar"></i> UN Data Flow</span>';
+                    linkEl.href = foundEvd.url;
+                    linkEl.innerHTML = 'View on UN Data <i class="ph-bold ph-arrow-up-right"></i>';
+                    linkEl.className = "px-4 py-2 text-sm font-bold text-white bg-green-600 rounded-lg shadow-md hover:bg-green-700 transition-all flex items-center gap-2";
+                } 
+                else if (foundEvd.type === 'who') { 
+                    badgeEl.innerHTML = '<span class="text-sky-600 flex items-center gap-1"><i class="ph-bold ph-heartbeat"></i> WHO Indicator</span>';
+                    linkEl.href = foundEvd.url;
+                    linkEl.innerHTML = 'View on WHO <i class="ph-bold ph-arrow-up-right"></i>';
+                    linkEl.className = "px-4 py-2 text-sm font-bold text-white bg-sky-600 rounded-lg shadow-md hover:bg-sky-700 transition-all flex items-center gap-2";
+                }
                 else {
+                    // Ini fallback untuk Local Database
                     badgeEl.innerHTML = '<span class="text-indigo-600 flex items-center gap-1"><i class="ph-bold ph-database"></i> Local Database</span>';
                     linkEl.href = foundEvd.url;
                     linkEl.innerHTML = 'Search on Google Scholar <i class="ph-bold ph-magnifying-glass"></i>';
                     linkEl.className = "px-4 py-2 text-sm font-bold text-white bg-indigo-600 rounded-lg shadow-md hover:bg-indigo-700 transition-all flex items-center gap-2";
                 }
             } else {
+                // Ini untuk teks sintesis AI yang tidak ada di referensi API
                 document.getElementById('modal-title').innerText = title;
                 document.getElementById('modal-summary').innerText = 'Data ini disintesis oleh AI. Anda dapat memverifikasi topik ini lebih lanjut di web penelitian.';
                 badgeEl.innerHTML = '<span class="text-slate-500 flex items-center gap-1"><i class="ph-bold ph-robot"></i> AI Synthesized</span>';
@@ -579,18 +607,20 @@
 
             try {
                 // ==========================================
-                // TAHAP 1: AI ROUTER (Cek Kebutuhan Multi-API)
+                // TAHAP 1: AI ROUTER (Cek Kebutuhan 4 API)
                 // ==========================================
                 const routerPrompt = `You are an API router. Analyze the user's question and decide which external APIs to query.
                 1. "unesdoc": True if about UNESCO, education, culture, heritage.
                 2. "worldbank": True if about economy, GDP, population, global development data.
-                3. "undata": True if about UN statistics, global health, environment.
+                3. "undata": True if about UN statistics, humanitarian, environment.
+                4. "who": True if about health, disease, mortality, life expectancy, WHO statistics.
                 Provide a 1-2 word English keyword for each if true.
                 Output EXACTLY in this JSON format:
                 {
                     "unesdoc": {"fetch": true, "keyword": "education"},
                     "worldbank": {"fetch": false, "keyword": ""},
-                    "undata": {"fetch": false, "keyword": ""}
+                    "undata": {"fetch": false, "keyword": ""},
+                    "who": {"fetch": false, "keyword": ""}
                 }`;
 
                 const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
@@ -605,11 +635,11 @@
                 if (!routerResponse.ok) throw new Error(routerData.error?.message || "Router API Error");
 
                 let routerDecision = JSON.parse(routerData.candidates[0]?.content?.parts[0]?.text || '{}');
-                let apiContexts = { unesdoc: "", worldbank: "", undata: "" };
+                let apiContexts = { unesdoc: "", worldbank: "", undata: "", who: "" };
                 let fetchPromises = [];
 
                 // ==========================================
-                // TAHAP 2: FETCH PARALEL KE 3 API EXTERNAL
+                // TAHAP 2: FETCH PARALEL KE 4 API EXTERNAL
                 // ==========================================
                 
                 // 1. Fetch UNESDOC
@@ -628,19 +658,15 @@
                     fetchPromises.push(req);
                 }
 
-
-                // 2. Fetch World Bank (V2 Indicators API - ASLI sesuai dokumentasi Anda)
-                // Endpoint: https://api.worldbank.org/v2/...
+                // 2. Fetch World Bank (V2 Indicators API)
                 if (routerDecision.worldbank?.fetch && routerDecision.worldbank?.keyword) {
                     setApiIndicator('worldbank', 'fetching');
                     const kw = encodeURIComponent(routerDecision.worldbank.keyword);
-                    // Langsung ke server Bank Dunia (Bebas CORS, HTTPs native)
                     const targetUrl = `https://api.worldbank.org/v2/indicator?q=${kw}&format=json`;
                     
                     const req = fetch(targetUrl)
                         .then(res => res.json())
                         .then(data => {
-                            // Format JSON WB Indicators V2 adalah Array berisi meta [0] dan data [1]
                             if(data && data[1]) {
                                 let formatted = data[1].slice(0, 3).map(d => ({ 
                                     title: d.name || "World Bank Indicator", 
@@ -658,26 +684,17 @@
                     fetchPromises.push(req);
                 }
 
-                // 3. Fetch UN Data (SDMX REST API - ASLI sesuai dokumentasi Anda)
-                // Endpoint: http://data.un.org/ws/rest/...
+                // 3. Fetch UN Data (SDMX REST API)
                 if (routerDecision.undata?.fetch && routerDecision.undata?.keyword) {
                     setApiIndicator('undata', 'fetching');
                     const kw = routerDecision.undata.keyword.toLowerCase();
-                    
-                    // URL asli PBB berawalan HTTP. 
-                    // Kita bungkus dengan HTTPS proxy CodeTabs agar tidak diblokir GitHub Pages (Mixed Content Rule)
                     const unUrl = `http://data.un.org/ws/rest/dataflow`;
                     const proxyUrl = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(unUrl)}`;
                     
-                    const req = fetch(proxyUrl, {
-                        headers: { "Accept": "text/json" } // Syarat dari dokumentasi UN Data FAQ
-                    })
+                    const req = fetch(proxyUrl, { headers: { "Accept": "text/json" } })
                         .then(res => res.json())
                         .then(data => {
-                            // Struktur JSON SDMX sangat kompleks, kita ambil list Dataflow/Datamart-nya
                             let dataflows = data?.data?.dataflows || [];
-                            
-                            // Karena SDMX REST tidak punya query ?q=keyword di URL, kita filter manual menggunakan javascript
                             let matched = dataflows.filter(d => 
                                 (d.name && d.name.toLowerCase().includes(kw)) || 
                                 (d.description && d.description.toLowerCase().includes(kw))
@@ -686,11 +703,10 @@
                             if(matched.length) {
                                 let formatted = matched.map(d => ({ 
                                     title: d.name, 
-                                    summary: d.description ? d.description.substring(0, 150) + '...' : `Agency: ${d.agencyID} | Version: ${d.version}`, 
+                                    summary: d.description ? d.description.substring(0, 150) + '...' : `Agency: ${d.agencyID}`, 
                                     source: 'undata', 
-                                    url: `https://data.un.org/` // SDMX tidak mengembalikan link spesifik, arahkan ke portal utama
+                                    url: `https://data.un.org/` 
                                 }));
-                                
                                 appendExternalEvidence(formatted, 'UN Data (SDMX)', 'ph-chart-polar', 'green');
                                 apiContexts.undata = `\nUN DATA FLOWS:\n` + JSON.stringify(formatted);
                             }
@@ -698,11 +714,45 @@
                     fetchPromises.push(req);
                 }
 
+                // 4. Fetch WHO Data (GHO OData API - Sesuai Dokumentasi + Bypass CORS)
+                if (routerDecision.who?.fetch && routerDecision.who?.keyword) {
+                    setApiIndicator('who', 'fetching');
+                    
+                    // Format keyword: Huruf pertama wajib besar agar cocok dengan database WHO (contoh: 'Malaria', 'Child')
+                    let kw = routerDecision.who.keyword;
+                    let formattedKw = kw.charAt(0).toUpperCase() + kw.slice(1).toLowerCase();
+                    
+                    // URL asli WHO sesuai Example 3 di dokumentasi
+                    const targetUrl = `https://ghoapi.azureedge.net/api/Indicator?$filter=contains(IndicatorName,'${formattedKw}')`;
+                    
+                    // Bungkus dengan CodeTabs Proxy agar Browser / GitHub Pages tidak diblokir (CORS Issue)
+                    const proxyUrl = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(targetUrl)}`;
+                    
+                    const req = fetch(proxyUrl)
+                        .then(res => res.json())
+                        .then(data => {
+                            if(data && data.value) {
+                                let formatted = data.value.slice(0, 3).map(d => ({ 
+                                    title: d.IndicatorName, 
+                                    summary: `Official WHO Indicator. Code: ${d.IndicatorCode}`, 
+                                    source: 'who', 
+                                    url: `https://www.who.int/data/gho/data/indicators/indicator-details/GHO/${d.IndicatorCode}` 
+                                }));
+                                
+                                if(formatted.length) {
+                                    appendExternalEvidence(formatted, 'WHO GHO', 'ph-heartbeat', 'sky');
+                                    apiContexts.who = `\nWHO INDICATORS:\n` + JSON.stringify(formatted);
+                                }
+                            }
+                        }).catch(e => console.warn("WHO Notice:", e)).finally(() => setApiIndicator('who', 'standby'));
+                    fetchPromises.push(req);
+                }
+
                 // Tunggu semua API selesai
                 await Promise.all(fetchPromises);
 
                 // ==========================================
-                // TAHAP 3: GENERATOR AKHIR (+ Penambahan Token)
+                // TAHAP 3: GENERATOR AKHIR
                 // ==========================================
                 const systemPrompt = `You are Edu-Scite, an elite academic research assistant. Respond in ${currentLang === 'id' ? 'Indonesian' : 'English'}.
                 CRITICAL INSTRUCTIONS: 
@@ -715,6 +765,7 @@
                 - [[UNESDOC: Title]] -> For UNESDOC data.
                 - [[WorldBank: Title]] -> For WORLD BANK data.
                 - [[UNData: Title]] -> For UN data.
+                - [[WHO: Title]] -> For WHO data.
                 - [[External: Journal/Author - Title]] -> For Google Search findings.
 
                 INTERNAL SEARCH RESULTS:
@@ -723,7 +774,8 @@
                 EXTERNAL API RESULTS:
                 ${apiContexts.unesdoc}
                 ${apiContexts.worldbank}
-                ${apiContexts.undata}`;
+                ${apiContexts.undata}
+                ${apiContexts.who}`;
 
                 let contents = chatHistory.map(msg => ({ role: msg.role === 'user' ? 'user' : 'model', parts: [{ text: msg.text }] }));
                 contents.push({ role: 'user', parts: [{ text: message }] });
@@ -734,14 +786,13 @@
                     tools: [{ googleSearch: {} }], 
                     generationConfig: { 
                         temperature: 0.3,
-                        maxOutputTokens: 8192 // <--- PENAMBAHAN TOKEN LIMIT
+                        maxOutputTokens: 8192
                     } 
                 };
 
                 let finalResponse = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(finalPayload) });
 
                 if (finalResponse.status === 503 || finalResponse.status === 500) {
-                    // Fallback jika Google Search Overload
                     delete finalPayload.tools;
                     finalResponse = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(finalPayload) });
                 }
