@@ -126,6 +126,38 @@ articles.forEach(article => {
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
+    <!-- ============================================== -->
+    <!-- SCRIPT AUTO-TRANSLATE BERDASARKAN BAHASA BROWSER -->
+    <!-- ============================================== -->
+    <style>
+        /* Sembunyikan banner bawaan Google Translate agar tampilan tetap rapi */
+        .VIpgJd-ZVi9od-ORHb-OEVmcd { display: none !important; }
+        .goog-te-banner-frame.skiptranslate { display: none !important; }
+        body { top: 0 !important; }
+    </style>
+    <script>
+        // Deteksi bahasa browser
+        var userLang = navigator.language || navigator.userLanguage;
+        var langCode = userLang.split('-')[0];
+        var pageLang = 'en'; // Asumsi bahasa asli konten Anda adalah English
+
+        // Jika bahasa browser BUKAN bahasa asli, dan belum diset, paksakan translate
+        if (langCode !== pageLang && document.cookie.indexOf('googtrans=') === -1) {
+            document.cookie = "googtrans=/" + pageLang + "/" + langCode + "; path=/;";
+            document.cookie = "googtrans=/" + pageLang + "/" + langCode + "; path=/; domain=" + location.hostname + ";";
+        }
+    </script>
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en',
+                autoDisplay: false
+            }, 'google_translate_element');
+        }
+    </script>
+    <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    <!-- ============================================== -->
+
     <script>
         tailwind.config = {
             theme: {
@@ -140,36 +172,34 @@ articles.forEach(article => {
         }
     </script>
 
-    <!-- CUSTOM CSS UNTUK RICH TEXT (Table, Callout, Diagram) -->
+    <!-- CUSTOM CSS UNTUK RICH TEXT -->
     <style>
-        /* Styling untuk Tabel agar responsif dan bagus */
         .prose table { width: 100%; border-collapse: collapse; margin-top: 2rem; margin-bottom: 2rem; }
         .prose th, .prose td { border: 1px solid #e2e8f0; padding: 1rem; text-align: left; }
         .prose th { background-color: #f8fafc; color: #0f172a; font-weight: 700; }
         .prose tr:nth-child(even) { background-color: #f8fafc; }
         
-        /* Membungkus tabel untuk mobile */
         .table-responsive { overflow-x: auto; width: 100%; border-radius: 0.5rem; box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1); border: 1px solid #e2e8f0; }
         .table-responsive table { margin: 0; border: none; }
 
-        /* Styling untuk Box Catatan (Callout / Textbox) */
         .callout { padding: 1.5rem; border-radius: 0.75rem; margin: 2rem 0; border-left: 4px solid #0d9488; background-color: #f0fdfa; }
         .callout h4 { margin-top: 0 !important; color: #0f172a !important; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; }
         .callout p:last-child { margin-bottom: 0 !important; }
 
-        /* Styling Blockquote */
         .prose blockquote { border-left-color: #0d9488; font-style: normal; background-color: #f8fafc; padding: 1rem 1.5rem; border-radius: 0 0.75rem 0.75rem 0; color: #334155; }
         .prose blockquote p { margin: 0; }
 
-        /* Styling Container Chart / Workflow */
         .chart-container { background: white; border: 1px solid #e2e8f0; border-radius: 1rem; padding: 2rem; margin: 2.5rem 0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); text-align: center; }
         .chart-container img { margin: 0 auto; border-radius: 0.5rem; }
         .chart-caption { font-size: 0.875rem; color: #64748b; margin-top: 1rem; text-align: center; font-style: italic; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans antialiased">
+    
+    <!-- Element Google Translate Tersembunyi -->
+    <div id="google_translate_element" style="display:none;"></div>
 
-    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm notranslate">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <a href="../../index.html" class="flex items-center gap-2">
@@ -184,12 +214,12 @@ articles.forEach(article => {
     </nav>
 
     <header class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-8">
-        <span class="inline-block bg-teal-100 text-teal-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-4 shadow-sm">
+        <span class="inline-block bg-teal-100 text-teal-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-4 shadow-sm notranslate">
             ${article.category}
         </span>
         <h1 class="text-3xl md:text-5xl font-extrabold text-navy-900 mb-6 leading-tight">${article.title}</h1>
         
-        <div class="flex items-center gap-4 text-sm text-slate-500 font-medium">
+        <div class="flex items-center gap-4 text-sm text-slate-500 font-medium notranslate">
             <div class="flex items-center gap-2">
                 <i class="ph-fill ph-user-circle text-xl text-slate-400"></i> ${article.author}
             </div>
@@ -204,7 +234,6 @@ articles.forEach(article => {
         <img src="${imageUrl.startsWith('http') ? imageUrl : '../../' + imageUrl.replace(/^[\.\/]+/, '')}" alt="${article.title}" class="w-full h-auto max-h-[500px] object-cover rounded-2xl shadow-lg border border-slate-200" onerror="this.src='${fallbackImage}'">
     </div>
 
-    <!-- MAIN CONTENT DENGAN TYPOGRAPHY YANG DISEMPURNAKAN -->
     <main class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
         <article class="prose prose-slate prose-lg max-w-none 
             prose-headings:text-navy-900 prose-headings:font-bold 
@@ -214,7 +243,7 @@ articles.forEach(article => {
             ${article.content}
         </article>
         
-        <div class="mt-16 pt-8 border-t border-slate-200 text-center">
+        <div class="mt-16 pt-8 border-t border-slate-200 text-center notranslate">
             <h3 class="text-xl font-bold text-navy-900 mb-4">Share this insight</h3>
             <div class="flex justify-center gap-4">
                 <a href="https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(articleAbsoluteUrl)}" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-[#0A66C2] hover:text-white transition-all shadow-sm hover:shadow"><i class="ph-fill ph-linkedin-logo text-xl"></i></a>
@@ -250,6 +279,35 @@ const blogIndexHtml = `
     <meta property="og:url" content="${baseUrl}/blog.html">
     <meta property="og:type" content="website">
     
+    <!-- ============================================== -->
+    <!-- SCRIPT AUTO-TRANSLATE BERDASARKAN BAHASA BROWSER -->
+    <!-- ============================================== -->
+    <style>
+        .VIpgJd-ZVi9od-ORHb-OEVmcd { display: none !important; }
+        .goog-te-banner-frame.skiptranslate { display: none !important; }
+        body { top: 0 !important; }
+    </style>
+    <script>
+        var userLang = navigator.language || navigator.userLanguage;
+        var langCode = userLang.split('-')[0];
+        var pageLang = 'en';
+
+        if (langCode !== pageLang && document.cookie.indexOf('googtrans=') === -1) {
+            document.cookie = "googtrans=/" + pageLang + "/" + langCode + "; path=/;";
+            document.cookie = "googtrans=/" + pageLang + "/" + langCode + "; path=/; domain=" + location.hostname + ";";
+        }
+    </script>
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en',
+                autoDisplay: false
+            }, 'google_translate_element');
+        }
+    </script>
+    <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    <!-- ============================================== -->
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -269,8 +327,11 @@ const blogIndexHtml = `
     </script>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans antialiased">
+    
+    <!-- Element Google Translate Tersembunyi -->
+    <div id="google_translate_element" style="display:none;"></div>
 
-    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm notranslate">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <a href="index.html" class="flex items-center gap-2">
@@ -289,7 +350,7 @@ const blogIndexHtml = `
         <p class="text-slate-500 max-w-2xl mx-auto text-lg">Publications, methodologies, and case studies on navigating uncertainty and mastering horizon scanning.</p>
     </section>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8 mt-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8 mt-8 notranslate">
         <div class="flex flex-col md:flex-row justify-between items-center gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
             <div class="relative w-full md:w-96">
                 <i class="ph ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
