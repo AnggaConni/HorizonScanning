@@ -729,26 +729,37 @@
                     fetchPromises.push(req);
                 }
 
-                // 4. Fetch WHO Data (GHO OData API - Direct Fetch tanpa Proxy)
+// 4. Fetch WHO Data (GHO OData V4 API - Fix Proxy)
                 if (routerDecision.who?.fetch && routerDecision.who?.keyword) {
                     setApiIndicator('who', 'fetching');
                     
-                    // Gunakan huruf kecil (lowercase) untuk persiapan query OData
-                    let kw = routerDecision.who.keyword.toLowerCase();
+                    let kw = routerDecision.who.keyword;
+                    let formattedKw = kw.charAt(0).toUpperCase() + kw.slice(1).toLowerCase();
                     
-                    // Gunakan fungsi tolower() bawaan OData agar pencarian tidak sensitif terhadap huruf besar/kecil (case-insensitive)
-                    // URL langsung ditembak ke Azure tanpa menggunakan proxy pihak ketiga
-                    const targetUrl = `https://ghoapi.azureedge.net/api/Indicator?$filter=contains(tolower(IndicatorName),'${kw}')`;
+                    // Sintaks OData V4 ini sudah sangat benar sesuai dokumentasi
+                    const targetUrl = `https://ghoapi.azureedge.net/api/Indicator?$filter=contains(IndicatorName,'${formattedKw}')`;
                     
-                    const req = fetch(targetUrl)
-                        .then(res => res.json())
+                    // Gunakan corsproxy.io karena AllOrigins di-blokir oleh Azure Edge
+                    const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`;
+                    
+                    // Naikkan batas waktu menjadi 12 detik
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 12000); 
+                    
+                    const req = fetch(proxyUrl, { signal: controller.signal })
+                        .then(res => {
+                            clearTimeout(timeoutId);
+                            if (!res.ok) throw new Error("WHO Proxy Error");
+                            return res.json();
+                        })
                         .then(data => {
                             if(data && data.value) {
                                 let formatted = data.value.slice(0, 3).map(d => ({ 
                                     title: d.IndicatorName, 
                                     summary: `Official WHO Indicator. Code: ${d.IndicatorCode}`, 
                                     source: 'who', 
-                                    url: `https://www.who.int/data/gho/data/indicators/indicator-details/GHO/${d.IndicatorCode}` 
+                                    // PERBAIKAN: Mengarahkan link ke direktori indikator utama WHO untuk menghindari 404
+                                    url: `https://www.who.int/data/gho/data/indicators` 
                                 }));
                                 
                                 if(formatted.length) {
@@ -756,7 +767,11 @@
                                     apiContexts.who = `\nWHO INDICATORS:\n` + JSON.stringify(formatted);
                                 }
                             }
-                        }).catch(e => console.warn("WHO Notice:", e)).finally(() => setApiIndicator('who', 'standby'));
+                        }).catch(e => {
+                            clearTimeout(timeoutId);
+                            console.warn("WHO Notice:", e.message); // Jika proxy lambat, chat AI akan tetap lanjut
+                        }).finally(() => setApiIndicator('who', 'standby'));
+                        
                     fetchPromises.push(req);
                 }
 
