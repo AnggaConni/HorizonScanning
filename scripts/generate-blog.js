@@ -66,7 +66,7 @@ articles.forEach(article => {
 
     // A. Buat Card untuk dimasukkan ke blog.html (List)
     articleCards += `
-        <a href="${articleUrl}" data-category="${article.category}" data-timestamp="${new Date(article.date).getTime()}" class="article-card bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-all duration-300 flex flex-col group transform hover:-translate-y-1">
+        <a href="${articleUrl}" data-title="${article.title.replace(/"/g, '&quot;')}" data-category="${article.category}" data-timestamp="${new Date(article.date).getTime()}" class="article-card bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-all duration-300 flex flex-col group transform hover:-translate-y-1">
             <div class="h-48 overflow-hidden relative border-b border-slate-100">
                 <img src="${imageUrl.startsWith('http') ? imageUrl : '../../' + imageUrl.replace(/^[\.\/]+/, '')}" alt="${article.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.src='${fallbackImage}'">
                 <span class="absolute top-4 left-4 bg-teal-600 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">
@@ -396,7 +396,7 @@ const blogIndexHtml = `
 
                 // 1. Proses Filter (Pencarian & Kategori)
                 cards.forEach(card => {
-                    const title = card.querySelector('h3').innerText.toLowerCase();
+                    const title = card.getAttribute('data-title').toLowerCase();
                     const cardCategory = card.getAttribute('data-category');
                     
                     const matchesSearch = title.includes(searchTerm);
