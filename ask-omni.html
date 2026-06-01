@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edu-Scite — Smart Citation Assistant</title>
+    <title>Smart Citation Assistant</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -67,8 +67,8 @@
                 <i class="ph-bold ph-quotes"></i>
             </div>
             <div>
-                <h1 class="text-lg font-serif-title font-bold text-slate-900 leading-none">Edu-Scite</h1>
-                <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">Smart Citations</p>
+                <h1 class="text-lg font-serif-title font-bold text-slate-900 leading-none">Smart Assistant</h1>
+                <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">AI Assistant for Academic Research</p>
             </div>
         </div>
 
@@ -262,16 +262,48 @@
                 'https://raw.githubusercontent.com/AnggaConni/Nexus-Radar/refs/heads/main/data.json',
                 'https://raw.githubusercontent.com/AnggaConni/artifact-radar/refs/heads/main/data.json'
             ];
+            
             try {
                 const results = await Promise.all(urls.map(async u => {
-                    try { const res = await fetch(u + '?v=' + new Date().getTime()); const data = await res.json(); return Array.isArray(data) ? data : (data.inventory || []); } catch(e) { return []; }
+                    try { 
+                        const res = await fetch(u + '?v=' + new Date().getTime()); 
+                        
+                        // Cek jika URL gagal (misal 404 Not Found)
+                        if (!res.ok) {
+                            console.warn(`⚠️ Gagal memuat URL: ${u} (Status HTTP: ${res.status})`);
+                            return [];
+                        }
+                        
+                        const data = await res.json(); 
+                        
+                        // 1. Jika bentuknya Array langsung
+                        if (Array.isArray(data)) return data;
+                        
+                        // 2. Cek berbagai kemungkinan Key JSON
+                        if (data.inventory) return data.inventory;
+                        if (data.data) return data.data;           // Sering digunakan di API
+                        if (data.items) return data.items;         // Sering digunakan di list
+                        if (data.features) return data.features;   // Sering digunakan di GeoJSON
+                        
+                        // 3. Jika strukturnya tetap tidak dikenali
+                        console.warn(`❓ Struktur JSON tidak dikenali di URL: ${u}`, data);
+                        return []; 
+                        
+                    } catch(e) { 
+                        console.error(`❌ Error sistem saat fetch URL ${u}:`, e);
+                        return []; 
+                    }
                 }));
+                
                 innovationData = results.flat();
+                
                 if (innovationData.length > 0) {
                     dbIndicator.className = "w-2 h-2 rounded-full bg-emerald-500 mt-1.5 shrink-0";
                     dbStatus.innerText = i18n[currentLang].dbSuccess;
                     dbCount.innerText = `${innovationData.length} documents indexed`;
+                    console.log(`✅ Total data berhasil di-load: ${innovationData.length}`);
                 } else throw new Error("Empty DB");
+                
             } catch (error) {
                 dbIndicator.className = "w-2 h-2 rounded-full bg-rose-500 mt-1.5 shrink-0";
                 dbStatus.innerText = i18n[currentLang].dbFail;
