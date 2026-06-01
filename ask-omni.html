@@ -51,6 +51,12 @@
         .scite-external { background-color: #f3e8ff; color: #7e22ce; border-color: #e9d5ff; }
         .scite-external:hover { background-color: #e9d5ff; transform: translateY(-1px); box-shadow: 0 2px 4px rgba(126, 34, 206, 0.1); }
 
+        /* World Bank & UN Data Styles */
+        .scite-worldbank { background-color: #fefce8; color: #ca8a04; border-color: #fef08a; }
+        .scite-worldbank:hover { background-color: #fef08a; transform: translateY(-1px); }
+        .scite-undata { background-color: #f0fdf4; color: #16a34a; border-color: #bbf7d0; }
+        .scite-undata:hover { background-color: #bbf7d0; transform: translateY(-1px); }
+
         /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
@@ -85,12 +91,25 @@
                 </div>
             </div>
 
-            <!-- UNESDOC Status Indicator (Static) -->
+            <!-- External API Status Indicators -->
             <div class="mt-4 border-t border-slate-100 pt-4">
                 <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">External API Status</label>
-                <div id="unesdoc-indicator" class="w-full py-2 px-3 bg-slate-50 text-slate-400 border border-slate-200 rounded-lg text-xs font-bold flex items-center justify-between shadow-sm transition-all duration-300">
-                    <div class="flex items-center gap-2"><i class="ph-bold ph-bank"></i> UNESDOC</div>
-                    <div id="unesdoc-status-badge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-200 text-slate-500 transition-all duration-300">STANDBY</div>
+                <div class="space-y-2">
+                    <!-- UNESDOC -->
+                    <div id="api-unesdoc-indicator" class="w-full py-2 px-3 bg-slate-50 text-slate-400 border border-slate-200 rounded-lg text-xs font-bold flex items-center justify-between shadow-sm transition-all duration-300">
+                        <div class="flex items-center gap-2"><i class="ph-bold ph-books"></i> UNESDOC</div>
+                        <div id="api-unesdoc-badge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-200 text-slate-500">STANDBY</div>
+                    </div>
+                    <!-- World Bank -->
+                    <div id="api-worldbank-indicator" class="w-full py-2 px-3 bg-slate-50 text-slate-400 border border-slate-200 rounded-lg text-xs font-bold flex items-center justify-between shadow-sm transition-all duration-300">
+                        <div class="flex items-center gap-2"><i class="ph-bold ph-globe-hemisphere-west"></i> World Bank</div>
+                        <div id="api-worldbank-badge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-200 text-slate-500">STANDBY</div>
+                    </div>
+                    <!-- UN Data -->
+                    <div id="api-undata-indicator" class="w-full py-2 px-3 bg-slate-50 text-slate-400 border border-slate-200 rounded-lg text-xs font-bold flex items-center justify-between shadow-sm transition-all duration-300">
+                        <div class="flex items-center gap-2"><i class="ph-bold ph-chart-polar"></i> UN Data</div>
+                        <div id="api-undata-badge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-200 text-slate-500">STANDBY</div>
+                    </div>
                 </div>
             </div>
 
@@ -390,12 +409,14 @@
         }
 
         function parseSciteCitations(text) {
-            return text.replace(/\[\[(Supporting|Contrasting|Mentioning|External|UNESDOC):\s*(.+?)\]\]/gi, (match, type, title) => {
+            return text.replace(/\[\[(Supporting|Contrasting|Mentioning|External|UNESDOC|WorldBank|UNData):\s*(.+?)\]\]/gi, (match, type, title) => {
                 let lowerType = type.toLowerCase();
                 let icon = lowerType === 'supporting' ? '<i class="ph-bold ph-check-circle"></i>' : 
                         lowerType === 'contrasting' ? '<i class="ph-bold ph-x-circle"></i>' : 
                         lowerType === 'external' ? '<i class="ph-bold ph-globe"></i>' : 
-                        lowerType === 'unesdoc' ? '<i class="ph-bold ph-bank"></i>' : '<i class="ph-bold ph-quotes"></i>';
+                        lowerType === 'unesdoc' ? '<i class="ph-bold ph-books"></i>' : 
+                        lowerType === 'worldbank' ? '<i class="ph-bold ph-globe-hemisphere-west"></i>' : 
+                        lowerType === 'undata' ? '<i class="ph-bold ph-chart-polar"></i>' : '<i class="ph-bold ph-quotes"></i>';
                 
                 let safeTitle = title.replace(/'/g, "\\'").replace(/"/g, "&quot;");
                 return `<span class="scite-badge scite-${lowerType}" title="${title} (${type})" onclick="highlightEvidence('${safeTitle}')">${icon} ${title}</span>`;
@@ -518,21 +539,22 @@
             document.getElementById('evidence-list').innerHTML = `<div class="text-center py-10 opacity-60"><p class="text-xs font-medium text-slate-500">Ask a question to see data.</p></div>`;
         }
 
-        function setUnesdocIndicator(status) {
-            const container = document.getElementById('unesdoc-indicator');
-            const badge = document.getElementById('unesdoc-status-badge');
-            
+        function setApiIndicator(apiName, status) {
+            const container = document.getElementById(`api-${apiName}-indicator`);
+            const badge = document.getElementById(`api-${apiName}-badge`);
             if (!container || !badge) return;
 
             if (status === 'fetching') {
-                // Lampu Menyala (Biru & Animasi Spin)
-                container.className = "w-full py-2 px-3 bg-blue-50 text-blue-700 border border-blue-200 rounded-lg text-xs font-bold flex items-center justify-between shadow-sm transition-all duration-300";
-                badge.className = "px-2 py-0.5 rounded text-[10px] font-bold bg-blue-600 text-white shadow-inner transition-all duration-300 flex items-center gap-1";
+                container.classList.replace('bg-slate-50', 'bg-indigo-50');
+                container.classList.replace('text-slate-400', 'text-indigo-700');
+                container.classList.replace('border-slate-200', 'border-indigo-200');
+                badge.className = "px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-600 text-white shadow-inner flex items-center gap-1";
                 badge.innerHTML = '<i class="ph-bold ph-spinner animate-spin text-sm"></i> FETCHING';
             } else {
-                // Lampu Mati / Standby (Abu-abu)
-                container.className = "w-full py-2 px-3 bg-slate-50 text-slate-400 border border-slate-200 rounded-lg text-xs font-bold flex items-center justify-between shadow-sm transition-all duration-300";
-                badge.className = "px-2 py-0.5 rounded text-[10px] font-bold bg-slate-200 text-slate-500 transition-all duration-300";
+                container.classList.replace('bg-indigo-50', 'bg-slate-50');
+                container.classList.replace('text-indigo-700', 'text-slate-400');
+                container.classList.replace('border-indigo-200', 'border-slate-200');
+                badge.className = "px-2 py-0.5 rounded text-[10px] font-bold bg-slate-200 text-slate-500";
                 badge.innerHTML = 'STANDBY';
             }
         }
@@ -557,86 +579,151 @@
 
             try {
                 // ==========================================
-                // TAHAP 1: AI ROUTER (Cek Kebutuhan UNESDOC via JSON)
+                // TAHAP 1: AI ROUTER (Cek Kebutuhan Multi-API)
                 // ==========================================
-                const routerPrompt = `You are a search routing assistant. Analyze the user's research question.
-                If the question is related to global issues, history, science, education, culture, or UNESCO, set "needs_unesdoc" to true and provide a 1-2 word English "keyword" for searching.
-                If not, set it to false.
-                Output ONLY valid JSON format. Example: {"needs_unesdoc": true, "keyword": "climate"}`;
+                const routerPrompt = `You are an API router. Analyze the user's question and decide which external APIs to query.
+                1. "unesdoc": True if about UNESCO, education, culture, heritage.
+                2. "worldbank": True if about economy, GDP, population, global development data.
+                3. "undata": True if about UN statistics, global health, environment.
+                Provide a 1-2 word English keyword for each if true.
+                Output EXACTLY in this JSON format:
+                {
+                    "unesdoc": {"fetch": true, "keyword": "education"},
+                    "worldbank": {"fetch": false, "keyword": ""},
+                    "undata": {"fetch": false, "keyword": ""}
+                }`;
 
                 const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
                 
                 const routerPayload = {
                     contents: [{ role: 'user', parts: [{ text: routerPrompt + "\n\nUser Question: " + message }] }],
-                    generationConfig: { temperature: 0.1, responseMimeType: "application/json" } // Memaksa AI output JSON
+                    generationConfig: { temperature: 0.1, responseMimeType: "application/json" }
                 };
 
                 let routerResponse = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(routerPayload) });
                 let routerData = await routerResponse.json();
-
                 if (!routerResponse.ok) throw new Error(routerData.error?.message || "Router API Error");
 
-                // Parse Keputusan AI
-                let routerDecision = { needs_unesdoc: false, keyword: "" };
-                try {
-                    routerDecision = JSON.parse(routerData.candidates[0]?.content?.parts[0]?.text || '{}');
-                } catch(e) { console.warn("Gagal parse JSON router AI"); }
-
-                let formattedUnesdoc = [];
-                let unesdocContext = "";
+                let routerDecision = JSON.parse(routerData.candidates[0]?.content?.parts[0]?.text || '{}');
+                let apiContexts = { unesdoc: "", worldbank: "", undata: "" };
+                let fetchPromises = [];
 
                 // ==========================================
-                // TAHAP 2: FETCH UNESDOC LOKAL (Jika 'True')
+                // TAHAP 2: FETCH PARALEL KE 3 API EXTERNAL
                 // ==========================================
-                if (routerDecision.needs_unesdoc && routerDecision.keyword) {
-                    console.log("AI Router memutuskan panggil UNESDOC dengan keyword:", routerDecision.keyword);
-                    setUnesdocIndicator('fetching');
-
-                    try {
-                        const queryParams = encodeURIComponent(`search("${routerDecision.keyword}")`);
-                        const unesdocUrl = `https://data.unesco.org/api/explore/v2.1/catalog/datasets/doc001/records?limit=5&where=${queryParams}`;
-
-                        let unesdocRes = await fetch(unesdocUrl);
-                        let unesdocJson = await unesdocRes.json();
-
-                        formattedUnesdoc = (unesdocJson.results || []).map(doc => ({
-                            title: doc.title || "Untitled",
-                            summary: doc.description || (doc.subject ? doc.subject.join(", ") : "No description"),
-                            url: doc.url || "https://unesdoc.unesco.org/"
-                        }));
-
-                        if (formattedUnesdoc.length > 0) {
-                            appendUnesdocEvidence(formattedUnesdoc);
-                            unesdocContext = "\nUNESDOC EXTERNAL RESULTS:\n---\n" + JSON.stringify(formattedUnesdoc) + "\n---";
-                        }
-                    } catch (e) {
-                        console.error("Gagal Fetch UNESDOC:", e);
-                    }
-                    
-                    setUnesdocIndicator('standby');
+                
+                // 1. Fetch UNESDOC
+                if (routerDecision.unesdoc?.fetch && routerDecision.unesdoc?.keyword) {
+                    setApiIndicator('unesdoc', 'fetching');
+                    const kw = encodeURIComponent(routerDecision.unesdoc.keyword);
+                    const req = fetch(`https://data.unesco.org/api/explore/v2.1/catalog/datasets/doc001/records?limit=3&where=search("${kw}")`)
+                        .then(res => res.json())
+                        .then(data => {
+                            let formatted = (data.results || []).map(d => ({ title: d.title, summary: d.description || "UNESDOC record", source: 'unesdoc', url: d.url }));
+                            if(formatted.length) {
+                                appendExternalEvidence(formatted, 'UNESDOC', 'ph-books', 'blue');
+                                apiContexts.unesdoc = `\nUNESDOC DATA:\n` + JSON.stringify(formatted);
+                            }
+                        }).catch(e => console.error("UNESDOC Error", e)).finally(() => setApiIndicator('unesdoc', 'standby'));
+                    fetchPromises.push(req);
                 }
 
+
+                // 2. Fetch World Bank (V2 Indicators API - ASLI sesuai dokumentasi Anda)
+                // Endpoint: https://api.worldbank.org/v2/...
+                if (routerDecision.worldbank?.fetch && routerDecision.worldbank?.keyword) {
+                    setApiIndicator('worldbank', 'fetching');
+                    const kw = encodeURIComponent(routerDecision.worldbank.keyword);
+                    // Langsung ke server Bank Dunia (Bebas CORS, HTTPs native)
+                    const targetUrl = `https://api.worldbank.org/v2/indicator?q=${kw}&format=json`;
+                    
+                    const req = fetch(targetUrl)
+                        .then(res => res.json())
+                        .then(data => {
+                            // Format JSON WB Indicators V2 adalah Array berisi meta [0] dan data [1]
+                            if(data && data[1]) {
+                                let formatted = data[1].slice(0, 3).map(d => ({ 
+                                    title: d.name || "World Bank Indicator", 
+                                    summary: d.sourceNote ? d.sourceNote.substring(0, 200) + '...' : "Official World Bank Data Indicator.", 
+                                    source: 'worldbank', 
+                                    url: `https://data.worldbank.org/indicator/${d.id}` 
+                                }));
+                                
+                                if(formatted.length) {
+                                    appendExternalEvidence(formatted, 'WB Indicators', 'ph-globe-hemisphere-west', 'amber');
+                                    apiContexts.worldbank = `\nWORLD BANK INDICATORS:\n` + JSON.stringify(formatted);
+                                }
+                            }
+                        }).catch(e => console.warn("WB Notice:", e)).finally(() => setApiIndicator('worldbank', 'standby'));
+                    fetchPromises.push(req);
+                }
+
+                // 3. Fetch UN Data (SDMX REST API - ASLI sesuai dokumentasi Anda)
+                // Endpoint: http://data.un.org/ws/rest/...
+                if (routerDecision.undata?.fetch && routerDecision.undata?.keyword) {
+                    setApiIndicator('undata', 'fetching');
+                    const kw = routerDecision.undata.keyword.toLowerCase();
+                    
+                    // URL asli PBB berawalan HTTP. 
+                    // Kita bungkus dengan HTTPS proxy CodeTabs agar tidak diblokir GitHub Pages (Mixed Content Rule)
+                    const unUrl = `http://data.un.org/ws/rest/dataflow`;
+                    const proxyUrl = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(unUrl)}`;
+                    
+                    const req = fetch(proxyUrl, {
+                        headers: { "Accept": "text/json" } // Syarat dari dokumentasi UN Data FAQ
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            // Struktur JSON SDMX sangat kompleks, kita ambil list Dataflow/Datamart-nya
+                            let dataflows = data?.data?.dataflows || [];
+                            
+                            // Karena SDMX REST tidak punya query ?q=keyword di URL, kita filter manual menggunakan javascript
+                            let matched = dataflows.filter(d => 
+                                (d.name && d.name.toLowerCase().includes(kw)) || 
+                                (d.description && d.description.toLowerCase().includes(kw))
+                            ).slice(0, 3);
+                            
+                            if(matched.length) {
+                                let formatted = matched.map(d => ({ 
+                                    title: d.name, 
+                                    summary: d.description ? d.description.substring(0, 150) + '...' : `Agency: ${d.agencyID} | Version: ${d.version}`, 
+                                    source: 'undata', 
+                                    url: `https://data.un.org/` // SDMX tidak mengembalikan link spesifik, arahkan ke portal utama
+                                }));
+                                
+                                appendExternalEvidence(formatted, 'UN Data (SDMX)', 'ph-chart-polar', 'green');
+                                apiContexts.undata = `\nUN DATA FLOWS:\n` + JSON.stringify(formatted);
+                            }
+                        }).catch(e => console.warn("UN Notice:", e)).finally(() => setApiIndicator('undata', 'standby'));
+                    fetchPromises.push(req);
+                }
+
+                // Tunggu semua API selesai
+                await Promise.all(fetchPromises);
+
                 // ==========================================
-                // TAHAP 3: GENERATOR AKHIR (Eksklusif Google Search Tool)
+                // TAHAP 3: GENERATOR AKHIR (+ Penambahan Token)
                 // ==========================================
                 const systemPrompt = `You are Edu-Scite, an elite academic research assistant. Respond in ${currentLang === 'id' ? 'Indonesian' : 'English'}.
                 CRITICAL INSTRUCTIONS: 
-                1. Synthesize the "INTERNAL SEARCH RESULTS" and "UNESDOC EXTERNAL RESULTS" below.
-                2. You have native access to Google Search. You MUST use it if external validation is needed.
+                1. Synthesize the INTERNAL RESULTS and any EXTERNAL API RESULTS below.
+                2. You MUST use Google Search if external validation is needed.
                 3. Every claim MUST be cited using THIS EXACT FORMAT: [[Type: Exact Title]]
                 
                 TYPES OF CITATIONS:
-                - [[Supporting: Title]] -> For internal data.
-                - [[Contrasting: Title]] -> For internal data.
-                - [[Mentioning: Title]] -> For internal data.
-                - [[UNESDOC: Title]] -> For claims backed by UNESDOC EXTERNAL RESULTS.
-                - [[External: Journal/Author - Title]] -> For claims backed by Google Search.
+                - [[Supporting: Title]], [[Contrasting: Title]], [[Mentioning: Title]] -> For INTERNAL data.
+                - [[UNESDOC: Title]] -> For UNESDOC data.
+                - [[WorldBank: Title]] -> For WORLD BANK data.
+                - [[UNData: Title]] -> For UN data.
+                - [[External: Journal/Author - Title]] -> For Google Search findings.
 
                 INTERNAL SEARCH RESULTS:
-                ---
                 ${filteredContext}
-                ---
-                ${unesdocContext}`;
+                
+                EXTERNAL API RESULTS:
+                ${apiContexts.unesdoc}
+                ${apiContexts.worldbank}
+                ${apiContexts.undata}`;
 
                 let contents = chatHistory.map(msg => ({ role: msg.role === 'user' ? 'user' : 'model', parts: [{ text: msg.text }] }));
                 contents.push({ role: 'user', parts: [{ text: message }] });
@@ -644,17 +731,18 @@
                 let finalPayload = { 
                     contents: contents, 
                     systemInstruction: { parts: [{ text: systemPrompt }] }, 
-                    tools: [{ googleSearch: {} }], // Hanya Tool Google yang dipakai di sini
-                    generationConfig: { temperature: 0.3 } 
+                    tools: [{ googleSearch: {} }], 
+                    generationConfig: { 
+                        temperature: 0.3,
+                        maxOutputTokens: 8192 // <--- PENAMBAHAN TOKEN LIMIT
+                    } 
                 };
 
                 let finalResponse = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(finalPayload) });
 
-                // Penanganan jika Google Search Sedang Down/Overload
                 if (finalResponse.status === 503 || finalResponse.status === 500) {
-                    document.getElementById('external-evidence-section').classList.remove('hidden');
-                    document.getElementById('external-evidence-list').innerHTML += `<div class="bg-rose-50 p-3 rounded-lg border border-rose-200 shadow-sm text-rose-600 text-xs font-medium"><i class="ph-bold ph-warning-circle mb-1 text-base"></i><br>Google Web Search is currently overloaded. Generated response is based on Local & UNESDOC data only.</div>`;
-                    delete finalPayload.tools; // Lempar ulang tanpa googleSearch
+                    // Fallback jika Google Search Overload
+                    delete finalPayload.tools;
                     finalResponse = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(finalPayload) });
                 }
 
@@ -675,91 +763,34 @@
             } catch (error) {
                 document.getElementById('loading-bubble')?.remove(); 
                 document.getElementById('send-btn').disabled = false;
-                setUnesdocIndicator('standby');
+                
+                // Matikan ketiga lampu indikator kembali ke STANDBY jika terjadi error
+                setApiIndicator('unesdoc', 'standby');
+                setApiIndicator('worldbank', 'standby');
+                setApiIndicator('undata', 'standby');
                 
                 console.error("API Error Detail:", error);
-                appendMessage('ai', i18n[currentLang].errorApi + `<br><br><span class="text-xs text-rose-500 font-mono">${error.message}</span>`); 
+                appendMessage('ai', i18n[currentLang].errorApi + `<br><br><span class="text-xs text-rose-500 font-mono hover:text-rose-700 transition-all">${error.message}</span><br><br><span class="text-xs text-slate-500">Google Gemini API is currently overloaded or rejecting requests. Please try again in a few seconds.</span>`); 
             }
         }
 
-       async function toggleUnesdoc() {
-            const btn = document.getElementById('unesdoc-toggle-btn');
-            const badge = document.getElementById('unesdoc-status-badge');
-            
-            if (unesdocEnabled) {
-                // MATIKAN (OFF): Filter/hapus data UNESDOC dari array utama
-                unesdocEnabled = false;
-                innovationData = innovationData.filter(item => item.source !== 'unesdoc');
-                
-                // Kembalikan UI ke status OFF
-                badge.innerText = "OFF";
-                badge.className = "px-2 py-0.5 rounded text-[10px] font-bold bg-slate-200 text-slate-500 transition-all";
-                btn.classList.remove('bg-blue-50', 'text-blue-700', 'border-blue-200');
-                btn.classList.add('bg-slate-50', 'text-slate-600', 'border-slate-200');
-                
-            } else {
-                // HIDUPKAN (ON)
-                badge.innerHTML = '<i class="ph-bold ph-spinner animate-spin"></i>';
-                btn.disabled = true;
-
-                try {
-                    // Hanya panggil API jika cache masih kosong
-                    if (cachedUnesdocData.length === 0) {
-                        const response = await fetch('https://data.unesco.org/api/explore/v2.1/catalog/datasets/doc001/records?limit=100');
-                        if (!response.ok) throw new Error("API Error");
-                        const data = await response.json();
-                        
-                        cachedUnesdocData = data.results.map(doc => ({
-                            title: doc.title || "Untitled UNESDOC Document",
-                            summary: (doc.description ? doc.description + ". " : "") + (doc.subject ? "Subjects: " + doc.subject.join(", ") : "No description available."),
-                            category: doc.type || ["Unesdoc Publication"],
-                            location: { country: doc.coverage || "Global/Multiple" },
-                            url: doc.url,
-                            source: 'unesdoc' // PENANDA KHUSUS
-                        }));
-                    }
-                    
-                    // Gabungkan data
-                    innovationData = [...innovationData, ...cachedUnesdocData];
-                    unesdocEnabled = true;
-                    
-                    // Ubah UI ke status ON
-                    badge.innerText = "ON";
-                    badge.className = "px-2 py-0.5 rounded text-[10px] font-bold bg-blue-600 text-white shadow-inner transition-all";
-                    btn.classList.remove('bg-slate-50', 'text-slate-600', 'border-slate-200');
-                    btn.classList.add('bg-blue-50', 'text-blue-700', 'border-blue-200');
-
-                } catch (error) {
-                    console.error(error);
-                    badge.innerText = "ERR";
-                    badge.className = "px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500 text-white";
-                }
-                btn.disabled = false;
-            }
-            
-            // Perbarui jumlah dokumen di UI
-            document.getElementById('db-count').innerText = `${innovationData.length} documents indexed`;
-        }
-
-
-        function appendUnesdocEvidence(unesdocData) {
+        function appendExternalEvidence(apiData, apiName, iconClass, colorTheme) {
             const extList = document.getElementById('external-evidence-list');
             document.getElementById('external-evidence-section').classList.remove('hidden');
             
-            unesdocData.forEach((data, idx) => {
-                // Daftarkan ke memori Modal
+            apiData.forEach((data) => {
                 sessionEvidences[data.title.toLowerCase()] = {
-                    type: 'unesdoc',
+                    type: data.source,
                     title: data.title,
                     summary: data.summary,
                     url: data.url
                 };
 
                 extList.innerHTML += `
-                    <a href="${data.url}" target="_blank" class="block bg-blue-50 p-3 rounded-lg border border-blue-200 shadow-sm hover:border-blue-400 hover:-translate-y-0.5 transition-all cursor-pointer mb-3">
-                        <div class="text-[10px] font-bold text-blue-600 uppercase tracking-wider mb-1 flex items-center gap-1"><i class="ph-bold ph-bank"></i> UNESDOC API</div>
+                    <a href="${data.url}" target="_blank" class="block bg-${colorTheme}-50 p-3 rounded-lg border border-${colorTheme}-200 shadow-sm hover:border-${colorTheme}-400 hover:-translate-y-0.5 transition-all cursor-pointer mb-3">
+                        <div class="text-[10px] font-bold text-${colorTheme}-600 uppercase tracking-wider mb-1 flex items-center gap-1"><i class="ph-bold ${iconClass}"></i> ${apiName} API</div>
                         <h3 class="text-[12px] font-bold text-slate-800 leading-tight mb-1 line-clamp-2">${data.title}</h3>
-                        <div class="text-[9px] text-blue-500 font-medium line-clamp-2">${data.summary}</div>
+                        <div class="text-[9px] text-${colorTheme}-500 font-medium line-clamp-2">${data.summary}</div>
                     </a>
                 `;
             });
