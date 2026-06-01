@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edu-Scite — Smart Citation Assistant</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- Marked.js for Markdown parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #fcfcfc; }
+        .font-serif-title { font-family: 'Merriweather', serif; }
+        
+        .scite-unesdoc { background-color: #eff6ff; color: #2563eb; border-color: #bfdbfe; }
+.scite-unesdoc:hover { background-color: #bfdbfe; transform: translateY(-1px); box-shadow: 0 2px 4px rgba(37, 99, 235, 0.1); }
+        
+        /* Markdown Styles for Academic Look */
+        .academic-body { font-size: 0.95rem; color: #334155; line-height: 1.8; }
+        .academic-body p { margin-bottom: 1.25rem; }
+        .academic-body strong { font-weight: 700; color: #0f172a; }
+        .academic-body ul { list-style-type: disc; margin-left: 1.5rem; margin-bottom: 1.25rem; }
+        .academic-body li { margin-bottom: 0.5rem; }
+        .academic-body h3 { font-family: 'Merriweather', serif; font-size: 1.25rem; font-weight: 700; color: #1e293b; margin-top: 2rem; margin-bottom: 1rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem;}
+        
+        /* --- SCITE.AI STYLE CITATION BADGES --- */
+        .scite-badge {
+            display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 12px;
+            font-size: 0.7rem; font-weight: 700; cursor: pointer; transition: all 0.2s ease;
+            vertical-align: middle; border: 1px solid transparent; margin: 0 2px;
+            font-family: 'Inter', sans-serif; text-decoration: none !important;
+        }
+        .scite-supporting { background-color: #ecfdf5; color: #059669; border-color: #a7f3d0; }
+        .scite-mentioning { background-color: #f1f5f9; color: #475569; border-color: #cbd5e1; }
+        .scite-contrasting { background-color: #eff6ff; color: #2563eb; border-color: #bfdbfe; }
+        .scite-unesdoc { background-color: #eff6ff; color: #2563eb; border-color: #bfdbfe; }
+        .scite-unesdoc:hover { background-color: #bfdbfe; transform: translateY(-1px); box-shadow: 0 2px 4px rgba(37, 99, 235, 0.1); }
+
+        /* Purple - External/Web Publications */
+        .scite-external { background-color: #f3e8ff; color: #7e22ce; border-color: #e9d5ff; }
+        .scite-external:hover { background-color: #e9d5ff; transform: translateY(-1px); box-shadow: 0 2px 4px rgba(126, 34, 206, 0.1); }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="h-full flex overflow-hidden text-slate-800">
+
+    <!-- Sidebar Settings (Kiri) -->
+    <aside class="w-72 bg-white border-r border-slate-200 flex flex-col shadow-[2px_0_10px_rgba(0,0,0,0.02)] z-10 hidden md:flex shrink-0">
+        <div class="p-6 border-b border-slate-100 flex items-center gap-3 cursor-pointer" onclick="window.location.href='index.html'">
+            <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white shadow-sm">
+                <i class="ph-bold ph-quotes"></i>
+            </div>
+            <div>
+                <h1 class="text-lg font-serif-title font-bold text-slate-900 leading-none">Edu-Scite</h1>
+                <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">Smart Citations</p>
+            </div>
+        </div>
+
+        <div class="p-6 flex-1 overflow-y-auto space-y-6">
+            <!-- Database Status -->
+            <div class="p-4 bg-slate-50 rounded-xl border border-slate-100 shadow-inner">
+                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2" data-i18n="dbLabel">Corpus Source</label>
+                <div class="flex items-start gap-2">
+                    <div id="db-indicator" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse mt-1.5 shrink-0"></div>
+                    <div>
+                        <span id="db-status" class="text-sm font-bold text-slate-700 leading-tight" data-i18n="dbLoading">Syncing repositories...</span>
+                        <p id="db-count" class="text-xs text-slate-500 mt-1"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- UNESDOC Status Indicator (Static) -->
+            <div class="mt-4 border-t border-slate-100 pt-4">
+                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">External API Status</label>
+                <div id="unesdoc-indicator" class="w-full py-2 px-3 bg-slate-50 text-slate-400 border border-slate-200 rounded-lg text-xs font-bold flex items-center justify-between shadow-sm transition-all duration-300">
+                    <div class="flex items-center gap-2"><i class="ph-bold ph-bank"></i> UNESDOC</div>
+                    <div id="unesdoc-status-badge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-200 text-slate-500 transition-all duration-300">STANDBY</div>
+                </div>
+            </div>
+
+            <!-- API Key Input -->
+            <div>
+                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2" data-i18n="apiLabel">Authentication (BYOK)</label>
+                <div class="relative">
+                    <i class="ph-bold ph-key absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                    <input type="password" id="api-key" placeholder="Enter Gemini API Key..." class="w-full pl-9 pr-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-indigo-500 transition-all shadow-sm">
+                </div>
+            </div>
+
+            <!-- Model Selection -->
+            <div>
+                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2" data-i18n="modelLabel">Inference Model</label>
+                <select id="model-select" class="w-full p-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 shadow-sm focus:outline-none focus:border-indigo-500">
+                    <option value="gemini-2.5-flash">Gemini 2.5 Flash (Fast)</option>
+                    <option value="gemini-2.5-pro">Gemini 2.5 Pro (Deep)</option>
+                </select>
+            </div>
+
+            <!-- Language Toggle -->
+            <div>
+                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2" data-i18n="langLabel">Output Language</label>
+                <div class="flex bg-slate-100 p-1 rounded-lg border border-slate-200 shadow-inner">
+                    <button onclick="setLang('en')" id="btn-en" class="flex-1 py-1.5 text-xs font-bold rounded-md bg-white shadow-sm text-indigo-600 transition-all border border-slate-200">English</button>
+                    <button onclick="setLang('id')" id="btn-id" class="flex-1 py-1.5 text-xs font-bold rounded-md text-slate-500 hover:text-slate-700 transition-all bg-transparent border border-transparent">Bahasa</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="p-4 bg-white border-t border-slate-100">
+            <button onclick="clearChat()" class="w-full py-2.5 px-4 bg-white border border-slate-200 text-slate-600 rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 transition-all flex items-center justify-center gap-2">
+                <i class="ph-bold ph-trash"></i> <span data-i18n="clearChat">Clear Research</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Chat Area (Tengah) -->
+    <main class="flex-1 flex flex-col h-full bg-[#fcfcfc] relative">
+        <header class="flex items-center justify-between p-4 border-b border-slate-200 bg-white shadow-sm">
+            <div class="flex items-center gap-2 md:hidden text-indigo-600">
+                <i class="ph-bold ph-quotes text-xl"></i>
+                <h1 class="text-base font-serif-title font-bold text-slate-900">Edu-Scite</h1>
+            </div>
+            
+            <div class="ml-auto">
+                <button onclick="toggleEvidencePanel()" class="flex items-center gap-2 px-3 py-1.5 bg-indigo-50 text-indigo-600 border border-indigo-100 rounded-lg text-xs font-bold hover:bg-indigo-100 transition-all">
+                    <i class="ph-bold ph-books"></i> <span id="evidence-toggle-text">Evidence: OFF</span>
+                </button>
+            </div>
+        </header>
+
+        <div id="chat-container" class="flex-1 overflow-y-auto p-4 md:p-10 scroll-smooth">
+            <div class="max-w-4xl mx-auto flex flex-col gap-10" id="chat-history">
+                <div class="flex flex-col items-center justify-center text-center py-10 opacity-80" id="welcome-block">
+                    <div class="w-16 h-16 bg-indigo-50 text-indigo-500 rounded-2xl flex items-center justify-center text-3xl mb-4 border border-indigo-100">
+                        <i class="ph-fill ph-magnifying-glass"></i>
+                    </div>
+                    <h2 class="font-serif-title text-2xl font-bold text-slate-800 mb-2">Ask an evidence-based question</h2>
+                    <p class="text-sm text-slate-500 max-w-md mx-auto mb-6" id="welcome-msg">I analyze your dataset and provide answers backed by <span class="font-bold text-emerald-600">Supporting</span>, <span class="font-bold text-blue-600">Contrasting</span>, or <span class="font-bold text-slate-600">Mentioning</span> citations.</p>
+                </div>
+            </div>
+            <div id="chat-anchor" class="h-10"></div>
+        </div>
+
+        <div class="p-4 md:p-8 bg-gradient-to-t from-[#fcfcfc] to-transparent">
+            <div class="max-w-4xl mx-auto relative bg-white border-2 border-slate-200 rounded-2xl p-2 focus-within:border-indigo-500 shadow-lg flex items-end gap-2">
+                <div class="p-3 text-slate-400 shrink-0 mb-1"><i class="ph-bold ph-sparkle text-xl"></i></div>
+                <textarea id="chat-input" rows="1" placeholder="Ask a research question..." class="w-full max-h-40 bg-transparent border-none focus:ring-0 resize-none text-base p-3 py-3.5 text-slate-800 placeholder-slate-400 font-medium" oninput="this.style.height = ''; this.style.height = Math.min(this.scrollHeight, 160) + 'px'"></textarea>
+                <button id="send-btn" onclick="sendMessage()" class="shrink-0 w-12 h-12 mb-1 mr-1 rounded-xl bg-indigo-600 text-white flex items-center justify-center hover:bg-indigo-700 transition-all shadow-md disabled:opacity-50">
+                    <i class="ph-bold ph-arrow-up text-xl"></i>
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Evidence Panel (Kanan) -->
+    <aside id="evidence-panel" class="w-80 bg-slate-50 border-l border-slate-200 flex-col shadow-inner z-10 hidden shrink-0">
+        <div class="p-4 border-b border-slate-200 bg-white flex items-center justify-between">
+            <div class="flex items-center gap-2 text-slate-800">
+                <i class="ph-bold ph-files text-lg text-indigo-600"></i>
+                <h2 class="text-sm font-bold font-serif-title">Retrieved Evidence</h2>
+            </div>
+            <button onclick="toggleEvidencePanel()" class="text-slate-400 hover:text-slate-600"><i class="ph-bold ph-x"></i></button>
+        </div>
+        
+        <div class="p-4 flex-1 overflow-y-auto space-y-4 h-full">
+            <div id="internal-evidence-list" class="space-y-4">
+                <div class="text-center py-10 opacity-60">
+                    <i class="ph-duotone ph-file-search text-4xl text-slate-400 mb-2"></i>
+                    <p class="text-xs font-medium text-slate-500">Ask a question to see data.</p>
+                </div>
+            </div>
+            
+            <div id="external-evidence-section" class="hidden mt-6 pt-4 border-t-2 border-dashed border-slate-200 space-y-4 pb-10">
+                <h3 class="text-xs font-bold text-purple-600 uppercase tracking-wider flex items-center gap-2">
+                    <i class="ph-bold ph-globe"></i> Web & Publications
+                </h3>
+                <div id="external-evidence-list" class="space-y-4"></div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MODAL POPUP CITATION -->
+    <div id="citation-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/40 backdrop-blur-sm transition-opacity opacity-0">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full mx-4 overflow-hidden transform scale-95 transition-all duration-300" id="citation-modal-content">
+            <div class="p-6 border-b border-slate-100 flex justify-between items-start">
+                <div class="pr-4">
+                    <div id="modal-badge" class="text-[10px] font-bold uppercase tracking-wider mb-2"></div>
+                    <h2 id="modal-title" class="text-lg font-serif-title font-bold text-slate-900 leading-tight"></h2>
+                </div>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 bg-slate-50 p-2 rounded-full transition-all shrink-0"><i class="ph-bold ph-x"></i></button>
+            </div>
+            <div class="p-6 bg-slate-50 flex flex-col gap-4">
+                <p id="modal-summary" class="text-sm text-slate-600 leading-relaxed"></p>
+                <div class="flex justify-end gap-3 mt-4 pt-4 border-t border-slate-200">
+                    <button onclick="closeModal()" class="px-4 py-2 text-sm font-bold text-slate-500 hover:text-slate-700 transition-all">Close</button>
+                    <a id="modal-link" href="#" target="_blank" class="px-4 py-2 text-sm font-bold text-white bg-indigo-600 rounded-lg shadow-md hover:bg-indigo-700 transition-all flex items-center gap-2">
+                        Go to Research <i class="ph-bold ph-arrow-up-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // --- State Management ---
+        let currentLang = 'en';
+        let innovationData = [];
+        let chatHistory = [];
+        let evidencePanelOpen = false;
+        let unesdocEnabled = false;
+        let cachedUnesdocData = []; // Menyimpan data API agar tidak perlu fetch ulang
+        
+        // Memori Kamus (Menyimpan seluruh referensi lokal & web yang pernah dicari)
+        let sessionEvidences = {}; 
+
+        const i18n = {
+            en: { connectUnesdoc: "Add UNESDOC Corpus", dbLabel: "Corpus Source", dbLoading: "Syncing repositories...", dbSuccess: "Database Synchronized", dbFail: "Connection Failed", apiLabel: "Authentication (BYOK)", modelLabel: "Inference Model", langLabel: "Output Language", clearChat: "Clear Research", errorNoKey: "⚠️ Please enter Gemini API Key.", errorDb: "⚠️ Corpus empty.", errorApi: "⚠️ Inference API Error.", loading: "Searching literature & synthesizing..." },
+            id: { connectUnesdoc: "Tambah Korpus UNESDOC", dbLabel: "Sumber Korpus", dbLoading: "Sinkronisasi...", dbSuccess: "Database Tersinkronisasi", dbFail: "Koneksi Gagal", apiLabel: "Autentikasi (BYOK)", modelLabel: "Model Inferensi", langLabel: "Bahasa Output", clearChat: "Hapus Riset", errorNoKey: "⚠️ Masukkan API Key Gemini.", errorDb: "⚠️ Korpus kosong.", errorApi: "⚠️ API Error.", loading: "Mencari data & menyintesis..." }
+        };
+
+        window.onload = () => {
+            const savedKey = localStorage.getItem('gii_gemini_key');
+            if (savedKey) document.getElementById('api-key').value = savedKey;
+            loadDataset();
+            document.getElementById('chat-input').addEventListener('keypress', function (e) {
+                if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+            });
+        };
+
+        function setLang(lang) {
+            currentLang = lang;
+            document.getElementById('btn-en').className = lang === 'en' ? "flex-1 py-1.5 text-xs font-bold rounded-md bg-white shadow-sm text-indigo-600 border border-slate-200 transition-all" : "flex-1 py-1.5 text-xs font-bold rounded-md text-slate-500 hover:text-slate-700 bg-transparent transition-all border border-transparent";
+            document.getElementById('btn-id').className = lang === 'id' ? "flex-1 py-1.5 text-xs font-bold rounded-md bg-white shadow-sm text-indigo-600 border border-slate-200 transition-all" : "flex-1 py-1.5 text-xs font-bold rounded-md text-slate-500 hover:text-slate-700 bg-transparent transition-all border border-transparent";
+            document.querySelectorAll('[data-i18n]').forEach(el => { const key = el.getAttribute('data-i18n'); if (i18n[lang][key]) el.innerHTML = i18n[lang][key]; });
+        }
+
+        async function loadDataset() {
+            const dbStatus = document.getElementById('db-status');
+            const dbIndicator = document.getElementById('db-indicator');
+            const dbCount = document.getElementById('db-count');
+            const urls = [
+                'https://raw.githubusercontent.com/AnggaConni/GSI-Radar/refs/heads/main/data.json',
+                'https://raw.githubusercontent.com/AnggaConni/EDU-Innovation/refs/heads/main/data.json',
+                'https://raw.githubusercontent.com/AnggaConni/ICH-Radar/refs/heads/main/data.json',
+                'https://raw.githubusercontent.com/AnggaConni/Nexus-Radar/refs/heads/main/data.json',
+                'https://raw.githubusercontent.com/AnggaConni/artifact-radar/refs/heads/main/data.json'
+            ];
+            try {
+                const results = await Promise.all(urls.map(async u => {
+                    try { const res = await fetch(u + '?v=' + new Date().getTime()); const data = await res.json(); return Array.isArray(data) ? data : (data.inventory || []); } catch(e) { return []; }
+                }));
+                innovationData = results.flat();
+                if (innovationData.length > 0) {
+                    dbIndicator.className = "w-2 h-2 rounded-full bg-emerald-500 mt-1.5 shrink-0";
+                    dbStatus.innerText = i18n[currentLang].dbSuccess;
+                    dbCount.innerText = `${innovationData.length} documents indexed`;
+                } else throw new Error("Empty DB");
+            } catch (error) {
+                dbIndicator.className = "w-2 h-2 rounded-full bg-rose-500 mt-1.5 shrink-0";
+                dbStatus.innerText = i18n[currentLang].dbFail;
+                dbCount.innerText = "Check network";
+            }
+        }
+
+        function toggleEvidencePanel() {
+            evidencePanelOpen = !evidencePanelOpen;
+            const panel = document.getElementById('evidence-panel');
+            const toggleText = document.getElementById('evidence-toggle-text');
+            if (evidencePanelOpen) { panel.classList.remove('hidden'); panel.classList.add('flex'); toggleText.innerText = "Evidence: ON"; } 
+            else { panel.classList.add('hidden'); panel.classList.remove('flex'); toggleText.innerText = "Evidence: OFF"; }
+        }
+
+        function retrieveRelevantData(query) {
+            const stopWords = ['yang', 'di', 'ke', 'dari', 'apa', 'bagaimana', 'untuk', 'dan', 'atau', 'is', 'the', 'in', 'of', 'and', 'to', 'how', 'what'];
+            const keywords = query.toLowerCase().split(/\W+/).filter(w => w.length > 2 && !stopWords.includes(w));
+            let scoredData = innovationData.map(item => {
+                let score = 0;
+                let categoryText = Array.isArray(item.category) ? item.category.join(' ') : (item.category || '');
+                let textToSearch = `${item.title || ''} ${item.summary || ''} ${categoryText} ${item.location?.country || ''}`.toLowerCase();
+                keywords.forEach(kw => { if (textToSearch.includes(kw)) score += 1; });
+                return { item, score };
+            });
+            scoredData.sort((a, b) => b.score - a.score);
+            const topResults = scoredData.filter(d => d.score > 0).slice(0, 15).map(d => d.item);
+            if (topResults.length === 0 && innovationData.length > 0) return innovationData.slice(0, 10);
+            return topResults;
+        }
+
+        function updateEvidencePanel(retrievedData) {
+            const list = document.getElementById('internal-evidence-list');
+            document.getElementById('external-evidence-section').classList.add('hidden'); 
+            list.innerHTML = '';
+            
+            if(retrievedData.length === 0) {
+                list.innerHTML = `<p class="text-xs text-slate-400 text-center mt-10">No specific internal data found.</p>`;
+                return;
+            }
+
+            retrievedData.forEach((data, index) => {
+                // Simpan ke memori sesi untuk Modal Popup
+
+                // GANTI KODE INI:
+                sessionEvidences[data.title.toLowerCase()] = {
+                    type: data.source === 'unesdoc' ? 'unesdoc' : 'local', // Simpan tipe unesdoc
+                    title: data.title,
+                    summary: data.summary,
+                    url: data.url ? data.url : `https://scholar.google.com/scholar?q=${encodeURIComponent(data.title)}`
+                };
+
+                // Agar label di daftar panel kanan juga berubah
+                let badgeLabel = data.source === 'unesdoc' ? 'UNESDOC' : 'Local';
+                let badgeColor = data.source === 'unesdoc' ? 'text-blue-500' : 'text-indigo-500';
+
+                list.innerHTML += `
+                    <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm">
+                        <div class="text-[10px] font-bold ${badgeColor} uppercase tracking-wider mb-1">${badgeLabel} #${index + 1}</div>
+                        <h3 class="text-[13px] font-bold text-slate-800 leading-tight mb-1">${data.title || 'Untitled'}</h3>
+                        <p class="text-[11px] text-slate-500 line-clamp-3">${data.summary || 'No description available.'}</p>
+                    </div>
+                `;
+
+            });
+            
+            if(!evidencePanelOpen) toggleEvidencePanel();
+        }
+
+        function parseSciteCitations(text) {
+            return text.replace(/\[\[(Supporting|Contrasting|Mentioning|External|UNESDOC):\s*(.+?)\]\]/gi, (match, type, title) => {
+                let lowerType = type.toLowerCase();
+                let icon = lowerType === 'supporting' ? '<i class="ph-bold ph-check-circle"></i>' : 
+                        lowerType === 'contrasting' ? '<i class="ph-bold ph-x-circle"></i>' : 
+                        lowerType === 'external' ? '<i class="ph-bold ph-globe"></i>' : 
+                        lowerType === 'unesdoc' ? '<i class="ph-bold ph-bank"></i>' : '<i class="ph-bold ph-quotes"></i>';
+                
+                let safeTitle = title.replace(/'/g, "\\'").replace(/"/g, "&quot;");
+                return `<span class="scite-badge scite-${lowerType}" title="${title} (${type})" onclick="highlightEvidence('${safeTitle}')">${icon} ${title}</span>`;
+            });
+        }
+
+        // --- FUNGSI BARU: MODAL & HIGHLIGHT ---
+        function highlightEvidence(title) {
+            // 1. Highlight Kartu di Panel Kanan
+            if (!evidencePanelOpen) toggleEvidencePanel();
+            document.querySelectorAll('.highlight-card').forEach(el => el.classList.remove('ring-4', 'ring-indigo-400', 'ring-purple-400', 'highlight-card'));
+            const cards = document.querySelectorAll('#internal-evidence-list > div, #external-evidence-list > a');
+            let searchKeywords = title.toLowerCase().split(' - ').pop().split(' ').filter(w => w.length > 3);
+
+            cards.forEach(card => {
+                const cardText = card.innerText.toLowerCase();
+                let matchCount = 0;
+                searchKeywords.forEach(kw => { if (cardText.includes(kw)) matchCount++; });
+                if (matchCount > 0 || cardText.includes(title.toLowerCase())) {
+                    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    card.classList.add('highlight-card', 'transition-all', 'duration-500');
+                    if (card.tagName === 'A') { card.classList.add('ring-4', 'ring-purple-400'); setTimeout(() => card.classList.remove('ring-4', 'ring-purple-400', 'highlight-card'), 2500); } 
+                    else { card.classList.add('ring-4', 'ring-indigo-400'); setTimeout(() => card.classList.remove('ring-4', 'ring-indigo-400', 'highlight-card'), 2500); }
+                }
+            });
+
+            // 2. Buka Modal Popup
+            let foundEvd = null;
+            for (let key in sessionEvidences) {
+                let matchCount = 0;
+                searchKeywords.forEach(kw => { if (key.includes(kw)) matchCount++; });
+                if (matchCount > 0 || key.includes(title.toLowerCase())) {
+                    foundEvd = sessionEvidences[key];
+                    break;
+                }
+            }
+
+            const modal = document.getElementById('citation-modal');
+            const modalContent = document.getElementById('citation-modal-content');
+            let badgeEl = document.getElementById('modal-badge');
+            let linkEl = document.getElementById('modal-link');
+            
+            if (foundEvd) {
+                document.getElementById('modal-title').innerText = foundEvd.title;
+                document.getElementById('modal-summary').innerText = foundEvd.summary;
+                
+                if (foundEvd.type === 'external') {
+                    badgeEl.innerHTML = '<span class="text-purple-600 flex items-center gap-1"><i class="ph-bold ph-globe"></i> Web Publication</span>';
+                    linkEl.href = foundEvd.url;
+                    linkEl.innerHTML = 'Go to Web Source <i class="ph-bold ph-arrow-up-right"></i>';
+                    linkEl.className = "px-4 py-2 text-sm font-bold text-white bg-purple-600 rounded-lg shadow-md hover:bg-purple-700 transition-all flex items-center gap-2";
+                }
+                    else if (foundEvd.type === 'unesdoc') { 
+                    badgeEl.innerHTML = '<span class="text-blue-600 flex items-center gap-1"><i class="ph-bold ph-bank"></i> UNESDOC Publication</span>';
+                    linkEl.href = foundEvd.url;
+                    linkEl.innerHTML = 'Read on UNESDOC <i class="ph-bold ph-arrow-up-right"></i>';
+                    linkEl.className = "px-4 py-2 text-sm font-bold text-white bg-blue-600 rounded-lg shadow-md hover:bg-blue-700 transition-all flex items-center gap-2";
+                } 
+                
+                else {
+                    badgeEl.innerHTML = '<span class="text-indigo-600 flex items-center gap-1"><i class="ph-bold ph-database"></i> Local Database</span>';
+                    linkEl.href = foundEvd.url;
+                    linkEl.innerHTML = 'Search on Google Scholar <i class="ph-bold ph-magnifying-glass"></i>';
+                    linkEl.className = "px-4 py-2 text-sm font-bold text-white bg-indigo-600 rounded-lg shadow-md hover:bg-indigo-700 transition-all flex items-center gap-2";
+                }
+            } else {
+                document.getElementById('modal-title').innerText = title;
+                document.getElementById('modal-summary').innerText = 'Data ini disintesis oleh AI. Anda dapat memverifikasi topik ini lebih lanjut di web penelitian.';
+                badgeEl.innerHTML = '<span class="text-slate-500 flex items-center gap-1"><i class="ph-bold ph-robot"></i> AI Synthesized</span>';
+                linkEl.href = `https://scholar.google.com/scholar?q=${encodeURIComponent(title)}`;
+                linkEl.innerHTML = 'Search on Google Scholar <i class="ph-bold ph-magnifying-glass"></i>';
+                linkEl.className = "px-4 py-2 text-sm font-bold text-white bg-slate-800 rounded-lg shadow-md hover:bg-slate-900 transition-all flex items-center gap-2";
+            }
+
+            modal.classList.remove('hidden'); modal.classList.add('flex');
+            setTimeout(() => { modal.classList.remove('opacity-0'); modalContent.classList.remove('scale-95'); modalContent.classList.add('scale-100'); }, 10);
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('citation-modal');
+            const modalContent = document.getElementById('citation-modal-content');
+            modal.classList.add('opacity-0'); modalContent.classList.remove('scale-100'); modalContent.classList.add('scale-95');
+            setTimeout(() => { modal.classList.remove('flex'); modal.classList.add('hidden'); }, 300);
+        }
+
+        function appendMessage(role, text) {
+            const container = document.getElementById('chat-history');
+            const welcome = document.getElementById('welcome-block');
+            if (welcome) welcome.remove();
+            const msgDiv = document.createElement('div');
+            if (role === 'user') {
+                msgDiv.className = "flex gap-4 md:gap-6 w-full items-start pb-6 border-b border-slate-100";
+                msgDiv.innerHTML = `
+                    <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center shrink-0 border border-slate-300"><i class="ph-fill ph-user text-slate-500 text-sm"></i></div>
+                    <div class="flex-1 pt-1"><h3 class="font-bold text-slate-800 text-sm mb-2">Research Question</h3><p class="text-lg md:text-xl font-serif-title font-bold text-slate-900 leading-snug">${text.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</p></div>
+                `;
+            } else {
+                msgDiv.className = "flex gap-4 md:gap-6 w-full items-start py-6";
+                let htmlContent = marked.parse(text); htmlContent = parseSciteCitations(htmlContent);
+                msgDiv.innerHTML = `
+                    <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center shrink-0 shadow-md"><i class="ph-bold ph-quotes text-white text-sm"></i></div>
+                    <div class="flex-1 pt-1 overflow-hidden"><div class="academic-body w-full">${htmlContent}</div></div>
+                `;
+            }
+            container.appendChild(msgDiv); document.getElementById('chat-anchor').scrollIntoView({ behavior: "smooth" });
+        }
+
+        function showLoading() {
+            const container = document.getElementById('chat-history');
+            const msgDiv = document.createElement('div');
+            msgDiv.id = 'loading-bubble'; msgDiv.className = "flex gap-6 w-full items-start py-6";
+            msgDiv.innerHTML = `<div class="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center shrink-0 border border-indigo-200"><i class="ph-bold ph-spinner animate-spin text-indigo-600 text-sm"></i></div><div class="flex-1 pt-1.5"><p class="text-sm font-bold text-slate-400 animate-pulse uppercase">${i18n[currentLang].loading}</p></div>`;
+            container.appendChild(msgDiv); document.getElementById('chat-anchor').scrollIntoView({ behavior: "smooth" });
+            document.getElementById('send-btn').disabled = true;
+        }
+
+        function clearChat() {
+            document.getElementById('chat-history').innerHTML = `<div class="flex flex-col items-center justify-center text-center py-10 opacity-80" id="welcome-block"><div class="w-16 h-16 bg-indigo-50 text-indigo-500 rounded-2xl flex items-center justify-center text-3xl mb-4 border border-indigo-100"><i class="ph-fill ph-magnifying-glass"></i></div><h2 class="font-serif-title text-2xl font-bold text-slate-800 mb-2">Ask an evidence-based question</h2><p class="text-sm text-slate-500 max-w-md mx-auto mb-6">Ask me anything about your dataset.</p></div>`;
+            chatHistory = [];
+            document.getElementById('evidence-list').innerHTML = `<div class="text-center py-10 opacity-60"><p class="text-xs font-medium text-slate-500">Ask a question to see data.</p></div>`;
+        }
+
+        function setUnesdocIndicator(status) {
+            const container = document.getElementById('unesdoc-indicator');
+            const badge = document.getElementById('unesdoc-status-badge');
+            
+            if (!container || !badge) return;
+
+            if (status === 'fetching') {
+                // Lampu Menyala (Biru & Animasi Spin)
+                container.className = "w-full py-2 px-3 bg-blue-50 text-blue-700 border border-blue-200 rounded-lg text-xs font-bold flex items-center justify-between shadow-sm transition-all duration-300";
+                badge.className = "px-2 py-0.5 rounded text-[10px] font-bold bg-blue-600 text-white shadow-inner transition-all duration-300 flex items-center gap-1";
+                badge.innerHTML = '<i class="ph-bold ph-spinner animate-spin text-sm"></i> FETCHING';
+            } else {
+                // Lampu Mati / Standby (Abu-abu)
+                container.className = "w-full py-2 px-3 bg-slate-50 text-slate-400 border border-slate-200 rounded-lg text-xs font-bold flex items-center justify-between shadow-sm transition-all duration-300";
+                badge.className = "px-2 py-0.5 rounded text-[10px] font-bold bg-slate-200 text-slate-500 transition-all duration-300";
+                badge.innerHTML = 'STANDBY';
+            }
+        }
+
+        async function sendMessage() {
+            const inputEl = document.getElementById('chat-input');
+            const message = inputEl.value.trim();
+            const apiKey = document.getElementById('api-key').value.trim();
+            const model = document.getElementById('model-select').value;
+
+            if (!message) return;
+            if (!apiKey) { alert(i18n[currentLang].errorNoKey); return; }
+
+            localStorage.setItem('gii_gemini_key', apiKey);
+            inputEl.value = ''; inputEl.style.height = 'auto'; 
+            appendMessage('user', message); showLoading();
+
+            // 1. Ambil Data Lokal (Github JSON)
+            const relevantData = retrieveRelevantData(message);
+            updateEvidencePanel(relevantData);
+            const filteredContext = JSON.stringify(relevantData.map(item => ({ T: item.title, C: item.location?.country, S: item.summary })));
+
+            try {
+                // ==========================================
+                // TAHAP 1: AI ROUTER (Cek Kebutuhan UNESDOC via JSON)
+                // ==========================================
+                const routerPrompt = `You are a search routing assistant. Analyze the user's research question.
+                If the question is related to global issues, history, science, education, culture, or UNESCO, set "needs_unesdoc" to true and provide a 1-2 word English "keyword" for searching.
+                If not, set it to false.
+                Output ONLY valid JSON format. Example: {"needs_unesdoc": true, "keyword": "climate"}`;
+
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+                
+                const routerPayload = {
+                    contents: [{ role: 'user', parts: [{ text: routerPrompt + "\n\nUser Question: " + message }] }],
+                    generationConfig: { temperature: 0.1, responseMimeType: "application/json" } // Memaksa AI output JSON
+                };
+
+                let routerResponse = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(routerPayload) });
+                let routerData = await routerResponse.json();
+
+                if (!routerResponse.ok) throw new Error(routerData.error?.message || "Router API Error");
+
+                // Parse Keputusan AI
+                let routerDecision = { needs_unesdoc: false, keyword: "" };
+                try {
+                    routerDecision = JSON.parse(routerData.candidates[0]?.content?.parts[0]?.text || '{}');
+                } catch(e) { console.warn("Gagal parse JSON router AI"); }
+
+                let formattedUnesdoc = [];
+                let unesdocContext = "";
+
+                // ==========================================
+                // TAHAP 2: FETCH UNESDOC LOKAL (Jika 'True')
+                // ==========================================
+                if (routerDecision.needs_unesdoc && routerDecision.keyword) {
+                    console.log("AI Router memutuskan panggil UNESDOC dengan keyword:", routerDecision.keyword);
+                    setUnesdocIndicator('fetching');
+
+                    try {
+                        const queryParams = encodeURIComponent(`search("${routerDecision.keyword}")`);
+                        const unesdocUrl = `https://data.unesco.org/api/explore/v2.1/catalog/datasets/doc001/records?limit=5&where=${queryParams}`;
+
+                        let unesdocRes = await fetch(unesdocUrl);
+                        let unesdocJson = await unesdocRes.json();
+
+                        formattedUnesdoc = (unesdocJson.results || []).map(doc => ({
+                            title: doc.title || "Untitled",
+                            summary: doc.description || (doc.subject ? doc.subject.join(", ") : "No description"),
+                            url: doc.url || "https://unesdoc.unesco.org/"
+                        }));
+
+                        if (formattedUnesdoc.length > 0) {
+                            appendUnesdocEvidence(formattedUnesdoc);
+                            unesdocContext = "\nUNESDOC EXTERNAL RESULTS:\n---\n" + JSON.stringify(formattedUnesdoc) + "\n---";
+                        }
+                    } catch (e) {
+                        console.error("Gagal Fetch UNESDOC:", e);
+                    }
+                    
+                    setUnesdocIndicator('standby');
+                }
+
+                // ==========================================
+                // TAHAP 3: GENERATOR AKHIR (Eksklusif Google Search Tool)
+                // ==========================================
+                const systemPrompt = `You are Edu-Scite, an elite academic research assistant. Respond in ${currentLang === 'id' ? 'Indonesian' : 'English'}.
+                CRITICAL INSTRUCTIONS: 
+                1. Synthesize the "INTERNAL SEARCH RESULTS" and "UNESDOC EXTERNAL RESULTS" below.
+                2. You have native access to Google Search. You MUST use it if external validation is needed.
+                3. Every claim MUST be cited using THIS EXACT FORMAT: [[Type: Exact Title]]
+                
+                TYPES OF CITATIONS:
+                - [[Supporting: Title]] -> For internal data.
+                - [[Contrasting: Title]] -> For internal data.
+                - [[Mentioning: Title]] -> For internal data.
+                - [[UNESDOC: Title]] -> For claims backed by UNESDOC EXTERNAL RESULTS.
+                - [[External: Journal/Author - Title]] -> For claims backed by Google Search.
+
+                INTERNAL SEARCH RESULTS:
+                ---
+                ${filteredContext}
+                ---
+                ${unesdocContext}`;
+
+                let contents = chatHistory.map(msg => ({ role: msg.role === 'user' ? 'user' : 'model', parts: [{ text: msg.text }] }));
+                contents.push({ role: 'user', parts: [{ text: message }] });
+
+                let finalPayload = { 
+                    contents: contents, 
+                    systemInstruction: { parts: [{ text: systemPrompt }] }, 
+                    tools: [{ googleSearch: {} }], // Hanya Tool Google yang dipakai di sini
+                    generationConfig: { temperature: 0.3 } 
+                };
+
+                let finalResponse = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(finalPayload) });
+
+                // Penanganan jika Google Search Sedang Down/Overload
+                if (finalResponse.status === 503 || finalResponse.status === 500) {
+                    document.getElementById('external-evidence-section').classList.remove('hidden');
+                    document.getElementById('external-evidence-list').innerHTML += `<div class="bg-rose-50 p-3 rounded-lg border border-rose-200 shadow-sm text-rose-600 text-xs font-medium"><i class="ph-bold ph-warning-circle mb-1 text-base"></i><br>Google Web Search is currently overloaded. Generated response is based on Local & UNESDOC data only.</div>`;
+                    delete finalPayload.tools; // Lempar ulang tanpa googleSearch
+                    finalResponse = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(finalPayload) });
+                }
+
+                let finalData = await finalResponse.json();
+                if (!finalResponse.ok) throw new Error(finalData.error?.message || "Generation API Error");
+
+                let aiResponseText = finalData.candidates[0]?.content?.parts[0]?.text || "";
+
+                document.getElementById('loading-bubble')?.remove(); 
+                document.getElementById('send-btn').disabled = false;
+                
+                if (aiResponseText) {
+                    appendMessage('ai', aiResponseText); 
+                    chatHistory.push({ role: 'user', text: message }); 
+                    chatHistory.push({ role: 'ai', text: aiResponseText });
+                }
+
+            } catch (error) {
+                document.getElementById('loading-bubble')?.remove(); 
+                document.getElementById('send-btn').disabled = false;
+                setUnesdocIndicator('standby');
+                
+                console.error("API Error Detail:", error);
+                appendMessage('ai', i18n[currentLang].errorApi + `<br><br><span class="text-xs text-rose-500 font-mono">${error.message}</span>`); 
+            }
+        }
+
+       async function toggleUnesdoc() {
+            const btn = document.getElementById('unesdoc-toggle-btn');
+            const badge = document.getElementById('unesdoc-status-badge');
+            
+            if (unesdocEnabled) {
+                // MATIKAN (OFF): Filter/hapus data UNESDOC dari array utama
+                unesdocEnabled = false;
+                innovationData = innovationData.filter(item => item.source !== 'unesdoc');
+                
+                // Kembalikan UI ke status OFF
+                badge.innerText = "OFF";
+                badge.className = "px-2 py-0.5 rounded text-[10px] font-bold bg-slate-200 text-slate-500 transition-all";
+                btn.classList.remove('bg-blue-50', 'text-blue-700', 'border-blue-200');
+                btn.classList.add('bg-slate-50', 'text-slate-600', 'border-slate-200');
+                
+            } else {
+                // HIDUPKAN (ON)
+                badge.innerHTML = '<i class="ph-bold ph-spinner animate-spin"></i>';
+                btn.disabled = true;
+
+                try {
+                    // Hanya panggil API jika cache masih kosong
+                    if (cachedUnesdocData.length === 0) {
+                        const response = await fetch('https://data.unesco.org/api/explore/v2.1/catalog/datasets/doc001/records?limit=100');
+                        if (!response.ok) throw new Error("API Error");
+                        const data = await response.json();
+                        
+                        cachedUnesdocData = data.results.map(doc => ({
+                            title: doc.title || "Untitled UNESDOC Document",
+                            summary: (doc.description ? doc.description + ". " : "") + (doc.subject ? "Subjects: " + doc.subject.join(", ") : "No description available."),
+                            category: doc.type || ["Unesdoc Publication"],
+                            location: { country: doc.coverage || "Global/Multiple" },
+                            url: doc.url,
+                            source: 'unesdoc' // PENANDA KHUSUS
+                        }));
+                    }
+                    
+                    // Gabungkan data
+                    innovationData = [...innovationData, ...cachedUnesdocData];
+                    unesdocEnabled = true;
+                    
+                    // Ubah UI ke status ON
+                    badge.innerText = "ON";
+                    badge.className = "px-2 py-0.5 rounded text-[10px] font-bold bg-blue-600 text-white shadow-inner transition-all";
+                    btn.classList.remove('bg-slate-50', 'text-slate-600', 'border-slate-200');
+                    btn.classList.add('bg-blue-50', 'text-blue-700', 'border-blue-200');
+
+                } catch (error) {
+                    console.error(error);
+                    badge.innerText = "ERR";
+                    badge.className = "px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500 text-white";
+                }
+                btn.disabled = false;
+            }
+            
+            // Perbarui jumlah dokumen di UI
+            document.getElementById('db-count').innerText = `${innovationData.length} documents indexed`;
+        }
+
+
+        function appendUnesdocEvidence(unesdocData) {
+            const extList = document.getElementById('external-evidence-list');
+            document.getElementById('external-evidence-section').classList.remove('hidden');
+            
+            unesdocData.forEach((data, idx) => {
+                // Daftarkan ke memori Modal
+                sessionEvidences[data.title.toLowerCase()] = {
+                    type: 'unesdoc',
+                    title: data.title,
+                    summary: data.summary,
+                    url: data.url
+                };
+
+                extList.innerHTML += `
+                    <a href="${data.url}" target="_blank" class="block bg-blue-50 p-3 rounded-lg border border-blue-200 shadow-sm hover:border-blue-400 hover:-translate-y-0.5 transition-all cursor-pointer mb-3">
+                        <div class="text-[10px] font-bold text-blue-600 uppercase tracking-wider mb-1 flex items-center gap-1"><i class="ph-bold ph-bank"></i> UNESDOC API</div>
+                        <h3 class="text-[12px] font-bold text-slate-800 leading-tight mb-1 line-clamp-2">${data.title}</h3>
+                        <div class="text-[9px] text-blue-500 font-medium line-clamp-2">${data.summary}</div>
+                    </a>
+                `;
+            });
+        }
+
+    </script>
+</body>
+</html>
