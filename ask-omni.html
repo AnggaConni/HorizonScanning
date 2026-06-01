@@ -390,13 +390,15 @@
 
             retrievedData.forEach((data, index) => {
                 // Simpan ke memori sesi untuk Modal Popup
+                
+                // Tambahkan pengaman: Jika data.title kosong, gunakan "Untitled Document"
+                let safeTitle = data.title ? data.title : "Untitled Document";
 
-                // GANTI KODE INI:
-                sessionEvidences[data.title.toLowerCase()] = {
-                    type: data.source === 'unesdoc' ? 'unesdoc' : 'local', // Simpan tipe unesdoc
-                    title: data.title,
-                    summary: data.summary,
-                    url: data.url ? data.url : `https://scholar.google.com/scholar?q=${encodeURIComponent(data.title)}`
+                sessionEvidences[safeTitle.toLowerCase()] = {
+                    type: data.source === 'unesdoc' ? 'unesdoc' : 'local',
+                    title: safeTitle,
+                    summary: data.summary || 'No description available.',
+                    url: data.url ? data.url : `https://scholar.google.com/scholar?q=${encodeURIComponent(safeTitle)}`
                 };
 
                 // Agar label di daftar panel kanan juga berubah
@@ -684,15 +686,25 @@
                     fetchPromises.push(req);
                 }
 
-                // 3. Fetch UN Data (SDMX REST API)
+// 3. Fetch UN Data (SDMX REST API - Improved Proxy)
                 if (routerDecision.undata?.fetch && routerDecision.undata?.keyword) {
                     setApiIndicator('undata', 'fetching');
                     const kw = routerDecision.undata.keyword.toLowerCase();
-                    const unUrl = `http://data.un.org/ws/rest/dataflow`;
-                    const proxyUrl = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(unUrl)}`;
                     
-                    const req = fetch(proxyUrl, { headers: { "Accept": "text/json" } })
-                        .then(res => res.json())
+                    // Menggunakan HTTPS dan proxy AllOrigins yang lebih stabil dari corsproxy.io
+                    const unUrl = `https://data.un.org/ws/rest/dataflow`;
+                    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(unUrl)}`;
+                    
+                    // Tambahkan AbortController untuk mencegah Request Hang/Timeout terlalu lama dari Proxy
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 8000); // Batas maksimal 8 detik
+                    
+                    const req = fetch(proxyUrl, { headers: { "Accept": "text/json" }, signal: controller.signal })
+                        .then(res => {
+                            clearTimeout(timeoutId);
+                            if (!res.ok) throw new Error("Proxy error");
+                            return res.json();
+                        })
                         .then(data => {
                             let dataflows = data?.data?.dataflows || [];
                             let matched = dataflows.filter(d => 
@@ -710,25 +722,25 @@
                                 appendExternalEvidence(formatted, 'UN Data (SDMX)', 'ph-chart-polar', 'green');
                                 apiContexts.undata = `\nUN DATA FLOWS:\n` + JSON.stringify(formatted);
                             }
-                        }).catch(e => console.warn("UN Notice:", e)).finally(() => setApiIndicator('undata', 'standby'));
+                        }).catch(e => {
+                            clearTimeout(timeoutId); // Bersihkan timeout jika gagal
+                            console.warn("UN API Error/Timeout:", e.message);
+                        }).finally(() => setApiIndicator('undata', 'standby'));
                     fetchPromises.push(req);
                 }
 
-                // 4. Fetch WHO Data (GHO OData API - Sesuai Dokumentasi + Bypass CORS)
+                // 4. Fetch WHO Data (GHO OData API - Direct Fetch tanpa Proxy)
                 if (routerDecision.who?.fetch && routerDecision.who?.keyword) {
                     setApiIndicator('who', 'fetching');
                     
-                    // Format keyword: Huruf pertama wajib besar agar cocok dengan database WHO (contoh: 'Malaria', 'Child')
-                    let kw = routerDecision.who.keyword;
-                    let formattedKw = kw.charAt(0).toUpperCase() + kw.slice(1).toLowerCase();
+                    // Gunakan huruf kecil (lowercase) untuk persiapan query OData
+                    let kw = routerDecision.who.keyword.toLowerCase();
                     
-                    // URL asli WHO sesuai Example 3 di dokumentasi
-                    const targetUrl = `https://ghoapi.azureedge.net/api/Indicator?$filter=contains(IndicatorName,'${formattedKw}')`;
+                    // Gunakan fungsi tolower() bawaan OData agar pencarian tidak sensitif terhadap huruf besar/kecil (case-insensitive)
+                    // URL langsung ditembak ke Azure tanpa menggunakan proxy pihak ketiga
+                    const targetUrl = `https://ghoapi.azureedge.net/api/Indicator?$filter=contains(tolower(IndicatorName),'${kw}')`;
                     
-                    // Bungkus dengan CodeTabs Proxy agar Browser / GitHub Pages tidak diblokir (CORS Issue)
-                    const proxyUrl = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(targetUrl)}`;
-                    
-                    const req = fetch(proxyUrl)
+                    const req = fetch(targetUrl)
                         .then(res => res.json())
                         .then(data => {
                             if(data && data.value) {
