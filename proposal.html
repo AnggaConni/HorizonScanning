@@ -81,6 +81,8 @@
                 alertReviseAll: "This will revise all text sections one by one. The process may take 1-2 minutes. Continue?",
                 alertDone: "Total Revision Complete!",
                 alertLoadErr: "Invalid file format or error reading file.",
+                rabConstraintLabel: "AI Constraints (Max Budget, Pilot Target, etc.)",
+                rabConstraintPlaceholder: "Example: Max budget $50,000 for a pilot in 2 coastal villages...",
                 loadSample: "Load Sample"
             },
             id: {
@@ -128,6 +130,8 @@
                 alertReviseAll: "Ini akan merevisi seluruh bab teks satu per satu. Proses mungkin memakan waktu 1-2 menit. Lanjutkan?",
                 alertDone: "Revisi Total Selesai!",
                 alertLoadErr: "Format file tidak valid atau error membaca file.",
+                rabConstraintLabel: "Batasan AI (Maks Anggaran, Target Pilot, dll.)",
+                rabConstraintPlaceholder: "Contoh: Max budget Rp 50.000.000 untuk pilot di 2 desa pesisir...",
                 loadSample: "Muat Contoh"
             }
         };
@@ -529,19 +533,21 @@ const sampleDataID = {
 
             return (
                 <div className={`bg-white rounded-lg border shadow-sm overflow-hidden relative ${isAiLoading ? 'border-purple-400' : 'border-slate-200'}`}>
-                    <div className="p-4 bg-blue-50/50 border-b border-slate-200">
-                <label className="block text-xs font-bold text-blue-800 mb-1">
-                    <i className="fas fa-bullseye"></i> AI Constraints (Max Budget, Pilot Target, etc.)
-                </label>
-                <input 
-                    type="text" 
-                    className="w-full p-2 border border-blue-200 rounded text-sm outline-none focus:border-blue-500 bg-white" 
-                    placeholder="Contoh: Max budget Rp 50.000.000 untuk pilot di 2 desa pesisir..." 
-                    value={contextText} 
-                    onChange={(e) => onContextChange(e.target.value)}
-                    disabled={isAiLoading}
-                />
-            </div>
+                    
+                    
+                <div className="p-4 bg-blue-50/50 border-b border-slate-200">
+                    <label className="block text-xs font-bold text-blue-800 mb-1">
+                        <i className="fas fa-bullseye"></i> {txt.rabConstraintLabel}
+                    </label>
+                    <input 
+                        type="text" 
+                        className="w-full p-2 border border-blue-200 rounded text-sm outline-none focus:border-blue-500 bg-white" 
+                        placeholder={txt.rabConstraintPlaceholder} 
+                        value={contextText} 
+                        onChange={(e) => onContextChange(e.target.value)}
+                        disabled={isAiLoading}
+                    />
+                </div>
                     
                     {isAiLoading && (
                         <div className="absolute inset-0 bg-white/70 flex flex-col items-center justify-center z-10 text-purple-600 backdrop-blur-[1px]">
@@ -806,7 +812,7 @@ const sampleDataID = {
                     
                     try {
                         const context = getProposalContext();
-                        
+
                         const systemContext = lang === 'en' 
                             ? `You are an automated expert proposal system. CRITICAL RULE 1: You must output ONLY raw HTML tags (<h3>, <p>, <ul>). NO greetings, NO chat text, NO markdown code blocks (\`\`\`html). CRITICAL RULE 2: ALL OUTPUT MUST BE IN ENGLISH. Translate any non-English input perfectly.` 
                             : `Anda adalah sistem proposal ahli otomatis. ATURAN KRITIS 1: Anda HARUS mengembalikan HANYA tag HTML mentah (<h3>, <p>, <ul>). DILARANG ADA sapaan, kalimat obrolan, atau blok markdown (\`\`\`html). ATURAN KRITIS 2: SEMUA OUTPUT HARUS DALAM BAHASA INDONESIA. Terjemahkan input dari bahasa lain dengan natural.`;
