@@ -1,0 +1,360 @@
+
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Ultimate Zero-Cost Architecture: Connecting a Porkbun Domain to GitHub Pages | Horizon Scan AI</title>
+    <meta name="description" content="Porkbun is currently the most affordable domain registrar on the market. Learn how to combine its unbeatable domain pricing with GitHub Pages' free hosting to create a blazing-fast, zero-cost web architecture. Complete with visual DNS routing guides.">
+    <link rel="canonical" href="https://horizon-scanning.org/blog/article/the-ultimate-zero-cost-architecture-connecting-a-porkbun-domain-to-github-pages.html" />
+    
+    <!-- Open Graph / Facebook / LinkedIn / WA -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://horizon-scanning.org/blog/article/the-ultimate-zero-cost-architecture-connecting-a-porkbun-domain-to-github-pages.html">
+    <meta property="og:title" content="The Ultimate Zero-Cost Architecture: Connecting a Porkbun Domain to GitHub Pages">
+    <meta property="og:description" content="Porkbun is currently the most affordable domain registrar on the market. Learn how to combine its unbeatable domain pricing with GitHub Pages' free hosting to create a blazing-fast, zero-cost web architecture. Complete with visual DNS routing guides.">
+    <meta property="og:image" content="https://horizon-scanning.org/thum/porkbun-github.png">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://horizon-scanning.org/blog/article/the-ultimate-zero-cost-architecture-connecting-a-porkbun-domain-to-github-pages.html">
+    <meta name="twitter:title" content="The Ultimate Zero-Cost Architecture: Connecting a Porkbun Domain to GitHub Pages">
+    <meta name="twitter:description" content="Porkbun is currently the most affordable domain registrar on the market. Learn how to combine its unbeatable domain pricing with GitHub Pages' free hosting to create a blazing-fast, zero-cost web architecture. Complete with visual DNS routing guides.">
+    <meta name="twitter:image" content="https://horizon-scanning.org/thum/porkbun-github.png">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- ============================================== -->
+    <!-- SCRIPT AUTO-TRANSLATE BERDASARKAN BAHASA BROWSER -->
+    <!-- ============================================== -->
+    <style>
+        /* Sembunyikan banner bawaan Google Translate agar tampilan tetap rapi */
+        .VIpgJd-ZVi9od-ORHb-OEVmcd { display: none !important; }
+        .goog-te-banner-frame.skiptranslate { display: none !important; }
+        body { top: 0 !important; }
+    </style>
+    <script>
+        // Deteksi bahasa browser
+        var userLang = navigator.language || navigator.userLanguage;
+        var langCode = userLang.split('-')[0];
+        var pageLang = 'en'; // Asumsi bahasa asli konten Anda adalah English
+
+        // Jika bahasa browser BUKAN bahasa asli, dan belum diset, paksakan translate
+        if (langCode !== pageLang && document.cookie.indexOf('googtrans=') === -1) {
+            document.cookie = "googtrans=/" + pageLang + "/" + langCode + "; path=/;";
+            document.cookie = "googtrans=/" + pageLang + "/" + langCode + "; path=/; domain=" + location.hostname + ";";
+        }
+    </script>
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en',
+                autoDisplay: false
+            }, 'google_translate_element');
+        }
+    </script>
+    <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    <!-- ============================================== -->
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        navy: { 800: '#1e293b', 900: '#0f172a', 950: '#020617' },
+                        teal: { 400: '#2dd4bf', 500: '#14b8a6', 600: '#0d9488' }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- CUSTOM CSS UNTUK RICH TEXT -->
+    <style>
+        .prose table { width: 100%; border-collapse: collapse; margin-top: 2rem; margin-bottom: 2rem; }
+        .prose th, .prose td { border: 1px solid #e2e8f0; padding: 1rem; text-align: left; }
+        .prose th { background-color: #f8fafc; color: #0f172a; font-weight: 700; }
+        .prose tr:nth-child(even) { background-color: #f8fafc; }
+        
+        .table-responsive { overflow-x: auto; width: 100%; border-radius: 0.5rem; box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1); border: 1px solid #e2e8f0; }
+        .table-responsive table { margin: 0; border: none; }
+
+        .callout { padding: 1.5rem; border-radius: 0.75rem; margin: 2rem 0; border-left: 4px solid #0d9488; background-color: #f0fdfa; }
+        .callout h4 { margin-top: 0 !important; color: #0f172a !important; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; }
+        .callout p:last-child { margin-bottom: 0 !important; }
+
+        .prose blockquote { border-left-color: #0d9488; font-style: normal; background-color: #f8fafc; padding: 1rem 1.5rem; border-radius: 0 0.75rem 0.75rem 0; color: #334155; }
+        .prose blockquote p { margin: 0; }
+
+        .chart-container { background: white; border: 1px solid #e2e8f0; border-radius: 1rem; padding: 2rem; margin: 2.5rem 0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); text-align: center; }
+        .chart-container img { margin: 0 auto; border-radius: 0.5rem; }
+        .chart-caption { font-size: 0.875rem; color: #64748b; margin-top: 1rem; text-align: center; font-style: italic; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased">
+    
+    <!-- Element Google Translate Tersembunyi -->
+    <div id="google_translate_element" style="display:none;"></div>
+
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm notranslate">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <a href="../../index.html" class="flex items-center gap-2">
+                    <i class="ph ph-radar text-teal-600 text-2xl"></i>
+                    <span class="font-bold text-lg text-navy-900 tracking-tight">HorizonScan<span class="text-teal-600">AI</span></span>
+                </a>
+                <a href="../../blog.html" class="text-sm font-bold text-slate-600 hover:text-teal-600 flex items-center gap-1 transition-colors">
+                    <i class="ph-bold ph-arrow-left"></i> Back to Articles
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <header class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-8">
+        <span class="inline-block bg-teal-100 text-teal-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-4 shadow-sm notranslate">
+            Tech Tutorials & Web Architecture
+        </span>
+        <h1 class="text-3xl md:text-5xl font-extrabold text-navy-900 mb-6 leading-tight">The Ultimate Zero-Cost Architecture: Connecting a Porkbun Domain to GitHub Pages</h1>
+        
+        <div class="flex items-center gap-4 text-sm text-slate-500 font-medium notranslate">
+            <div class="flex items-center gap-2">
+                <i class="ph-fill ph-user-circle text-xl text-slate-400"></i> Angga Conni Saputra
+            </div>
+            <span>•</span>
+            <div class="flex items-center gap-2">
+                <i class="ph-fill ph-calendar-blank text-lg text-slate-400"></i> February 24, 2026
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
+        <img src="../../thum/porkbun-github.png" alt="The Ultimate Zero-Cost Architecture: Connecting a Porkbun Domain to GitHub Pages" class="w-full h-auto max-h-[500px] object-cover rounded-2xl shadow-lg border border-slate-200" onerror="this.src='https://via.placeholder.com/1200x600/0f172a/ffffff?text=HorizonScan+AI'">
+    </div>
+
+    <main class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
+        <article class="prose prose-slate prose-lg max-w-none 
+            prose-headings:text-navy-900 prose-headings:font-bold 
+            prose-a:text-teal-600 hover:prose-a:text-teal-500 prose-a:font-semibold prose-a:no-underline hover:prose-a:underline
+            prose-img:rounded-xl prose-img:shadow-md
+            prose-li:marker:text-teal-500">
+            <p class="lead text-xl md:text-2xl text-slate-600 font-light leading-relaxed mb-8">In the modern web ecosystem, building a blazing-fast, highly secure personal portfolio or business landing page shouldn't require a monthly subscription. The secret to a truly <strong>zero-cost web architecture</strong> lies in combining two of the most developer-friendly platforms available today: <strong>Porkbun</strong> for unbeatable domain pricing, and <strong>GitHub Pages</strong> for enterprise-grade, absolutely free static hosting.</p>
+
+<p>While many legacy registrars lure you in with $1 first-year deals only to trap you with $20+ renewals, Porkbun has emerged as the undisputed king of transparent, low-cost domain registration in 2026. They offer free WHOIS privacy, free SSL certificates, and some of the cheapest renewal rates in the industry. But why pay them for hosting when GitHub provides global CDN-backed static hosting for free?</p>
+
+<div class="callout bg-indigo-50 border-l-4 border-indigo-600 p-6 rounded-r-2xl my-10">
+  <h4 class="font-extrabold text-indigo-900 flex items-center gap-2 mb-3"><i class="fa-solid fa-server text-indigo-600"></i> The Tech Stack Logic</h4>
+  <p class="text-indigo-800 text-sm leading-relaxed mb-3"><strong>The Registrar (Porkbun):</strong> You only pay the flat annual fee for your domain name (usually around $4 to $10 depending on the TLD). No hidden fees, no upselling.</p>
+  <p class="text-indigo-800 text-sm leading-relaxed"><strong>The Host (GitHub Pages):</strong> GitHub provides free static web hosting directly from your repository. It includes a built-in global CDN, automatic HTTPS enforcement, and native CI/CD through GitHub Actions.</p>
+</div>
+
+<h3 class="text-2xl font-extrabold text-slate-900 mt-16 mb-6">Visualizing the DNS Connection Architecture</h3>
+
+<p>Before diving into the steps, it is crucial to understand what we are actually doing. Domain Name System (DNS) is simply the phonebook of the internet. We are telling Porkbun's phonebook that whenever someone types your custom domain, they should be routed directly to GitHub's server IP addresses.</p>
+
+<div class="not-prose my-12 p-8 md:p-10 bg-slate-900 border border-slate-800 rounded-[1.5rem] shadow-2xl flex flex-col items-center">
+  <h4 class="text-white font-extrabold mb-2 text-xl text-center">The Routing Flow: Porkbun &#8594; GitHub Pages</h4>
+  <p class="text-center text-slate-400 text-sm mb-8 max-w-2xl">A visual representation of how traffic is directed from your custom domain to your GitHub repository via A Records and a CNAME.</p>
+  <div class="w-full max-w-4xl relative overflow-hidden rounded-xl bg-slate-800 p-6">
+    <svg viewBox="0 0 800 400" class="w-full h-auto overflow-visible">
+      <defs>
+        <linearGradient id="pinkGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#f472b6" stop-opacity="1"/><stop offset="100%" stop-color="#db2777" stop-opacity="1"/>
+        </linearGradient>
+        <linearGradient id="darkGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#334155" stop-opacity="1"/><stop offset="100%" stop-color="#0f172a" stop-opacity="1"/>
+        </linearGradient>
+        <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#db2777" stop-opacity="0.8"/><stop offset="100%" stop-color="#38bdf8" stop-opacity="0.8"/>
+        </linearGradient>
+        <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+          <path d="M0,0 L0,6 L9,3 z" fill="#38bdf8" />
+        </marker>
+        <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur stdDeviation="5" result="blur" />
+          <feComposite in="SourceGraphic" in2="blur" operator="over" />
+        </filter>
+      </defs>
+
+      <!-- Porkbun Node -->
+      <rect x="50" y="120" width="160" height="160" rx="20" fill="url(#pinkGrad)" shadow="lg"/>
+      <circle cx="130" cy="170" r="35" fill="#ffffff"/>
+      <path d="M115,165 Q130,145 145,165 Q150,185 130,195 Q110,185 115,165 Z" fill="#db2777"/> <!-- Abstract Pig Snout/Logo -->
+      <text x="130" y="240" font-family="sans-serif" font-size="18" font-weight="bold" fill="#ffffff" text-anchor="middle">PORKBUN</text>
+      <text x="130" y="260" font-family="sans-serif" font-size="12" fill="#fdf2f8" text-anchor="middle">Domain Registrar</text>
+      <text x="130" y="295" font-family="sans-serif" font-size="12" font-weight="bold" fill="#f472b6" text-anchor="middle">yourdomain.com</text>
+
+      <!-- Connecting Lines (A Records) -->
+      <path d="M 220,170 C 300,170 350,110 450,110" fill="none" stroke="url(#lineGrad)" stroke-width="3" stroke-dasharray="6,4" marker-end="url(#arrow)" class="animate-pulse"/>
+      <path d="M 220,185 C 300,185 350,160 450,160" fill="none" stroke="url(#lineGrad)" stroke-width="3" stroke-dasharray="6,4" marker-end="url(#arrow)"/>
+      <path d="M 220,200 C 300,200 350,210 450,210" fill="none" stroke="url(#lineGrad)" stroke-width="3" stroke-dasharray="6,4" marker-end="url(#arrow)"/>
+      <path d="M 220,215 C 300,215 350,260 450,260" fill="none" stroke="url(#lineGrad)" stroke-width="3" stroke-dasharray="6,4" marker-end="url(#arrow)"/>
+
+      <!-- CNAME Line -->
+      <path d="M 220,240 C 300,240 350,330 450,330" fill="none" stroke="#8b5cf6" stroke-width="3" marker-end="url(#arrow)"/>
+      
+      <!-- Connecting Labels -->
+      <rect x="310" y="155" width="80" height="24" rx="12" fill="#1e293b" stroke="#38bdf8"/>
+      <text x="350" y="171" font-family="sans-serif" font-size="10" font-weight="bold" fill="#38bdf8" text-anchor="middle">4x A Records</text>
+      
+      <rect x="310" y="290" width="80" height="24" rx="12" fill="#1e293b" stroke="#8b5cf6"/>
+      <text x="350" y="306" font-family="sans-serif" font-size="10" font-weight="bold" fill="#8b5cf6" text-anchor="middle">1x CNAME</text>
+
+      <!-- GitHub Node -->
+      <rect x="470" y="50" width="280" height="300" rx="20" fill="url(#darkGrad)" stroke="#475569" stroke-width="2"/>
+      <path d="M610,80 C625,80 635,95 635,110 C635,125 620,140 610,140 C600,140 585,125 585,110 C585,95 595,80 610,80 Z" fill="#ffffff"/> <!-- Abstract GitHub Cat head -->
+      <circle cx="602" cy="110" r="3" fill="#0f172a"/>
+      <circle cx="618" cy="110" r="3" fill="#0f172a"/>
+      
+      <text x="610" y="170" font-family="sans-serif" font-size="18" font-weight="bold" fill="#ffffff" text-anchor="middle">GITHUB PAGES</text>
+      <text x="610" y="190" font-family="sans-serif" font-size="12" fill="#94a3b8" text-anchor="middle">Global Static Hosting</text>
+
+      <rect x="510" y="210" width="200" height="110" rx="8" fill="#0f172a" stroke="#334155"/>
+      <text x="610" y="230" font-family="monospace" font-size="11" fill="#38bdf8" text-anchor="middle">185.199.108.153</text>
+      <text x="610" y="250" font-family="monospace" font-size="11" fill="#38bdf8" text-anchor="middle">185.199.109.153</text>
+      <text x="610" y="270" font-family="monospace" font-size="11" fill="#38bdf8" text-anchor="middle">185.199.110.153</text>
+      <text x="610" y="290" font-family="monospace" font-size="11" fill="#38bdf8" text-anchor="middle">185.199.111.153</text>
+      <text x="610" y="310" font-family="monospace" font-size="11" fill="#a78bfa" text-anchor="middle">user.github.io</text>
+    </svg>
+  </div>
+</div>
+
+<h3 class="text-2xl font-extrabold text-slate-900 mt-16 mb-6">Step 1: Preparing Your GitHub Repository</h3>
+
+<p>Before touching your domain settings, you need to prepare the destination.</p>
+
+<ol class="space-y-4 mb-8 list-decimal list-inside text-slate-700">
+  <li>Log into your GitHub account and create a new repository. If this is your main website, name it exactly <code>yourusername.github.io</code>. (If it's a project site, name it whatever you want).</li>
+  <li>Upload your static website files (HTML, CSS, JS) to the root of the repository. Ensure you have an <code>index.html</code> file.</li>
+  <li>Navigate to the repository's <strong>Settings</strong> tab.</li>
+  <li>On the left sidebar, click on <strong>Pages</strong>.</li>
+  <li>Under the <em>Custom domain</em> section, type in your newly purchased Porkbun domain (e.g., <code>yourdomain.com</code>) and click <strong>Save</strong>.</li>
+  <li>GitHub will perform a DNS check. It will initially fail because we haven't set up Porkbun yet. That is completely normal. <strong>Keep this tab open.</strong></li>
+</ol>
+
+<h3 class="text-2xl font-extrabold text-slate-900 mt-16 mb-6">Step 2: Configuring DNS on Porkbun</h3>
+
+<p>Now, open a new tab and log into your Porkbun account. This is where the magic happens. We need to point your domain to GitHub's four specific IP addresses and set up the 'www' subdomain.</p>
+
+<div class="not-prose my-10 p-6 bg-slate-950 border border-slate-800 rounded-3xl shadow-xl">
+  <h4 class="text-white font-extrabold mb-2 text-lg px-2"><i class="fa-solid fa-table-list text-emerald-400 mr-2"></i> The Required DNS Records</h4>
+  <p class="text-slate-400 text-sm px-2 mb-6">Enter these exact records into your Porkbun DNS Management area. Delete any existing A or CNAME records for the root domain to prevent conflicts.</p>
+  
+  <div class="overflow-x-auto">
+    <svg viewBox="0 0 800 300" class="w-full min-w-[600px] h-auto">
+      <defs>
+        <linearGradient id="rowHover" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#1e293b" stop-opacity="0.5"/><stop offset="100%" stop-color="#0f172a" stop-opacity="0.5"/>
+        </linearGradient>
+      </defs>
+      <!-- Table Header -->
+      <rect x="0" y="0" width="800" height="40" fill="#1e293b" rx="8"/>
+      <text x="40" y="25" font-family="sans-serif" font-size="12" font-weight="bold" fill="#94a3b8">TYPE</text>
+      <text x="160" y="25" font-family="sans-serif" font-size="12" font-weight="bold" fill="#94a3b8">HOST</text>
+      <text x="320" y="25" font-family="sans-serif" font-size="12" font-weight="bold" fill="#94a3b8">ANSWER (VALUE)</text>
+      <text x="600" y="25" font-family="sans-serif" font-size="12" font-weight="bold" fill="#94a3b8">TTL</text>
+
+      <!-- Row 1: A Record 1 -->
+      <rect x="0" y="50" width="800" height="40" fill="url(#rowHover)" rx="4"/>
+      <text x="40" y="75" font-family="monospace" font-size="14" font-weight="bold" fill="#38bdf8">A</text>
+      <rect x="160" y="60" width="30" height="20" fill="#334155" rx="4"/>
+      <text x="175" y="74" font-family="monospace" font-size="14" fill="#ffffff" text-anchor="middle">@</text>
+      <text x="320" y="75" font-family="monospace" font-size="14" fill="#a3e635">185.199.108.153</text>
+      <text x="600" y="75" font-family="sans-serif" font-size="13" fill="#94a3b8">600 (Auto)</text>
+
+      <!-- Row 2: A Record 2 -->
+      <rect x="0" y="100" width="800" height="40" fill="url(#rowHover)" rx="4"/>
+      <text x="40" y="125" font-family="monospace" font-size="14" font-weight="bold" fill="#38bdf8">A</text>
+      <rect x="160" y="110" width="30" height="20" fill="#334155" rx="4"/>
+      <text x="175" y="124" font-family="monospace" font-size="14" fill="#ffffff" text-anchor="middle">@</text>
+      <text x="320" y="125" font-family="monospace" font-size="14" fill="#a3e635">185.199.109.153</text>
+      <text x="600" y="125" font-family="sans-serif" font-size="13" fill="#94a3b8">600 (Auto)</text>
+
+      <!-- Row 3: A Record 3 -->
+      <rect x="0" y="150" width="800" height="40" fill="url(#rowHover)" rx="4"/>
+      <text x="40" y="175" font-family="monospace" font-size="14" font-weight="bold" fill="#38bdf8">A</text>
+      <rect x="160" y="160" width="30" height="20" fill="#334155" rx="4"/>
+      <text x="175" y="174" font-family="monospace" font-size="14" fill="#ffffff" text-anchor="middle">@</text>
+      <text x="320" y="175" font-family="monospace" font-size="14" fill="#a3e635">185.199.110.153</text>
+      <text x="600" y="175" font-family="sans-serif" font-size="13" fill="#94a3b8">600 (Auto)</text>
+
+      <!-- Row 4: A Record 4 -->
+      <rect x="0" y="200" width="800" height="40" fill="url(#rowHover)" rx="4"/>
+      <text x="40" y="225" font-family="monospace" font-size="14" font-weight="bold" fill="#38bdf8">A</text>
+      <rect x="160" y="210" width="30" height="20" fill="#334155" rx="4"/>
+      <text x="175" y="224" font-family="monospace" font-size="14" fill="#ffffff" text-anchor="middle">@</text>
+      <text x="320" y="225" font-family="monospace" font-size="14" fill="#a3e635">185.199.111.153</text>
+      <text x="600" y="225" font-family="sans-serif" font-size="13" fill="#94a3b8">600 (Auto)</text>
+
+      <!-- Row 5: CNAME -->
+      <rect x="0" y="250" width="800" height="40" fill="#2e1065" rx="4" stroke="#8b5cf6" stroke-width="1"/>
+      <text x="40" y="275" font-family="monospace" font-size="14" font-weight="bold" fill="#c084fc">CNAME</text>
+      <rect x="160" y="260" width="40" height="20" fill="#1e1b4b" rx="4"/>
+      <text x="180" y="274" font-family="monospace" font-size="14" fill="#ffffff" text-anchor="middle">www</text>
+      <text x="320" y="275" font-family="monospace" font-size="14" fill="#e879f9">yourusername.github.io</text>
+      <text x="600" y="275" font-family="sans-serif" font-size="13" fill="#c4b5fd">600 (Auto)</text>
+      
+      <!-- Annotations -->
+      <line x1="195" y1="70" x2="240" y2="40" stroke="#94a3b8" stroke-width="1" stroke-dasharray="2,2"/>
+      <text x="245" y="35" font-family="sans-serif" font-size="10" fill="#94a3b8">@ means root domain (yourdomain.com)</text>
+    </svg>
+  </div>
+</div>
+
+<ol class="space-y-4 mb-8 list-decimal list-inside text-slate-700">
+  <li>In your Porkbun dashboard, find your domain and click the <strong>DNS</strong> icon.</li>
+  <li>Scroll down to the <strong>Current Records</strong> section. If you see any existing 'A' or 'CNAME' records for your root domain or 'www' that you didn't create (often parking pages), click the trash can icon to delete them.</li>
+  <li>Now, add the new records:
+    <ul class="list-disc list-inside ml-6 mt-2 space-y-1 text-sm">
+      <li>Select Type: <strong>A - Address record</strong>. Leave the Host field empty (Porkbun uses an empty field to represent `@` or root). Paste the first IP: <code>185.199.108.153</code> and click <strong>Add</strong>.</li>
+      <li>Repeat this process for the other three IPs: <code>185.199.109.153</code>, <code>185.199.110.153</code>, and <code>185.199.111.153</code>.</li>
+    </ul>
+  </li>
+  <li>Finally, add the CNAME record for the 'www' subdomain so users typing <em>www.yourdomain.com</em> get routed correctly:
+    <ul class="list-disc list-inside ml-6 mt-2 space-y-1 text-sm">
+      <li>Select Type: <strong>CNAME - Canonical name record</strong>.</li>
+      <li>In the Host field, type: <code>www</code>.</li>
+      <li>In the Answer field, type your GitHub pages URL: <code>yourusername.github.io</code>.</li>
+      <li>Click <strong>Add</strong>.</li>
+    </ul>
+  </li>
+</ol>
+
+<div class="bg-amber-50 border-l-4 border-amber-500 p-4 mb-8 rounded-r-lg">
+  <p class="text-sm text-amber-900 font-bold mb-1"><i class="fa-solid fa-clock mr-1"></i> The Waiting Game (DNS Propagation)</p>
+  <p class="text-sm text-amber-800">DNS changes are not instantaneous. While Porkbun is exceptionally fast, it can take anywhere from 5 minutes to 24 hours for ISPs globally to recognize the new routing. Be patient.</p>
+</div>
+
+<h3 class="text-2xl font-extrabold text-slate-900 mt-16 mb-6">Step 3: Enforcing HTTPS Security</h3>
+
+<p>Return to the GitHub Pages tab you left open in Step 1. Refresh the page.</p>
+
+<p>Once the DNS has propagated, GitHub will successfully verify your custom domain. You will see a green checkmark indicating <strong>DNS check successful</strong>.</p>
+
+<p>Immediately below the Custom domain input field, you will see a checkbox labeled <strong>Enforce HTTPS</strong>. Check this box! It might take a few minutes for GitHub to provision the free TLS/SSL certificate via Let's Encrypt, but once done, your site will be permanently served over a secure connection (the padlock icon in the browser).</p>
+
+<h3 class="text-2xl font-extrabold text-slate-900 mt-16 mb-6">Conclusion: Why This Changes Everything</h3>
+
+<p>For independent developers, freelance designers, MSMEs, or open-source projects, the Porkbun + GitHub Pages combination is a game-changer. You bypass the restrictive storage limits, bandwidth throttling, and upsell banners typical of "free" hosting tiers elsewhere.</p>
+
+<p>By routing the industry's cheapest domain registrar through the world's most robust developer platform, you achieve an enterprise-grade infrastructure—global CDN, robust uptime, and automated SSL—for absolutely zero recurring monthly cost. All it requires is 10 minutes of DNS routing.</p>
+
+<p class="text-slate-500 text-sm mt-6">#Porkbun #GitHubPages #ZeroCostHosting #DNSConfiguration #WebArchitecture #MSME #FrontendDevelopment</p>
+        </article>
+        
+        <div class="mt-16 pt-8 border-t border-slate-200 text-center notranslate">
+            <h3 class="text-xl font-bold text-navy-900 mb-4">Share this insight</h3>
+            <div class="flex justify-center gap-4">
+                <a href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fhorizon-scanning.org%2Fblog%2Farticle%2Fthe-ultimate-zero-cost-architecture-connecting-a-porkbun-domain-to-github-pages.html" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-[#0A66C2] hover:text-white transition-all shadow-sm hover:shadow"><i class="ph-fill ph-linkedin-logo text-xl"></i></a>
+                <a href="https://twitter.com/intent/tweet?url=https%3A%2F%2Fhorizon-scanning.org%2Fblog%2Farticle%2Fthe-ultimate-zero-cost-architecture-connecting-a-porkbun-domain-to-github-pages.html&text=The%20Ultimate%20Zero-Cost%20Architecture%3A%20Connecting%20a%20Porkbun%20Domain%20to%20GitHub%20Pages" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-[#1DA1F2] hover:text-white transition-all shadow-sm hover:shadow"><i class="ph-fill ph-twitter-logo text-xl"></i></a>
+                <a href="https://api.whatsapp.com/send?text=The%20Ultimate%20Zero-Cost%20Architecture%3A%20Connecting%20a%20Porkbun%20Domain%20to%20GitHub%20Pages%20-%20https%3A%2F%2Fhorizon-scanning.org%2Fblog%2Farticle%2Fthe-ultimate-zero-cost-architecture-connecting-a-porkbun-domain-to-github-pages.html" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-[#25D366] hover:text-white transition-all shadow-sm hover:shadow"><i class="ph-fill ph-whatsapp-logo text-xl"></i></a>
+            </div>
+        </div>
+    </main>
+
+</body>
+</html>
+    

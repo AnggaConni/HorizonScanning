@@ -122,6 +122,12 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://horizon-scanning.org/blog/article/the-ultimate-zero-cost-architecture-connecting-a-porkbun-domain-to-github-pages.html</loc>
+    <lastmod>2026-06-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://horizon-scanning.org/blog/article/when-foresight-fails-the-cost-of-strategic-blindness.html</loc>
     <lastmod>2026-06-02</lastmod>
     <changefreq>monthly</changefreq>
