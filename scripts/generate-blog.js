@@ -231,7 +231,7 @@ articles.forEach(article => {
     </header>
 
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
-        <img src="${imageUrl.startsWith('http') ? imageUrl : '../../' + imageUrl.replace(/^[\.\/]+/, '')}" alt="${article.title}" class="w-full h-auto max-h-[500px] object-cover rounded-2xl shadow-lg border border-slate-200" onerror="this.src='${fallbackImage}'">
+        <img src="${imageUrl.startsWith('http') ? imageUrl : '../../' + imageUrl.replace(/^[\.\/]+/, '')}" alt="${article.title}" class="w-full h-auto rounded-2xl shadow-lg border border-slate-200" onerror="this.src='${fallbackImage}'">
     </div>
 
     <main class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
