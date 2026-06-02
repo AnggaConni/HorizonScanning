@@ -507,7 +507,7 @@ const sampleDataID = {
             );
         };
 
-        const RabEditor = ({ data, onChange, isAiLoading, txt }) => {
+        const RabEditor = ({ data, contextText, onContextChange, onChange, isAiLoading, txt }) => {
             const addRow = () => {
                 const newRow = { id: Date.now(), uraian: '', qty: 1, unit: 'pcs', harga: 0 };
                 onChange([...data, newRow]);
@@ -529,6 +529,20 @@ const sampleDataID = {
 
             return (
                 <div className={`bg-white rounded-lg border shadow-sm overflow-hidden relative ${isAiLoading ? 'border-purple-400' : 'border-slate-200'}`}>
+                    <div className="p-4 bg-blue-50/50 border-b border-slate-200">
+                <label className="block text-xs font-bold text-blue-800 mb-1">
+                    <i className="fas fa-bullseye"></i> AI Constraints (Max Budget, Pilot Target, etc.)
+                </label>
+                <input 
+                    type="text" 
+                    className="w-full p-2 border border-blue-200 rounded text-sm outline-none focus:border-blue-500 bg-white" 
+                    placeholder="Contoh: Max budget Rp 50.000.000 untuk pilot di 2 desa pesisir..." 
+                    value={contextText} 
+                    onChange={(e) => onContextChange(e.target.value)}
+                    disabled={isAiLoading}
+                />
+            </div>
+                    
                     {isAiLoading && (
                         <div className="absolute inset-0 bg-white/70 flex flex-col items-center justify-center z-10 text-purple-600 backdrop-blur-[1px]">
                             <i className="fas fa-spinner fa-spin text-3xl mb-2"></i>
@@ -727,9 +741,9 @@ const sampleDataID = {
                     
                     // Tambahkan ATURAN KRITIS (CRITICAL RULE) pada System Context
                     const systemContext = lang === 'en' 
-                        ? `You are a world-class proposal maker system. Your output is consumed directly by an application pipeline.\n\nCRITICAL RULE: Output EXACTLY the requested format (raw HTML or pure JSON). NO greetings, NO explanations, NO conversational text, and NO markdown code blocks (do not use \`\`\`html or \`\`\`json). Return ONLY the raw code or data.`
-                        : `Anda adalah sistem pembuat proposal kelas dunia. Output Anda akan dibaca langsung oleh sistem aplikasi.\n\nATURAN KRITIS: Output HARUS TEPAT seperti format yang diminta (HTML mentah atau JSON murni). DILARANG KERAS menyertakan sapaan, penjelasan, kalimat pengantar, penutup, atau blok kode markdown (jangan gunakan \`\`\`html atau \`\`\`json). Kembalikan HANYA kode atau datanya saja.`;
-
+                        ? `You are a world-class proposal maker system. Your output is consumed directly by an application pipeline.\n\nCRITICAL RULE 1: Output EXACTLY the requested format (raw HTML or pure JSON). NO greetings, NO markdown code blocks (do not use \`\`\`html or \`\`\`json).\nCRITICAL RULE 2: ALL OUTPUT MUST BE IN ENGLISH. If the input is in another language, translate it to English seamlessly.`
+                        : `Anda adalah sistem pembuat proposal kelas dunia. Output Anda akan dibaca langsung oleh sistem aplikasi.\n\nATURAN KRITIS 1: Output HARUS TEPAT seperti format yang diminta (HTML mentah atau JSON murni). DILARANG KERAS menyertakan sapaan atau blok kode markdown (jangan gunakan \`\`\`html atau \`\`\`json).\nATURAN KRITIS 2: SEMUA OUTPUT HARUS DALAM BAHASA INDONESIA. Jika input dalam bahasa lain, terjemahkan ke Bahasa Indonesia dengan natural.`;
+                        
                     let prompt = "";
                     if (section.type === 'richtext') {
                         if (isEmpty) {
@@ -738,8 +752,8 @@ const sampleDataID = {
                                 : `Konteks proposal:\n${context}\n\nTugas: Tulis konten lengkap untuk Bab "${section.title}".\nOutput HANYA tag HTML dasar (<h3>, <p>, <ul>, <li>). Jangan bungkus dengan markdown.`;
                         } else {
                             prompt = lang === 'en'
-                                ? `Proposal context:\n${context}\n\nTask: Revise, fix grammar, and make the following content professional for Chapter "${section.title}":\n\nCURRENT CONTENT:\n${section.content}\n\nOutput ONLY basic HTML tags. Do not wrap in markdown.`
-                                : `Konteks proposal:\n${context}\n\nTugas: Revisi, perbaiki tata bahasa, dan buat konten berikut lebih profesional untuk Bab "${section.title}":\n\nKONTEN SAAT INI:\n${section.content}\n\nOutput HANYA tag HTML dasar. Jangan bungkus dengan markdown.`;
+                                ? `Proposal context:\n${context}\n\nTask: TRANSLATE to English (if necessary), revise, fix grammar, and make the following content professional for Chapter "${section.title}":\n\nCURRENT CONTENT:\n${section.content}\n\nOutput ONLY basic HTML tags. Do not wrap in markdown.`
+                                : `Konteks proposal:\n${context}\n\nTugas: TERJEMAHKAN ke Bahasa Indonesia (jika perlu), revisi, perbaiki tata bahasa, dan buat konten berikut lebih profesional untuk Bab "${section.title}":\n\nKONTEN SAAT INI:\n${section.content}\n\nOutput HANYA tag HTML dasar. Jangan bungkus dengan markdown.`;
                         }
                         const result = await callAI(prompt, systemContext, data.apiKeys);
                         updateSection(sectionId, { content: stripMarkdown(result) });
@@ -752,9 +766,17 @@ const sampleDataID = {
                         updateSection(sectionId, { nodes: JSON.parse(stripMarkdown(result)) });
                     }
                     else if (section.type === 'rab') {
+                        // Tangkap input batasan dari user (jika diisi)
+                        const constraint = section.aiContext 
+                            ? (lang === 'en'
+                                ? `\n\nCRITICAL CONSTRAINTS FOR THIS BUDGET:\n${section.aiContext}\nYou MUST mathematically ensure that the total sum of (qty * harga) strictly aligns with this budget limit and pilot target.`
+                                : `\n\nBATASAN KRITIS UNTUK ANGGARAN INI:\n${section.aiContext}\nAnda HARUS memastikan secara matematis bahwa total keseluruhan (qty * harga) benar-benar sejalan dengan batas anggaran dan target pilot ini.`)
+                            : '';
+
                         prompt = lang === 'en'
-                            ? `Proposal context:\n${context}\n\nTask: Create a realistic Budget Plan for this proposal.\nOutput MUST be pure JSON array format EXACTLY like this example: [{"id": 1, "uraian": "Item/Service Name", "qty": 1, "unit": "Month", "harga": 5000}]. Pricing must be logical numbers only.`
-                            : `Konteks proposal:\n${context}\n\nTugas: Buatkan estimasi Rencana Anggaran (RAB) realistis.\nOutput HARUS berupa JSON array murni PERSIS seperti contoh ini: [{"id": 1, "uraian": "Nama Barang", "qty": 1, "unit": "Bulan", "harga": 5000000}]. Harga berupa angka logis (Rupiah).`;
+                            ? `Proposal context:\n${context}${constraint}\n\nTask: Create a realistic Budget Plan for this proposal.\nOutput MUST be pure JSON array format EXACTLY like this example: [{"id": 1, "uraian": "Item/Service Name", "qty": 1, "unit": "Month", "harga": 5000}]. Pricing must be logical numbers only.`
+                            : `Konteks proposal:\n${context}${constraint}\n\nTugas: Buatkan estimasi Rencana Anggaran (RAB) realistis.\nOutput HARUS berupa JSON array murni PERSIS seperti contoh ini: [{"id": 1, "uraian": "Nama Barang", "qty": 1, "unit": "Bulan", "harga": 5000000}]. Harga berupa angka logis.`;
+                        
                         const result = await callAI(prompt, systemContext, data.apiKeys);
                         updateSection(sectionId, { rows: JSON.parse(stripMarkdown(result)) });
                     }
@@ -784,13 +806,15 @@ const sampleDataID = {
                     
                     try {
                         const context = getProposalContext();
+                        
                         const systemContext = lang === 'en' 
-                            ? `You are an automated expert proposal system. CRITICAL RULE: You must output ONLY raw HTML tags (<h3>, <p>, <ul>). NO greetings, NO chat text, NO markdown code blocks (\`\`\`html).` 
-                            : `Anda adalah sistem proposal ahli otomatis. ATURAN KRITIS: Anda HARUS mengembalikan HANYA tag HTML mentah (<h3>, <p>, <ul>). DILARANG ADA sapaan, kalimat obrolan, atau blok markdown (\`\`\`html).`;
+                            ? `You are an automated expert proposal system. CRITICAL RULE 1: You must output ONLY raw HTML tags (<h3>, <p>, <ul>). NO greetings, NO chat text, NO markdown code blocks (\`\`\`html). CRITICAL RULE 2: ALL OUTPUT MUST BE IN ENGLISH. Translate any non-English input perfectly.` 
+                            : `Anda adalah sistem proposal ahli otomatis. ATURAN KRITIS 1: Anda HARUS mengembalikan HANYA tag HTML mentah (<h3>, <p>, <ul>). DILARANG ADA sapaan, kalimat obrolan, atau blok markdown (\`\`\`html). ATURAN KRITIS 2: SEMUA OUTPUT HARUS DALAM BAHASA INDONESIA. Terjemahkan input dari bahasa lain dengan natural.`;
 
                         const prompt = lang === 'en'
-                            ? `Context:\n${context}\n\nTask: Revise and polish the wording for "${sec.title}" to be persuasive and professional.\n\nCONTENT:\n${sec.content}\n\nOutput only the HTML.`
-                            : `Konteks:\n${context}\n\nTugas: Revisi dan perhalus bahasa dari Bab "${sec.title}" agar lebih meyakinkan dan profesional.\n\nKONTEN:\n${sec.content}\n\nOutput hanya HTML-nya saja.`;
+                            ? `Context:\n${context}\n\nTask: TRANSLATE to English (if needed), revise, and polish the wording for "${sec.title}" to be persuasive and professional.\n\nCONTENT:\n${sec.content}\n\nOutput only the HTML.`
+                            : `Konteks:\n${context}\n\nTugas: TERJEMAHKAN ke Bahasa Indonesia (jika perlu), revisi, dan perhalus bahasa dari Bab "${sec.title}" agar lebih meyakinkan dan profesional.\n\nKONTEN:\n${sec.content}\n\nOutput hanya HTML-nya saja.`;
+
                         const result = await callAI(prompt, systemContext, data.apiKeys);
                         updateSection(sec.id, { content: stripMarkdown(result) });
                     } catch (err) { 
@@ -1007,7 +1031,16 @@ const sampleDataID = {
                                         )}
 
                                         {activeSection.type === 'richtext' && <MiniRichText content={activeSection.content} onChange={(content) => updateSection(activeSection.id, { content })} isAiLoading={loadingSection === activeSection.id} />}
-                                        {activeSection.type === 'rab' && <RabEditor data={activeSection.rows} onChange={(rows) => updateSection(activeSection.id, { rows })} isAiLoading={loadingSection === activeSection.id} txt={txt} />}
+                                        {activeSection.type === 'rab' && (
+                                            <RabEditor 
+                                                data={activeSection.rows} 
+                                                contextText={activeSection.aiContext || ''}
+                                                onContextChange={(text) => updateSection(activeSection.id, { aiContext: text })}
+                                                onChange={(rows) => updateSection(activeSection.id, { rows })} 
+                                                isAiLoading={loadingSection === activeSection.id} 
+                                                txt={txt} 
+                                            />
+                                        )}
                                         {activeSection.type === 'framework' && <FrameworkEditor nodes={activeSection.nodes} onChange={(nodes) => updateSection(activeSection.id, { nodes })} isAiLoading={loadingSection === activeSection.id} txt={txt} />}
                                     </div>
                                 )}
