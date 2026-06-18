@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>404 - Page Not Found</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #0f172a; /* Slate 900 */
+            color: #e2e8f0;
+            overflow-x: hidden;
+            touch-action: none;
+        } 
+
+        .code-font {
+            font-family: 'Fira Code', monospace;
+        }
+
+        /* Background Grid Animation */
+        .bg-grid {
+            background-size: 50px 50px;
+            background-image: linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: -1;
+            mask-image: radial-gradient(circle at center, black 50%, transparent 100%);
+            -webkit-mask-image: radial-gradient(circle at center, black 50%, transparent 100%);
+        }
+
+        /* Game Container */
+        .game-wrapper {
+            position: relative;
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 0 25px rgba(56, 189, 248, 0.15);
+            border: 2px solid #334155;
+            width: 100%;
+        }
+
+        .scanlines {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1));
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            image-rendering: pixelated;
+        }
+
+        /* Overlay UI */
+        .game-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(6px);
+            z-index: 20;
+            transition: opacity 0.3s;
+        }
+
+        .hidden-overlay {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .glitch-text {
+            position: relative;
+            animation: glitch 2s linear infinite;
+        }
+
+        @keyframes glitch {
+            2%, 64% { transform: translate(2px,0) skew(0deg); }
+            4%, 60% { transform: translate(-2px,0) skew(0deg); }
+            62% { transform: translate(0,0) skew(5deg); }
+        }
+
+        /* Cards for Menu */
+        .game-card {
+            transition: all 0.2s ease-in-out;
+        }
+        .game-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 10px 25px -5px rgba(56, 189, 248, 0.3);
+            border-color: #38bdf8;
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen relative selection:bg-sky-500 selection:text-slate-900 p-4 md:p-8">
+
+    <div class="bg-grid"></div>
+
+    <div class="max-w-5xl w-full text-center relative z-10 flex flex-col items-center">
+        
+        <!-- Header -->
+        <div class="mb-6">
+            <h1 class="text-6xl md:text-8xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-indigo-500 tracking-tighter glitch-text">
+                404
+            </h1>
+            <h2 class="text-2xl md:text-3xl font-bold text-slate-200 mt-2">Lost in the Void!</h2>
+            <p class="code-font text-sky-400 mt-2 text-sm md:text-base max-w-2xl mx-auto">
+                <span class="text-slate-400">$ message:</span> The page you requested is either under maintenance or attacked by bugs. While Mas Angga fixes the servers, choose your distraction!
+            </p>
+        </div>
+
+        <!-- Main Menu Selection -->
+        <div id="main-menu" class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl mt-4">
+            
+            <!-- Game 1 Card -->
+            <button onclick="startGameMode('banana')" class="game-card bg-slate-800 border-2 border-slate-700 rounded-2xl p-6 text-left flex flex-col items-center text-center cursor-pointer group">
+                <div class="text-6xl mb-4 group-hover:scale-110 transition-transform">🍌🔫</div>
+                <h3 class="text-2xl font-bold text-white mb-2">Banana Bug Hunter</h3>
+                <p class="text-slate-400 text-sm mb-4">An endless runner. Shoot the system bugs with hot coffee and survive as long as possible!</p>
+                <span class="mt-auto px-4 py-2 bg-slate-700 text-sky-300 rounded-full text-sm font-semibold group-hover:bg-sky-500 group-hover:text-white transition-colors">
+                    Play Arcade
+                </span>
+            </button>
+
+            <!-- Game 2 Card -->
+            <button onclick="startGameMode('bubble')" class="game-card bg-slate-800 border-2 border-slate-700 rounded-2xl p-6 text-left flex flex-col items-center text-center cursor-pointer group">
+                <div class="text-6xl mb-4 group-hover:scale-110 transition-transform">🫧🧩</div>
+                <h3 class="text-2xl font-bold text-white mb-2">Code Bubble Pop</h3>
+                <p class="text-slate-400 text-sm mb-4">A classic puzzle. Match 3 or more floating syntax bubbles to clear the server memory!</p>
+                <span class="mt-auto px-4 py-2 bg-slate-700 text-purple-300 rounded-full text-sm font-semibold group-hover:bg-purple-500 group-hover:text-white transition-colors">
+                    Play Puzzle
+                </span>
+            </button>
+        </div>
+
+        <!-- Active Game Container (Hidden by default) -->
+        <div id="game-area" class="w-full hidden flex-col items-center">
+            
+            <div class="flex justify-between w-full max-w-5xl mb-2 px-2">
+                <button onclick="returnToMenu()" class="text-slate-400 hover:text-white transition-colors text-sm flex items-center gap-2">
+                    <i class="fas fa-arrow-left"></i> Back to Menu
+                </button>
+                <div class="code-font text-sky-400 text-lg font-bold drop-shadow-md">
+                    Score: <span id="scoreVal">0</span>
+                </div>
+            </div>
+
+            <div class="game-wrapper max-w-5xl">
+                <!-- Single Canvas used for both games, dynamically handled -->
+                <canvas id="gameCanvas" width="1000" height="450"></canvas>
+                <div class="scanlines"></div>
+
+                <!-- Game UI Overlay (Start / Game Over / Legend) -->
+                <div id="ui-overlay" class="game-overlay">
+                    <div id="overlay-icon" class="text-6xl mb-4">🎮</div>
+                    <h3 id="overlay-title" class="text-3xl md:text-4xl font-bold text-white mb-2 text-center">Game Title</h3>
+                    
+                    <!-- Legend / Instructions -->
+                    <div id="overlay-legend" class="bg-slate-900/80 border border-slate-600 rounded-lg p-4 mb-6 mt-2 max-w-md text-center">
+                        <p class="text-sky-300 text-sm font-semibold mb-2 uppercase tracking-wider">How to Play</p>
+                        <p id="overlay-desc" class="text-slate-300 text-sm md:text-base"></p>
+                    </div>
+
+                    <button id="start-btn" class="px-8 py-3 bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-bold rounded-full transition-transform transform hover:scale-105 active:scale-95 flex items-center gap-2 shadow-lg shadow-sky-500/30">
+                        <i class="fas fa-play"></i> <span id="start-btn-text">START GAME</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Controls (Banana Game Only) -->
+            <div id="mobile-controls" class="hidden md:hidden gap-8 mt-6 w-full max-w-sm justify-center px-4">
+                <button id="btn-jump" class="w-20 h-20 bg-slate-800 border-2 border-slate-600 rounded-full flex items-center justify-center text-3xl shadow-lg active:bg-slate-700 active:scale-95 transition-all opacity-80 select-none">
+                    ⬆️
+                </button>
+                <button id="btn-shoot" class="w-20 h-20 bg-slate-800 border-2 border-slate-600 rounded-full flex items-center justify-center text-3xl shadow-lg active:bg-slate-700 active:scale-95 transition-all opacity-80 text-yellow-500 select-none">
+                    ☕
+                </button>
+            </div>
+        </div>
+
+        <p class="mt-12 text-slate-500 text-xs md:text-sm">
+            <a href="/" class="text-sky-400 hover:underline mr-4"><i class="fas fa-home"></i> Go to Homepage</a>
+            &copy; <script>document.write(new Date().getFullYear())</script> Mas Angga.
+        </p>
+    </div>
+
+    
+    <div id="audio-player-container" class="fixed bottom-4 left-4 z-50 bg-slate-800/90 border border-slate-700 rounded-xl p-3 flex items-center gap-3 backdrop-blur-sm shadow-xl transition-all hover:border-sky-500">
+    <audio id="bg-music" src="blue.mp3" loop></audio>
+    
+    <button id="music-toggle" class="w-10 h-10 rounded-full bg-slate-700 text-sky-400 hover:bg-sky-600 hover:text-white transition-colors flex items-center justify-center focus:outline-none">
+        <i id="music-icon" class="fas fa-play"></i>
+    </button>
+    
+    <div class="flex flex-col gap-1 w-24">
+        <span class="text-[10px] code-font text-slate-400 tracking-wider select-none">BGM VOLUME</span>
+        <input id="music-volume" type="range" min="0" max="1" step="0.05" value="0.5" class="w-full h-1 bg-slate-600 rounded-lg appearance-none cursor-pointer accent-sky-400 focus:outline-none">
+    </div>
+</div>
+
+    <script>
+        // DOM Elements
+        const mainMenu = document.getElementById('main-menu');
+        const gameArea = document.getElementById('game-area');
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const overlay = document.getElementById('ui-overlay');
+        const overlayIcon = document.getElementById('overlay-icon');
+        const overlayTitle = document.getElementById('overlay-title');
+        const overlayDesc = document.getElementById('overlay-desc');
+        const startBtn = document.getElementById('start-btn');
+        const startBtnText = document.getElementById('start-btn-text');
+        const scoreVal = document.getElementById('scoreVal');
+        const mobileControls = document.getElementById('mobile-controls');
+
+        // Global State
+        let currentMode = null; // 'banana' or 'bubble'
+        let gameState = 'IDLE'; // IDLE, PLAYING, GAMEOVER
+        let animationId;
+        let score = 0;
+        let frames = 0;
+
+        // Reset canvas context
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "#0f172a";
+            ctx.fillRect(0,0, canvas.width, canvas.height);
+        }
+
+        // Switch to Game Area
+        function startGameMode(mode) {
+            currentMode = mode;
+            mainMenu.classList.add('hidden');
+            gameArea.classList.replace('hidden', 'flex');
+            gameState = 'IDLE';
+            score = 0;
+            scoreVal.innerText = score;
+            clearCanvas();
+            
+            overlay.classList.remove('hidden-overlay');
+            startBtnText.innerText = "START GAME";
+
+            if (mode === 'banana') {
+                overlayIcon.innerText = "🍌🔫";
+                overlayTitle.innerText = "Banana Bug Hunter";
+                overlayTitle.className = "text-3xl md:text-4xl font-bold text-white mb-2 text-center";
+                overlayDesc.innerHTML = `
+                    <span class="block mb-1"><b>[SPACE / TAP ☕]</b> to shoot hot coffee.</span>
+                    <span class="block"><b>[UP ARROW / TAP ⬆️]</b> to jump.</span>
+                    <span class="block text-slate-400 mt-2 text-xs">Squash the incoming system bugs!</span>
+                `;
+                mobileControls.classList.replace('hidden', 'flex');
+                
+                // Draw preview
+                ctx.font = "30px Arial";
+                ctx.textAlign = "center";
+                ctx.fillText("🍌", canvas.width/2 - 20, canvas.height/2);
+                ctx.fillText("🐛", canvas.width/2 + 50, canvas.height/2);
+                
+            } else if (mode === 'bubble') {
+                overlayIcon.innerText = "🫧🧩";
+                overlayTitle.innerText = "Code Bubble Pop";
+                overlayTitle.className = "text-3xl md:text-4xl font-bold text-white mb-2 text-center";
+                overlayDesc.innerHTML = `
+                    <span class="block mb-1"><b>[MOUSE CLICK / SCREEN TAP]</b></span>
+                    <span class="block">Aim and shoot the colored bubbles.</span>
+                    <span class="block text-slate-400 mt-2 text-xs">Match 3 or more of the same color to pop them and clear the grid. Don't let them hit the bottom!</span>
+                `;
+                mobileControls.classList.replace('flex', 'hidden'); // Hide mobile controls for bubble (uses tap anywhere)
+
+                // Draw preview
+                ctx.fillStyle = "#ef4444"; ctx.beginPath(); ctx.arc(canvas.width/2 - 20, canvas.height/2, 15, 0, Math.PI*2); ctx.fill();
+                ctx.fillStyle = "#3b82f6"; ctx.beginPath(); ctx.arc(canvas.width/2 + 20, canvas.height/2, 15, 0, Math.PI*2); ctx.fill();
+            }
+        }
+
+        function returnToMenu() {
+            cancelAnimationFrame(animationId);
+            gameState = 'IDLE';
+            gameArea.classList.replace('flex', 'hidden');
+            mainMenu.classList.remove('hidden');
+        }
+
+        startBtn.addEventListener('click', () => {
+            if (currentMode === 'banana') initBananaGame();
+            else if (currentMode === 'bubble') initBubbleGame();
+        });
+
+
+        /* =======================================================================
+           STREAMING_CHUNK: Game 1 - BANANA BUG HUNTER (Platformer/Shooter)
+           ======================================================================= */
+        
+        const GRAVITY = 0.6;
+        const JUMP_POWER = -12;
+        const GROUND_Y = 350;
+
+        let b_player, b_projectiles, b_enemies, b_particles;
+
+        class BananaPlayer {
+            constructor() {
+                this.x = 100;
+                this.y = GROUND_Y;
+                this.vy = 0;
+                this.isGrounded = true;
+            }
+            jump() {
+                if (this.isGrounded) {
+                    this.vy = JUMP_POWER;
+                    this.isGrounded = false;
+                }
+            }
+            update() {
+                this.vy += GRAVITY;
+                this.y += this.vy;
+                if (this.y >= GROUND_Y) {
+                    this.y = GROUND_Y;
+                    this.vy = 0;
+                    this.isGrounded = true;
+                }
+            }
+            draw() {
+                ctx.font = "50px Arial";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.fillText("🍌", this.x, this.y);
+                ctx.font = "20px Arial";
+                ctx.fillText("🔫", this.x + 25, this.y + 5);
+            }
+        }
+
+        class BananaProjectile {
+            constructor(x, y) {
+                this.x = x + 30;
+                this.y = y + 5;
+                this.vx = 12;
+                this.active = true;
+            }
+            update() {
+                this.x += this.vx;
+                if (this.x > canvas.width) this.active = false;
+            }
+            draw() {
+                ctx.font = "25px Arial";
+                ctx.fillText("☕", this.x, this.y);
+            }
+        }
+
+        class BananaEnemy {
+            constructor() {
+                this.x = canvas.width + 50;
+                this.y = Math.random() > 0.5 ? GROUND_Y : GROUND_Y - 80; 
+                this.vx = -(5 + Math.random() * 4 + (score * 0.15)); // Scales with score
+                this.active = true;
+                this.emoji = Math.random() > 0.5 ? "🐛" : "👾";
+            }
+            update() {
+                this.x += this.vx;
+                if (this.x < -50) this.active = false;
+            }
+            draw() {
+                ctx.font = "45px Arial";
+                ctx.fillText(this.emoji, this.x, this.y);
+            }
+        }
+
+        class CodeParticle {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.vx = (Math.random() - 0.5) * 12;
+                this.vy = (Math.random() - 0.5) * 12;
+                this.life = 1.0;
+                this.color = Math.random() > 0.5 ? '#38bdf8' : '#eab308';
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.life -= 0.04;
+            }
+            draw() {
+                ctx.globalAlpha = Math.max(0, this.life);
+                ctx.fillStyle = this.color;
+                ctx.font = "16px Fira Code";
+                ctx.fillText("{ }", this.x, this.y);
+                ctx.globalAlpha = 1.0;
+            }
+        }
+
+        function initBananaGame() {
+            b_player = new BananaPlayer();
+            b_projectiles = [];
+            b_enemies = [];
+            b_particles = [];
+            score = 0;
+            frames = 0;
+            scoreVal.innerText = score;
+            gameState = 'PLAYING';
+            overlay.classList.add('hidden-overlay');
+            cancelAnimationFrame(animationId);
+            bananaLoop();
+        }
+
+        function checkDistCollision(x1, y1, x2, y2, threshold) {
+            const dx = x1 - x2;
+            const dy = y1 - y2;
+            return Math.sqrt(dx * dx + dy * dy) < threshold;
+        }
+
+        function bananaGameOver() {
+            gameState = 'GAMEOVER';
+            cancelAnimationFrame(animationId);
+            overlayIcon.innerText = "💥";
+            overlayTitle.innerText = "System Crashed!";
+            overlayTitle.className = "text-3xl md:text-4xl font-bold text-red-500 mb-2 text-center";
+            overlayDesc.innerHTML = `You squashed <b class="text-yellow-400">${score}</b> Bugs.<br>But the overload was too much!`;
+            startBtnText.innerText = "TRY AGAIN";
+            overlay.classList.remove('hidden-overlay');
+        }
+
+        function bananaLoop() {
+            if (gameState !== 'PLAYING' || currentMode !== 'banana') return;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw Ground
+            ctx.strokeStyle = "#334155";
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(0, GROUND_Y + 25);
+            ctx.lineTo(canvas.width, GROUND_Y + 25);
+            ctx.stroke();
+
+            // Spawn Logic
+            let spawnRate = Math.max(30, 90 - Math.floor(score * 1.5));
+            if (frames % spawnRate === 0) {
+                b_enemies.push(new BananaEnemy());
+            }
+
+            b_player.update();
+            b_player.draw();
+
+            b_projectiles.forEach((p, index) => {
+                p.update(); p.draw();
+                if (!p.active) b_projectiles.splice(index, 1);
+            });
+
+            b_particles.forEach((pt, index) => {
+                pt.update(); pt.draw();
+                if (pt.life <= 0) b_particles.splice(index, 1);
+            });
+
+            b_enemies.forEach((enemy, eIndex) => {
+                enemy.update(); enemy.draw();
+
+                // Bullet hits enemy
+                b_projectiles.forEach((proj) => {
+                    if (proj.active && checkDistCollision(proj.x, proj.y, enemy.x, enemy.y, 40)) {
+                        for(let i=0; i<6; i++) b_particles.push(new CodeParticle(enemy.x, enemy.y));
+                        enemy.active = false;
+                        proj.active = false;
+                        score += 10; // 10 points per bug
+                        scoreVal.innerText = score;
+                    }
+                });
+
+                // Enemy hits player
+                if (enemy.active && checkDistCollision(b_player.x, b_player.y, enemy.x, enemy.y, 35)) {
+                    bananaGameOver();
+                }
+
+                if (!enemy.active) b_enemies.splice(eIndex, 1);
+            });
+
+            frames++;
+            animationId = requestAnimationFrame(bananaLoop);
+        }
+
+        // Banana Controls
+        function actionBananaJump() { if (gameState === 'PLAYING' && currentMode === 'banana') b_player.jump(); }
+        function actionBananaShoot() { if (gameState === 'PLAYING' && currentMode === 'banana') b_projectiles.push(new BananaProjectile(b_player.x, b_player.y)); }
+
+
+        /* =======================================================================
+           STREAMING_CHUNK: Game 2 - CODE BUBBLE POP (Physics & Grid logic)
+           ======================================================================= */
+        
+        const BUBBLE_RADIUS = 22;
+        const BUBBLE_COLORS = ['#ef4444', '#3b82f6', '#22c55e', '#eab308', '#a855f7']; // Red, Blue, Green, Yellow, Purple
+        let bubbles = []; // Array of {x, y, color, active}
+        let shooterBubble = null;
+        let shooterAngle = -Math.PI / 2; // Pointing up
+        let mouseX = 500, mouseY = 225;
+        let b_speed = 15;
+        let bubbleDropThreshold = 400; // If bubbles cross this Y, Game Over
+
+        function getRandomColor() {
+            return BUBBLE_COLORS[Math.floor(Math.random() * BUBBLE_COLORS.length)];
+        }
+
+        function initBubbleGame() {
+            bubbles = [];
+            b_particles = []; // <-- FIX: Inisialisasi partikel untuk Bubble agar tidak error saat pertama kali dibuka
+            score = 0;
+            scoreVal.innerText = score;
+            
+            // Generate starting cluster of bubbles at the top
+            let rows = 4;
+            let cols = Math.floor(canvas.width / (BUBBLE_RADIUS * 2));
+            
+            for (let r = 0; r < rows; r++) {
+                let isOffset = r % 2 !== 0;
+                let colCount = isOffset ? cols - 1 : cols;
+                for (let c = 0; c < colCount; c++) {
+                    let x = (c * BUBBLE_RADIUS * 2) + BUBBLE_RADIUS + (isOffset ? BUBBLE_RADIUS : 0);
+                    let y = (r * BUBBLE_RADIUS * 1.8) + BUBBLE_RADIUS;
+                    bubbles.push({ x: x, y: y, color: getRandomColor(), active: true });
+                }
+            }
+
+            shooterBubble = {
+                x: canvas.width / 2,
+                y: canvas.height - BUBBLE_RADIUS,
+                color: getRandomColor(),
+                vx: 0, vy: 0, isMoving: false
+            };
+
+            gameState = 'PLAYING';
+            overlay.classList.add('hidden-overlay');
+            cancelAnimationFrame(animationId);
+            bubbleLoop();
+        }
+
+        function drawBubble(x, y, color) {
+            // Shadow
+            ctx.beginPath();
+            ctx.arc(x + 2, y + 2, BUBBLE_RADIUS, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(0,0,0,0.3)";
+            ctx.fill();
+
+            // Main bubble
+            ctx.beginPath();
+            ctx.arc(x, y, BUBBLE_RADIUS, 0, Math.PI * 2);
+            ctx.fillStyle = color;
+            ctx.fill();
+            
+            // Highlight for 3D effect
+            ctx.beginPath();
+            ctx.arc(x - 6, y - 6, BUBBLE_RADIUS * 0.3, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(255,255,255,0.4)";
+            ctx.fill();
+
+            // Small code symbol inside
+            ctx.fillStyle = "rgba(255,255,255,0.8)";
+            ctx.font = "bold 14px Fira Code";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText("<>", x, y);
+        }
+
+        function getBubbleDistance(b1, b2) {
+            let dx = b1.x - b2.x;
+            let dy = b1.y - b2.y;
+            return Math.sqrt(dx * dx + dy * dy);
+        }
+
+        function removeFloatingBubbles() {
+            let connected = [];
+            let toCheck = [];
+            
+            // Cari semua bubble yang nempel di langit-langit (baris teratas)
+            bubbles.forEach(b => {
+                if (b.y <= BUBBLE_RADIUS * 2.5) { 
+                    connected.push(b);
+                    toCheck.push(b);
+                }
+            });
+            
+            // Flood fill untuk mencari semua rantai bubble yang terhubung ke atas
+            while(toCheck.length > 0) {
+                let current = toCheck.pop();
+                bubbles.forEach(b => {
+                    if (!connected.includes(b) && getBubbleDistance(current, b) < BUBBLE_RADIUS * 2.6) {
+                        connected.push(b);
+                        toCheck.push(b);
+                    }
+                });
+            }
+            
+            // Bubble yang tidak ada di 'connected' berarti melayang terputus, kita jatuhkan
+            let droppedCount = 0;
+            bubbles.forEach(b => {
+                if (!connected.includes(b)) {
+                    b.active = false;
+                    droppedCount++;
+                    for(let i=0; i<3; i++) b_particles.push(new CodeParticle(b.x, b.y));
+                }
+            });
+            
+            if (droppedCount > 0) {
+                score += droppedCount * 20; // Bonus skor
+                scoreVal.innerText = score;
+                bubbles = bubbles.filter(b => b.active);
+            }
+        }
+
+        function findMatches(targetBubble) {
+            let matched = [];
+            let toCheck = [targetBubble];
+            let color = targetBubble.color;
+
+            while (toCheck.length > 0) {
+                let current = toCheck.pop();
+                if (!matched.includes(current)) {
+                    matched.push(current);
+                    
+                    // Find neighbors of same color
+                    bubbles.forEach(b => {
+                        if (b.active && b.color === color && !matched.includes(b)) {
+                            // Radius deteksi diperbesar (dari 2.2 ke 2.6) agar lebih akurat mendeteksi tetangga
+                            if (getBubbleDistance(current, b) < BUBBLE_RADIUS * 2.6) {
+                                toCheck.push(b);
+                            }
+                        }
+                    });
+                }
+            }
+            return matched;
+        }
+
+        function snapBubble() {
+            bubbles.push({
+                x: shooterBubble.x,
+                y: shooterBubble.y,
+                color: shooterBubble.color,
+                active: true
+            });
+
+            // Check for matches
+            let lastAdded = bubbles[bubbles.length - 1];
+            let matches = findMatches(lastAdded);
+
+            if (matches.length >= 3) {
+                matches.forEach(m => m.active = false);
+                score += matches.length * 15;
+                scoreVal.innerText = score;
+                
+                // Pop particle effect (optional visual flair)
+                matches.forEach(m => {
+                    for(let i=0; i<4; i++) b_particles.push(new CodeParticle(m.x, m.y));
+                });
+
+                // Clean up inactive
+                bubbles = bubbles.filter(b => b.active);
+
+                // Bersihkan bubble yang kehilangan tumpuan setelah ada ledakan
+                removeFloatingBubbles();
+            }
+
+            // Check Game Over condition (touched bottom zone)
+            if (bubbles.some(b => b.y + BUBBLE_RADIUS > bubbleDropThreshold)) {
+                bubbleGameOver("Out of Memory!");
+            } else if (bubbles.length === 0) {
+                bubbleGameOver("Server Cleared! You Win!");
+            } else {
+                // Reload shooter
+                shooterBubble.x = canvas.width / 2;
+                shooterBubble.y = canvas.height - BUBBLE_RADIUS;
+                shooterBubble.color = getRandomColor();
+                shooterBubble.isMoving = false;
+            }
+        }
+
+        function bubbleGameOver(msg) {
+            gameState = 'GAMEOVER';
+            cancelAnimationFrame(animationId);
+            overlayIcon.innerText = msg.includes("Win") ? "🎉" : "💀";
+            overlayTitle.innerText = msg;
+            overlayTitle.className = `text-3xl md:text-4xl font-bold ${msg.includes("Win") ? 'text-green-400' : 'text-red-500'} mb-2 text-center`;
+            overlayDesc.innerHTML = `Final Score: <b class="text-yellow-400">${score}</b>`;
+            startBtnText.innerText = "PLAY AGAIN";
+            overlay.classList.remove('hidden-overlay');
+        }
+
+        function bubbleLoop() {
+            if (gameState !== 'PLAYING' || currentMode !== 'bubble') return;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw Danger Line
+            ctx.strokeStyle = "rgba(239, 68, 68, 0.3)";
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath();
+            ctx.moveTo(0, bubbleDropThreshold);
+            ctx.lineTo(canvas.width, bubbleDropThreshold);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Draw particles
+            b_particles.forEach((pt, index) => {
+                pt.update(); pt.draw();
+                if (pt.life <= 0) b_particles.splice(index, 1);
+            });
+
+            // Draw grid bubbles
+            bubbles.forEach(b => drawBubble(b.x, b.y, b.color));
+
+            // Shooter Logic
+            if (shooterBubble) {
+                if (shooterBubble.isMoving) {
+                    shooterBubble.x += shooterBubble.vx;
+                    shooterBubble.y += shooterBubble.vy;
+
+                    // Wall bounce
+                    if (shooterBubble.x - BUBBLE_RADIUS <= 0 || shooterBubble.x + BUBBLE_RADIUS >= canvas.width) {
+                        shooterBubble.vx *= -1;
+                        shooterBubble.x = Math.max(BUBBLE_RADIUS, Math.min(canvas.width - BUBBLE_RADIUS, shooterBubble.x));
+                    }
+
+                    // Top ceiling collision
+                    if (shooterBubble.y - BUBBLE_RADIUS <= 0) {
+                        shooterBubble.y = BUBBLE_RADIUS;
+                        snapBubble();
+                    } else {
+                        // Collision with other bubbles
+                        for (let i = 0; i < bubbles.length; i++) {
+                            let b = bubbles[i];
+                            let dist = getBubbleDistance(shooterBubble, b);
+                            
+                            if (dist <= BUBBLE_RADIUS * 2) {
+                                // Hitung benturan secara matematis presisi, bukan sekadar membalikkan arah kecepatan
+                                let overlap = (BUBBLE_RADIUS * 2) - dist;
+                                let dx = shooterBubble.x - b.x;
+                                let dy = shooterBubble.y - b.y;
+                                
+                                if (dist > 0) {
+                                    // Dorong bubble keluar tepat di pinggiran bubble lain agar tidak saling tindih
+                                    shooterBubble.x += (dx / dist) * (overlap + 1);
+                                    shooterBubble.y += (dy / dist) * (overlap + 1);
+                                }
+                                
+                                snapBubble();
+                                break;
+                            }
+                        }
+                    }
+                } else {
+                    // Draw aiming line
+                    ctx.strokeStyle = "rgba(255,255,255,0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(shooterBubble.x, shooterBubble.y);
+                    ctx.lineTo(shooterBubble.x + Math.cos(shooterAngle) * 150, shooterBubble.y + Math.sin(shooterAngle) * 150);
+                    ctx.stroke();
+                }
+
+                drawBubble(shooterBubble.x, shooterBubble.y, shooterBubble.color);
+            }
+
+            animationId = requestAnimationFrame(bubbleLoop);
+        }
+
+        // Bubble Controls (Aim and Shoot)
+        function updateAim(clientX, clientY) {
+            if (gameState === 'PLAYING' && currentMode === 'bubble' && !shooterBubble.isMoving) {
+                const rect = canvas.getBoundingClientRect();
+                const scaleX = canvas.width / rect.width;
+                const scaleY = canvas.height / rect.height;
+                
+                let mx = (clientX - rect.left) * scaleX;
+                let my = (clientY - rect.top) * scaleY;
+
+                let dx = mx - shooterBubble.x;
+                let dy = my - shooterBubble.y;
+                
+                // Restrict angle so it can't shoot downwards
+                let angle = Math.atan2(dy, dx);
+                if (angle > -0.1 && angle < Math.PI) angle = -0.1;
+                if (angle < -Math.PI + 0.1 || angle >= Math.PI) angle = -Math.PI + 0.1;
+                
+                shooterAngle = angle;
+            }
+        }
+
+        function fireBubble() {
+            if (gameState === 'PLAYING' && currentMode === 'bubble' && shooterBubble && !shooterBubble.isMoving) {
+                shooterBubble.vx = Math.cos(shooterAngle) * b_speed;
+                shooterBubble.vy = Math.sin(shooterAngle) * b_speed;
+                shooterBubble.isMoving = true;
+            }
+        }
+
+        /* =======================================================================
+           STREAMING_CHUNK: Global Event Listeners
+           ======================================================================= */
+        
+        // Keyboard mapping
+        window.addEventListener('keydown', (e) => {
+            if (currentMode === 'banana') {
+                if (e.code === 'Space') {
+                    e.preventDefault(); 
+                    if (gameState === 'PLAYING') actionBananaShoot();
+                    else if (gameState !== 'PLAYING' && !gameArea.classList.contains('hidden')) initBananaGame();
+                }
+                if (e.code === 'ArrowUp' || e.code === 'KeyW') {
+                    e.preventDefault();
+                    actionBananaJump();
+                }
+            }
+        });
+
+        // Mobile Controls Banana
+        document.getElementById('btn-jump').addEventListener('touchstart', (e) => { e.preventDefault(); actionBananaJump(); });
+        document.getElementById('btn-shoot').addEventListener('touchstart', (e) => { e.preventDefault(); actionBananaShoot(); });
+
+        // Mouse/Touch for Bubble
+        canvas.addEventListener('mousemove', (e) => { updateAim(e.clientX, e.clientY); });
+        canvas.addEventListener('touchmove', (e) => { e.preventDefault(); updateAim(e.touches[0].clientX, e.touches[0].clientY); }, {passive: false});
+        
+        canvas.addEventListener('mousedown', () => { fireBubble(); });
+        canvas.addEventListener('touchstart', (e) => { 
+            if(currentMode === 'bubble'){
+                e.preventDefault(); 
+                updateAim(e.touches[0].clientX, e.touches[0].clientY);
+                fireBubble(); 
+            }
+        }, {passive: false});
+
+        /* =======================================================================
+        STREAMING_CHUNK: MP3 Background Music Player Logic
+        ======================================================================= */
+
+        // Seleksi elemen DOM audio
+        const bgMusic = document.getElementById('bg-music');
+        const musicToggle = document.getElementById('music-toggle');
+        const musicIcon = document.getElementById('music-icon');
+        const musicVolume = document.getElementById('music-volume');
+
+        // Set volume awal sesuai value input range (0.5)
+        bgMusic.volume = musicVolume.value;
+
+        // Fungsi untuk mengaktifkan audio saat interaksi pertama
+        function initAutoplay() {
+            bgMusic.play()
+                .then(() => {
+                    // Jika berhasil play, ubah icon jadi pause
+                    musicIcon.className = 'fas fa-pause';
+                    // Hapus event listener agar tidak ke-trigger terus saat klik berikutnya
+                    window.removeEventListener('click', initAutoplay);
+                    window.removeEventListener('touchstart', initAutoplay);
+                })
+                .catch(err => {
+                    console.log("Autoplay diblokir oleh browser atau file audio belum siap.", err);
+                });
+        }
+
+        // Trigger play di mana saja pada klik atau tap pertama
+        window.addEventListener('click', initAutoplay);
+        window.addEventListener('touchstart', initAutoplay);
+
+        // Logika tombol Play / Pause manual
+        musicToggle.addEventListener('click', (e) => {
+            // StopPropagation mencegah trigger event lain di canvas/window
+            e.stopPropagation(); 
+            
+            if (bgMusic.paused) {
+                bgMusic.play();
+                musicIcon.className = 'fas fa-pause';
+            } else {
+                bgMusic.pause();
+                musicIcon.className = 'fas fa-play';
+            }
+        });
+
+        // Logika pengaturan Slider Volume
+        musicVolume.addEventListener('input', (e) => {
+            bgMusic.volume = e.target.value;
+        });
+
+    </script>
+
+
+</body>
+</html>
