@@ -149,6 +149,20 @@ body{font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Roboto,sans-serif;
   box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.15); 
 }
 
+/* Mini Rich Editor untuk field Recipient */
+.rich-ed-mini {
+  min-height: 75px;
+  resize: vertical;
+  overflow-y: auto;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+.rich-ed-mini:empty::before {
+  content: attr(placeholder);
+  color: rgba(107, 114, 128, 0.6);
+  pointer-events: none;
+}
+
 /* Get Key Button CTA */
 .hdr-btn {
   color: #fff;
@@ -360,22 +374,46 @@ textarea.fc{resize:vertical}
   box-shadow:0 8px 28px rgba(0,0,0,.1);color:var(--TX);margin-bottom:32px}
 
 /* shared body content */
-.lt-body p{margin-bottom:15px;text-align:justify;font-size:.95rem;
-  color:#2d3748;line-height:1.75}
-.lt-body b,.lt-body strong{color:var(--P);font-weight:700}
-.lt-body a{color:var(--A);font-weight:600;text-decoration:none}
-.lt-body a:hover{text-decoration:underline}
-.lt-body .portfolio{background:var(--BG);border:1px solid var(--BD);
+.lt-body p, .rich-ed p {
+  margin-bottom:15px;text-align:justify;font-size:.95rem;
+  color:#2d3748;line-height:1.75
+}
+.lt-body b, .lt-body strong, .rich-ed b, .rich-ed strong {
+  color:var(--P);font-weight:700
+}
+.lt-body a, .rich-ed a {
+  color:var(--A);font-weight:600;text-decoration:none
+}
+.lt-body a:hover, .rich-ed a:hover {
+  text-decoration:underline
+}
+
+/* Portfolio Box Style (Now shared to Editor .rich-ed) */
+.lt-body .portfolio, .rich-ed .portfolio {
+  background:var(--BG);border:1px solid var(--BD);
   border-left:4px solid var(--A);border-radius:6px;padding:12px 16px;
-  margin:14px 0 16px}
-.lt-body .portfolio-label{font-size:.67rem;font-weight:700;text-transform:uppercase;
-  letter-spacing:1px;color:var(--P);margin-bottom:8px}
-.lt-body .pf-row{display:flex;align-items:baseline;gap:7px;
-  margin-bottom:5px;font-size:.84rem}
-.lt-body .pf-row:last-child{margin-bottom:0}
-.lt-body .pf-name{font-weight:700;color:var(--P);white-space:nowrap}
-.lt-body .pf-desc{color:var(--MT);font-size:.78rem}
-.lt-body .pf-row a{font-family:'Courier New',monospace;font-size:.76rem;white-space:nowrap}
+  margin:14px 0 16px
+}
+.lt-body .portfolio-label, .rich-ed .portfolio-label {
+  font-size:.67rem;font-weight:700;text-transform:uppercase;
+  letter-spacing:1px;color:var(--P);margin-bottom:8px
+}
+.lt-body .pf-row, .rich-ed .pf-row {
+  display:flex;flex-wrap:wrap;align-items:baseline;gap:7px;
+  margin-bottom:5px;font-size:.84rem
+}
+.lt-body .pf-row:last-child, .rich-ed .pf-row:last-child {
+  margin-bottom:0
+}
+.lt-body .pf-name, .rich-ed .pf-name {
+  font-weight:700;color:var(--P);white-space:nowrap
+}
+.lt-body .pf-desc, .rich-ed .pf-desc {
+  color:var(--MT);font-size:.78rem
+}
+.lt-body .pf-row a, .rich-ed .pf-row a {
+  font-family:'Courier New',monospace;font-size:.76rem;white-space:nowrap
+}
 
 /* ══════════════════════
    TEMPLATE: CLASSIC
@@ -608,17 +646,25 @@ textarea.fc{resize:vertical}
         </div>
 
         <hr class="divl">
+
         <div class="sec">📬 Recipient & Subject</div>
 
+ <!-- RECIPIENT (UPDATED TO MINI RICH EDITOR) -->
         <div class="fg">
-          <div class="fl">Recipient (To:)</div>
-          <textarea id="inpTo" class="fc" rows="4" placeholder="Selection Committee&#10;Department Name&#10;&lt;strong&gt;Organization Name&lt;/strong&gt;"></textarea>
-          <p class="fh">Use &lt;strong&gt;text&lt;/strong&gt; to bold lines.</p>
+          <div class="fl">
+            <span>Recipient (To:)</span>
+            <button class="tb-btn" style="padding:2px 8px;font-size:.65rem" onclick="document.getElementById('inpTo').focus();document.execCommand('bold',false,null)" title="Bold (Ctrl+B)"><b>B</b></button>
+          </div>
+          <div id="inpTo" class="fc rich-ed-mini" contenteditable="true" placeholder="Selection Committee&#10;Department Name&#10;Organization Name"></div>
+          <p class="fh">Select text and click <b>B</b> (or press Ctrl+B) to bold lines.</p>
         </div>
+
         <div class="fg">
           <div class="fl">Date <span class="fl-a" onclick="setToday()">↺ Today</span></div>
           <input type="text" id="inpDate" class="fc" placeholder="17 June 2026">
         </div>
+
+
         <div class="fg">
           <div class="fl">Subject Line</div>
           <input type="text" id="inpSubject" class="fc" placeholder="Application for [Role] — [Organization]">
@@ -676,11 +722,15 @@ textarea.fc{resize:vertical}
         <!-- GENERATE -->
         <div class="ai-mp on" id="aimp-gen">
           <div class="ai-ttl">✍️ Generate Body Content</div>
+          
           <div class="fg">
             <div class="fl">Input Mode</div>
-            <div style="display:flex;gap:10px;margin-bottom:10px">
+            <div style="display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap">
               <label style="display:flex;align-items:center;gap:4px;font-size:.8rem;cursor:pointer">
-                <input type="radio" name="gm" value="file" checked> From File(s)
+                <input type="radio" name="gm" value="hybrid" checked> Hybrid (Paste JD + File CV)
+              </label>
+              <label style="display:flex;align-items:center;gap:4px;font-size:.8rem;cursor:pointer">
+                <input type="radio" name="gm" value="file"> File(s) Only
               </label>
               <label style="display:flex;align-items:center;gap:4px;font-size:.8rem;cursor:pointer">
                 <input type="radio" name="gm" value="prompt"> Custom Prompt
@@ -688,7 +738,16 @@ textarea.fc{resize:vertical}
             </div>
           </div>
 
-          <div id="gfg" class="fg">
+          <!-- HYBRID MODE (NEW) -->
+          <div id="ghg" class="fg">
+            <div class="fl">1. Paste Vacancy / Job Desc</div>
+            <textarea id="gHybridText" class="fc" rows="3" placeholder="Paste the job description, requirements, or vacancy notice here..."></textarea>
+            <div class="fl" style="margin-top:10px">2. Upload CV / Resume</div>
+            <input type="file" id="gHybridFile" class="fc" accept=".pdf,.txt">
+          </div>
+
+          <!-- FILE ONLY MODE -->
+          <div id="gfg" class="fg" style="display:none">
             <div class="fl">Data Source</div>
             <select id="gds" class="fc" style="margin-bottom:7px">
               <option value="vacancy_cv">Vacancy Notice + CV / Achievements</option>
@@ -700,6 +759,7 @@ textarea.fc{resize:vertical}
             <div id="gFileNames" style="font-size:.68rem;color:var(--MT);margin-top:3px"></div>
           </div>
 
+          <!-- PROMPT ONLY MODE -->
           <div id="gpg" class="fg" style="display:none">
             <div class="fl">Your Prompt</div>
             <textarea id="gPrompt" class="fc" rows="4"
@@ -911,7 +971,7 @@ const FIELDS = [
   {id:'inpName',    pv:'pvName',    mode:'text'},
   {id:'inpSub',     pv:'pvSub',     mode:'text'},
   {id:'inpContact', pv:'pvContact', mode:'br'},
-  {id:'inpTo',      pv:'pvTo',      mode:'htmlbr'},
+  {id:'inpTo',      pv:'pvTo',      mode:'rich'},
   {id:'inpDate',    pv:'pvDate',    mode:'text'},
   {id:'inpSubject', pv:'pvSubject', mode:'text', special:'subj'},
   {id:'inpClosing', pv:'pvClosing', mode:'text'},
@@ -921,14 +981,25 @@ const FIELDS = [
 FIELDS.forEach(f => {
   const el = document.getElementById(f.id);
   const pv = document.getElementById(f.pv);
-  el.addEventListener('input', () => {
-    const v = el.value;
+  
+  const syncField = () => {
+    // Jika mode rich, ambil innerHTML. Jika tidak, ambil value.
+    const v = (f.mode === 'rich') ? el.innerHTML : el.value;
+    
     if (f.mode === 'text')   pv.textContent = v;
     if (f.mode === 'br')     pv.innerHTML = v.replace(/\n/g,'<br>');
-    if (f.mode === 'htmlbr') pv.innerHTML = v.replace(/\n/g,'<br>');
-    if (f.special === 'subj') pv.style.display = v.trim() ? 'block' : 'none';
+    if (f.mode === 'rich')   pv.innerHTML = v;
+    
+    if (f.special === 'subj') {
+       const textToCheck = f.mode === 'rich' ? el.innerText : v;
+       pv.style.display = textToCheck.trim() ? 'block' : 'none';
+    }
     triggerAS();
-  });
+  };
+
+  el.addEventListener('input', syncField);
+  // Tambahkan listener 'blur' untuk elemen contenteditable agar lebih stabil
+  if (f.mode === 'rich') el.addEventListener('blur', syncField);
 });
 
 const inpBody = document.getElementById('inpBody');
@@ -965,9 +1036,10 @@ function switchAI(m){
 /* gen mode toggle */
 document.querySelectorAll('input[name="gm"]').forEach(r=>{
   r.addEventListener('change',()=>{
-    const isF = document.querySelector('input[name="gm"]:checked').value==='file';
-    document.getElementById('gfg').style.display = isF?'block':'none';
-    document.getElementById('gpg').style.display = isF?'none':'block';
+    const val = document.querySelector('input[name="gm"]:checked').value;
+    document.getElementById('ghg').style.display = val === 'hybrid' ? 'block' : 'none';
+    document.getElementById('gfg').style.display = val === 'file' ? 'block' : 'none';
+    document.getElementById('gpg').style.display = val === 'prompt' ? 'block' : 'none';
   });
 });
 
@@ -1032,7 +1104,7 @@ function getState(){
     name:    document.getElementById('inpName').value,
     sub:     document.getElementById('inpSub').value,
     contact: document.getElementById('inpContact').value,
-    to:      document.getElementById('inpTo').value,
+    to:      document.getElementById('inpTo').innerHTML, // <-- Ubah ke innerHTML
     date:    document.getElementById('inpDate').value,
     subject: document.getElementById('inpSubject').value,
     body:    inpBody.innerHTML,
@@ -1044,11 +1116,33 @@ function getState(){
 
 function setState(d){
   if(!d) return;
-  const set = (id,v)=>{ if(v!==undefined){ document.getElementById(id).value=v; document.getElementById(id).dispatchEvent(new Event('input')); } };
-  set('inpName',d.name); set('inpSub',d.sub); set('inpContact',d.contact);
-  set('inpTo',d.to); set('inpDate',d.date); set('inpSubject',d.subject);
-  set('inpClosing',d.closing); set('inpSigName',d.sig);
-  if(d.body!==undefined){ inpBody.innerHTML=d.body; syncBody(); }
+  
+  const set = (id, v, isRich = false) => { 
+    if(v !== undefined) { 
+      const el = document.getElementById(id);
+      if (isRich) {
+        // Konversi draft lama yg masih pakai \n (enter) menjadi <br>
+        if (typeof v === 'string' && v.includes('\n') && !v.includes('<div') && !v.includes('<br')) {
+          v = v.replace(/\n/g, '<br>');
+        }
+        el.innerHTML = v;
+      } else {
+        el.value = v; 
+      }
+      el.dispatchEvent(new Event('input')); 
+    } 
+  };
+  
+  set('inpName', d.name); 
+  set('inpSub', d.sub); 
+  set('inpContact', d.contact);
+  set('inpTo', d.to, true); // <-- tandai isRich = true
+  set('inpDate', d.date); 
+  set('inpSubject', d.subject);
+  set('inpClosing', d.closing); 
+  set('inpSigName', d.sig);
+  
+  if(d.body !== undefined){ inpBody.innerHTML = d.body; syncBody(); }
   if(d.tpl) switchTpl(d.tpl);
 }
 
@@ -1181,35 +1275,70 @@ function setBtnState(sel, loading, origText){
 async function aiGenerate(){
   const key = getKey(); if(!key) return;
   setBtnState('#aimp-gen .btn-p', true);
+  
   try{
-    const isFile = document.querySelector('input[name="gm"]:checked').value==='file';
+    const gm = document.querySelector('input[name="gm"]:checked').value;
     const lang = document.getElementById('gLang').value==='id'?'Bahasa Indonesia':'English';
     let parts=[];
 
-    if(isFile){
+    if(gm === 'hybrid') {
+      // --- MODE HYBRID (PASTE + FILE) ---
+      const jdText = document.getElementById('gHybridText').value.trim();
+      const fileInput = document.getElementById('gHybridFile');
+      
+      if(!jdText){ toast('Paste the Job Description first', 'er'); return; }
+      if(!fileInput.files.length){ toast('Upload your CV file', 'er'); return; }
+      
+      // Instruksi Prompt Khusus Hybrid
+      parts.push({text:`You are a professional cover letter writer specializing in international development, UN agencies, and corporate institutions. 
+      Analyze the attached CV file and the Job Description provided below. 
+      Draft compelling cover letter body paragraphs in ${lang} that connect the candidate's CV achievements directly to the Job Description requirements. 
+      Use concrete numbers and institutional contexts. Return ONLY simple HTML using <p> and <b> tags — no markdown, no code fences.
+      
+      JOB DESCRIPTION:
+      ${jdText}`});
+      
+      const f = fileInput.files[0];
+      let mType = f.type;
+      if(!mType) mType = f.name.toLowerCase().endsWith('.pdf') ? 'application/pdf' : 'text/plain';
+      parts.push({inlineData:{data:await b64(f),mimeType:mType}});
+
+    } else if (gm === 'file') {
+      // --- MODE FILE ONLY ---
       const files = document.getElementById('gFiles').files;
       if(!files.length){ toast('Select at least one file','er'); return; }
       const src = document.getElementById('gds').options[document.getElementById('gds').selectedIndex].text;
+      
       parts.push({text:`You are a professional cover letter writer specializing in international development, UN agencies, and government institutions. Analyze the attached document(s) (source: ${src}) and draft compelling cover letter body paragraphs in ${lang}. Use concrete achievements, numbers, and institutional contexts from the documents. Return only simple HTML using <p> and <b> tags — no markdown, no code fences.`});
+      
       for(const f of files){ 
         let mType = f.type;
         if(!mType) mType = f.name.toLowerCase().endsWith('.pdf') ? 'application/pdf' : 'text/plain';
-        parts.push({inlineData: {data: await b64(f), mimeType: mType}}); 
-        }
+        parts.push({inlineData:{data:await b64(f),mimeType:mType}}); 
+      }
+      
     } else {
+      // --- MODE PROMPT ONLY ---
       const p = document.getElementById('gPrompt').value.trim();
       if(!p){ toast('Enter a prompt','er'); return; }
       parts.push({text:`${p}\n\nRespond in ${lang}. Format as simple HTML using only <p> and <b> tags. No markdown or code fences.`});
     }
 
+    // Eksekusi API
     const html = await gemini(parts, key);
-    const wrap = `<div style="background:#f0fdf4;border-left:4px solid #16a34a;padding:9px 12px;margin-bottom:10px"><p style="color:#166534;font-size:.75rem;font-weight:700;margin-bottom:5px">✨ AI Generated — review &amp; edit:</p>${html}</div><p><br></p>`;
+    
+    // Tampilkan di Editor
+    const wrap = `<div style="background:#f0fdf4;border-left:4px solid #16a34a;padding:9px 12px;margin-bottom:10px"><p style="color:#166534;font-size:.75rem;font-weight:700;margin-bottom:5px">✨ AI Generated (Review &amp; Edit):</p>${html}</div><p><br></p>`;
     inpBody.focus();
     document.execCommand('insertHTML',false,wrap);
     syncBody();
+    
     toast('Content generated!','ok');
-  }catch(e){ toast('AI error: '+e.message,'er'); }
-  finally{ setBtnState('#aimp-gen .btn-p', false); }
+  } catch(e) { 
+    toast('AI error: '+e.message,'er'); 
+  } finally { 
+    setBtnState('#aimp-gen .btn-p', false); 
+  }
 }
 
 /* ─── AI: CRITIQUE ─── */
@@ -1331,7 +1460,7 @@ function loadSample(){
     name:'ANGGA CONNI SAPUTRA',
     sub:'Senior Knowledge Management Specialist · Gov-Tech Architect',
     contact:'Jakarta, Indonesia\n+62 8998 788 909\nangga.conni@horizon-scanning.org\nanggaconni.github.io',
-    to:'<strong>To:</strong> Selection Committee\nEast Asia Department (EARD) &amp; PRC Resident Mission (PRCM)\n<strong>Asian Development Bank (ADB)</strong> · Beijing Representative Office',
+    to:'<b>To:</b> Selection Committee<br>East Asia Department (EARD) &amp; PRC Resident Mission (PRCM)<br><b>Asian Development Bank (ADB)</b> · Beijing Representative Office',
     date:'17 June 2026',
     subject:'Application · Senior Knowledge Management Specialist (PRCM/EARD)',
     body:`<p>Dear Members of the Selection Committee,</p>
