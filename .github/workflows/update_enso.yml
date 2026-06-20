@@ -1,0 +1,29 @@
+name: Update Data ENSO NOAA harian
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Jalan setiap tengah malam UTC
+  workflow_dispatch: # Bisa di-klik jalankan manual
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Jalankan Script Python
+        run: python fetch_enso.py
+
+      - name: Commit & Push enso.json
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add enso.json
+          git commit -m "Auto-update ENSO Data dari NOAA" || echo "No changes to commit"
+          git push
