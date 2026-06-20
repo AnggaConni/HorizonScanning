@@ -101,7 +101,7 @@
         </div>
 
         <!-- RIGHT PANEL: DASHBOARD & ANALYTICS (70%) -->
-        <div class="w-full md:w-2/3 h-[55vh] md:h-full overflow-y-auto bg-slate-50 relative">
+        <div class="w-full md:w-2/3 flex-1 md:h-full overflow-y-auto bg-slate-50 relative">
             
             <!-- Welcome State -->
             <div id="welcome-state" class="h-full flex flex-col items-center justify-center p-8 text-center">
@@ -534,17 +534,18 @@
         /* =========================================
            4. CORE ENGINE (100% LIVE DATA NO MOCKUP)
            ========================================= */
-        async function processVillageData(id, forceUpdate) {
+async function processVillageData(id, forceUpdate) {
             const v = db.villages.find(x => x.id === id);
             if(!v) return;
 
-            showLoader("Menghubungi Satelit Cuaca...");
+            showLoader("Menghubungi Satelit & Mengkalkulasi Iklim 5 Tahun...");
             try {
                 const urlCurrent = `https://api.open-meteo.com/v1/forecast?latitude=${v.lat}&longitude=${v.lon}&current=soil_moisture_0_to_7cm&daily=precipitation_sum,temperature_2m_max&past_days=30&forecast_days=14&timezone=Asia%2FJakarta`;
                 
-                // Set mundur mesin waktu 1 tahun lalu
+                // Set mundur 5 tahun untuk mencari rata-rata (Baseline Klimatologi MVP)
                 let dEnd = new Date(); dEnd.setFullYear(dEnd.getFullYear() - 1);
-                let dStart = new Date(dEnd); dStart.setDate(dStart.getDate() - 30);
+                let dStart = new Date(dEnd); dStart.setFullYear(dStart.getFullYear() - 5);
+                
                 let strEnd = dEnd.toISOString().split('T')[0];
                 let strStart = dStart.toISOString().split('T')[0];
                 
@@ -554,9 +555,17 @@
                 const dataCurrent = await resCurrent.json();
                 const dataArchive = await resArchive.json();
 
-                const pastYearRain = dataArchive.daily.precipitation_sum.reduce((a,b)=>a+(b||0), 0);
+                // Hitung rata-rata curah hujan 30 hari selama 5 tahun terakhir
+                const archiveRain = dataArchive.daily.precipitation_sum;
+                let totalRain5Years = 0;
+                let validDays = 0;
+                for(let i=0; i<archiveRain.length; i++) {
+                    if(archiveRain[i] !== null) { totalRain5Years += archiveRain[i]; validDays++; }
+                }
+                // Rata-rata curah hujan per 30 hari berdasarkan 5 tahun terakhir
+                const histMeanRain = (totalRain5Years / validDays) * 30;
                 
-                calculateIndices(v, dataCurrent, pastYearRain);
+                calculateIndices(v, dataCurrent, histMeanRain);
                 v.hasData = true;
                 
                 hideLoader();
@@ -566,7 +575,7 @@
             } catch (err) {
                 console.error(err);
                 hideLoader();
-                alert("Gagal koneksi ke server cuaca Open-Meteo. Pastikan internet Anda aktif.");
+                alert("Gagal koneksi ke server cuaca Open-Meteo.");
             }
         }
 
