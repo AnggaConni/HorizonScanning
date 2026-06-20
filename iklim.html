@@ -435,24 +435,38 @@
             const v = db.villages.find(x => x.id === id);
             if(!v) return;
 
-            showLoader("Mengunduh data satelit cuaca...");
+            showLoader("Mengunduh data satelit cuaca & historis...");
             try {
                 // 1. Current & Forecast (Open-Meteo)
-                const url = `https://api.open-meteo.com/v1/forecast?latitude=${v.lat}&longitude=${v.lon}&current=soil_moisture_0_to_7cm&daily=precipitation_sum,temperature_2m_max&past_days=30&forecast_days=14&timezone=Asia%2FJakarta`;
-                const res = await fetch(url);
-                const data = await res.json();
+                const urlCurrent = `https://api.open-meteo.com/v1/forecast?latitude=${v.lat}&longitude=${v.lon}&current=soil_moisture_0_to_7cm&daily=precipitation_sum,temperature_2m_max&past_days=30&forecast_days=14&timezone=Asia%2FJakarta`;
+                
+                // 2. Archive API (Menarik data persis 1 tahun yang lalu di bulan yang sama selama 30 hari untuk mencari Rata-rata Historis)
+                // Menghitung tanggal mundur 1 tahun
+                let dEnd = new Date(); dEnd.setFullYear(dEnd.getFullYear() - 1);
+                let dStart = new Date(dEnd); dStart.setDate(dStart.getDate() - 30);
+                let strEnd = dEnd.toISOString().split('T')[0];
+                let strStart = dStart.toISOString().split('T')[0];
+                
+                const urlArchive = `https://archive-api.open-meteo.com/v1/archive?latitude=${v.lat}&longitude=${v.lon}&start_date=${strStart}&end_date=${strEnd}&daily=precipitation_sum&timezone=Asia%2FJakarta`;
 
-                // 2. Simulasi Historical API (Untuk SPI)
-                // Idealnya: Archive API 30 tahun. Di UI client side, kita asumsikan rata-rata curah hujan bulanan historis adalah konstan untuk testing.
-                // Jika ingin benar2 pakai API: fetch archive-api.open-meteo.com. Disini disimulasikan rata-rata wilayah NTT = 60mm/bulan (musim kemarau).
-                const histMeanRain = 60; 
+                // Lakukan 2 request API secara bersamaan
+                const [resCurrent, resArchive] = await Promise.all([
+                    fetch(urlCurrent),
+                    fetch(urlArchive)
+                ]);
 
+                const dataCurrent = await resCurrent.json();
+                const dataArchive = await resArchive.json();
+
+                // Cari rata-rata hujan 30 hari di tahun lalu (sebagai baseline historis)
+                const pastYearRain = dataArchive.daily.precipitation_sum.reduce((a,b)=>a+(b||0), 0);
+                
                 // Kalkulasi Indikator
-                calculateIndices(v, data, histMeanRain);
+                calculateIndices(v, dataCurrent, pastYearRain);
                 v.hasData = true;
                 
                 hideLoader();
-                renderMapMarkers(); // Update marker color
+                renderMapMarkers(); 
                 renderDashboard(v);
 
             } catch (err) {
@@ -463,41 +477,35 @@
         }
 
         function calculateIndices(v, apiData, histMeanRain) {
-            // --- A. HAZARD (SPI & Kelembapan) ---
-            // 1. SPI (Simplified Z-Score pendekatan empiris)
+            // 1. SPI (Dibandingkan dengan hujan 1 tahun lalu di bulan yang sama)
             const past30Rain = apiData.daily.precipitation_sum.slice(0, 30).reduce((a,b)=>a+(b||0), 0);
-            // Z = (Curah Hujan 30 Hari - Rata2 Historis) / Standard Deviasi (Asumsi SD = 20)
-            let zScore = (past30Rain - histMeanRain) / 20;
-            // Cap SPI
+            
+            // Z-Score: (Hujan bulan ini - Hujan bulan yang sama tahun lalu) / deviasi statis ringan
+            // Jika tahun ini jauh lebih kecil dari tahun lalu, nilainya minus (kering)
+            let zScore = (past30Rain - histMeanRain) / (histMeanRain * 0.3 || 20); 
             if(zScore > 3) zScore = 3; if(zScore < -3) zScore = -3;
             v.satSPI = zScore.toFixed(2);
 
             // 2. Soil Moisture
             v.satSM = apiData.current.soil_moisture_0_to_7cm || 0;
             let hazardScore = 0;
-            // Jika kering ekstrem
             if(v.satSPI < -1.0) hazardScore += 50; else if(v.satSPI < 0) hazardScore += 20;
             if(v.satSM < 0.15) hazardScore += 50; else if(v.satSM < 0.25) hazardScore += 20;
 
             v.hazardLevel = hazardScore > 60 ? 'Tinggi' : (hazardScore > 30 ? 'Sedang' : 'Rendah');
 
-            // --- B. VULNERABILITY (Kerentanan Sosial) ---
-            // Bobot: Rasio Rentan (40%), Ketergantungan Petani (30%), Stok Pangan (30%)
-            let rasioRentan = (v.socRentan / v.socPop) * 100; // Misal 20%
+            // B. VULNERABILITY
+            let rasioRentan = (v.socRentan / v.socPop) * 100;
             let scoreRentan = rasioRentan > 30 ? 100 : (rasioRentan > 15 ? 50 : 10);
-            
-            let scorePetani = v.socPetani; // 10-100
-            
-            let scorePangan = v.socPangan === 1 ? 100 : (v.socPangan === 3 ? 50 : 10); // 1 bulan kritis = skor tinggi
-            
+            let scorePetani = v.socPetani; 
+            let scorePangan = v.socPangan === 1 ? 100 : (v.socPangan === 3 ? 50 : 10);
             let vulnScore = (scoreRentan * 0.4) + (scorePetani * 0.3) + (scorePangan * 0.3);
             v.vulnLevel = vulnScore > 70 ? 'Tinggi' : (vulnScore > 40 ? 'Sedang' : 'Rendah');
 
-            // --- C. CAPACITY ---
+            // C. CAPACITY
             v.capLevel = v.capAir > 70 ? 'Tinggi' : (v.capAir > 30 ? 'Sedang' : 'Rendah');
 
-            // --- D. TOTAL RISK (IBF) ---
-            // Risk = (H * V) / C . Skala dibuat sederhana 1-3.
+            // D. TOTAL RISK (IBF)
             let valH = v.hazardLevel === 'Tinggi' ? 3 : (v.hazardLevel === 'Sedang' ? 2 : 1);
             let valV = v.vulnLevel === 'Tinggi' ? 3 : (v.vulnLevel === 'Sedang' ? 2 : 1);
             let valC = v.capLevel === 'Tinggi' ? 3 : (v.capLevel === 'Sedang' ? 2 : 1);
@@ -507,12 +515,10 @@
             else if(totalRisk >= 1.5) v.riskLevel = 'Sedang';
             else v.riskLevel = 'Rendah';
 
-            // Simpan data raw chart untuk 14 hari ke depan
+            // Data Raw Chart 14 Hari
             v.chartDates = apiData.daily.time.slice(30, 44);
             v.chartRain = apiData.daily.precipitation_sum.slice(30, 44);
             v.chartTemp = apiData.daily.temperature_2m_max.slice(30, 44);
-            
-            // Hujan 7 hari total
             v.next7Rain = v.chartRain.slice(0, 7).reduce((a,b)=>a+(b||0), 0).toFixed(1);
         }
 
