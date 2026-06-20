@@ -1211,6 +1211,13 @@ function clrDraft(){
   if(!confirm('Clear all saved drafts and version history?')) return;
   localStorage.removeItem('clm_v2');
   localStorage.removeItem('clm_vers_v2');
+  
+  // TAMBAHKAN INI: Kosongkan semua inputan di layar
+  setState({
+    name:'', sub:'', contact:'', to:'', date:'', subject:'',
+    body:'', closing:'', sig:'', tpl: document.getElementById('cvPage').dataset.tpl
+  });
+  
   renderVers();
   lastSaved=null; updSaveInd();
   toast('Cleared','in');
@@ -1328,10 +1335,17 @@ async function aiGenerate(){
     const html = await gemini(parts, key);
     
     // Tampilkan di Editor
-    const wrap = `<div style="background:#f0fdf4;border-left:4px solid #16a34a;padding:9px 12px;margin-bottom:10px"><p style="color:#166534;font-size:.75rem;font-weight:700;margin-bottom:5px">✨ AI Generated (Review &amp; Edit):</p>${html}</div><p><br></p>`;
-    inpBody.focus();
-    document.execCommand('insertHTML',false,wrap);
+        const wrap = `<div style="background:#f0fdf4;border-left:4px solid #16a34a;padding:9px 12px;margin-bottom:10px"><p style="color:#166534;font-size:.75rem;font-weight:700;margin-bottom:5px">✨ AI Generated (Review &amp; Edit):</p>${html}</div><p><br></p>`;
+    
+    // Masukkan HTML secara manual karena elemen disembunyikan
+    if (inpBody.innerHTML.trim() === '' || inpBody.innerHTML === '<p><br></p>') {
+      inpBody.innerHTML = wrap;
+    } else {
+      inpBody.innerHTML += wrap; // Append jika sudah ada teks sebelumnya
+    }
+    
     syncBody();
+    switchTab('editor'); // Otomatis pindah ke tab editor agar user bisa langsung melihat hasil
     
     toast('Content generated!','ok');
   } catch(e) { 
