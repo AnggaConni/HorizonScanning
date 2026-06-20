@@ -213,7 +213,7 @@ body{font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Roboto,sans-serif;
 /* ═══ FLOATING AI TOOLBAR ═══ */
 .ai-floating-bar {
   position: absolute;
-  display: none; /* Disembunyikan secara default */
+  display: none; 
   background: var(--WH);
   border: 1px solid var(--V);
   border-radius: 8px;
@@ -229,6 +229,7 @@ body{font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Roboto,sans-serif;
   from { opacity: 0; transform: translateY(5px) scale(0.95); }
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
+
 .ai-floating-inp {
   flex: 1;
   border: none;
@@ -1503,30 +1504,29 @@ document.addEventListener('mouseup', function(e) {
   const selectedText = selection.toString().trim();
   const floatingBar = document.getElementById('aiFloatingBar');
   
-  // Jika klik di dalam floating bar itu sendiri, abaikan (jangan ditutup)
+  // Jika klik di dalam floating bar itu sendiri, abaikan
   if (e.target.closest('#aiFloatingBar')) return;
 
-  // Cek apakah teks yang diblok ada di area Editor atau Preview
-  const inEditor = e.target.closest('#inpBody');
+  // 🔥 HANYA aktif jika memblok teks di area PREVIEW (KANAN) 🔥
   const inPreview = e.target.closest('#pvBody');
 
-  if ((inEditor || inPreview) && selectedText.length > 5) {
+  if (inPreview && selectedText.length > 5) {
     // Simpan range/posisi persis dari teks yang diblok
     currentSelectionRange = selection.getRangeAt(0).cloneRange();
     
-    // 🔥 PERBAIKAN: Buat highlight visual menetap meskipun input di-focus
+    // Highlight visual menetap
     if (typeof CSS !== 'undefined' && 'highlights' in CSS) {
       const highlight = new Highlight(currentSelectionRange);
       CSS.highlights.set('ai-highlight', highlight);
     }
     
-    // Hitung posisi kursor/teks untuk menampilkan pop-up di bawahnya
+    // Hitung posisi untuk menampilkan pop-up persis di bawah teks yang diblok
     const rect = currentSelectionRange.getBoundingClientRect();
     
     floatingBar.style.display = 'flex';
     floatingBar.style.top = (rect.bottom + window.scrollY + 10) + 'px';
     
-    // Pastikan pop-up tidak keluar layar sebelah kanan
+    // Pastikan pop-up tidak keluar batas layar kanan
     let leftPos = rect.left + window.scrollX;
     if (leftPos + 300 > window.innerWidth) leftPos = window.innerWidth - 320;
     floatingBar.style.left = leftPos + 'px';
@@ -1534,7 +1534,7 @@ document.addEventListener('mouseup', function(e) {
     // Auto-focus ke input
     setTimeout(() => document.getElementById('aiFloatingInp').focus(), 50);
   } else {
-    // Jika klik di luar atau teks tidak diblok, sembunyikan pop-up & bersihkan blok visual
+    // Jika blok di Editor Kiri atau klik sembarang tempat, matikan fitur AI
     floatingBar.style.display = 'none';
     clearAIHighlight();
   }
