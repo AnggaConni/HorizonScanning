@@ -191,6 +191,11 @@
                     </div>
                 </div>
 
+                <!-- PANEL RADAR HAMA & PENYAKIT -->
+                <div id="pest-alert-container" class="mb-6 rounded-xl border p-4 shadow-sm flex items-center gap-4 transition-all bg-white hidden">
+                    <!-- Injected via JS -->
+                </div>
+
                 <!-- DETAIL DATA SATELIT -->
                 <h3 class="text-sm font-bold text-slate-800 mb-3 border-b pb-2"><i class="fa-solid fa-satellite mr-1 text-sky-500"></i> Data Telemetri Satelit</h3>
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
@@ -636,6 +641,41 @@ async function processVillageData(id, forceUpdate) {
             v.chartTemp = apiData.daily.temperature_2m_max.slice(30, 44);
             v.next7Rain = v.chartRain.slice(0, 7).reduce((a,b)=>a+(b||0), 0).toFixed(1);
             v.chartWeatherCodes = apiData.daily.weather_code.slice(30, 44); // BARIS BARU DITAMBAHKAN
+
+            // --- ALGORITMA RADAR HAMA & PENYAKIT (7 HARI KEDEPAN) ---
+            // Cari rata-rata suhu 7 hari ke depan
+            const next7Temp = v.chartTemp.slice(0, 7);
+            const avgTemp = next7Temp.reduce((a,b)=>a+(b||0), 0) / 7;
+            const next7RainTotal = parseFloat(v.next7Rain);
+            
+            // Default Aman
+            v.pestAlert = { 
+                title: 'Kondisi Aman Terkendali', 
+                desc: `Cuaca diprediksi stabil. Tidak ada indikasi suhu ekstrem atau hujan anomali yang memicu hama pada ${v.komoditas}. Lakukan pengamatan rutin.`, 
+                icon: 'fa-shield-virus text-emerald-500', 
+                bg: 'bg-emerald-50 border-emerald-200 text-emerald-800' 
+            };
+
+            if (avgTemp >= 30.5 && next7RainTotal < 15) {
+                // SKENARIO PANAS & KERING (Memicu ledakan Serangga)
+                if (v.komoditas === 'Padi Sawah') {
+                    v.pestAlert = { title: 'Waspada Wereng & Penggerek Batang', desc: 'Suhu panas (>30°C) tanpa hujan memicu siklus tetas telur serangga jauh lebih cepat. Jaga ketinggian air sawah dan pantau pangkal batang padi.', icon: 'fa-bug text-rose-500', bg: 'bg-rose-50 border-rose-300 text-rose-800' };
+                } else if (v.komoditas === 'Jagung') {
+                    v.pestAlert = { title: 'Waspada Ulat Grayak (Fall Armyworm)', desc: 'Kondisi kering memicu migrasi ngengat Ulat Grayak. Segera lakukan penyemprotan insektisida nabati / biologi difokuskan pada pucuk daun muda.', icon: 'fa-worm text-rose-500', bg: 'bg-rose-50 border-rose-300 text-rose-800' };
+                } else {
+                    v.pestAlert = { title: 'Awas Kutu Kebul & Thrips', desc: 'Suhu tinggi memicu ledakan kutu yang membawa virus kuning (gemini). Segera pasang perangkap lekat kuning (yellow trap) di area lahan.', icon: 'fa-spider text-rose-500', bg: 'bg-rose-50 border-rose-300 text-rose-800' };
+                }
+            } else if (next7RainTotal >= 40) {
+                // SKENARIO BASAH & LEMBAB (Memicu Jamur & Bakteri)
+                if (v.komoditas === 'Padi Sawah') {
+                    v.pestAlert = { title: 'Awas Jamur Blas & Bakteri Kresek', desc: 'Hujan lebat beruntun meningkatkan kelembaban. Hentikan pemupukan Urea (Nitrogen) sementara, dan siapkan fungisida preventif.', icon: 'fa-disease text-amber-600', bg: 'bg-amber-50 border-amber-300 text-amber-800' };
+                } else if (v.komoditas === 'Jagung') {
+                    v.pestAlert = { title: 'Waspada Penyakit Bulai Daun', desc: 'Hujan dan embun berlebih meningkatkan spora jamur Peronosclerospora. Segera cabut dan bakar tanaman yang daunnya mulai memutih/kuning bergaris.', icon: 'fa-disease text-amber-600', bg: 'bg-amber-50 border-amber-300 text-amber-800' };
+                } else {
+                    v.pestAlert = { title: 'Awas Patek (Antraknosa) & Busuk Akar', desc: 'Kelembaban tinggi mempercepat busuk buah/patek. Segera perbaiki drainase/parit agar air tidak menggenang di sekitar bedengan tanaman.', icon: 'fa-disease text-amber-600', bg: 'bg-amber-50 border-amber-300 text-amber-800' };
+                }
+            }
+
         }
 
         /* =========================================
@@ -811,6 +851,21 @@ async function processVillageData(id, forceUpdate) {
                     </div>
                 `;
             }
+
+            // --- INJEKSI UI RADAR HAMA & PENYAKIT ---
+            const pestContainer = document.getElementById('pest-alert-container');
+            pestContainer.classList.remove('hidden'); // Munculkan panel
+            pestContainer.className = `mb-6 rounded-xl border p-4 shadow-sm flex items-center gap-4 transition-all ${v.pestAlert.bg}`;
+            pestContainer.innerHTML = `
+                <div class="bg-white rounded-full w-14 h-14 flex items-center justify-center shrink-0 shadow-sm border border-slate-100">
+                    <i class="fa-solid ${v.pestAlert.icon} text-2xl"></i>
+                </div>
+                <div>
+                    <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1"><i class="fa-solid fa-radar mr-1"></i> Radar Hama & Penyakit (Pra-Panen)</h3>
+                    <h4 class="font-bold text-sm md:text-base mb-1">${v.pestAlert.title}</h4>
+                    <p class="text-xs opacity-90 leading-relaxed">${v.pestAlert.desc}</p>
+                </div>
+            `;
 
             renderChart(v.chartDates, v.chartRain, v.chartTemp);
         }
