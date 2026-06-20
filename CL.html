@@ -1289,29 +1289,22 @@ async function aiGenerate(){
     let parts=[];
 
     if(gm === 'hybrid') {
-      // --- MODE HYBRID (PASTE + FILE) ---
       const jdText = document.getElementById('gHybridText').value.trim();
       const fileInput = document.getElementById('gHybridFile');
       
       if(!jdText){ toast('Paste the Job Description first', 'er'); return; }
       if(!fileInput.files.length){ toast('Upload your CV file', 'er'); return; }
       
-      // Instruksi Prompt Khusus Hybrid
-      parts.push({text:`You are a professional cover letter writer specializing in international development, UN agencies, and corporate institutions. 
-      Analyze the attached CV file and the Job Description provided below. 
-      Draft compelling cover letter body paragraphs in ${lang} that connect the candidate's CV achievements directly to the Job Description requirements. 
-      Use concrete numbers and institutional contexts. Return ONLY simple HTML using <p> and <b> tags — no markdown, no code fences.
+      parts.push({text:`You are a professional cover letter writer specializing in international development, UN agencies, and corporate institutions. Analyze the attached CV file and the Job Description provided below. Draft compelling cover letter body paragraphs in ${lang} that connect the candidate's CV achievements directly to the Job Description requirements. Use concrete numbers and institutional contexts. Return ONLY simple HTML using <p> and <b> tags — no markdown, no code fences.
       
       JOB DESCRIPTION:
       ${jdText}`});
       
       const f = fileInput.files[0];
-      let mType = f.type;
-      if(!mType) mType = f.name.toLowerCase().endsWith('.pdf') ? 'application/pdf' : 'text/plain';
+      let mType = f.type || (f.name.toLowerCase().endsWith('.pdf') ? 'application/pdf' : 'text/plain');
       parts.push({inlineData:{data:await b64(f),mimeType:mType}});
 
     } else if (gm === 'file') {
-      // --- MODE FILE ONLY ---
       const files = document.getElementById('gFiles').files;
       if(!files.length){ toast('Select at least one file','er'); return; }
       const src = document.getElementById('gds').options[document.getElementById('gds').selectedIndex].text;
@@ -1319,13 +1312,11 @@ async function aiGenerate(){
       parts.push({text:`You are a professional cover letter writer specializing in international development, UN agencies, and government institutions. Analyze the attached document(s) (source: ${src}) and draft compelling cover letter body paragraphs in ${lang}. Use concrete achievements, numbers, and institutional contexts from the documents. Return only simple HTML using <p> and <b> tags — no markdown, no code fences.`});
       
       for(const f of files){ 
-        let mType = f.type;
-        if(!mType) mType = f.name.toLowerCase().endsWith('.pdf') ? 'application/pdf' : 'text/plain';
+        let mType = f.type || (f.name.toLowerCase().endsWith('.pdf') ? 'application/pdf' : 'text/plain');
         parts.push({inlineData:{data:await b64(f),mimeType:mType}}); 
       }
       
     } else {
-      // --- MODE PROMPT ONLY ---
       const p = document.getElementById('gPrompt').value.trim();
       if(!p){ toast('Enter a prompt','er'); return; }
       parts.push({text:`${p}\n\nRespond in ${lang}. Format as simple HTML using only <p> and <b> tags. No markdown or code fences.`});
@@ -1334,18 +1325,20 @@ async function aiGenerate(){
     // Eksekusi API
     const html = await gemini(parts, key);
     
-    // Tampilkan di Editor
-        const wrap = `<div style="background:#f0fdf4;border-left:4px solid #16a34a;padding:9px 12px;margin-bottom:10px"><p style="color:#166534;font-size:.75rem;font-weight:700;margin-bottom:5px">✨ AI Generated (Review &amp; Edit):</p>${html}</div><p><br></p>`;
+    // --- PERBAIKAN DI SINI ---
+    // Bersihkan sisa backtick markdown jika AI membandel
+    let cleanHtml = html.replace(/```(html)?|```/g, '').trim();
     
-    // Masukkan HTML secara manual karena elemen disembunyikan
+    // Masukkan hasil langsung sebagai paragraf polos (TANPA Kotak Hijau)
     if (inpBody.innerHTML.trim() === '' || inpBody.innerHTML === '<p><br></p>') {
-      inpBody.innerHTML = wrap;
+      inpBody.innerHTML = cleanHtml;
     } else {
-      inpBody.innerHTML += wrap; // Append jika sudah ada teks sebelumnya
+      // Jika sudah ada teks sebelumnya, tambahkan enter/jarak baru
+      inpBody.innerHTML += `<p><br></p>${cleanHtml}`;
     }
     
     syncBody();
-    switchTab('editor'); // Otomatis pindah ke tab editor agar user bisa langsung melihat hasil
+    switchTab('editor'); // Otomatis balik ke tab editor
     
     toast('Content generated!','ok');
   } catch(e) { 
