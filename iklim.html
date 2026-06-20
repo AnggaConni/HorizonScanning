@@ -1,725 +1,693 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Pantau Pangan Desa & Anticipatory Action</title>
-    
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- FontAwesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SiTani Pintar - Prakiraan Cuaca & Tani Desa</title>
 
-    <!-- Leaflet CSS & JS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
-        #map { height: 100%; width: 100%; z-index: 10; border-radius: 0.75rem; }
-        
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-
-        .glass-panel { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
-        .loader-spinner { border: 3px solid #f3f3f3; border-top: 3px solid #0ea5e9; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    </style>
+<style>
+  body { font-family: 'Plus Jakarta Sans', sans-serif; }
+  /* Bright cheerful background */
+  .bg-app { background: linear-gradient(160deg, #e0f2fe 0%, #f0f9ff 35%, #fefce8 100%); }
+  #map { height: 100%; width: 100%; z-index: 10; border-radius: 1rem; }
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-thumb { background: #bae6fd; border-radius: 10px; }
+  .loader-spinner { border: 4px solid #e0f2fe; border-top: 4px solid #0ea5e9; border-radius: 50%; width: 36px; height: 36px; animation: spin 1s linear infinite; }
+  @keyframes spin { 100% { transform: rotate(360deg); } }
+  .fade-in { animation: fade .4s ease; }
+  @keyframes fade { from { opacity:0; transform: translateY(8px);} to {opacity:1; transform:none;} }
+  .card { background:#fff; border-radius:1rem; box-shadow:0 4px 20px -8px rgba(14,165,233,0.25); }
+  .pill { font-size:10px; font-weight:700; padding:2px 8px; border-radius:999px; }
+</style>
 </head>
-<body class="text-slate-800 h-screen flex flex-col overflow-hidden">
 
-    <!-- TOP NAVBAR -->
-    <nav class="bg-slate-900 text-white p-3 shrink-0 flex justify-between items-center shadow-lg z-20">
-        <div class="flex items-center gap-3 pl-2">
-            <div class="w-8 h-8 rounded bg-sky-500 flex items-center justify-center text-white font-bold">
-                <i class="fa-solid fa-satellite-dish"></i>
-            </div>
-            <div>
-                <h1 class="font-bold text-sm tracking-wide">DESTANA / IBF SYSTEM</h1>
-                <p class="text-[10px] text-slate-400">NTT Province Early Action Protocol</p>
-            </div>
-        </div>
-        
-        <!-- Global ENSO Widget -->
-        <div class="hidden md:flex items-center gap-4 bg-slate-800 px-4 py-1.5 rounded-lg border border-slate-700">
-            <div class="text-xs text-slate-300">
-                <span class="block text-[9px] uppercase tracking-wider text-slate-500">Status ENSO (NOAA)</span>
-                Oceanic Niño Index: <strong id="enso-val" class="text-orange-400">...</strong>
-                <span id="enso-trend" class="ml-1 text-[10px] px-1 rounded bg-slate-700"></span> <!-- Tempat Trend Panah -->
-            </div>
-            <div id="enso-badge" class="px-2 py-1 bg-slate-700 text-slate-400 border border-slate-600 rounded text-xs font-bold uppercase">
-                Loading...
-            </div>
-        </div>
+<body class="bg-app text-slate-800 min-h-screen">
 
-        <div class="flex gap-2">
-            <button onclick="loadSampleData()" class="bg-sky-600 hover:bg-sky-500 px-3 py-1.5 rounded text-xs font-semibold transition flex items-center gap-2">
-                <i class="fa-solid fa-bolt"></i> <span class="hidden md:inline">Demo Data</span>
-            </button>
-        </div>
-    </nav>
-
-    <!-- MAIN LAYOUT -->
-    <div class="flex-1 flex flex-col md:flex-row overflow-hidden">
-        
-        <!-- LEFT PANEL: MAP & VILLAGE LIST (30%) -->
-        <div class="w-full md:w-1/3 h-[40vh] md:h-full flex flex-col border-r border-slate-200 bg-white shrink-0 relative">
-            <div class="p-3 bg-slate-50 border-b flex justify-between items-center z-20">
-                <h2 class="font-bold text-sm text-slate-700"><i class="fa-solid fa-map-location-dot mr-1 text-sky-500"></i> Peta Pantauan</h2>
-                <button onclick="openModal('modal-add-village')" class="text-xs bg-slate-800 text-white px-2 py-1 rounded hover:bg-slate-700"><i class="fa-solid fa-plus"></i> Desa</button>
-            </div>
-            <div class="flex-1 relative p-2">
-                <div id="map" class="shadow-inner border border-slate-200"></div>
-            </div>
-        </div>
-
-        <!-- RIGHT PANEL: DASHBOARD & ANALYTICS (70%) -->
-        <div class="w-full md:w-2/3 h-[60vh] md:h-full overflow-y-auto bg-slate-50 relative">
-            
-            <!-- Welcome State -->
-            <div id="welcome-state" class="h-full flex flex-col items-center justify-center p-8 text-center">
-                <img src="https://cdn-icons-png.flaticon.com/512/8636/8636208.png" class="w-24 h-24 mb-4 opacity-50 grayscale">
-                <h2 class="text-xl font-bold text-slate-700 mb-2">Pilih Wilayah Obeservasi</h2>
-                <p class="text-sm text-slate-500 max-w-md">Klik pin desa pada peta untuk menganalisa Risiko Iklim (Hazard), Kerentanan Sosial (Vulnerability), dan melihat rekomendasi Anticipatory Action (AA).</p>
-            </div>
-
-            <!-- Dashboard Content -->
-            <div id="dashboard-content" class="hidden p-4 md:p-6 pb-20">
-                
-                <!-- Header Desa -->
-                <div class="flex flex-col md:flex-row md:justify-between md:items-start gap-4 mb-6">
-                    <div>
-                        <div class="flex items-center gap-2 mb-1">
-                            <span class="px-2 py-0.5 bg-sky-100 text-sky-700 rounded text-[10px] font-bold uppercase tracking-wider border border-sky-200">Profil Desa</span>
-                            <span id="d-time" class="text-xs text-slate-400"><i class="fa-regular fa-clock"></i> Update: Hari ini</span>
-                        </div>
-                        <h2 id="d-name" class="font-extrabold text-2xl md:text-3xl text-slate-800 tracking-tight">DESA BENA</h2>
-                        <p class="text-sm text-slate-600 mt-1">Komoditas: <strong id="d-komoditas" class="text-slate-800">Padi Sawah</strong> | Lahan Tanam: <strong id="d-lahan">250 Ha</strong></p>
-                    </div>
-                    <div class="flex gap-2">
-                        <button onclick="openModal('modal-social')" class="bg-white border border-slate-300 text-slate-600 hover:bg-slate-50 px-3 py-2 rounded-lg text-xs font-semibold shadow-sm transition flex items-center gap-2">
-                            <i class="fa-solid fa-users"></i> Data Sosial
-                        </button>
-                        <button onclick="processVillageData(currentVillageId, true)" class="bg-slate-800 text-white hover:bg-slate-700 px-3 py-2 rounded-lg text-xs font-semibold shadow transition flex items-center gap-2">
-                            <i class="fa-solid fa-rotate-right"></i> Kalkulasi API
-                        </button>
-                    </div>
-                </div>
-
-                <!-- ALERT: IBF TRIGGER -->
-                <div id="ibf-alert" class="mb-6 rounded-xl border p-4 shadow-sm flex gap-4 items-start">
-                    <!-- Injected via JS -->
-                </div>
-
-                <!-- GRID: 3 PILAR RISIKO -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                    
-                    <!-- Hazard (Ancaman Iklim) -->
-                    <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-sm">
-                        <div class="flex justify-between items-center mb-3">
-                            <h3 class="text-xs font-bold text-slate-400 uppercase">1. Ancaman (Hazard)</h3>
-                            <i class="fa-solid fa-cloud-bolt text-slate-300"></i>
-                        </div>
-                        <div id="score-hazard" class="text-3xl font-black text-rose-600 mb-1">Tinggi</div>
-                        <p class="text-[10px] text-slate-500 leading-tight">Berdasarkan SPI Hujan & Soil Moisture (Open-Meteo).</p>
-                    </div>
-
-                    <!-- Vulnerability (Kerentanan) -->
-                    <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-sm cursor-pointer hover:border-sky-300 transition" onclick="openModal('modal-social')">
-                        <div class="flex justify-between items-center mb-3">
-                            <h3 class="text-xs font-bold text-slate-400 uppercase">2. Kerentanan (Vuln)</h3>
-                            <i class="fa-solid fa-people-group text-slate-300"></i>
-                        </div>
-                        <div id="score-vuln" class="text-3xl font-black text-orange-500 mb-1">Sedang</div>
-                        <p class="text-[10px] text-slate-500 leading-tight">Rasio Lansia/Balita & Ketahanan Stok Pangan warga.</p>
-                    </div>
-
-                    <!-- Capacity (Kapasitas) -->
-                    <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-sm">
-                        <div class="flex justify-between items-center mb-3">
-                            <h3 class="text-xs font-bold text-slate-400 uppercase">3. Kapasitas Adaptasi</h3>
-                            <i class="fa-solid fa-shield-halved text-slate-300"></i>
-                        </div>
-                        <div id="score-cap" class="text-3xl font-black text-emerald-600 mb-1">Rendah</div>
-                        <p class="text-[10px] text-slate-500 leading-tight">Infrastruktur air (Sumur/Embung/Irigasi).</p>
-                    </div>
-                </div>
-
-                <!-- DETAIL DATA SATELIT -->
-                <h3 class="text-sm font-bold text-slate-800 mb-3 border-b pb-2"><i class="fa-solid fa-satellite mr-1 text-sky-500"></i> Data Telemetri Satelit</h3>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-                    
-                    <div class="bg-white p-3 rounded-lg border border-slate-100 shadow-sm flex flex-col justify-between">
-                        <span class="text-[10px] font-bold text-slate-400 mb-1 block">SPI (30 Hari)</span>
-                        <div class="flex items-end gap-2">
-                            <span id="sat-spi" class="text-xl font-bold text-slate-700">-1.5</span>
-                        </div>
-                        <span id="sat-spi-lbl" class="text-[9px] px-1.5 py-0.5 rounded bg-orange-100 text-orange-700 inline-block mt-1 w-max">Kering Sedang</span>
-                    </div>
-
-                    <div class="bg-white p-3 rounded-lg border border-slate-100 shadow-sm flex flex-col justify-between">
-                        <span class="text-[10px] font-bold text-slate-400 mb-1 block">Soil Moisture (0-7cm)</span>
-                        <div class="flex items-end gap-2">
-                            <span id="sat-sm" class="text-xl font-bold text-slate-700">0.12</span>
-                            <span class="text-xs text-slate-400 mb-1">m³/m³</span>
-                        </div>
-                        <span id="sat-sm-lbl" class="text-[9px] px-1.5 py-0.5 rounded bg-red-100 text-red-700 inline-block mt-1 w-max">Kritis (Layu)</span>
-                    </div>
-
-                    <div class="bg-white p-3 rounded-lg border border-slate-100 shadow-sm flex flex-col justify-between relative overflow-hidden">
-                        <span class="text-[10px] font-bold text-slate-400 mb-1 block relative z-10">NDVI (Vegetasi)*</span>
-                        <div class="flex items-end gap-2 relative z-10">
-                            <span id="sat-ndvi" class="text-xl font-bold text-slate-700">0.35</span>
-                        </div>
-                        <span class="text-[9px] px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 inline-block mt-1 w-max relative z-10">Stres Ringan</span>
-                        <i class="fa-brands fa-google absolute -bottom-2 -right-2 text-4xl text-slate-100 z-0"></i>
-                    </div>
-
-                    <div class="bg-white p-3 rounded-lg border border-slate-100 shadow-sm flex flex-col justify-between">
-                        <span class="text-[10px] font-bold text-slate-400 mb-1 block">Hujan (7hr ke depan)</span>
-                        <div class="flex items-end gap-2">
-                            <span id="sat-rain" class="text-xl font-bold text-slate-700">12</span>
-                            <span class="text-xs text-slate-400 mb-1">mm</span>
-                        </div>
-                        <span class="text-[9px] text-slate-400 mt-1 inline-block"><i class="fa-solid fa-cloud-rain"></i> Open-Meteo</span>
-                    </div>
-                </div>
-
-                <!-- GRAFIK CHART.JS -->
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 mb-6">
-                    <h3 class="text-xs font-bold text-slate-500 uppercase mb-4">Grafik Prediksi Hujan & Suhu (14 Hari)</h3>
-                    <div class="h-48 w-full">
-                        <canvas id="weatherChart"></canvas>
-                    </div>
-                </div>
-
-            </div>
-        </div>
+<!-- HEADER (Bright) -->
+<header class="sticky top-0 z-30 bg-gradient-to-r from-sky-500 to-cyan-400 text-white shadow-lg">
+  <div class="px-4 py-3 flex items-center justify-between gap-2">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-white/25 backdrop-blur flex items-center justify-center text-xl shrink-0">
+        <i class="fa-solid fa-cloud-sun"></i>
+      </div>
+      <div>
+        <h1 class="font-extrabold text-base leading-tight">SiTani Pintar</h1>
+        <p class="text-[10px] text-sky-50/90">Prakiraan Cuaca & Pendamping Tani Desa</p>
+      </div>
     </div>
 
-    <!-- MODAL: TAMBAH DESA -->
-    <div id="modal-add-village" class="fixed inset-0 bg-slate-900/60 z-[100] hidden flex items-center justify-center backdrop-blur-sm px-4">
-        <div class="bg-white w-full max-w-md rounded-xl shadow-2xl overflow-hidden transform transition-all">
-            <div class="p-4 border-b bg-slate-50 flex justify-between items-center">
-                <h3 class="font-bold text-slate-800">Registrasi Wilayah Baru</h3>
-                <button onclick="closeModal('modal-add-village')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
-            </div>
-            <div class="p-5">
-                <form id="form-village" onsubmit="saveVillage(event)" class="space-y-4 text-sm">
-                    <div>
-                        <label class="block font-semibold text-slate-700 mb-1">Nama Desa / Wilayah</label>
-                        <input type="text" id="v-name" required class="w-full border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-sky-500 outline-none">
-                    </div>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block font-semibold text-slate-700 mb-1">Latitude</label>
-                            <input type="number" step="any" id="v-lat" required class="w-full border rounded-lg p-2 outline-none">
-                        </div>
-                        <div>
-                            <label class="block font-semibold text-slate-700 mb-1">Longitude</label>
-                            <input type="number" step="any" id="v-lon" required class="w-full border rounded-lg p-2 outline-none">
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block font-semibold text-slate-700 mb-1">Komoditas</label>
-                            <select id="v-komoditas" class="w-full border rounded-lg p-2 outline-none">
-                                <option value="Padi Sawah">Padi Sawah</option>
-                                <option value="Jagung">Jagung</option>
-                                <option value="Hortikultura">Hortikultura (Cabai/Bawang)</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block font-semibold text-slate-700 mb-1">Infrastruktur Air</label>
-                            <select id="v-air" class="w-full border rounded-lg p-2 outline-none">
-                                <option value="10">Tadah Hujan (Lemah)</option>
-                                <option value="50">Embung Desa (Sedang)</option>
-                                <option value="90">Irigasi Teknis (Kuat)</option>
-                            </select>
-                        </div>
-                    </div>
-                    <button type="submit" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 rounded-lg transition mt-2">Simpan Desa</button>
-                </form>
-            </div>
+    <!-- ENSO Widget -->
+    <div class="flex items-center gap-2 bg-white/20 backdrop-blur px-3 py-1.5 rounded-xl">
+      <div class="text-right leading-tight">
+        <span class="block text-[8px] uppercase tracking-wider text-sky-50/80">Iklim Global (ENSO)</span>
+        <span class="text-xs font-bold">ONI: <span id="enso-val">...</span> <span id="enso-trend"></span></span>
+      </div>
+      <span id="enso-badge" class="pill bg-white/30 text-white">...</span>
+    </div>
+  </div>
+</header>
+
+<!-- SEARCH BAR -->
+<div class="px-4 pt-4 max-w-6xl mx-auto">
+  <div class="card p-2 flex items-center gap-2 relative">
+    <i class="fa-solid fa-magnifying-glass text-sky-400 pl-2"></i>
+    <input id="search-input" type="text" placeholder="Cari nama desa / kota Anda..."
+      class="flex-1 outline-none text-sm py-2 bg-transparent" onkeyup="handleSearchKey(event)">
+    <button onclick="searchPlace()" class="bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold px-4 py-2 rounded-lg">Cari</button>
+    <div id="search-results" class="hidden absolute top-full left-0 right-0 mt-1 bg-white rounded-xl shadow-xl border border-sky-100 z-40 overflow-hidden max-h-72 overflow-y-auto"></div>
+  </div>
+  <p class="text-[11px] text-slate-500 mt-1.5 pl-1"><i class="fa-solid fa-circle-info text-sky-400"></i> Ketik nama desa lalu pilih, atau klik titik di peta untuk melihat prakiraan.</p>
+</div>
+
+<!-- MAIN -->
+<main class="px-4 py-4 max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-5 gap-4">
+
+  <!-- MAP -->
+  <section class="lg:col-span-2 order-2 lg:order-1">
+    <div class="card overflow-hidden">
+      <div class="px-4 py-3 flex justify-between items-center border-b border-slate-100">
+        <h2 class="font-bold text-sm text-slate-700"><i class="fa-solid fa-map-location-dot text-sky-500 mr-1"></i> Peta Desa</h2>
+        <button onclick="openModal('modal-add-village')" class="text-xs bg-sky-100 text-sky-700 px-2.5 py-1 rounded-lg font-semibold hover:bg-sky-200"><i class="fa-solid fa-plus"></i> Tambah</button>
+      </div>
+      <div class="h-[300px] lg:h-[460px] p-2"><div id="map"></div></div>
+    </div>
+
+    <!-- Daftar Desa Tersimpan -->
+    <div id="village-list" class="card mt-3 p-3 hidden">
+      <h3 class="text-xs font-bold text-slate-500 uppercase mb-2">Desa Tersimpan</h3>
+      <div id="village-list-items" class="space-y-1.5"></div>
+    </div>
+  </section>
+
+  <!-- DASHBOARD -->
+  <section class="lg:col-span-3 order-1 lg:order-2">
+
+    <!-- Welcome -->
+    <div id="welcome-state" class="card p-8 text-center">
+      <div class="text-6xl mb-3">⛅</div>
+      <h2 class="text-lg font-extrabold text-slate-700 mb-1">Selamat Datang, Sahabat Tani!</h2>
+      <p class="text-sm text-slate-500 max-w-sm mx-auto">Cari nama desa Anda di atas atau klik tombol <b>"Demo Lokasi NTT"</b> untuk melihat prakiraan cuaca, prediksi musim, dan saran bercocok tanam.</p>
+      <button onclick="loadSampleData()" class="mt-4 bg-amber-400 hover:bg-amber-500 text-amber-900 font-bold text-sm px-5 py-2.5 rounded-xl shadow"><i class="fa-solid fa-bolt"></i> Demo Lokasi NTT</button>
+    </div>
+
+    <!-- Content -->
+    <div id="dashboard-content" class="hidden space-y-4 fade-in">
+
+      <!-- Header desa -->
+      <div class="card p-4 bg-gradient-to-br from-sky-50 to-white">
+        <div class="flex justify-between items-start gap-2">
+          <div>
+            <span class="pill bg-sky-100 text-sky-700">PROFIL DESA</span>
+            <h2 id="d-name" class="font-extrabold text-xl text-slate-800 mt-1">-</h2>
+            <p class="text-xs text-slate-500 mt-0.5">Komoditas: <b id="d-komoditas" class="text-slate-700">-</b> · <span id="d-time">-</span></p>
+          </div>
+          <button onclick="openModal('modal-social')" class="bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 px-3 py-2 rounded-xl text-xs font-semibold shrink-0">
+            <i class="fa-solid fa-users text-sky-500"></i><br><span class="text-[10px]">Data Sosial</span>
+          </button>
         </div>
-    </div>
+      </div>
 
-    <!-- MODAL: DATA SOSIAL (VULNERABILITY) -->
-    <div id="modal-social" class="fixed inset-0 bg-slate-900/60 z-[100] hidden flex items-center justify-center backdrop-blur-sm px-4">
-        <div class="bg-white w-full max-w-md rounded-xl shadow-2xl overflow-hidden">
-            <div class="p-4 border-b bg-amber-50 flex justify-between items-center">
-                <h3 class="font-bold text-amber-900"><i class="fa-solid fa-clipboard-user mr-1"></i> Asesmen Kerentanan Desa</h3>
-                <button onclick="closeModal('modal-social')" class="text-amber-700 hover:text-amber-900"><i class="fa-solid fa-xmark text-lg"></i></button>
-            </div>
-            <div class="p-5 text-sm">
-                <p class="text-[11px] text-slate-500 mb-4 leading-tight">Data ini digunakan untuk menghitung Indeks Kerentanan Sosial (Social Vulnerability Index) yang menjadi pengali Dampak Bencana dalam konsep IBF.</p>
-                <form id="form-social" onsubmit="saveSocialData(event)" class="space-y-4">
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block font-semibold text-slate-700 mb-1">Total Penduduk</label>
-                            <input type="number" id="s-pop" required class="w-full border rounded-lg p-2 outline-none bg-slate-50">
-                        </div>
-                        <div>
-                            <label class="block font-semibold text-slate-700 mb-1">Kelompok Rentan</label>
-                            <input type="number" id="s-rentan" placeholder="Lansia, Balita..." required class="w-full border rounded-lg p-2 outline-none bg-slate-50">
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block font-semibold text-slate-700 mb-1">Ketahanan Stok Pangan Lokal</label>
-                        <select id="s-pangan" class="w-full border rounded-lg p-2 outline-none bg-slate-50">
-                            <option value="1">Kritis (< 1 Bulan)</option>
-                            <option value="3">Waspada (1 - 3 Bulan)</option>
-                            <option value="6">Aman (> 3 Bulan)</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block font-semibold text-slate-700 mb-1">Persentase Pekerja Sektor Pertanian</label>
-                        <input type="range" id="s-petani" min="10" max="100" step="10" value="80" class="w-full mt-2" oninput="document.getElementById('lbl-petani').innerText = this.value + '%'">
-                        <div class="text-right text-[10px] font-bold text-sky-600 mt-1" id="lbl-petani">80%</div>
-                    </div>
+      <!-- CUACA HARI INI (Big card) -->
+      <div id="today-card" class="card p-5 bg-gradient-to-br from-sky-400 to-cyan-300 text-white relative overflow-hidden">
+        <!-- Injected -->
+      </div>
 
-                    <!-- KODE BARU UNTUK INPUT NDVI MANUAL -->
-                    <div class="mt-4 p-3 bg-sky-50 border border-sky-100 rounded-lg">
-                        <label class="block font-semibold text-slate-700 mb-1">
-                            <i class="fa-solid fa-leaf text-green-600"></i> Observasi Vegetasi / Daun
-                        </label>
-                        <p class="text-[10px] text-slate-500 mb-2">Pilih berdasarkan pantauan visual PPL di lapangan.</p>
-                        <select id="s-ndvi" class="w-full border rounded-lg p-2 outline-none bg-white text-sm">
-                            <option value="0.7">Hijau & Sehat (> 0.6)</option>
-                            <option value="0.4">Mulai Menguning / Stres Air (0.3 - 0.5)</option>
-                            <option value="0.1">Kering / Layu (< 0.2)</option>
-                        </select>
-                    </div>
+      <!-- PRAKIRAAN 7 HARI -->
+      <div class="card p-4">
+        <h3 class="text-sm font-bold text-slate-700 mb-3"><i class="fa-solid fa-calendar-days text-sky-500"></i> Prakiraan 7 Hari</h3>
+        <div id="forecast-week" class="flex gap-2 overflow-x-auto pb-1"></div>
+      </div>
 
-                    <button type="submit" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 rounded-lg transition mt-4">Kalkulasi Kerentanan</button>
-                </form>
-            </div>
+      <!-- PREDIKSI MUSIMAN (Pure JS + ENSO) -->
+      <div id="seasonal-card" class="card p-4 border-l-4 border-amber-400">
+        <!-- Injected -->
+      </div>
+
+      <!-- ANALISIS RISIKO (IBF) -->
+      <div class="card p-4">
+        <h3 class="text-sm font-bold text-slate-700 mb-3"><i class="fa-solid fa-shield-halved text-sky-500"></i> Tingkat Risiko Desa</h3>
+        <div class="grid grid-cols-3 gap-2 mb-3">
+          <div class="bg-slate-50 rounded-xl p-3 text-center">
+            <div class="text-[9px] font-bold text-slate-400 uppercase mb-1">Ancaman</div>
+            <div id="score-hazard" class="text-lg font-black">-</div>
+            <div class="text-[9px] text-slate-400">Kekeringan</div>
+          </div>
+          <div class="bg-slate-50 rounded-xl p-3 text-center cursor-pointer hover:bg-slate-100" onclick="openModal('modal-social')">
+            <div class="text-[9px] font-bold text-slate-400 uppercase mb-1">Kerentanan</div>
+            <div id="score-vuln" class="text-lg font-black">-</div>
+            <div class="text-[9px] text-slate-400">Sosial</div>
+          </div>
+          <div class="bg-slate-50 rounded-xl p-3 text-center">
+            <div class="text-[9px] font-bold text-slate-400 uppercase mb-1">Kapasitas</div>
+            <div id="score-cap" class="text-lg font-black">-</div>
+            <div class="text-[9px] text-slate-400">Air</div>
+          </div>
         </div>
+        <div id="ibf-alert" class="rounded-xl p-3 text-sm"></div>
+      </div>
+
+      <!-- BANJIR / SUNGAI -->
+      <div id="flood-card" class="card p-4">
+        <!-- Injected -->
+      </div>
+
+      <!-- TELEMETRI -->
+      <div class="card p-4">
+        <h3 class="text-sm font-bold text-slate-700 mb-3"><i class="fa-solid fa-gauge-high text-sky-500"></i> Data Lapangan</h3>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+          <div class="bg-orange-50 rounded-xl p-3">
+            <div class="text-[9px] font-bold text-orange-400 uppercase">Indeks Hujan (SPI)</div>
+            <div id="sat-spi" class="text-xl font-black text-orange-600">-</div>
+            <div id="sat-spi-lbl" class="pill bg-orange-100 text-orange-700 inline-block mt-1">-</div>
+          </div>
+          <div class="bg-sky-50 rounded-xl p-3">
+            <div class="text-[9px] font-bold text-sky-400 uppercase">Kelembapan Tanah</div>
+            <div id="sat-sm" class="text-xl font-black text-sky-600">-</div>
+            <div id="sat-sm-lbl" class="pill bg-sky-100 text-sky-700 inline-block mt-1">-</div>
+          </div>
+          <div class="bg-emerald-50 rounded-xl p-3">
+            <div class="text-[9px] font-bold text-emerald-400 uppercase">Kondisi Tanaman</div>
+            <div id="sat-ndvi" class="text-xl font-black text-emerald-600">-</div>
+            <div id="sat-ndvi-lbl" class="pill bg-emerald-100 text-emerald-700 inline-block mt-1">-</div>
+          </div>
+          <div class="bg-purple-50 rounded-xl p-3">
+            <div class="text-[9px] font-bold text-purple-400 uppercase">Kualitas Udara</div>
+            <div id="sat-aqi" class="text-xl font-black text-purple-600">-</div>
+            <div id="sat-aqi-lbl" class="pill bg-purple-100 text-purple-700 inline-block mt-1">-</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- REKOMENDASI TANI -->
+      <div id="reco-card" class="card p-4 border-l-4 border-emerald-400">
+        <!-- Injected -->
+      </div>
+
+      <!-- GRAFIK -->
+      <div class="card p-4">
+        <h3 class="text-sm font-bold text-slate-700 mb-3"><i class="fa-solid fa-chart-column text-sky-500"></i> Grafik Hujan & Suhu (14 Hari)</h3>
+        <div class="h-52"><canvas id="weatherChart"></canvas></div>
+      </div>
+
     </div>
+  </section>
+</main>
 
-    <!-- Global API Loader -->
-    <div id="loader" class="fixed inset-0 bg-white/80 z-[200] hidden items-center justify-center flex-col backdrop-blur-sm">
-        <div class="loader-spinner mb-3"></div>
-        <p class="font-bold text-sky-700 text-sm animate-pulse" id="loader-text">Menghubungi Open-Meteo & NOAA...</p>
+<footer class="text-center text-[11px] text-slate-400 py-4">
+  Sumber data: Open-Meteo · NOAA ENSO · OpenStreetMap · Prediksi musiman dihitung mandiri (JavaScript)
+</footer>
+
+<!-- MODAL TAMBAH DESA -->
+<div id="modal-add-village" class="fixed inset-0 bg-slate-900/50 z-[100] hidden items-center justify-center backdrop-blur-sm px-4">
+  <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden">
+    <div class="p-4 bg-sky-50 flex justify-between items-center">
+      <h3 class="font-bold text-slate-800">Tambah Desa</h3>
+      <button onclick="closeModal('modal-add-village')" class="text-slate-400"><i class="fa-solid fa-xmark text-lg"></i></button>
     </div>
+    <form onsubmit="saveVillage(event)" class="p-5 space-y-3 text-sm">
+      <div>
+        <label class="block font-semibold mb-1">Nama Desa</label>
+        <input type="text" id="v-name" required class="w-full border rounded-lg p-2 outline-none focus:ring-2 focus:ring-sky-300">
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="block font-semibold mb-1">Latitude</label><input type="number" step="any" id="v-lat" required class="w-full border rounded-lg p-2 outline-none"></div>
+        <div><label class="block font-semibold mb-1">Longitude</label><input type="number" step="any" id="v-lon" required class="w-full border rounded-lg p-2 outline-none"></div>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="block font-semibold mb-1">Komoditas</label>
+          <select id="v-komoditas" class="w-full border rounded-lg p-2 outline-none">
+            <option>Padi Sawah</option><option>Jagung</option><option>Hortikultura</option>
+          </select>
+        </div>
+        <div><label class="block font-semibold mb-1">Sumber Air</label>
+          <select id="v-air" class="w-full border rounded-lg p-2 outline-none">
+            <option value="10">Tadah Hujan</option><option value="50">Embung Desa</option><option value="90">Irigasi Teknis</option>
+          </select>
+        </div>
+      </div>
+      <button type="submit" class="w-full bg-sky-500 hover:bg-sky-600 text-white font-bold py-2.5 rounded-lg">Simpan</button>
+    </form>
+  </div>
+</div>
 
-    <script>
-        /* =========================================
-           1. DATABASE & STATE MANAGEMENT
-           ========================================= */
-        let db = { villages: [] };
-        let map = null;
-        let markers = {};
-        let currentVillageId = null;
-        let weatherChart = null;
+<!-- MODAL SOSIAL -->
+<div id="modal-social" class="fixed inset-0 bg-slate-900/50 z-[100] hidden items-center justify-center backdrop-blur-sm px-4">
+  <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden">
+    <div class="p-4 bg-amber-50 flex justify-between items-center">
+      <h3 class="font-bold text-amber-900"><i class="fa-solid fa-clipboard-user mr-1"></i> Data Desa</h3>
+      <button onclick="closeModal('modal-social')" class="text-amber-700"><i class="fa-solid fa-xmark text-lg"></i></button>
+    </div>
+    <form onsubmit="saveSocialData(event)" class="p-5 space-y-3 text-sm">
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="block font-semibold mb-1">Jumlah Penduduk</label><input type="number" id="s-pop" required class="w-full border rounded-lg p-2 bg-slate-50 outline-none"></div>
+        <div><label class="block font-semibold mb-1">Kelompok Rentan</label><input type="number" id="s-rentan" placeholder="Lansia/Balita" required class="w-full border rounded-lg p-2 bg-slate-50 outline-none"></div>
+      </div>
+      <div><label class="block font-semibold mb-1">Stok Pangan</label>
+        <select id="s-pangan" class="w-full border rounded-lg p-2 bg-slate-50 outline-none">
+          <option value="1">Kritis (< 1 Bulan)</option><option value="3">Waspada (1-3 Bulan)</option><option value="6">Aman (> 3 Bulan)</option>
+        </select>
+      </div>
+      <div><label class="block font-semibold mb-1">% Pekerja Tani</label>
+        <input type="range" id="s-petani" min="10" max="100" step="10" value="80" class="w-full" oninput="document.getElementById('lbl-petani').innerText=this.value+'%'">
+        <div class="text-right text-[11px] font-bold text-sky-600" id="lbl-petani">80%</div>
+      </div>
+      <div class="p-3 bg-emerald-50 rounded-lg">
+        <label class="block font-semibold mb-1"><i class="fa-solid fa-leaf text-emerald-600"></i> Pantauan Daun (Visual)</label>
+        <select id="s-ndvi" class="w-full border rounded-lg p-2 bg-white outline-none">
+          <option value="0.7">Hijau & Sehat</option><option value="0.4">Mulai Menguning</option><option value="0.1">Kering / Layu</option>
+        </select>
+      </div>
+      <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-2.5 rounded-lg">Simpan & Hitung</button>
+    </form>
+  </div>
+</div>
 
+<!-- LOADER -->
+<div id="loader" class="fixed inset-0 bg-white/80 z-[200] hidden items-center justify-center flex-col backdrop-blur-sm">
+  <div class="loader-spinner mb-3"></div>
+  <p class="font-bold text-sky-600 text-sm animate-pulse" id="loader-text">Mengambil data cuaca...</p>
+</div>
 
-        /* =========================================
-           2. MAP & UI HELPERS
-           ========================================= */
-        function initMap() {
-            map = L.map('map', {zoomControl: false}).setView([-9.6, 124.0], 8);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OSM' }).addTo(map);
-            L.control.zoom({ position: 'bottomright' }).addTo(map);
-        }
+<script>
+/* ========== STATE ========== */
+let db = { villages: [] };
+let map=null, markers={}, currentVillageId=null, weatherChart=null;
+let ensoOni = 0, ensoStatus = "Netral";
 
-        function renderMapMarkers() {
-            for (let id in markers) map.removeLayer(markers[id]);
-            markers = {};
-            if(db.villages.length === 0) return;
-            
-            let bounds = L.latLngBounds();
-            db.villages.forEach(v => {
-                // Warna marker berdasarkan status kalkulasi risiko (default biru)
-                let color = v.riskLevel === 'Tinggi' ? 'red' : (v.riskLevel === 'Sedang' ? 'orange' : 'blue');
-                
-                const markerHtml = `<div class="w-4 h-4 bg-${color}-500 rounded-full border-2 border-white shadow-md"></div>`;
-                const icon = L.divIcon({ html: markerHtml, className: '' });
-                
-                const marker = L.marker([v.lat, v.lon], {icon: icon}).addTo(map);
-                marker.bindTooltip(`<b>${v.name}</b>`, {direction: 'top'});
-                marker.on('click', () => {
-                    currentVillageId = v.id;
-                    if(v.hasData) {
-                        renderDashboard(v);
-                    } else {
-                        processVillageData(v.id, false);
-                    }
-                });
-                markers[v.id] = marker;
-                bounds.extend([v.lat, v.lon]);
-            });
-            map.fitBounds(bounds, {padding: [20, 20], maxZoom: 12});
-        }
+/* ========== MAP ========== */
+function initMap(){
+  map = L.map('map',{zoomControl:false}).setView([-9.6,124.0],7);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OSM'}).addTo(map);
+  L.control.zoom({position:'bottomright'}).addTo(map);
+}
+function renderMapMarkers(){
+  for(let id in markers) map.removeLayer(markers[id]); markers={};
+  if(!db.villages.length) return;
+  let bounds=L.latLngBounds();
+  db.villages.forEach(v=>{
+    let color = v.riskLevel==='Tinggi'?'#ef4444':(v.riskLevel==='Sedang'?'#f97316':'#0ea5e9');
+    const icon=L.divIcon({html:`<div style="width:16px;height:16px;background:${color};border-radius:50%;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.3)"></div>`,className:''});
+    const m=L.marker([v.lat,v.lon],{icon}).addTo(map);
+    m.bindTooltip(`<b>${v.name}</b>`,{direction:'top'});
+    m.on('click',()=>{ currentVillageId=v.id; v.hasData?renderDashboard(v):processVillageData(v.id); });
+    markers[v.id]=m; bounds.extend([v.lat,v.lon]);
+  });
+  map.fitBounds(bounds,{padding:[30,30],maxZoom:11});
+  renderVillageList();
+}
+function renderVillageList(){
+  const box=document.getElementById('village-list'), items=document.getElementById('village-list-items');
+  if(!db.villages.length){box.classList.add('hidden');return;}
+  box.classList.remove('hidden');
+  items.innerHTML = db.villages.map(v=>`
+    <button onclick="selectVillage('${v.id}')" class="w-full text-left flex items-center justify-between px-3 py-2 rounded-lg hover:bg-sky-50 text-sm">
+      <span><i class="fa-solid fa-location-dot text-sky-400"></i> ${v.name}</span>
+      ${v.riskLevel?`<span class="pill ${v.riskLevel==='Tinggi'?'bg-rose-100 text-rose-600':v.riskLevel==='Sedang'?'bg-orange-100 text-orange-600':'bg-emerald-100 text-emerald-600'}">${v.riskLevel}</span>`:''}
+    </button>`).join('');
+}
+function selectVillage(id){ const v=db.villages.find(x=>x.id===id); currentVillageId=id; v.hasData?renderDashboard(v):processVillageData(id); map.setView([v.lat,v.lon],11); }
 
-        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
-        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
-        function showLoader(text) { document.getElementById('loader-text').innerText = text; document.getElementById('loader').style.display = 'flex'; }
-        function hideLoader() { document.getElementById('loader').style.display = 'none'; }
+function openModal(id){document.getElementById(id).style.display='flex';}
+function closeModal(id){document.getElementById(id).style.display='none';}
+function showLoader(t){document.getElementById('loader-text').innerText=t;document.getElementById('loader').style.display='flex';}
+function hideLoader(){document.getElementById('loader').style.display='none';}
 
-        /* =========================================
-           3. DATA INPUT & MOCK DATA
-           ========================================= */
-            function loadSampleData() {
-                db.villages = [
-                    { id: "v1", name: "Desa Bena, TTS", lat: -9.866, lon: 124.233, komoditas: "Padi Sawah", lahan: 250, capAir: 10, socPop: 1200, socRentan: 350, socPangan: 1, socPetani: 85, manualNDVI: 0.7, hasData: false },
-                    { id: "v2", name: "Desa Noelbaki, Kupang", lat: -10.083, lon: 123.666, komoditas: "Hortikultura", lahan: 50, capAir: 90, socPop: 3000, socRentan: 400, socPangan: 6, socPetani: 40, manualNDVI: 0.4, hasData: false }
-                ];
-                renderMapMarkers();
-                alert("Data Simulasi Kabupaten Kupang & TTS dimuat. Silakan klik marker merah/biru di peta.");
-            }
+/* ========== GEOCODING SEARCH (Open-Meteo, gratis) ========== */
+let searchTimer=null;
+function handleSearchKey(e){ if(e.key==='Enter') searchPlace(); }
+async function searchPlace(){
+  const q=document.getElementById('search-input').value.trim();
+  if(q.length<3) return;
+  const box=document.getElementById('search-results');
+  box.innerHTML='<div class="p-3 text-sm text-slate-400">Mencari...</div>'; box.classList.remove('hidden');
+  try{
+    const r=await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=6&language=id&format=json`);
+    const d=await r.json();
+    if(!d.results){ box.innerHTML='<div class="p-3 text-sm text-slate-400">Lokasi tidak ditemukan.</div>'; return; }
+    box.innerHTML=d.results.map(p=>`
+      <button onclick="addFromSearch('${p.name.replace(/'/g,'')}',${p.latitude},${p.longitude})" class="w-full text-left px-3 py-2.5 hover:bg-sky-50 border-b border-slate-50 text-sm">
+        <b>${p.name}</b><span class="text-slate-400 text-xs"> · ${p.admin1||''} ${p.country?', '+p.country:''}</span>
+      </button>`).join('');
+  }catch(e){ box.innerHTML='<div class="p-3 text-sm text-rose-400">Gagal mencari. Cek internet.</div>'; }
+}
+function addFromSearch(name,lat,lon){
+  document.getElementById('search-results').classList.add('hidden');
+  document.getElementById('search-input').value='';
+  let exist=db.villages.find(v=>Math.abs(v.lat-lat)<0.001&&Math.abs(v.lon-lon)<0.001);
+  if(exist){ selectVillage(exist.id); return; }
+  const v={ id:"V_"+Date.now(), name, lat, lon, komoditas:"Padi Sawah", capAir:50,
+            socPop:1000, socRentan:200, socPangan:3, socPetani:70, manualNDVI:0.7, hasData:false };
+  db.villages.push(v); currentVillageId=v.id;
+  renderMapMarkers(); processVillageData(v.id);
+}
 
-        function saveVillage(e) {
-            e.preventDefault();
-            const v = {
-                id: "V_" + Date.now(),
-                name: document.getElementById('v-name').value,
-                lat: parseFloat(document.getElementById('v-lat').value),
-                lon: parseFloat(document.getElementById('v-lon').value),
-                komoditas: document.getElementById('v-komoditas').value,
-                lahan: 100, // Default
-                capAir: parseInt(document.getElementById('v-air').value),
-                // Default Social Data
-                socPop: 1000, socRentan: 200, socPangan: 3, socPetani: 70,
-                hasData: false
-            };
-            db.villages.push(v);
-            closeModal('modal-add-village');
-            renderMapMarkers();
-            currentVillageId = v.id;
-            processVillageData(v.id, false);
-        }
+/* ========== INPUT ========== */
+function loadSampleData(){
+  db.villages=[
+    {id:"v1",name:"Desa Bena, TTS",lat:-9.866,lon:124.233,komoditas:"Padi Sawah",capAir:10,socPop:1200,socRentan:350,socPangan:1,socPetani:85,manualNDVI:0.4,hasData:false},
+    {id:"v2",name:"Desa Noelbaki, Kupang",lat:-10.083,lon:123.666,komoditas:"Hortikultura",capAir:90,socPop:3000,socRentan:400,socPangan:6,socPetani:40,manualNDVI:0.7,hasData:false}
+  ];
+  renderMapMarkers(); selectVillage("v1");
+}
+function saveVillage(e){
+  e.preventDefault();
+  const v={ id:"V_"+Date.now(), name:v_name.value, lat:parseFloat(v_lat.value), lon:parseFloat(v_lon.value),
+            komoditas:v_komoditas.value, capAir:parseInt(v_air.value),
+            socPop:1000,socRentan:200,socPangan:3,socPetani:70,manualNDVI:0.7,hasData:false };
+  db.villages.push(v); closeModal('modal-add-village'); currentVillageId=v.id;
+  renderMapMarkers(); processVillageData(v.id);
+  e.target.reset();
+}
+function saveSocialData(e){
+  e.preventDefault();
+  const v=db.villages.find(x=>x.id===currentVillageId); if(!v) return;
+  v.socPop=parseInt(s_pop.value); v.socRentan=parseInt(s_rentan.value);
+  v.socPangan=parseInt(s_pangan.value); v.socPetani=parseInt(s_petani.value);
+  v.manualNDVI=parseFloat(s_ndvi.value);
+  closeModal('modal-social'); processVillageData(currentVillageId);
+}
+function populateSocialForm(v){
+  s_pop.value=v.socPop; s_rentan.value=v.socRentan; s_pangan.value=v.socPangan;
+  s_petani.value=v.socPetani; lbl_petani.innerText=v.socPetani+'%';
+  if(v.manualNDVI!==undefined) s_ndvi.value=v.manualNDVI;
+}
+// shortcut refs
+const v_name=()=>0; // placeholder (avoid lint)
+['v-name','v-lat','v-lon','v-komoditas','v-air','s-pop','s-rentan','s-pangan','s-petani','s-ndvi','lbl-petani'].forEach(id=>{window[id.replace(/-/g,'_')]=document.getElementById(id)||{};});
 
-        function saveSocialData(e) {
-            e.preventDefault();
-            const v = db.villages.find(x => x.id === currentVillageId);
-            if(!v) return;
-            
-            v.socPop = parseInt(document.getElementById('s-pop').value);
-            v.socRentan = parseInt(document.getElementById('s-rentan').value);
-            v.socPangan = parseInt(document.getElementById('s-pangan').value);
-            v.socPetani = parseInt(document.getElementById('s-petani').value);
-            v.manualNDVI = parseFloat(document.getElementById('s-ndvi').value);
-            
-            closeModal('modal-social');
-            processVillageData(currentVillageId, true); // Recalculate everything
-        }
+/* ========== KALKULASI MURNI JAVASCRIPT ========== */
+function linearRegression(y){
+  const n=y.length; let sx=0,sy=0,sxy=0,sxx=0;
+  for(let i=0;i<n;i++){sx+=i;sy+=y[i];sxy+=i*y[i];sxx+=i*i;}
+  const slope=(n*sxy-sx*sy)/(n*sxx-sx*sx)||0;
+  const intercept=(sy-slope*sx)/n;
+  return {slope,intercept};
+}
+function movingAverage(arr,w){
+  return arr.map((_,i)=>{ let s=arr.slice(Math.max(0,i-w+1),i+1); return s.reduce((a,b)=>a+b,0)/s.length; });
+}
+function maxDrySpell(rain){ // hari kering beruntun terpanjang
+  let max=0,cur=0;
+  rain.forEach(r=>{ if((r||0)<1){cur++;max=Math.max(max,cur);}else cur=0; });
+  return max;
+}
+// Outlook musiman terkoreksi ENSO (El Nino = lebih kering di Indonesia)
+function ensoSeasonalOutlook(histMonthlyRain){
+  let factor = 1 - (ensoOni*0.18); // tiap 1.0 ONI ≈ 18% perubahan
+  factor = Math.max(0.45, Math.min(1.6, factor));
+  const est = histMonthlyRain*factor;
+  let kategori, warna, saran;
+  if(est < histMonthlyRain*0.7){ kategori="Cenderung KERING"; warna="rose"; saran="Pilih tanaman tahan kering & hemat air."; }
+  else if(est > histMonthlyRain*1.3){ kategori="Cenderung BASAH"; warna="sky"; saran="Waspada genangan, siapkan drainase."; }
+  else { kategori="NORMAL"; warna="emerald"; saran="Cocok untuk kalender tanam normal."; }
+  return {est:Math.round(est), normal:Math.round(histMonthlyRain), factor, kategori, warna, saran};
+}
 
-        function populateSocialForm(v) {
-            document.getElementById('s-pop').value = v.socPop;
-            document.getElementById('s-rentan').value = v.socRentan;
-            document.getElementById('s-pangan').value = v.socPangan;
-            document.getElementById('s-petani').value = v.socPetani;
-            document.getElementById('lbl-petani').innerText = v.socPetani + '%';
-                if (v.manualNDVI !== undefined) {
-            document.getElementById('s-ndvi').value = v.manualNDVI;
-            }
+/* ========== KODE CUACA WMO ========== */
+function weatherInfo(c){
+  const m={0:["Cerah","☀️"],1:["Cerah Berawan","🌤️"],2:["Berawan","⛅"],3:["Mendung","☁️"],
+    45:["Berkabut","🌫️"],48:["Kabut","🌫️"],51:["Gerimis","🌦️"],53:["Gerimis","🌦️"],55:["Gerimis Lebat","🌧️"],
+    61:["Hujan Ringan","🌦️"],63:["Hujan Sedang","🌧️"],65:["Hujan Lebat","🌧️"],
+    80:["Hujan Lokal","🌦️"],81:["Hujan Sedang","🌧️"],82:["Hujan Deras","⛈️"],
+    95:["Badai Petir","⛈️"],96:["Badai + Es","⛈️"],99:["Badai Hebat","⛈️"]};
+  return m[c]||["-","❓"];
+}
+const HARI=['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
 
-        }
+/* ========== CORE: AMBIL DATA API ========== */
+async function processVillageData(id){
+  const v=db.villages.find(x=>x.id===id); if(!v) return;
+  showLoader("Mengambil data cuaca aktual...");
+  try{
+    const urlForecast=`https://api.open-meteo.com/v1/forecast?latitude=${v.lat}&longitude=${v.lon}`+
+      `&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,precipitation,soil_moisture_0_to_7cm`+
+      `&daily=weather_code,precipitation_sum,temperature_2m_max,temperature_2m_min&past_days=30&forecast_days=14&timezone=Asia%2FJakarta`;
 
-        /* =========================================
-           4. CORE ENGINE: API CALLS & IBF LOGIC
-           ========================================= */
-        
-        async function processVillageData(id, forceUpdate) {
-            const v = db.villages.find(x => x.id === id);
-            if(!v) return;
+    // Arsip tahun lalu (baseline historis 30 hari)
+    let dEnd=new Date(); dEnd.setFullYear(dEnd.getFullYear()-1);
+    let dStart=new Date(dEnd); dStart.setDate(dStart.getDate()-30);
+    const urlArchive=`https://archive-api.open-meteo.com/v1/archive?latitude=${v.lat}&longitude=${v.lon}`+
+      `&start_date=${dStart.toISOString().split('T')[0]}&end_date=${dEnd.toISOString().split('T')[0]}&daily=precipitation_sum&timezone=Asia%2FJakarta`;
 
-            showLoader("Mengunduh data satelit cuaca & historis...");
-            try {
-                // 1. Current & Forecast (Open-Meteo)
-                const urlCurrent = `https://api.open-meteo.com/v1/forecast?latitude=${v.lat}&longitude=${v.lon}&current=soil_moisture_0_to_7cm&daily=precipitation_sum,temperature_2m_max&past_days=30&forecast_days=14&timezone=Asia%2FJakarta`;
-                
-                // 2. Archive API (Menarik data persis 1 tahun yang lalu di bulan yang sama selama 30 hari untuk mencari Rata-rata Historis)
-                // Menghitung tanggal mundur 1 tahun
-                let dEnd = new Date(); dEnd.setFullYear(dEnd.getFullYear() - 1);
-                let dStart = new Date(dEnd); dStart.setDate(dStart.getDate() - 30);
-                let strEnd = dEnd.toISOString().split('T')[0];
-                let strStart = dStart.toISOString().split('T')[0];
-                
-                const urlArchive = `https://archive-api.open-meteo.com/v1/archive?latitude=${v.lat}&longitude=${v.lon}&start_date=${strStart}&end_date=${strEnd}&daily=precipitation_sum&timezone=Asia%2FJakarta`;
+    const urlFlood=`https://flood-api.open-meteo.com/v1/flood?latitude=${v.lat}&longitude=${v.lon}&daily=river_discharge&forecast_days=30`;
+    const urlAir=`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${v.lat}&longitude=${v.lon}&current=pm10,pm2_5,us_aqi&timezone=Asia%2FJakarta`;
 
-                // Lakukan 2 request API secara bersamaan
-                const [resCurrent, resArchive] = await Promise.all([
-                    fetch(urlCurrent),
-                    fetch(urlArchive)
-                ]);
+    const [rF,rA,rFl,rAir]=await Promise.all([fetch(urlForecast),fetch(urlArchive),fetch(urlFlood),fetch(urlAir)]);
+    const dF=await rF.json(), dA=await rA.json(); 
+    let dFl={}, dAir={};
+    try{ dFl=await rFl.json(); }catch(e){}
+    try{ dAir=await rAir.json(); }catch(e){}
 
-                const dataCurrent = await resCurrent.json();
-                const dataArchive = await resArchive.json();
+    const histRain=(dA.daily?.precipitation_sum||[]).reduce((a,b)=>a+(b||0),0);
+    calculateIndices(v,dF,histRain,dFl,dAir);
+    v.hasData=true;
+    hideLoader(); renderMapMarkers(); renderDashboard(v);
+  }catch(err){ console.error(err); hideLoader(); alert("Gagal mengambil data. Periksa koneksi internet Anda."); }
+}
 
-                // Cari rata-rata hujan 30 hari di tahun lalu (sebagai baseline historis)
-                const pastYearRain = dataArchive.daily.precipitation_sum.reduce((a,b)=>a+(b||0), 0);
-                
-                // Kalkulasi Indikator
-                calculateIndices(v, dataCurrent, pastYearRain);
-                v.hasData = true;
-                
-                hideLoader();
-                renderMapMarkers(); 
-                renderDashboard(v);
+function calculateIndices(v,api,histRain,flood,air){
+  const daily=api.daily;
+  // SPI sederhana (anomali vs tahun lalu)
+  const past30=daily.precipitation_sum.slice(0,30).reduce((a,b)=>a+(b||0),0);
+  let z=(past30-histRain)/((histRain*0.3)||20);
+  z=Math.max(-3,Math.min(3,z)); v.satSPI=z.toFixed(2);
 
-            } catch (err) {
-                console.error(err);
-                hideLoader();
-                alert("Gagal mengambil data Open-Meteo. Periksa internet.");
-            }
-        }
+  v.satSM=api.current.soil_moisture_0_to_7cm||0;
+  let haz=0;
+  if(v.satSPI<-1) haz+=50; else if(v.satSPI<0) haz+=20;
+  if(v.satSM<0.15) haz+=50; else if(v.satSM<0.25) haz+=20;
+  v.hazardLevel=haz>60?'Tinggi':(haz>30?'Sedang':'Rendah');
 
-        function calculateIndices(v, apiData, histMeanRain) {
-            // 1. SPI (Dibandingkan dengan hujan 1 tahun lalu di bulan yang sama)
-            const past30Rain = apiData.daily.precipitation_sum.slice(0, 30).reduce((a,b)=>a+(b||0), 0);
-            
-            // Z-Score: (Hujan bulan ini - Hujan bulan yang sama tahun lalu) / deviasi statis ringan
-            // Jika tahun ini jauh lebih kecil dari tahun lalu, nilainya minus (kering)
-            let zScore = (past30Rain - histMeanRain) / (histMeanRain * 0.3 || 20); 
-            if(zScore > 3) zScore = 3; if(zScore < -3) zScore = -3;
-            v.satSPI = zScore.toFixed(2);
+  // Vulnerability
+  let rasio=(v.socRentan/v.socPop)*100;
+  let sR=rasio>30?100:(rasio>15?50:10);
+  let sPangan=v.socPangan===1?100:(v.socPangan===3?50:10);
+  let vuln=(sR*0.4)+(v.socPetani*0.3)+(sPangan*0.3);
+  v.vulnLevel=vuln>70?'Tinggi':(vuln>40?'Sedang':'Rendah');
+  v.capLevel=v.capAir>70?'Tinggi':(v.capAir>30?'Sedang':'Rendah');
 
-            // 2. Soil Moisture
-            v.satSM = apiData.current.soil_moisture_0_to_7cm || 0;
-            let hazardScore = 0;
-            if(v.satSPI < -1.0) hazardScore += 50; else if(v.satSPI < 0) hazardScore += 20;
-            if(v.satSM < 0.15) hazardScore += 50; else if(v.satSM < 0.25) hazardScore += 20;
+  let h={Tinggi:3,Sedang:2,Rendah:1}[v.hazardLevel], vv={Tinggi:3,Sedang:2,Rendah:1}[v.vulnLevel], c={Tinggi:3,Sedang:2,Rendah:1}[v.capLevel];
+  let total=(h*vv)/c;
+  v.riskLevel=total>=3?'Tinggi':(total>=1.5?'Sedang':'Rendah');
 
-            v.hazardLevel = hazardScore > 60 ? 'Tinggi' : (hazardScore > 30 ? 'Sedang' : 'Rendah');
+  // Data cuaca hari ini
+  v.curTemp=api.current.temperature_2m; v.curHum=api.current.relative_humidity_2m;
+  v.curWind=api.current.wind_speed_10m; v.curCode=api.current.weather_code; v.curRain=api.current.precipitation;
 
-            // B. VULNERABILITY
-            let rasioRentan = (v.socRentan / v.socPop) * 100;
-            let scoreRentan = rasioRentan > 30 ? 100 : (rasioRentan > 15 ? 50 : 10);
-            let scorePetani = v.socPetani; 
-            let scorePangan = v.socPangan === 1 ? 100 : (v.socPangan === 3 ? 50 : 10);
-            let vulnScore = (scoreRentan * 0.4) + (scorePetani * 0.3) + (scorePangan * 0.3);
-            v.vulnLevel = vulnScore > 70 ? 'Tinggi' : (vulnScore > 40 ? 'Sedang' : 'Rendah');
+  // Forecast 14 hari (API)
+  v.chartDates=daily.time.slice(30,44);
+  v.chartRain=daily.precipitation_sum.slice(30,44);
+  v.chartTmax=daily.temperature_2m_max.slice(30,44);
+  v.chartTmin=daily.temperature_2m_min.slice(30,44);
+  v.chartCode=daily.weather_code.slice(30,44);
+  v.next7Rain=v.chartRain.slice(0,7).reduce((a,b)=>a+(b||0),0).toFixed(1);
 
-            // C. CAPACITY
-            v.capLevel = v.capAir > 70 ? 'Tinggi' : (v.capAir > 30 ? 'Sedang' : 'Rendah');
+  // KALKULASI JS: tren & dry spell
+  v.trend=linearRegression(v.chartRain.map(x=>x||0)).slope;
+  v.drySpell=maxDrySpell(v.chartRain);
 
-            // D. TOTAL RISK (IBF)
-            let valH = v.hazardLevel === 'Tinggi' ? 3 : (v.hazardLevel === 'Sedang' ? 2 : 1);
-            let valV = v.vulnLevel === 'Tinggi' ? 3 : (v.vulnLevel === 'Sedang' ? 2 : 1);
-            let valC = v.capLevel === 'Tinggi' ? 3 : (v.capLevel === 'Sedang' ? 2 : 1);
+  // KALKULASI JS: outlook musiman (klimatologi tahun lalu × ENSO)
+  v.outlook=ensoSeasonalOutlook(histRain);
 
-            let totalRisk = (valH * valV) / valC; 
-            if(totalRisk >= 3.0) v.riskLevel = 'Tinggi';
-            else if(totalRisk >= 1.5) v.riskLevel = 'Sedang';
-            else v.riskLevel = 'Rendah';
+  // Banjir (debit sungai)
+  v.flood=null;
+  if(flood.daily?.river_discharge){
+    const fd=flood.daily.river_discharge.filter(x=>x!=null);
+    if(fd.length){
+      const maxF=Math.max(...fd), avgF=fd.reduce((a,b)=>a+b,0)/fd.length;
+      v.flood={max:maxF.toFixed(1), avg:avgF.toFixed(1), ratio:avgF>0?(maxF/avgF):1};
+    }
+  }
+  // Kualitas udara
+  v.aqi = air.current?.us_aqi ?? null;
+}
 
-            // Data Raw Chart 14 Hari
-            v.chartDates = apiData.daily.time.slice(30, 44);
-            v.chartRain = apiData.daily.precipitation_sum.slice(30, 44);
-            v.chartTemp = apiData.daily.temperature_2m_max.slice(30, 44);
-            v.next7Rain = v.chartRain.slice(0, 7).reduce((a,b)=>a+(b||0), 0).toFixed(1);
-        }
+/* ========== RENDER ========== */
+function renderDashboard(v){
+  welcome_state.classList.add('hidden');
+  dashboard_content.classList.remove('hidden');
+  document.getElementById('d-name').innerText=v.name;
+  document.getElementById('d-komoditas').innerText=v.komoditas;
+  document.getElementById('d-time').innerText="Diperbarui: "+new Date().toLocaleString('id-ID',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+  populateSocialForm(v);
 
-        /* =========================================
-           5. RENDER DASHBOARD (UI UPDATE)
-           ========================================= */
-        function renderDashboard(v) {
-            document.getElementById('welcome-state').classList.add('hidden');
-            document.getElementById('dashboard-content').classList.remove('hidden');
+  // CUACA HARI INI
+  const [desc,emo]=weatherInfo(v.curCode);
+  document.getElementById('today-card').innerHTML=`
+    <div class="relative z-10 flex items-center justify-between">
+      <div>
+        <p class="text-xs font-semibold text-sky-50/90">Cuaca Sekarang</p>
+        <div class="text-5xl font-black mt-1">${Math.round(v.curTemp)}°<span class="text-2xl">C</span></div>
+        <p class="text-sm font-semibold mt-1">${desc}</p>
+      </div>
+      <div class="text-7xl">${emo}</div>
+    </div>
+    <div class="relative z-10 grid grid-cols-3 gap-2 mt-4 text-center">
+      <div class="bg-white/20 rounded-xl py-2"><div class="text-[10px] text-sky-50/90">Kelembapan</div><div class="font-bold text-sm">${v.curHum}%</div></div>
+      <div class="bg-white/20 rounded-xl py-2"><div class="text-[10px] text-sky-50/90">Angin</div><div class="font-bold text-sm">${Math.round(v.curWind)} km/j</div></div>
+      <div class="bg-white/20 rounded-xl py-2"><div class="text-[10px] text-sky-50/90">Hujan/jam</div><div class="font-bold text-sm">${v.curRain||0} mm</div></div>
+    </div>`;
 
-            // Header
-            document.getElementById('d-name').innerText = v.name;
-            document.getElementById('d-komoditas').innerText = v.komoditas;
-            
-            populateSocialForm(v); // Update modal form state
+  // PRAKIRAAN 7 HARI
+  let html='';
+  for(let i=0;i<7;i++){
+    const d=new Date(v.chartDates[i]); const [ds,em]=weatherInfo(v.chartCode[i]);
+    const rain=Math.round(v.chartRain[i]||0);
+    html+=`<div class="shrink-0 w-16 bg-slate-50 rounded-xl p-2 text-center">
+      <div class="text-[10px] font-bold text-slate-500">${i===0?'Hari ini':HARI[d.getDay()]}</div>
+      <div class="text-2xl my-1">${em}</div>
+      <div class="text-xs font-bold text-slate-700">${Math.round(v.chartTmax[i])}°</div>
+      <div class="text-[10px] text-sky-500"><i class="fa-solid fa-droplet"></i> ${rain}</div>
+    </div>`;
+  }
+  document.getElementById('forecast-week').innerHTML=html;
 
-            // 3 Pilar Risiko UI
-            const setRiskCard = (id, level) => {
-                const el = document.getElementById(id);
-                el.innerText = level;
-                if(level === 'Tinggi') el.className = "text-3xl font-black text-rose-600 mb-1";
-                else if(level === 'Sedang') el.className = "text-3xl font-black text-orange-500 mb-1";
-                else el.className = "text-3xl font-black text-emerald-600 mb-1";
-            };
-            setRiskCard('score-hazard', v.hazardLevel);
-            setRiskCard('score-vuln', v.vulnLevel);
-            setRiskCard('score-cap', v.capLevel);
+  // PREDIKSI MUSIMAN (Pure JS)
+  const o=v.outlook;
+  const trendTxt = v.trend>0.5?'meningkat 📈':(v.trend<-0.5?'menurun 📉':'stabil ➡️');
+  document.getElementById('seasonal-card').innerHTML=`
+    <h3 class="text-sm font-bold text-slate-700 mb-2"><i class="fa-solid fa-cloud-sun-rain text-amber-500"></i> Prediksi Musim (1 Bulan ke Depan)</h3>
+    <div class="flex items-center gap-3">
+      <div class="text-center bg-${o.warna}-50 rounded-xl px-4 py-3">
+        <div class="text-2xl font-black text-${o.warna}-600">${o.est}<span class="text-sm">mm</span></div>
+        <div class="text-[9px] text-slate-400">perkiraan hujan</div>
+      </div>
+      <div class="flex-1 text-xs text-slate-600">
+        <div class="pill bg-${o.warna}-100 text-${o.warna}-700 mb-1 inline-block">${o.kategori}</div>
+        <p class="leading-snug">Normal historis ±<b>${o.normal}mm</b>. Pengaruh iklim global (ENSO ${ensoStatus}). Tren hujan terkini <b>${trendTxt}</b>.</p>
+        <p class="mt-1 text-amber-700 font-semibold"><i class="fa-solid fa-lightbulb"></i> ${o.saran}</p>
+      </div>
+    </div>
+    <p class="text-[9px] text-slate-400 mt-2 italic">*Dihitung mandiri: klimatologi (data arsip 1 tahun lalu) × faktor ENSO. Bukan jaminan, gunakan sebagai panduan.</p>`;
 
-            // Telemetri Satelit UI
-            document.getElementById('sat-spi').innerText = v.satSPI;
-            let spiLbl = document.getElementById('sat-spi-lbl');
-            if(v.satSPI < -1.5) { spiLbl.innerText = "Kering Ekstrem"; spiLbl.className = "text-[9px] px-1.5 py-0.5 rounded bg-red-100 text-red-700 inline-block mt-1 w-max"; }
-            else if(v.satSPI < -0.5) { spiLbl.innerText = "Kering Ringan"; spiLbl.className = "text-[9px] px-1.5 py-0.5 rounded bg-orange-100 text-orange-700 inline-block mt-1 w-max"; }
-            else { spiLbl.innerText = "Normal"; spiLbl.className = "text-[9px] px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700 inline-block mt-1 w-max"; }
+  // RISIKO
+  const setCard=(id,lv)=>{const e=document.getElementById(id);e.innerText=lv;
+    e.className="text-lg font-black "+(lv==='Tinggi'?'text-rose-600':lv==='Sedang'?'text-orange-500':'text-emerald-600');};
+  setCard('score-hazard',v.hazardLevel); setCard('score-vuln',v.vulnLevel); setCard('score-cap',v.capLevel);
 
-            document.getElementById('sat-sm').innerText = v.satSM;
-            let smLbl = document.getElementById('sat-sm-lbl');
-            if(v.satSM < 0.15) { smLbl.innerText = "Sangat Kritis"; smLbl.className = "text-[9px] px-1.5 py-0.5 rounded bg-red-100 text-red-700 inline-block mt-1 w-max"; }
-            else if(v.satSM < 0.25) { smLbl.innerText = "Defisit Air"; smLbl.className = "text-[9px] px-1.5 py-0.5 rounded bg-orange-100 text-orange-700 inline-block mt-1 w-max"; }
-            else { smLbl.innerText = "Air Cukup"; smLbl.className = "text-[9px] px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700 inline-block mt-1 w-max"; }
+  // TELEMETRI
+  const spi=document.getElementById('sat-spi'), spiL=document.getElementById('sat-spi-lbl');
+  spi.innerText=v.satSPI;
+  if(v.satSPI<-1.5){spiL.innerText="Kering Ekstrem";spiL.className="pill bg-rose-100 text-rose-700 inline-block mt-1";}
+  else if(v.satSPI<-0.5){spiL.innerText="Kering";spiL.className="pill bg-orange-100 text-orange-700 inline-block mt-1";}
+  else{spiL.innerText="Normal";spiL.className="pill bg-emerald-100 text-emerald-700 inline-block mt-1";}
 
-            // Proxy NDVI (Simulasi berdasar SM & SPI)
-            let ndviVal = v.manualNDVI !== undefined ? v.manualNDVI : 0.7; // default 0.7 (Hijau)
-            document.getElementById('sat-ndvi').innerText = ndviVal;
+  const sm=document.getElementById('sat-sm'), smL=document.getElementById('sat-sm-lbl');
+  sm.innerText=Number(v.satSM).toFixed(2);
+  if(v.satSM<0.15){smL.innerText="Kritis";smL.className="pill bg-rose-100 text-rose-700 inline-block mt-1";}
+  else if(v.satSM<0.25){smL.innerText="Defisit";smL.className="pill bg-orange-100 text-orange-700 inline-block mt-1";}
+  else{smL.innerText="Cukup";smL.className="pill bg-emerald-100 text-emerald-700 inline-block mt-1";}
 
-            let ndviLbl = document.querySelector('#sat-ndvi').parentElement.nextElementSibling;
-            if(ndviVal < 0.2) { 
-                ndviLbl.innerText = "Kering (Layu)"; 
-                ndviLbl.className = "text-[9px] px-1.5 py-0.5 rounded bg-red-100 text-red-700 inline-block mt-1 w-max relative z-10"; 
-            } else if(ndviVal < 0.5) { 
-                ndviLbl.innerText = "Stres Air"; 
-                ndviLbl.className = "text-[9px] px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 inline-block mt-1 w-max relative z-10"; 
-            } else { 
-                ndviLbl.innerText = "Hijau Sehat"; 
-                ndviLbl.className = "text-[9px] px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700 inline-block mt-1 w-max relative z-10"; 
-            }
+  const nd=document.getElementById('sat-ndvi'), ndL=document.getElementById('sat-ndvi-lbl');
+  nd.innerText=v.manualNDVI;
+  if(v.manualNDVI<0.2){ndL.innerText="Layu";ndL.className="pill bg-rose-100 text-rose-700 inline-block mt-1";}
+  else if(v.manualNDVI<0.5){ndL.innerText="Stres";ndL.className="pill bg-amber-100 text-amber-700 inline-block mt-1";}
+  else{ndL.innerText="Sehat";ndL.className="pill bg-emerald-100 text-emerald-700 inline-block mt-1";}
 
-            // --- EARLY ACTION PROTOCOL (EAP) TRIGGER ALERTS ---
-            const alertBox = document.getElementById('ibf-alert');
-            if (v.riskLevel === 'Tinggi') {
-                alertBox.className = "mb-6 rounded-xl border border-rose-200 bg-rose-50 p-4 shadow-sm flex gap-4 items-start";
-                alertBox.innerHTML = `
-                    <div class="bg-rose-100 text-rose-600 rounded-full p-2 shrink-0"><i class="fa-solid fa-triangle-exclamation text-xl"></i></div>
-                    <div>
-                        <h3 class="font-bold text-rose-800 text-sm mb-1">TRIGGER TERCAPAI: AKSI ANTISIPASI (AA) DIBUTUHKAN</h3>
-                        <p class="text-xs text-rose-700 leading-relaxed mb-2">Peringatan: Kerentanan sosial tinggi (${v.socPangan === 1 ? 'Stok pangan < 1 bulan' : 'Populasi rentan besar'}) bertabrakan dengan kondisi ancaman kekeringan satelit (SPI: ${v.satSPI}).</p>
-                        <div class="bg-white/60 p-2 rounded text-[11px] font-semibold text-rose-900 border border-rose-200">
-                            <strong>SOP DESTANA:</strong> Segera distribusikan benih umur genjah (cepat panen) dan siapkan dropping air bersih dalam 14 hari ke depan. Hentikan penanaman ${v.komoditas}.
-                        </div>
-                    </div>
-                `;
-            } else if (v.riskLevel === 'Sedang') {
-                alertBox.className = "mb-6 rounded-xl border border-orange-200 bg-orange-50 p-4 shadow-sm flex gap-4 items-start";
-                alertBox.innerHTML = `
-                    <div class="bg-orange-100 text-orange-600 rounded-full p-2 shrink-0"><i class="fa-solid fa-bullhorn text-xl"></i></div>
-                    <div>
-                        <h3 class="font-bold text-orange-800 text-sm mb-1">WASPADA: ANOMALI IKLIM</h3>
-                        <p class="text-xs text-orange-700 leading-relaxed">Sistem memantau penurunan kelembapan tanah. Disarankan membatasi penanaman lahan baru dan mulai mengumpulkan air di embung desa.</p>
-                    </div>
-                `;
-            } else {
-                alertBox.className = "mb-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4 shadow-sm flex gap-4 items-start";
-                alertBox.innerHTML = `
-                    <div class="bg-emerald-100 text-emerald-600 rounded-full p-2 shrink-0"><i class="fa-solid fa-check-double text-xl"></i></div>
-                    <div>
-                        <h3 class="font-bold text-emerald-800 text-sm mb-1">KONDISI AMAN: FASE KESIAPSIAGAAN</h3>
-                        <p class="text-xs text-emerald-700 leading-relaxed">Indikator SPI dan kelembapan tanah terpantau normal. Kegiatan pertanian komoditas ${v.komoditas} dapat dilanjutkan sesuai kalender tanam.</p>
-                    </div>
-                `;
-            }
+  const aq=document.getElementById('sat-aqi'), aqL=document.getElementById('sat-aqi-lbl');
+  if(v.aqi!=null){ aq.innerText=Math.round(v.aqi);
+    if(v.aqi<=50){aqL.innerText="Baik";aqL.className="pill bg-emerald-100 text-emerald-700 inline-block mt-1";}
+    else if(v.aqi<=100){aqL.innerText="Sedang";aqL.className="pill bg-amber-100 text-amber-700 inline-block mt-1";}
+    else{aqL.innerText="Tidak Sehat";aqL.className="pill bg-rose-100 text-rose-700 inline-block mt-1";}
+  } else { aq.innerText="-"; aqL.innerText="N/A"; }
 
-            // Render Chart
-            renderChart(v.chartDates, v.chartRain, v.chartTemp);
-        }
+  // BANJIR
+  const fc=document.getElementById('flood-card');
+  if(v.flood){
+    let lvl,warna,txt;
+    if(v.flood.ratio>3){lvl="Waspada Banjir";warna="rose";txt="Debit sungai berpotensi naik tajam dalam 30 hari. Siapkan jalur evakuasi & amankan ternak.";}
+    else if(v.flood.ratio>1.8){lvl="Perhatian";warna="amber";txt="Debit sungai sedikit meningkat. Pantau curah hujan hulu.";}
+    else{lvl="Aman";warna="emerald";txt="Debit sungai stabil, risiko banjir rendah.";}
+    fc.innerHTML=`
+      <h3 class="text-sm font-bold text-slate-700 mb-2"><i class="fa-solid fa-water text-sky-500"></i> Pemantauan Sungai (Banjir)</h3>
+      <div class="flex items-center gap-3">
+        <span class="pill bg-${warna}-100 text-${warna}-700">${lvl}</span>
+        <div class="text-xs text-slate-500">Debit rata2: <b>${v.flood.avg}</b> m³/s · Puncak: <b>${v.flood.max}</b> m³/s</div>
+      </div>
+      <p class="text-xs text-slate-600 mt-2">${txt}</p>`;
+  } else {
+    fc.innerHTML=`<h3 class="text-sm font-bold text-slate-700 mb-1"><i class="fa-solid fa-water text-sky-500"></i> Pemantauan Sungai</h3><p class="text-xs text-slate-400">Tidak ada data sungai besar di wilayah ini.</p>`;
+  }
 
-        function renderChart(labels, rainData, tempData) {
-            const ctx = document.getElementById('weatherChart').getContext('2d');
-            if(weatherChart) weatherChart.destroy();
-            
-            // Format labels ke hari
-            const shortLabels = labels.map(d => {
-                let date = new Date(d); return date.toLocaleDateString('id-ID', {day:'numeric', month:'short'});
-            });
+  // ALERT IBF
+  const a=document.getElementById('ibf-alert');
+  if(v.riskLevel==='Tinggi'){
+    a.className="rounded-xl p-3 bg-rose-50 border border-rose-200";
+    a.innerHTML=`<div class="font-bold text-rose-700 text-sm mb-1"><i class="fa-solid fa-triangle-exclamation"></i> SIAGA: AKSI DINI DIPERLUKAN</div>
+      <p class="text-xs text-rose-700">Kekeringan (SPI ${v.satSPI}) bertemu kerentanan tinggi. Distribusikan benih umur genjah & siapkan air bersih. Tunda tanam ${v.komoditas}.</p>`;
+  } else if(v.riskLevel==='Sedang'){
+    a.className="rounded-xl p-3 bg-orange-50 border border-orange-200";
+    a.innerHTML=`<div class="font-bold text-orange-700 text-sm mb-1"><i class="fa-solid fa-bullhorn"></i> WASPADA</div>
+      <p class="text-xs text-orange-700">Kelembapan tanah menurun. Batasi pembukaan lahan baru, mulai tampung air di embung.</p>`;
+  } else {
+    a.className="rounded-xl p-3 bg-emerald-50 border border-emerald-200";
+    a.innerHTML=`<div class="font-bold text-emerald-700 text-sm mb-1"><i class="fa-solid fa-check-double"></i> AMAN</div>
+      <p class="text-xs text-emerald-700">Kondisi normal. Bercocok tanam ${v.komoditas} dapat dilanjutkan sesuai kalender.</p>`;
+  }
 
-            weatherChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: shortLabels,
-                    datasets: [
-                        {
-                            label: 'Prediksi Hujan (mm)',
-                            data: rainData,
-                            backgroundColor: 'rgba(14, 165, 233, 0.6)', // Sky blue
-                            borderRadius: 4,
-                            yAxisID: 'y'
-                        },
-                        {
-                            label: 'Suhu Maks (°C)',
-                            data: tempData,
-                            type: 'line',
-                            borderColor: 'rgba(249, 115, 22, 1)', // Orange
-                            borderWidth: 2,
-                            pointRadius: 3,
-                            fill: false,
-                            yAxisID: 'y1'
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { position: 'top', labels: { boxWidth: 12, font: {size: 10} } } },
-                    scales: {
-                        y: { type: 'linear', display: true, position: 'left', title: {display: true, text: 'Hujan (mm)', font:{size:9}} },
-                        y1: { type: 'linear', display: true, position: 'right', grid: {drawOnChartArea: false}, title: {display: true, text: 'Suhu (°C)', font:{size:9}} }
-                    }
-                }
-            });
-        }
+  // REKOMENDASI TANI
+  let recos=[];
+  if(v.drySpell>=7) recos.push(`⚠️ Ada potensi <b>${v.drySpell} hari tanpa hujan</b> beruntun. Lakukan penyiraman terjadwal & mulsa jerami.`);
+  if(parseFloat(v.next7Rain)>50) recos.push(`🌧️ Hujan cukup tinggi (${v.next7Rain}mm/7hari). Pastikan drainase lancar agar akar tidak busuk.`);
+  else if(parseFloat(v.next7Rain)<5) recos.push(`🏜️ Hujan minim (${v.next7Rain}mm/7hari). Tunda penyemaian, prioritaskan tanaman yang sudah ada.`);
+  if(v.outlook.kategori.includes("KERING")) recos.push(`🌽 Musim cenderung kering. Pertimbangkan komoditas tahan kering (jagung lokal, sorgum, kacang hijau).`);
+  if(v.outlook.kategori.includes("BASAH")) recos.push(`🌾 Musim cenderung basah. Cocok untuk padi, namun waspadai hama keong & jamur.`);
+  if(v.satSM<0.15) recos.push(`💧 Tanah sangat kering. Manfaatkan air embung sehemat mungkin (irigasi tetes).`);
+  if(!recos.length) recos.push(`✅ Kondisi cuaca mendukung. Lanjutkan perawatan rutin tanaman Anda.`);
+  document.getElementById('reco-card').innerHTML=`
+    <h3 class="text-sm font-bold text-slate-700 mb-2"><i class="fa-solid fa-seedling text-emerald-500"></i> Saran Bercocok Tanam</h3>
+    <ul class="space-y-1.5 text-xs text-slate-600">${recos.map(r=>`<li class="flex gap-2"><span>•</span><span>${r}</span></li>`).join('')}</ul>`;
 
+  renderChart(v.chartDates,v.chartRain,v.chartTmax);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
 
-        // LOAD ENSO DATA (NOAA) - TIMELINE UPDATE
-        async function loadEnsoData() {
-            try {
-                const response = await fetch('./enso.json'); 
-                const rawData = await response.json();
-                
-                // Pastikan formatnya selalu array
-                const historyData = Array.isArray(rawData) ? rawData : [rawData];
-                if (historyData.length === 0) return;
+function renderChart(labels,rain,temp){
+  const ctx=document.getElementById('weatherChart').getContext('2d');
+  if(weatherChart) weatherChart.destroy();
+  const lbl=labels.map(d=>new Date(d).toLocaleDateString('id-ID',{day:'numeric',month:'short'}));
+  weatherChart=new Chart(ctx,{type:'bar',
+    data:{labels:lbl,datasets:[
+      {label:'Hujan (mm)',data:rain,backgroundColor:'rgba(14,165,233,0.6)',borderRadius:6,yAxisID:'y'},
+      {label:'Suhu Maks (°C)',data:temp,type:'line',borderColor:'#f97316',borderWidth:2,pointRadius:3,fill:false,yAxisID:'y1'}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'top',labels:{boxWidth:12,font:{size:10}}}},
+      scales:{
+        y:{position:'left',title:{display:true,text:'mm',font:{size:9}}},
+        y1:{position:'right',grid:{drawOnChartArea:false},title:{display:true,text:'°C',font:{size:9}}}
+      }}});
+}
 
-                // Ambil data paling terakhir (terbaru)
-                const latest = historyData[historyData.length - 1];
-                
-                const ensoVal = document.getElementById('enso-val');
-                const ensoBadge = document.getElementById('enso-badge');
-                const ensoTrend = document.getElementById('enso-trend');
-                
-                // Deteksi Tren Perubahan (Bandingkan dengan nilai periode yang beda)
-                let prevOni = latest.oni_value;
-                for (let i = historyData.length - 2; i >= 0; i--) {
-                    if (historyData[i].oni_value !== latest.oni_value) {
-                        prevOni = historyData[i].oni_value;
-                        break;
-                    }
-                }
+/* ========== ENSO (NOAA) ========== */
+async function loadEnsoData(){
+  try{
+    const r=await fetch('./enso.json'); const raw=await r.json();
+    const hist=Array.isArray(raw)?raw:[raw]; if(!hist.length) return;
+    const last=hist[hist.length-1];
+    ensoOni=parseFloat(last.oni_value)||0; ensoStatus=last.status||"Netral";
 
-                let prefix = latest.oni_value > 0 ? "+" : "";
-                ensoVal.innerText = `${prefix}${latest.oni_value} (${latest.periode})`;
-                ensoBadge.innerText = latest.status;
+    let prev=last.oni_value;
+    for(let i=hist.length-2;i>=0;i--){ if(hist[i].oni_value!==last.oni_value){prev=hist[i].oni_value;break;} }
 
-                // Logika Panah Tren
-                if (latest.oni_value > prevOni) {
-                    ensoTrend.innerHTML = '<i class="fa-solid fa-arrow-trend-up text-rose-400" title="Suhu Laut Memanas (Ancaman El Nino meningkat)"></i>';
-                } else if (latest.oni_value < prevOni) {
-                    ensoTrend.innerHTML = '<i class="fa-solid fa-arrow-trend-down text-sky-400" title="Suhu Laut Mendingin"></i>';
-                } else {
-                    ensoTrend.innerHTML = '<i class="fa-solid fa-minus text-slate-400" title="Kondisi Stabil"></i>';
-                }
-                
-                // Ubah warna badge berdasarkan status
-                if (latest.oni_value >= 0.5) {
-                    ensoBadge.className = "px-2 py-1 bg-orange-500/20 text-orange-400 border border-orange-500/50 rounded text-xs font-bold uppercase";
-                    ensoVal.className = "text-orange-400 font-bold";
-                } else if (latest.oni_value <= -0.5) {
-                    ensoBadge.className = "px-2 py-1 bg-sky-500/20 text-sky-400 border border-sky-500/50 rounded text-xs font-bold uppercase";
-                    ensoVal.className = "text-sky-400 font-bold";
-                } else {
-                    ensoBadge.className = "px-2 py-1 bg-emerald-500/20 text-emerald-400 border border-emerald-500/50 rounded text-xs font-bold uppercase";
-                    ensoVal.className = "text-emerald-400 font-bold";
-                }
-            } catch (e) {
-                console.log("Belum ada data enso.json atau gagal load");
-            }
-        }
+    document.getElementById('enso-val').innerText=(ensoOni>0?"+":"")+ensoOni;
+    document.getElementById('enso-badge').innerText=ensoStatus;
+    const t=document.getElementById('enso-trend');
+    if(ensoOni>prev) t.innerHTML='<i class="fa-solid fa-arrow-trend-up"></i>';
+    else if(ensoOni<prev) t.innerHTML='<i class="fa-solid fa-arrow-trend-down"></i>';
+    else t.innerHTML='<i class="fa-solid fa-minus"></i>';
+  }catch(e){ console.log("enso.json belum ada"); document.getElementById('enso-badge').innerText="N/A"; }
+}
 
-        // Panggil di DOMContentLoaded
-        document.addEventListener('DOMContentLoaded', () => {
-            initMap();
-            loadEnsoData(); // Panggil disini agar status NOAA langsung update saat dibuka
-        });
-
-    </script>
+document.addEventListener('DOMContentLoaded',()=>{ initMap(); loadEnsoData(); });
+document.addEventListener('click',e=>{ if(!e.target.closest('#search-results')&&!e.target.closest('#search-input')) document.getElementById('search-results').classList.add('hidden'); });
+</script>
 </body>
 </html>
