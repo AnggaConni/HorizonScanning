@@ -121,10 +121,24 @@ href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 
         </div>
 
         <div class="flex gap-2">
+            <!-- Hidden input untuk Load File -->
+            <input type="file" id="file-import" accept=".json" class="hidden" onchange="importJSON(event)">
+            
+            <!-- Tombol Load -->
+            <button onclick="document.getElementById('file-import').click()" class="bg-slate-700 hover:bg-slate-600 border border-slate-600 px-3 py-1.5 rounded text-xs font-semibold transition flex items-center gap-2" title="Load Data JSON">
+                <i class="fa-solid fa-folder-open text-amber-400"></i> <span class="hidden md:inline">Load</span>
+            </button>
+            
+            <!-- Tombol Save -->
+            <button onclick="exportJSON()" class="bg-slate-700 hover:bg-slate-600 border border-slate-600 px-3 py-1.5 rounded text-xs font-semibold transition flex items-center gap-2" title="Save Data JSON">
+                <i class="fa-solid fa-download text-emerald-400"></i> <span class="hidden md:inline">Save</span>
+            </button>
+
             <button onclick="loadSampleData()" class="bg-sky-600 hover:bg-sky-500 px-3 py-1.5 rounded text-xs font-semibold transition flex items-center gap-2">
                 <i class="fa-solid fa-bolt"></i> <span class="hidden md:inline">Sampel Data</span>
             </button>
         </div>
+
     </nav>
 
     <!-- MAIN LAYOUT -->
@@ -426,6 +440,7 @@ href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 
     </div>
 
     <script>
+        
         /* =========================================
            1. DATABASE & STATE MANAGEMENT
            ========================================= */
@@ -438,6 +453,46 @@ href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 
         // Status Mode UI
         let isMapCollapsed = false;
         let isPickingMap = false;
+
+        // -- FUNGSI PENYIMPANAN OTOMATIS (LOCAL STORAGE) --
+        function saveToLocalStorage() {
+            localStorage.setItem('destana_db', JSON.stringify(db));
+        }
+
+        // -- FUNGSI SAVE/EXPORT (UNDUH JSON) --
+        function exportJSON() {
+            if (db.villages.length === 0) return alert("Tidak ada data untuk disimpan!");
+            const blob = new Blob([JSON.stringify(db, null, 2)], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Destana_Data_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // -- FUNGSI LOAD/IMPORT (BACA JSON) --
+        function importJSON(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedDb = JSON.parse(e.target.result);
+                    if (importedDb && Array.isArray(importedDb.villages)) {
+                        db = importedDb;
+                        saveToLocalStorage();
+                        renderMapMarkers();
+                        document.getElementById('welcome-state').classList.remove('hidden');
+                        document.getElementById('dashboard-content').classList.add('hidden');
+                        currentVillageId = null;
+                        alert(`Berhasil memuat ${db.villages.length} data desa dari file!`);
+                    } else { alert("Format file JSON tidak valid!"); }
+                } catch (err) { alert("Gagal membaca file JSON!"); }
+                event.target.value = ''; // Reset form agar bisa import file yang sama lagi
+            };
+            reader.readAsText(file);
+        }
 
         /* =========================================
            2. MAP & UI HELPERS
@@ -577,6 +632,7 @@ href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 
                 { id: "v2", name: "Desa Noelbaki, Kupang", lat: -10.083, lon: 123.666, komoditas: "Hortikultura", lahan: 50, capAir: 90, socPop: 3000, socRentan: 400, socPangan: 6, socPetani: 40, manualNDVI: 0.4, hasData: false, tglTanam: d2.toISOString().split('T')[0] }
             ];
 
+            saveToLocalStorage();
             renderMapMarkers();
             alert("Data Simulasi Kabupaten Kupang & TTS dimuat. Silakan klik marker merah/biru di peta.");
         }
@@ -596,6 +652,7 @@ href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 
                 hasData: false
             };
             db.villages.push(v);
+            saveToLocalStorage();
             closeModal('modal-add-village');
             
             // Bersihkan form
@@ -616,6 +673,8 @@ href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 
             v.socPangan = parseInt(document.getElementById('s-pangan').value);
             v.socPetani = parseInt(document.getElementById('s-petani').value);
             v.manualNDVI = parseFloat(document.getElementById('s-ndvi').value);
+
+            saveToLocalStorage();
             
             closeModal('modal-social');
             processVillageData(currentVillageId, true);
@@ -666,6 +725,8 @@ async function processVillageData(id, forceUpdate) {
                 
                 calculateIndices(v, dataCurrent, histMeanRain);
                 v.hasData = true;
+
+                saveToLocalStorage();
                 
                 hideLoader();
                 renderMapMarkers(); 
@@ -1082,6 +1143,18 @@ async function processVillageData(id, forceUpdate) {
         // INIT
         document.addEventListener('DOMContentLoaded', () => {
             initMap();
+            
+            // Baca memori penyimpanan saat web baru dibuka
+            const storedDb = localStorage.getItem('destana_db');
+            if (storedDb) {
+                try {
+                    db = JSON.parse(storedDb);
+                    if (!db.villages) db.villages = [];
+                    // Jika memori ditemukan, otomatis gambarkan pin di peta
+                    renderMapMarkers(); 
+                } catch(e) { console.error("Gagal load LocalStorage"); }
+            }
+
             loadEnsoData(); 
         });
 
