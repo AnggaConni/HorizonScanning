@@ -3,8 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sistem Pantau Pangan Desa & Anticipatory Action</title>
-    
+    <meta name="title" content="Pantau Iklim Desa - Early Warning & Anticipatory Action">
+
+    <link rel="icon" type="image/svg+xml"
+href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%2315803d'/%3E%3Ctext x='50%25' y='52%25' dominant-baseline='middle' text-anchor='middle' font-size='36'%3E🌾%3C/text%3E%3C/svg%3E">
+
+    <meta name="description"
+        content="Sistem pemantauan iklim desa berbasis satelit untuk mendukung ketahanan pangan, mitigasi kekeringan, dan Anticipatory Action tingkat komunitas.">
+
+    <meta name="keywords"
+        content="iklim, desa, ketahanan pangan, anticipatory action, drought monitoring, SPI, ENSO, climate dashboard, early warning system">
+
+    <meta name="author"
+        content="Angga Conni Saputra">
+
+    <meta name="robots"
+        content="index,follow">
+
+    <link rel="canonical"
+        href="https://horizon-scanning.org/iklim">
+        <meta property="og:title"content="Apakah Desa Anda Siap Menghadapi Kekeringan?">
+
+
+
+        <meta property="og:type" content="website">
+
+    <meta property="og:url"
+        content="https://horizon-scanning.org/iklim">
+
+    <meta property="og:title"
+        content="Pantau Iklim Desa & Anticipatory Action">
+
+    <meta property="og:description"
+        content="Deteksi dini kekeringan, prakiraan cuaca, kondisi tanaman, dan rekomendasi tindakan antisipasi untuk petani dan desa.">
+
+    <meta property="og:image"
+        content="https://horizon-scanning.org/iklim/thum/iklim.png">
+
+    <meta property="og:image:width"
+        content="1200">
+
+    <meta property="og:image:height"
+        content="630">
+
+    <meta property="og:site_name"
+        content="Horizon Scanning Indonesia">
+
+        <meta name="twitter:card"
+        content="summary_large_image">
+
+    <meta name="twitter:title"
+        content="Pantau Iklim Desa & Anticipatory Action">
+
+    <meta name="twitter:description"
+        content="Dashboard iklim desa berbasis satelit untuk membantu petani menghadapi risiko kekeringan dan perubahan iklim.">
+
+    <meta name="twitter:image"
+        content="https://horizon-scanning.org/iklim/thum/iklim.png">
+
+        
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
@@ -191,6 +248,11 @@
                     </div>
                 </div>
 
+                <!-- PANEL INSTRUKSI FASE PERTUMBUHAN -->
+                <div id="growth-phase-container" class="mb-6 rounded-xl border border-sky-200 bg-gradient-to-r from-sky-50 to-white p-4 shadow-sm hidden flex-col md:flex-row gap-4 items-start">
+                    <!-- Injected via JS -->
+                </div>
+
                 <!-- PANEL RADAR HAMA & PENYAKIT -->
                 <div id="pest-alert-container" class="mb-6 rounded-xl border p-4 shadow-sm flex items-center gap-4 transition-all bg-white hidden">
                     <!-- Injected via JS -->
@@ -293,6 +355,12 @@
                             </select>
                         </div>
                     </div>
+
+                    <div class="mt-3 p-3 bg-sky-50 border border-sky-100 rounded-lg">
+                        <label class="block font-semibold text-slate-700 mb-1 text-xs">Kapan mulai tanam komoditas ini?</label>
+                        <input type="date" id="v-tanam" required class="w-full border border-slate-300 rounded p-2 outline-none text-xs bg-white">
+                    </div>
+
                     <button type="submit" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 rounded-lg transition mt-2 shadow">Simpan Data Desa</button>
                 </form>
             </div>
@@ -500,10 +568,15 @@
            3. DATA INPUT & LOGIC
            ========================================= */
         function loadSampleData() {
+            // Simulasi data tanggal tanam menggunakan waktu mundur
+            let d1 = new Date(); d1.setDate(d1.getDate() - 50); // Sudah tanam 50 hari lalu
+            let d2 = new Date(); d2.setDate(d2.getDate() - 15); // Baru tanam 15 hari lalu
+
             db.villages = [
-                { id: "v1", name: "Desa Bena, TTS", lat: -9.866, lon: 124.233, komoditas: "Padi Sawah", lahan: 250, capAir: 10, socPop: 1200, socRentan: 350, socPangan: 1, socPetani: 85, manualNDVI: 0.7, hasData: false },
-                { id: "v2", name: "Desa Noelbaki, Kupang", lat: -10.083, lon: 123.666, komoditas: "Hortikultura", lahan: 50, capAir: 90, socPop: 3000, socRentan: 400, socPangan: 6, socPetani: 40, manualNDVI: 0.4, hasData: false }
+                { id: "v1", name: "Desa Bena, TTS", lat: -9.866, lon: 124.233, komoditas: "Padi Sawah", lahan: 250, capAir: 10, socPop: 1200, socRentan: 350, socPangan: 1, socPetani: 85, manualNDVI: 0.7, hasData: false, tglTanam: d1.toISOString().split('T')[0] },
+                { id: "v2", name: "Desa Noelbaki, Kupang", lat: -10.083, lon: 123.666, komoditas: "Hortikultura", lahan: 50, capAir: 90, socPop: 3000, socRentan: 400, socPangan: 6, socPetani: 40, manualNDVI: 0.4, hasData: false, tglTanam: d2.toISOString().split('T')[0] }
             ];
+
             renderMapMarkers();
             alert("Data Simulasi Kabupaten Kupang & TTS dimuat. Silakan klik marker merah/biru di peta.");
         }
@@ -516,6 +589,7 @@
                 lat: parseFloat(document.getElementById('v-lat').value),
                 lon: parseFloat(document.getElementById('v-lon').value),
                 komoditas: document.getElementById('v-komoditas').value,
+                tglTanam: document.getElementById('v-tanam').value, 
                 lahan: 100,
                 capAir: parseInt(document.getElementById('v-air').value),
                 socPop: 1000, socRentan: 200, socPangan: 3, socPetani: 70,
@@ -851,6 +925,77 @@ async function processVillageData(id, forceUpdate) {
                     </div>
                 `;
             }
+
+            // --- LOGIKA FASE PERTUMBUHAN & INSTRUKSI LAPANGAN ---
+            const phaseContainer = document.getElementById('growth-phase-container');
+            phaseContainer.classList.remove('hidden');
+            phaseContainer.classList.add('flex');
+
+            // Hitung Umur Tanaman (Hari Setelah Tanam / HST)
+            const today = new Date();
+            const plantDate = new Date(v.tglTanam);
+            const diffTime = Math.abs(today - plantDate);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+            
+            let fase = ""; let instruksi = ""; let iconPhase = "";
+            const next7RainVol = parseFloat(v.next7Rain); // Hujan 7 hari ke depan
+
+            // Algoritma Silang: Komoditas x HST x Cuaca
+            if (v.komoditas === 'Padi Sawah') {
+                if (diffDays <= 40) {
+                    fase = "Vegetatif (Pembentukan Tunas)"; iconPhase = "fa-seedling";
+                    instruksi = next7RainVol < 15 ? 
+                        "Sawah mulai kering di fase kritis anakan. <b>SEGERA POMPA AIR</b> atau lakukan penggenangan bergilir. Tunda pemupukan urea jika tanah retak karena pupuk akan menguap sia-sia." : 
+                        "Kebutuhan air tercukupi. Lakukan pemupukan susulan pertama dan bersihkan gulma (matun).";
+                } else if (diffDays <= 75) {
+                    fase = "Generatif (Bunting & Berbunga)"; iconPhase = "fa-wheat-awn-circle-exclamation text-rose-500";
+                    instruksi = next7RainVol < 15 ? 
+                        "<b><i class='fa-solid fa-triangle-exclamation text-rose-600'></i> FASE SANGAT KRITIS!</b> Tanaman sedang bunting. Kekurangan air sekarang akan menyebabkan bulir hampa (puso). Kerahkan semua sumber cadangan air (sumur bor/embung) ke petak sawah prioritas!" : 
+                        "Jaga genangan air 3-5 cm. Kondisi aman untuk proses penyerbukan bulir padi.";
+                } else {
+                    fase = "Pematangan (Jelang Panen)"; iconPhase = "fa-wheat-awn text-amber-500";
+                    instruksi = next7RainVol > 40 ? 
+                        "Waspada hujan lebat menjelang panen! Segera buka pintu pembuangan air agar petak sawah kering. Jika terendam, batang akan roboh dan gabah membusuk." : 
+                        "Keringkan petak sawah secara bertahap untuk mempercepat pematangan gabah kuning. Persiapkan alat panen.";
+                }
+            } else if (v.komoditas === 'Jagung') {
+                if (diffDays <= 35) {
+                    fase = "Pertumbuhan Awal (Vegetatif)"; iconPhase = "fa-seedling";
+                    instruksi = next7RainVol < 15 ? "Tanah kering menghambat penyerapan pupuk dasar. Lakukan penyiraman manual di area pangkal batang setidaknya 3 hari sekali." : "Kondisi air optimal. Lakukan pembumbunan (menutup akar) agar batang kokoh menahan angin.";
+                } else if (diffDays <= 65) {
+                    fase = "Pembungaan (Tasseling)"; iconPhase = "fa-pagelines text-rose-500";
+                    instruksi = next7RainVol < 15 ? "<b>FASE KRITIS!</b> Jagung sedang mengeluarkan bunga. Stres air sekarang menggagalkan pembentukan tongkol. Alirkan air irigasi di parit bedengan." : "Kebutuhan air tongkol terpenuhi. Awasi curah hujan berlebih yang bisa membuat serbuk sari hanyut.";
+                } else {
+                    fase = "Pengisian Biji & Panen"; iconPhase = "fa-leaf text-amber-500";
+                    instruksi = "Fase aman terhadap stres air. Hentikan pengairan. Biarkan klobot/kulit jagung mengering sempurna di ladang sebelum dipetik.";
+                }
+            } else {
+                // Hortikultura
+                if (diffDays <= 30) {
+                    fase = "Pertumbuhan Vegetatif"; iconPhase = "fa-seedling";
+                    instruksi = next7RainVol > 40 ? "Bibit muda rentan busuk akar akibat hujan lebat. Perbaiki drainase bedengan agar air tidak menggenang di area perakaran." : "Jaga kelembaban tanah dengan penyiraman rutin pagi/sore hari.";
+                } else {
+                    fase = "Pembungaan & Pembuahan"; iconPhase = "fa-pepper-hot text-rose-500";
+                    instruksi = next7RainVol < 10 ? "Tanaman butuh air untuk membesarkan buah. Kekeringan akan menyebabkan rontok bunga. Pasang mulsa pelindung dan siram intensif." : "Awasi curah hujan lebat yang memicu kerontokan bunga secara fisik.";
+                }
+            }
+
+            // Injeksi Tampilan ke HTML
+            phaseContainer.innerHTML = `
+                <div class="bg-sky-100 text-sky-600 rounded-full w-14 h-14 flex items-center justify-center shrink-0 border border-sky-200">
+                    <i class="fa-solid ${iconPhase} text-2xl"></i>
+                </div>
+                <div class="w-full">
+                    <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-2 gap-1">
+                        <h3 class="text-[11px] font-bold text-sky-700 uppercase tracking-wider"><i class="fa-regular fa-calendar-check mr-1"></i> Instruksi Lapangan Spesifik</h3>
+                        <span class="bg-sky-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-sm">Umur: ${diffDays} Hari Setelah Tanam (HST)</span>
+                    </div>
+                    <h4 class="font-bold text-slate-800 text-sm mb-1">Fase Tanaman: <span class="text-sky-600">${fase}</span></h4>
+                    <div class="bg-white p-3 rounded-lg text-xs text-slate-700 border border-slate-100 shadow-sm leading-relaxed">
+                        ${instruksi}
+                    </div>
+                </div>
+            `;
 
             // --- INJEKSI UI RADAR HAMA & PENYAKIT ---
             const pestContainer = document.getElementById('pest-alert-container');
