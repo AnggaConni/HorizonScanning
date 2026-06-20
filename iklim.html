@@ -138,6 +138,26 @@
                     <!-- Injected via JS -->
                 </div>
 
+                <!-- STATUS TANAM & PRAKIRAAN 14 HARI -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <!-- Status Tanam -->
+                    <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-sm flex flex-col justify-center items-center text-center">
+                        <h3 class="text-xs font-bold text-slate-400 uppercase mb-3">Rekomendasi Status Tanam</h3>
+                        <div id="status-tanam-badge" class="text-2xl font-black rounded-full px-8 py-3 shadow-sm border transition-all">
+                            <!-- Injected via JS -->
+                        </div>
+                        <p class="text-[10px] text-slate-500 mt-3 leading-tight max-w-[80%]">Berdasarkan kalkulasi matriks IBF (Ancaman Iklim Satelit x Kerentanan Sosial).</p>
+                    </div>
+
+                    <!-- Prakiraan 14 Hari -->
+                    <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-sm overflow-hidden">
+                        <h3 class="text-xs font-bold text-slate-400 uppercase mb-2">Prakiraan 14 Hari (Open-Meteo)</h3>
+                        <div id="forecast-14-days" class="flex gap-2 overflow-x-auto pb-2" style="scrollbar-width: thin;">
+                            <!-- Injected via JS -->
+                        </div>
+                    </div>
+                </div>
+
                 <!-- GRID: 3 PILAR RISIKO -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                     <!-- Hazard -->
@@ -540,7 +560,7 @@ async function processVillageData(id, forceUpdate) {
 
             showLoader("Menghubungi Satelit & Mengkalkulasi Iklim 5 Tahun...");
             try {
-                const urlCurrent = `https://api.open-meteo.com/v1/forecast?latitude=${v.lat}&longitude=${v.lon}&current=soil_moisture_0_to_7cm&daily=precipitation_sum,temperature_2m_max&past_days=30&forecast_days=14&timezone=Asia%2FJakarta`;
+                const urlCurrent = `https://api.open-meteo.com/v1/forecast?latitude=${v.lat}&longitude=${v.lon}&current=soil_moisture_0_to_7cm&daily=precipitation_sum,temperature_2m_max,weather_code&past_days=30&forecast_days=14&timezone=Asia%2FJakarta`;
                 
                 // Set mundur 5 tahun untuk mencari rata-rata (Baseline Klimatologi MVP)
                 let dEnd = new Date(); dEnd.setFullYear(dEnd.getFullYear() - 1);
@@ -615,6 +635,7 @@ async function processVillageData(id, forceUpdate) {
             v.chartRain = apiData.daily.precipitation_sum.slice(30, 44);
             v.chartTemp = apiData.daily.temperature_2m_max.slice(30, 44);
             v.next7Rain = v.chartRain.slice(0, 7).reduce((a,b)=>a+(b||0), 0).toFixed(1);
+            v.chartWeatherCodes = apiData.daily.weather_code.slice(30, 44); // BARIS BARU DITAMBAHKAN
         }
 
         /* =========================================
@@ -667,35 +688,126 @@ async function processVillageData(id, forceUpdate) {
                 ndviLbl.className = "text-[9px] px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700 inline-block mt-1 w-max relative z-10"; 
             }
 
+            // --- INJEKSI STATUS TANAM ---
+            const statusTanamBadge = document.getElementById('status-tanam-badge');
+            if (v.riskLevel === 'Tinggi') {
+                statusTanamBadge.innerHTML = '🔴 TUNDA TANAM';
+                statusTanamBadge.className = 'text-xl md:text-2xl font-black rounded-full px-6 py-2 shadow-sm border border-rose-300 bg-rose-100 text-rose-700';
+            } else if (v.riskLevel === 'Sedang') {
+                statusTanamBadge.innerHTML = '🟡 HATI-HATI';
+                statusTanamBadge.className = 'text-xl md:text-2xl font-black rounded-full px-6 py-2 shadow-sm border border-amber-300 bg-amber-100 text-amber-700';
+            } else {
+                statusTanamBadge.innerHTML = '🟢 BISA TANAM';
+                statusTanamBadge.className = 'text-xl md:text-2xl font-black rounded-full px-6 py-2 shadow-sm border border-emerald-300 bg-emerald-100 text-emerald-700';
+            }
+
+            // --- INJEKSI IKON PRAKIRAAN 14 HARI ---
+            const forecastContainer = document.getElementById('forecast-14-days');
+            forecastContainer.innerHTML = '';
+            
+            // Konversi Kode Cuaca WMO ke Ikon FontAwesome
+            const getWeatherIcon = (code) => {
+                if (code <= 3) return '<i class="fa-solid fa-sun text-amber-500"></i>'; // Cerah/Berawan
+                if (code >= 45 && code <= 48) return '<i class="fa-solid fa-smog text-slate-400"></i>'; // Kabut
+                if (code >= 51 && code <= 67) return '<i class="fa-solid fa-cloud-rain text-sky-400"></i>'; // Hujan Ringan-Sedang
+                if (code >= 71 && code <= 82) return '<i class="fa-solid fa-cloud-showers-heavy text-sky-600"></i>'; // Hujan Lebat
+                if (code >= 95) return '<i class="fa-solid fa-cloud-bolt text-indigo-600"></i>'; // Petir/Badai
+                return '<i class="fa-solid fa-cloud text-slate-400"></i>'; // Default
+            };
+
+            for (let i = 0; i < v.chartDates.length; i++) {
+                let dateObj = new Date(v.chartDates[i]);
+                let dayName = dateObj.toLocaleDateString('id-ID', { weekday: 'short' });
+                let dateNum = dateObj.getDate();
+                let icon = getWeatherIcon(v.chartWeatherCodes[i]);
+                let rainVol = v.chartRain[i] > 0 ? `<div class="text-[9px] text-sky-600 font-bold mt-1">${v.chartRain[i]} mm</div>` : `<div class="text-[9px] text-slate-400 mt-1">-</div>`;
+
+                forecastContainer.innerHTML += `
+                    <div class="flex flex-col items-center justify-center bg-slate-50 border border-slate-100 rounded-lg p-2 min-w-[55px] shrink-0">
+                        <span class="text-[10px] text-slate-500 uppercase font-bold">${dayName}</span>
+                        <span class="text-xs text-slate-800 font-bold mb-1">${dateNum}</span>
+                        <div class="text-lg">${icon}</div>
+                        ${rainVol}
+                    </div>
+                `;
+            }
+
             const alertBox = document.getElementById('ibf-alert');
             if (v.riskLevel === 'Tinggi') {
                 alertBox.className = "mb-6 rounded-xl border border-rose-200 bg-rose-50 p-4 shadow-sm flex gap-4 items-start";
                 alertBox.innerHTML = `
                     <div class="bg-rose-100 text-rose-600 rounded-full p-2 shrink-0"><i class="fa-solid fa-triangle-exclamation text-xl"></i></div>
-                    <div>
+                    <div class="w-full">
                         <h3 class="font-bold text-rose-800 text-sm mb-1">TRIGGER TERCAPAI: AKSI ANTISIPASI (AA) DIBUTUHKAN</h3>
-                        <p class="text-xs text-rose-700 leading-relaxed mb-2">Peringatan: Kerentanan sosial tinggi bertabrakan dengan kondisi ancaman kekeringan satelit (SPI: ${v.satSPI}).</p>
-                        <div class="bg-white/60 p-2 rounded text-[11px] font-semibold text-rose-900 border border-rose-200">
-                            <strong>SOP DESTANA:</strong> Segera distribusikan benih genjah dan siapkan dropping air bersih dalam 14 hari ke depan. Hentikan penanaman ${v.komoditas}.
+                        <p class="text-xs text-rose-700 leading-relaxed mb-3">Peringatan: Kerentanan sosial tinggi bertabrakan dengan kondisi ancaman kekeringan satelit (SPI: ${v.satSPI}).</p>
+                        
+                        <div class="bg-white/70 p-3 rounded-lg text-xs text-rose-900 border border-rose-200 shadow-sm w-full">
+                            <div class="font-bold border-b border-rose-200 pb-1.5 mb-2.5 uppercase text-[10px] text-rose-700 tracking-wider"><i class="fa-solid fa-list-check mr-1"></i> Protokol SOP DESTANA (14 Hari Kedepan)</div>
+                            <ul class="space-y-2 list-none text-[11px] md:text-xs">
+                                <li class="flex items-start gap-2">
+                                    <i class="fa-solid fa-wheat-awn text-rose-600 mt-0.5 w-4 text-center"></i> 
+                                    <span><b>Sektor Pertanian:</b> Hentikan total pembukaan lahan/penanaman <b>${v.komoditas}</b> baru. Segera distribusikan benih alternatif (palawija/umur genjah) yang tahan kekeringan.</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i class="fa-solid fa-faucet-drip text-sky-600 mt-0.5 w-4 text-center"></i> 
+                                    <span><b>Sektor Air (WASH):</b> Aktivasi dropping air bersih ke titik krisis. Batasi ketat penggunaan air embung desa untuk kebutuhan non-esensial.</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i class="fa-solid fa-person-shelter text-amber-600 mt-0.5 w-4 text-center"></i> 
+                                    <span><b>Sosial & Pangan:</b> Buka akses lumbung pangan desa. Prioritaskan bantuan logistik dan ketahanan gizi untuk <b>${v.socRentan} jiwa</b> kelompok rentan (Lansia/Balita/Ibu Hamil).</span>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                 `;
             } else if (v.riskLevel === 'Sedang') {
-                alertBox.className = "mb-6 rounded-xl border border-orange-200 bg-orange-50 p-4 shadow-sm flex gap-4 items-start";
+                alertBox.className = "mb-6 rounded-xl border border-amber-200 bg-amber-50 p-4 shadow-sm flex gap-4 items-start";
                 alertBox.innerHTML = `
-                    <div class="bg-orange-100 text-orange-600 rounded-full p-2 shrink-0"><i class="fa-solid fa-bullhorn text-xl"></i></div>
-                    <div>
-                        <h3 class="font-bold text-orange-800 text-sm mb-1">WASPADA: ANOMALI IKLIM</h3>
-                        <p class="text-xs text-orange-700 leading-relaxed">Disarankan membatasi penanaman lahan baru dan mulai mengumpulkan air di embung desa.</p>
+                    <div class="bg-amber-100 text-amber-600 rounded-full p-2 shrink-0"><i class="fa-solid fa-bullhorn text-xl"></i></div>
+                    <div class="w-full">
+                        <h3 class="font-bold text-amber-800 text-sm mb-1">WASPADA: ANOMALI IKLIM (FASE KESIAPSIAGAAN)</h3>
+                        <p class="text-xs text-amber-700 leading-relaxed mb-3">Tren curah hujan mulai menurun. Potensi stres air pada tanaman terdeteksi.</p>
+                        
+                        <div class="bg-white/70 p-3 rounded-lg text-xs text-amber-900 border border-amber-200 shadow-sm w-full">
+                            <div class="font-bold border-b border-amber-200 pb-1.5 mb-2.5 uppercase text-[10px] text-amber-700 tracking-wider"><i class="fa-solid fa-shield-halved mr-1"></i> Rekomendasi Mitigasi Jangka Pendek</div>
+                            <ul class="space-y-2 list-none text-[11px] md:text-xs">
+                                <li class="flex items-start gap-2">
+                                    <i class="fa-solid fa-seedling text-amber-600 mt-0.5 w-4 text-center"></i> 
+                                    <span><b>Pertanian:</b> Batasi perluasan lahan <b>${v.komoditas}</b>. Terapkan sistem gilir giring air irigasi untuk menghemat cadangan air.</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i class="fa-solid fa-cloud-rain text-sky-600 mt-0.5 w-4 text-center"></i> 
+                                    <span><b>Infrastruktur Air:</b> Mulai panen air hujan (jika masih ada presipitasi) dan pastikan pengisian embung/bak penampungan desa maksimal.</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i class="fa-solid fa-users text-slate-600 mt-0.5 w-4 text-center"></i> 
+                                    <span><b>Sosial:</b> Edukasi warga terkait potensi ancaman kekeringan dan keluarkan imbauan penghematan air rumah tangga.</span>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 `;
             } else {
                 alertBox.className = "mb-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4 shadow-sm flex gap-4 items-start";
                 alertBox.innerHTML = `
                     <div class="bg-emerald-100 text-emerald-600 rounded-full p-2 shrink-0"><i class="fa-solid fa-check-double text-xl"></i></div>
-                    <div>
-                        <h3 class="font-bold text-emerald-800 text-sm mb-1">KONDISI AMAN: FASE KESIAPSIAGAAN</h3>
-                        <p class="text-xs text-emerald-700 leading-relaxed">Indikator normal. Kegiatan pertanian komoditas ${v.komoditas} dapat dilanjutkan sesuai kalender tanam.</p>
+                    <div class="w-full">
+                        <h3 class="font-bold text-emerald-800 text-sm mb-1">KONDISI AMAN: INDIKATOR NORMAL</h3>
+                        <p class="text-xs text-emerald-700 leading-relaxed mb-3">Tidak terdeteksi anomali cuaca yang mengancam ketahanan pangan dalam 14 hari ke depan.</p>
+                        
+                        <div class="bg-white/70 p-3 rounded-lg text-xs text-emerald-900 border border-emerald-200 shadow-sm w-full">
+                            <div class="font-bold border-b border-emerald-200 pb-1.5 mb-2.5 uppercase text-[10px] text-emerald-700 tracking-wider"><i class="fa-solid fa-clipboard-check mr-1"></i> Rekomendasi Rutin</div>
+                            <ul class="space-y-2 list-none text-[11px] md:text-xs">
+                                <li class="flex items-start gap-2">
+                                    <i class="fa-solid fa-leaf text-emerald-600 mt-0.5 w-4 text-center"></i> 
+                                    <span><b>Pertanian:</b> Kegiatan penanaman dan pemeliharaan <b>${v.komoditas}</b> dapat dilanjutkan sesuai Kalender Tanam penyuluh pertanian setempat.</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i class="fa-solid fa-screwdriver-wrench text-slate-500 mt-0.5 w-4 text-center"></i> 
+                                    <span><b>Infrastruktur:</b> Lakukan pemeliharaan rutin pada saluran irigasi, pintu air, dan pompa desa mumpung kondisi cuaca mendukung.</span>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 `;
             }
