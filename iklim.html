@@ -50,14 +50,15 @@
             </div>
         </div>
         
-        <!-- Global ENSO Widget (Simulasi Fetch NOAA) -->
+        <!-- Global ENSO Widget -->
         <div class="hidden md:flex items-center gap-4 bg-slate-800 px-4 py-1.5 rounded-lg border border-slate-700">
             <div class="text-xs text-slate-300">
                 <span class="block text-[9px] uppercase tracking-wider text-slate-500">Status ENSO (NOAA)</span>
-                Oceanic Niño Index: <strong id="enso-val" class="text-orange-400">+0.8</strong>
+                Oceanic Niño Index: <strong id="enso-val" class="text-orange-400">...</strong>
+                <span id="enso-trend" class="ml-1 text-[10px] px-1 rounded bg-slate-700"></span> <!-- Tempat Trend Panah -->
             </div>
-            <div id="enso-badge" class="px-2 py-1 bg-orange-500/20 text-orange-400 border border-orange-500/50 rounded text-xs font-bold uppercase">
-                El Niño Lemah
+            <div id="enso-badge" class="px-2 py-1 bg-slate-700 text-slate-400 border border-slate-600 rounded text-xs font-bold uppercase">
+                Loading...
             </div>
         </div>
 
@@ -652,26 +653,50 @@
         }
 
 
-        // Tambahkan fungsi ini di Javascript
+        // LOAD ENSO DATA (NOAA) - TIMELINE UPDATE
         async function loadEnsoData() {
             try {
-                // Ambil file JSON statis dari repo github pages anda sendiri
-                // Jika testing lokal (VS Code Live Server), pastikan enso.json sudah ada
                 const response = await fetch('./enso.json'); 
-                const data = await response.json();
+                const rawData = await response.json();
+                
+                // Pastikan formatnya selalu array
+                const historyData = Array.isArray(rawData) ? rawData : [rawData];
+                if (historyData.length === 0) return;
+
+                // Ambil data paling terakhir (terbaru)
+                const latest = historyData[historyData.length - 1];
                 
                 const ensoVal = document.getElementById('enso-val');
                 const ensoBadge = document.getElementById('enso-badge');
+                const ensoTrend = document.getElementById('enso-trend');
                 
-                let prefix = data.oni_value > 0 ? "+" : "";
-                ensoVal.innerText = `${prefix}${data.oni_value} (${data.periode})`;
-                ensoBadge.innerText = data.status;
+                // Deteksi Tren Perubahan (Bandingkan dengan nilai periode yang beda)
+                let prevOni = latest.oni_value;
+                for (let i = historyData.length - 2; i >= 0; i--) {
+                    if (historyData[i].oni_value !== latest.oni_value) {
+                        prevOni = historyData[i].oni_value;
+                        break;
+                    }
+                }
+
+                let prefix = latest.oni_value > 0 ? "+" : "";
+                ensoVal.innerText = `${prefix}${latest.oni_value} (${latest.periode})`;
+                ensoBadge.innerText = latest.status;
+
+                // Logika Panah Tren
+                if (latest.oni_value > prevOni) {
+                    ensoTrend.innerHTML = '<i class="fa-solid fa-arrow-trend-up text-rose-400" title="Suhu Laut Memanas (Ancaman El Nino meningkat)"></i>';
+                } else if (latest.oni_value < prevOni) {
+                    ensoTrend.innerHTML = '<i class="fa-solid fa-arrow-trend-down text-sky-400" title="Suhu Laut Mendingin"></i>';
+                } else {
+                    ensoTrend.innerHTML = '<i class="fa-solid fa-minus text-slate-400" title="Kondisi Stabil"></i>';
+                }
                 
-                // Ubah warna berdasarkan status
-                if (data.oni_value >= 0.5) {
+                // Ubah warna badge berdasarkan status
+                if (latest.oni_value >= 0.5) {
                     ensoBadge.className = "px-2 py-1 bg-orange-500/20 text-orange-400 border border-orange-500/50 rounded text-xs font-bold uppercase";
                     ensoVal.className = "text-orange-400 font-bold";
-                } else if (data.oni_value <= -0.5) {
+                } else if (latest.oni_value <= -0.5) {
                     ensoBadge.className = "px-2 py-1 bg-sky-500/20 text-sky-400 border border-sky-500/50 rounded text-xs font-bold uppercase";
                     ensoVal.className = "text-sky-400 font-bold";
                 } else {
