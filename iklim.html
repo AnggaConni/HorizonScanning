@@ -77,6 +77,7 @@ href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 
 
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
@@ -92,6 +93,63 @@ href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 
         
         /* Kursor khusus saat mode pilih peta */
         .picking-mode { cursor: crosshair !important; }
+
+
+        /* Custom Google Translate UI */
+        body { top: 0 !important; position: static !important; } /* Cegah halaman turun karena banner iframe */
+
+        /* Buang widget asli jauh dari layar, jangan di-display: none */
+        #google_translate_element {
+            position: absolute !important;
+            top: -10000px !important;
+            left: -10000px !important;
+            visibility: hidden !important;
+            width: 1px !important;
+            height: 1px !important;
+            overflow: hidden !important;
+        }
+
+        #google_translate_element select {
+            background-color: #334155 !important; /* bg-slate-700 */
+            color: #f8fafc !important; /* text-slate-50 */
+            border: 1px solid #475569 !important; /* border-slate-600 */
+            border-radius: 0.25rem !important; /* rounded */
+            padding: 0.375rem 0.5rem !important; /* py-1.5 px-2 */
+            font-size: 0.75rem !important; /* text-xs */
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+            font-weight: 600 !important; /* font-semibold */
+            outline: none;
+            cursor: pointer;
+            box-shadow: none !important;
+            height: 100%;
+        }
+
+        #google_translate_element select:hover {
+            background-color: #475569 !important; /* hover:bg-slate-600 */
+        }
+
+        /* Sembunyikan teks "Powered by Google" & Icon */
+        .goog-logo-link { display: none !important; }
+        .goog-te-gadget { color: transparent !important; font-size: 0px !important; margin: 0 !important; }
+        .goog-te-gadget .goog-te-combo { margin: 0 !important; }
+
+        #google_translate_element {
+            display: none !important;
+        }
+
+        /* Menghilangkan total top bar / banner melayang Google Translate */
+        .goog-te-banner-frame, 
+        .goog-te-banner, 
+        .skiptranslate iframe {
+            display: none !important;
+        }
+
+        /* Mencegah halaman bergeser ke bawah akibat ruang kosong banner */
+        body {
+            top: 0 !important;
+            position: static !important;
+        }
+
     </style>
 </head>
 <body class="text-slate-800 h-screen flex flex-col overflow-hidden">
@@ -133,6 +191,18 @@ href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 
             <button onclick="exportJSON()" class="bg-slate-700 hover:bg-slate-600 border border-slate-600 px-3 py-1.5 rounded text-xs font-semibold transition flex items-center gap-2" title="Save Data JSON">
                 <i class="fa-solid fa-download text-emerald-400"></i> <span class="hidden md:inline">Save</span>
             </button>
+
+            <div class="relative flex items-center">
+                <select onchange="triggerTranslate(this.value)" class="bg-slate-700 hover:bg-slate-600 border border-slate-600 text-white pl-3 pr-7 py-1.5 rounded text-xs font-semibold outline-none cursor-pointer appearance-none transition shadow-sm h-[30px]">
+                    <option value="" disabled selected>🌐 Bahasa</option>
+                    <option value="id">🇮🇩 Indonesia</option>
+                    <option value="en">🇬🇧 English</option>
+                    <option value="ja">🇯🇵 日本語</option>
+                    <option value="fr">🇫🇷 Français</option>
+                    <option value="zh-CN">🇨🇳 中文</option>
+                </select>
+                <i class="fa-solid fa-chevron-down absolute right-2.5 text-[10px] text-slate-300 pointer-events-none"></i>
+            </div>
 
             <button onclick="loadSampleData()" class="bg-sky-600 hover:bg-sky-500 px-3 py-1.5 rounded text-xs font-semibold transition flex items-center gap-2">
                 <i class="fa-solid fa-bolt"></i> <span class="hidden md:inline">Sampel Data</span>
@@ -200,6 +270,9 @@ href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 
                         </button>
                         <button onclick="processVillageData(currentVillageId, true)" class="bg-slate-800 text-white hover:bg-slate-700 px-3 py-2 rounded-lg text-xs font-semibold shadow transition flex items-center gap-2">
                             <i class="fa-solid fa-rotate-right"></i> Refresh
+                        </button>
+                        <button onclick="exportToPDF()" class="bg-emerald-600 text-white hover:bg-emerald-500 px-3 py-2 rounded-lg text-xs font-semibold shadow transition flex items-center gap-2">
+                            <i class="fa-solid fa-file-pdf"></i> Unduh PDF
                         </button>
                     </div>
                 </div>
@@ -445,6 +518,19 @@ href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 
            1. DATABASE & STATE MANAGEMENT
            ========================================= */
         let db = { villages: [] };
+
+        // Fungsi untuk memicu Google Translate dari dropdown custom
+        function triggerTranslate(lang) {
+            const translateSelect = document.querySelector('.goog-te-combo');
+            if (translateSelect) {
+                translateSelect.value = lang;
+                // Pancing event 'change' agar Google Translate mendeteksi perubahan
+                translateSelect.dispatchEvent(new Event('change'));
+            } else {
+                alert("Modul bahasa sedang dimuat, tunggu beberapa detik...");
+            }
+        }
+
         let map = null;
         let markers = {};
         let currentVillageId = null;
@@ -1140,6 +1226,105 @@ async function processVillageData(id, forceUpdate) {
             }
         }
 
+        // -- FUNGSI EXPORT LAPORAN PROFESIONAL KE PDF --
+        function exportToPDF() {
+            if (!currentVillageId) {
+                alert("Pilih desa di peta terlebih dahulu!");
+                return;
+            }
+
+            const v = db.villages.find(x => x.id === currentVillageId);
+            if (!v || !v.hasData) return;
+
+            showLoader("Menyusun Dokumen PDF Profesional...");
+
+            // Susun konten tabel dan teks laporan
+            const printContent = document.getElementById('print-content');
+            
+            // Tentukan warna status
+            let statusColor = v.riskLevel === 'Tinggi' ? '#e11d48' : (v.riskLevel === 'Sedang' ? '#d97706' : '#16a34a');
+            let statusText = v.riskLevel === 'Tinggi' ? 'TUNDA TANAM (RISIKO TINGGI)' : (v.riskLevel === 'Sedang' ? 'HATI-HATI (RISIKO SEDANG)' : 'AMAN (BISA TANAM)');
+
+            printContent.innerHTML = `
+                <table style="width: 100%; margin-bottom: 25px;">
+                    <tr>
+                        <td style="width: 50%;">
+                            <h2 style="font-size: 20px; font-weight: bold; margin: 0 0 5px 0;">${v.name}</h2>
+                            <p style="margin: 0; font-size: 14px;">Komoditas: <b>${v.komoditas}</b></p>
+                            <p style="margin: 5px 0 0 0; font-size: 14px;">Tgl Tanam: ${v.tglTanam}</p>
+                        </td>
+                        <td style="width: 50%; text-align: right;">
+                            <div style="background-color: ${statusColor}; color: white; padding: 10px 15px; border-radius: 5px; display: inline-block; font-weight: bold; font-size: 14px;">
+                                REKOMENDASI: ${statusText}
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+
+                <h3 style="font-size: 16px; border-bottom: 1px solid #cbd5e1; padding-bottom: 5px; margin-bottom: 15px;">Matriks Impact-Based Forecasting (IBF)</h3>
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 25px; font-size: 14px;">
+                    <tr style="background: #f1f5f9;">
+                        <th style="padding: 10px; border: 1px solid #cbd5e1; text-align: left;">Indikator Pengukuran</th>
+                        <th style="padding: 10px; border: 1px solid #cbd5e1; text-align: center;">Hasil Observasi</th>
+                        <th style="padding: 10px; border: 1px solid #cbd5e1; text-align: center;">Level</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px; border: 1px solid #cbd5e1;">Ancaman Iklim (SPI & Kelembapan Tanah)</td>
+                        <td style="padding: 10px; border: 1px solid #cbd5e1; text-align: center;">${v.satSPI} (SPI) | ${v.satSM} (SM)</td>
+                        <td style="padding: 10px; border: 1px solid #cbd5e1; text-align: center; font-weight: bold;">${v.hazardLevel}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px; border: 1px solid #cbd5e1;">Kerentanan Sosial (Lansia, Balita, Stok Pangan)</td>
+                        <td style="padding: 10px; border: 1px solid #cbd5e1; text-align: center;">Populasi: ${v.socPop} Jiwa</td>
+                        <td style="padding: 10px; border: 1px solid #cbd5e1; text-align: center; font-weight: bold;">${v.vulnLevel}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px; border: 1px solid #cbd5e1;">Kapasitas Adaptasi (Infrastruktur Air)</td>
+                        <td style="padding: 10px; border: 1px solid #cbd5e1; text-align: center;">Skor: ${v.capAir}</td>
+                        <td style="padding: 10px; border: 1px solid #cbd5e1; text-align: center; font-weight: bold;">${v.capLevel}</td>
+                    </tr>
+                </table>
+
+                <h3 style="font-size: 16px; border-bottom: 1px solid #cbd5e1; padding-bottom: 5px; margin-bottom: 15px;">Peringatan Hama & Penyakit (Satelit Prediktif)</h3>
+                <div style="padding: 15px; background: #f8fafc; border: 1px solid #e2e8f0; font-size: 14px; line-height: 1.6; border-radius: 5px; margin-bottom: 25px;">
+                    <p style="margin: 0;"><b>Status:</b> ${v.pestAlert.title}</p>
+                    <p style="margin: 5px 0 0 0; color: #475569;">${v.pestAlert.desc}</p>
+                </div>
+                
+                <p style="font-size: 10px; color: #94a3b8; text-align: center; margin-top: 50px;">Dokumen ini dihasilkan secara otomatis oleh sistem Horizon Scanning. Data berbasis satelit Open-Meteo.</p>
+            `;
+
+            // Eksekusi Pembuatan PDF
+            
+            // Trik Jitu: Kita ambil isinya sebagai String Text (innerHTML).
+            // Ini membuang semua efek CSS absolute & z-index minus yang bikin blank.
+            const templateHTML = document.getElementById('print-template').innerHTML;
+            
+            // Bungkus dalam div styling bersih khusus cetak
+            const finalPrintString = `
+                <div style="width: 800px; background: white; padding: 20px; color: black; font-family: Arial, sans-serif;">
+                    ${templateHTML}
+                </div>
+            `;
+
+            const opt = {
+                margin:       0.5,
+                filename:     `Laporan_Destana_${v.name.replace(/\s+/g, '_')}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true }, // Resolusi tajam
+                jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+            };
+
+            // Masukkan String HTML langsung ke .from()
+            html2pdf().set(opt).from(finalPrintString).save().then(() => {
+                hideLoader();
+            }).catch(err => {
+                console.error(err);
+                hideLoader();
+                alert("Gagal mencetak dokumen.");
+            });
+        }
+
         // INIT
         document.addEventListener('DOMContentLoaded', () => {
             initMap();
@@ -1159,5 +1344,28 @@ async function processVillageData(id, forceUpdate) {
         });
 
     </script>
+
+
+ <div id="google_translate_element" style="display: none !important;"></div>
+
+<script type="text/javascript">
+    function googleTranslateElementInit() {
+        new google.translate.TranslateElement({
+            pageLanguage: 'id', 
+            includedLanguages: 'en,fr,es,de,ja,zh-CN' // Daftar bahasa
+        }, 'google_translate_element');
+    }
+</script>
+<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<div id="print-template" style="position: absolute; top: -10000px; left: -10000px; width: 800px; background: white; padding: 40px; color: black; font-family: Arial, sans-serif; z-index: -10;">
+    <div style="border-bottom: 2px solid #1e293b; padding-bottom: 15px; margin-bottom: 25px;">
+        <h1 style="font-size: 24px; font-weight: bold; margin: 0; color: #0f172a;">LAPORAN ANALISIS IKLIM & KERENTANAN DESA</h1>
+        <p style="font-size: 14px; margin: 5px 0 0 0; color: #64748b;">DESTANA / Impact-Based Forecasting System</p>
+    </div>
+    <div id="print-content">
+        </div>
+</div>
+
 </body>
 </html>
