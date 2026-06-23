@@ -1226,7 +1226,7 @@ async function processVillageData(id, forceUpdate) {
             }
         }
 
-        // -- FUNGSI EXPORT LAPORAN PROFESIONAL KE PDF --
+// -- FUNGSI EXPORT LAPORAN PROFESIONAL KE PDF --
         function exportToPDF() {
             if (!currentVillageId) {
                 alert("Pilih desa di peta terlebih dahulu!");
@@ -1236,93 +1236,84 @@ async function processVillageData(id, forceUpdate) {
             const v = db.villages.find(x => x.id === currentVillageId);
             if (!v || !v.hasData) return;
 
-            showLoader("Menyusun Dokumen PDF Profesional...");
+            showLoader("Menyiapkan Layout & Mencetak PDF...");
 
-            // Susun konten tabel dan teks laporan
-            const printContent = document.getElementById('print-content');
+            const dashboardElement = document.getElementById('dashboard-content');
             
-            // Tentukan warna status
-            let statusColor = v.riskLevel === 'Tinggi' ? '#e11d48' : (v.riskLevel === 'Sedang' ? '#d97706' : '#16a34a');
-            let statusText = v.riskLevel === 'Tinggi' ? 'TUNDA TANAM (RISIKO TINGGI)' : (v.riskLevel === 'Sedang' ? 'HATI-HATI (RISIKO SEDANG)' : 'AMAN (BISA TANAM)');
-
-            printContent.innerHTML = `
-                <table style="width: 100%; margin-bottom: 25px;">
-                    <tr>
-                        <td style="width: 50%;">
-                            <h2 style="font-size: 20px; font-weight: bold; margin: 0 0 5px 0;">${v.name}</h2>
-                            <p style="margin: 0; font-size: 14px;">Komoditas: <b>${v.komoditas}</b></p>
-                            <p style="margin: 5px 0 0 0; font-size: 14px;">Tgl Tanam: ${v.tglTanam}</p>
-                        </td>
-                        <td style="width: 50%; text-align: right;">
-                            <div style="background-color: ${statusColor}; color: white; padding: 10px 15px; border-radius: 5px; display: inline-block; font-weight: bold; font-size: 14px;">
-                                REKOMENDASI: ${statusText}
-                            </div>
-                        </td>
-                    </tr>
-                </table>
-
-                <h3 style="font-size: 16px; border-bottom: 1px solid #cbd5e1; padding-bottom: 5px; margin-bottom: 15px;">Matriks Impact-Based Forecasting (IBF)</h3>
-                <table style="width: 100%; border-collapse: collapse; margin-bottom: 25px; font-size: 14px;">
-                    <tr style="background: #f1f5f9;">
-                        <th style="padding: 10px; border: 1px solid #cbd5e1; text-align: left;">Indikator Pengukuran</th>
-                        <th style="padding: 10px; border: 1px solid #cbd5e1; text-align: center;">Hasil Observasi</th>
-                        <th style="padding: 10px; border: 1px solid #cbd5e1; text-align: center;">Level</th>
-                    </tr>
-                    <tr>
-                        <td style="padding: 10px; border: 1px solid #cbd5e1;">Ancaman Iklim (SPI & Kelembapan Tanah)</td>
-                        <td style="padding: 10px; border: 1px solid #cbd5e1; text-align: center;">${v.satSPI} (SPI) | ${v.satSM} (SM)</td>
-                        <td style="padding: 10px; border: 1px solid #cbd5e1; text-align: center; font-weight: bold;">${v.hazardLevel}</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 10px; border: 1px solid #cbd5e1;">Kerentanan Sosial (Lansia, Balita, Stok Pangan)</td>
-                        <td style="padding: 10px; border: 1px solid #cbd5e1; text-align: center;">Populasi: ${v.socPop} Jiwa</td>
-                        <td style="padding: 10px; border: 1px solid #cbd5e1; text-align: center; font-weight: bold;">${v.vulnLevel}</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 10px; border: 1px solid #cbd5e1;">Kapasitas Adaptasi (Infrastruktur Air)</td>
-                        <td style="padding: 10px; border: 1px solid #cbd5e1; text-align: center;">Skor: ${v.capAir}</td>
-                        <td style="padding: 10px; border: 1px solid #cbd5e1; text-align: center; font-weight: bold;">${v.capLevel}</td>
-                    </tr>
-                </table>
-
-                <h3 style="font-size: 16px; border-bottom: 1px solid #cbd5e1; padding-bottom: 5px; margin-bottom: 15px;">Peringatan Hama & Penyakit (Satelit Prediktif)</h3>
-                <div style="padding: 15px; background: #f8fafc; border: 1px solid #e2e8f0; font-size: 14px; line-height: 1.6; border-radius: 5px; margin-bottom: 25px;">
-                    <p style="margin: 0;"><b>Status:</b> ${v.pestAlert.title}</p>
-                    <p style="margin: 5px 0 0 0; color: #475569;">${v.pestAlert.desc}</p>
-                </div>
-                
-                <p style="font-size: 10px; color: #94a3b8; text-align: center; margin-top: 50px;">Dokumen ini dihasilkan secara otomatis oleh sistem Horizon Scanning. Data berbasis satelit Open-Meteo.</p>
-            `;
-
-            // Eksekusi Pembuatan PDF
+            // Elemen container pembungkus yang membatasi scroll
+            const rightPanel = dashboardElement.parentElement;
+            const mainWrapper = rightPanel.parentElement;
             
-            // Trik Jitu: Kita ambil isinya sebagai String Text (innerHTML).
-            // Ini membuang semua efek CSS absolute & z-index minus yang bikin blank.
-            const templateHTML = document.getElementById('print-template').innerHTML;
+            // 1. Simpan nilai scroll agar layar tidak berantakan setelah print
+            const originalScroll = rightPanel.scrollTop;
             
-            // Bungkus dalam div styling bersih khusus cetak
-            const finalPrintString = `
-                <div style="width: 800px; background: white; padding: 20px; color: black; font-family: Arial, sans-serif;">
-                    ${templateHTML}
-                </div>
-            `;
+            // 2. Sembunyikan tombol-tombol UI (Refresh, Data Sosial, Download)
+            const buttons = dashboardElement.querySelectorAll('button');
+            const originalButtonsDisplay = [];
+            buttons.forEach((btn, i) => {
+                originalButtonsDisplay[i] = btn.style.display;
+                btn.style.display = 'none';
+            });
 
+            // 3. Trik Anti Terpotong (In-Place):
+            // Lepaskan batasan tinggi dan scroll (overflow) dari semua parent sementara.
+            // Ini membuat html2pdf bisa menjepret secara full dari atas ke bawah tanpa blank!
+            document.body.style.overflow = 'visible';
+            document.body.style.height = 'auto';
+            mainWrapper.style.overflow = 'visible';
+            mainWrapper.style.height = 'auto';
+            rightPanel.style.overflow = 'visible';
+            rightPanel.style.height = 'auto';
+
+            // 4. Scroll paksa ke titik 0,0 agar tidak ada "Blank Space" di PDF
+            window.scrollTo(0, 0);
+            rightPanel.scrollTop = 0;
+
+            // 5. Konfigurasi HTML2PDF
             const opt = {
-                margin:       0.5,
-                filename:     `Laporan_Destana_${v.name.replace(/\s+/g, '_')}.pdf`,
+                margin:       [0.3, 0.3, 0.3, 0.3], // Margin Atas, Kiri, Bawah, Kanan
+                filename:     `Laporan_Iklim_${v.name.replace(/\s+/g, '_')}.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true }, // Resolusi tajam
+                html2canvas:  { 
+                    scale: 2, 
+                    useCORS: true, 
+                    scrollY: 0,
+                    backgroundColor: '#f8fafc' // Warna BG asli Dashboard
+                },
                 jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
             };
 
-            // Masukkan String HTML langsung ke .from()
-            html2pdf().set(opt).from(finalPrintString).save().then(() => {
+            // 6. Eksekusi rendering dengan jeda waktu sedikit
+            // Jeda ini memastikan grafik Chart.js dan Font bahasa Jepang/asing ter-load sempurna
+            setTimeout(() => {
+                html2pdf().set(opt).from(dashboardElement).save().then(() => {
+                    restoreLayout();
+                }).catch(err => {
+                    console.error(err);
+                    restoreLayout();
+                    alert("Gagal mencetak dokumen.");
+                });
+            }, 800);
+
+            // Fungsi untuk mengembalikan tampilan website seperti semula
+            function restoreLayout() {
+                // Kembalikan batas CSS Scroll
+                document.body.style.overflow = '';
+                document.body.style.height = '';
+                mainWrapper.style.overflow = '';
+                mainWrapper.style.height = '';
+                rightPanel.style.overflow = '';
+                rightPanel.style.height = '';
+                
+                // Munculkan kembali tombol-tombol
+                buttons.forEach((btn, i) => {
+                    btn.style.display = originalButtonsDisplay[i];
+                });
+
+                // Kembalikan posisi scroll
+                rightPanel.scrollTop = originalScroll;
                 hideLoader();
-            }).catch(err => {
-                console.error(err);
-                hideLoader();
-                alert("Gagal mencetak dokumen.");
-            });
+            }
         }
 
         // INIT
@@ -1358,14 +1349,6 @@ async function processVillageData(id, forceUpdate) {
 </script>
 <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
-<div id="print-template" style="position: absolute; top: -10000px; left: -10000px; width: 800px; background: white; padding: 40px; color: black; font-family: Arial, sans-serif; z-index: -10;">
-    <div style="border-bottom: 2px solid #1e293b; padding-bottom: 15px; margin-bottom: 25px;">
-        <h1 style="font-size: 24px; font-weight: bold; margin: 0; color: #0f172a;">LAPORAN ANALISIS IKLIM & KERENTANAN DESA</h1>
-        <p style="font-size: 14px; margin: 5px 0 0 0; color: #64748b;">DESTANA / Impact-Based Forecasting System</p>
-    </div>
-    <div id="print-content">
-        </div>
-</div>
 
 </body>
 </html>
