@@ -521,6 +521,19 @@ href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 
 
         // Fungsi untuk memicu Google Translate dari dropdown custom
         function triggerTranslate(lang) {
+            
+            // JIKA USER MEMILIH KEMBALI KE BAHASA ASLI (INDONESIA)
+            if (lang === 'id') {
+                // 1. Hapus cookie 'googtrans' yang mengatur state bahasa
+                document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+                document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; domain=" + window.location.hostname + "; path=/;";
+                
+                // 2. Refresh halaman dengan cepat untuk mereset teks ke aslinya
+                window.location.reload();
+                return;
+            }
+
+            // JIKA USER MEMILIH BAHASA ASING LAINNYA
             const translateSelect = document.querySelector('.goog-te-combo');
             if (translateSelect) {
                 translateSelect.value = lang;
@@ -1226,114 +1239,103 @@ async function processVillageData(id, forceUpdate) {
             }
         }
 
-        // -- FUNGSI EXPORT LAPORAN PROFESIONAL KE PDF (NATIVE BROWSER PRINT) --
-        function exportToPDF() {
-            if (!currentVillageId) {
-                alert("Pilih desa di peta terlebih dahulu!");
-                return;
-            }
+// -- FUNGSI EXPORT LAPORAN PROFESIONAL KE PDF (NATIVE BROWSER PRINT) --
+function exportToPDF() {
+    if (!currentVillageId) {
+        alert("Pilih desa di peta terlebih dahulu!");
+        return;
+    }
 
-            const v = db.villages.find(x => x.id === currentVillageId);
-            if (!v || !v.hasData) return;
+    const v = db.villages.find(x => x.id === currentVillageId);
+    if (!v || !v.hasData) return;
 
-            showLoader("Menyiapkan Tab Cetak...");
+    showLoader("Menyiapkan Tab Cetak...");
 
-            // 1. Ambil & Kloning elemen dashboard
-            const dashboardElement = document.getElementById('dashboard-content');
-            const clone = dashboardElement.cloneNode(true);
+    // 1. Ambil & Kloning elemen dashboard
+    const dashboardElement = document.getElementById('dashboard-content');
+    const clone = dashboardElement.cloneNode(true);
 
-            // 2. Hapus semua tombol dari hasil kloning
-            const buttons = clone.querySelectorAll('button');
-            buttons.forEach(btn => btn.remove());
+    // 2. Hapus semua elemen non-print dari kloning
+    //    FIX: tambahkan 'script' dan 'noscript' agar tidak bocor sebagai teks
+    clone.querySelectorAll('button, script, noscript, [data-no-print]').forEach(el => el.remove());
 
-            // 3. Konversi grafik Chart.js menjadi Gambar (Image) agar tidak hilang di Tab Baru
-            const originalCanvas = document.getElementById('weatherChart');
-            if (originalCanvas) {
-                const chartImageUrl = originalCanvas.toDataURL('image/png', 1.0);
-                const cloneCanvas = clone.querySelector('#weatherChart');
-                if (cloneCanvas) {
-                    const img = document.createElement('img');
-                    img.src = chartImageUrl;
-                    img.style.width = '100%';
-                    img.style.maxHeight = '250px';
-                    img.style.objectFit = 'contain';
-                    cloneCanvas.parentNode.replaceChild(img, cloneCanvas);
-                }
-            }
-
-            // 4. Rapikan kotak prediksi 14 hari agar barisnya turun ke bawah (Wrap)
-            const forecastContainer = clone.querySelector('#forecast-14-days');
-            if (forecastContainer) {
-                forecastContainer.style.flexWrap = 'wrap';
-                forecastContainer.style.overflowX = 'visible';
-                forecastContainer.style.paddingBottom = '0';
-            }
-
-            // 5. Buka Tab Baru
-            const printWindow = window.open('', '_blank');
-            if (!printWindow) {
-                alert("Pop-up diblokir oleh browser. Izinkan pop-up untuk mencetak.");
-                hideLoader();
-                return;
-            }
-
-            // 6. Tulis kerangka dasar HTML super bersih (Tanpa script tag di string)
-            printWindow.document.open();
-            printWindow.document.write('<!DOCTYPE html><html lang="id"><head><title>Cetak Laporan - ' + v.name + '</title></head><body class="p-4 md:p-8"></body></html>');
-            printWindow.document.close();
-
-            // 7. Masukkan Tailwind CSS dengan aman
-            const twScript = printWindow.document.createElement('script');
-            twScript.src = "https://cdn.tailwindcss.com";
-            printWindow.document.head.appendChild(twScript);
-
-            // 8. Masukkan FontAwesome
-            const faLink = printWindow.document.createElement('link');
-            faLink.rel = "stylesheet";
-            faLink.href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css";
-            printWindow.document.head.appendChild(faLink);
-
-            // 9. Masukkan Google Fonts
-            const fontLink = printWindow.document.createElement('link');
-            fontLink.rel = "stylesheet";
-            fontLink.href = "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap";
-            printWindow.document.head.appendChild(fontLink);
-
-            // 10. Tambahkan CSS Cetak Khusus (A4 & Anti Terpotong Tengah)
-            const style = printWindow.document.createElement('style');
-            style.innerHTML = `
-                body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #ffffff; color: #1e293b; }
-                @media print {
-                    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-                    @page { size: A4 portrait; margin: 10mm; }
-                    .grid > div, .mb-6, .border { page-break-inside: avoid; break-inside: avoid; }
-                }
-            `;
-            printWindow.document.head.appendChild(style);
-
-            // 11. Buat Container Utama dan masukkan Kloning Dashboard ke dalamnya
-            const container = printWindow.document.createElement('div');
-            container.style.maxWidth = '800px';
-            container.style.margin = '0 auto';
-
-            // Header Judul PDF
-            const header = printWindow.document.createElement('div');
-            header.className = 'border-b-2 border-slate-800 pb-3 mb-6';
-            header.innerHTML = '<h1 class="text-2xl font-black text-slate-800">Laporan Analisis Iklim Desa</h1><p class="text-sm text-slate-500">DESTANA Impact-Based Forecasting System</p>';
-            
-            container.appendChild(header);
-            container.appendChild(clone);
-            
-            // Render ke Layar Tab Baru
-            printWindow.document.body.appendChild(container);
-
-            // 12. Panggil jendela Print setelah jeda 2 detik (Menunggu Tailwind Loading Warna)
-            setTimeout(() => {
-                printWindow.print();
-            }, 2000);
-
-            hideLoader();
+    // 3. Konversi grafik Chart.js menjadi <img> agar tidak hilang di Tab Baru
+    const originalCanvas = document.getElementById('weatherChart');
+    if (originalCanvas) {
+        const chartImageUrl = originalCanvas.toDataURL('image/png', 1.0);
+        const cloneCanvas = clone.querySelector('#weatherChart');
+        if (cloneCanvas) {
+            const img = document.createElement('img');
+            img.src = chartImageUrl;
+            img.style.cssText = 'width:100%;max-height:250px;object-fit:contain;';
+            cloneCanvas.parentNode.replaceChild(img, cloneCanvas);
         }
+    }
+
+    // 4. Rapikan kotak prediksi 14 hari agar wrap ke bawah
+    const forecastContainer = clone.querySelector('#forecast-14-days');
+    if (forecastContainer) {
+        forecastContainer.style.flexWrap = 'wrap';
+        forecastContainer.style.overflowX = 'visible';
+        forecastContainer.style.paddingBottom = '0';
+    }
+
+    // 5. Buka Tab Baru
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+        alert("Pop-up diblokir oleh browser. Izinkan pop-up untuk mencetak.");
+        hideLoader();
+        return;
+    }
+
+    // 6. FIX UTAMA: Ambil outerHTML clone SEBELUM dikirim ke tab baru
+    //    lalu tulis SELURUH HTML sekaligus dalam satu document.write()
+    //    — jangan pernah manipulasi DOM setelah document.close()
+    const dashboardHTML = clone.outerHTML;
+
+    const fullHTML = [
+        '<!DOCTYPE html>',
+        '<html lang="id">',
+        '<head>',
+        '  <meta charset="UTF-8">',
+        '  <meta name="viewport" content="width=device-width, initial-scale=1.0">',
+        '  <title>Laporan - ' + v.name + '</title>',
+        '  <script src="https://cdn.tailwindcss.com"><\/script>',
+        '  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">',
+        '  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap">',
+        '  <style>',
+        '    body { font-family: "Plus Jakarta Sans", sans-serif; background: #fff; color: #1e293b; }',
+        '    @media print {',
+        '      body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }',
+        '      @page { size: A4 portrait; margin: 10mm; }',
+        '      .grid > div, .mb-6, .border { page-break-inside: avoid; break-inside: avoid; }',
+        '    }',
+        '  <\/style>',
+        '</head>',
+        '<body class="p-4 md:p-8">',
+        '  <div style="max-width:800px;margin:0 auto">',
+        '    <div style="border-bottom:2px solid #1e293b;padding-bottom:12px;margin-bottom:24px">',
+        '      <h1 style="font-size:1.5rem;font-weight:900;color:#1e293b">Laporan Analisis Iklim Desa</h1>',
+        '      <p style="font-size:0.875rem;color:#64748b">DESTANA Impact-Based Forecasting System</p>',
+        '    </div>',
+        dashboardHTML,
+        '  </div>',
+        '  <script>',
+        '    window.onload = function() {',
+        '      setTimeout(function() { window.print(); }, 1500);',
+        '    };',
+        '  <\/script>',
+        '</body>',
+        '</html>'
+    ].join('\n');
+
+    // 7. Tulis semuanya sekaligus — document.close() adalah panggilan terakhir
+    printWindow.document.open();
+    printWindow.document.write(fullHTML);
+    printWindow.document.close();
+
+    hideLoader();
+}
 
         // INIT
         document.addEventListener('DOMContentLoaded', () => {
