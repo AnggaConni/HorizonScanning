@@ -1226,7 +1226,7 @@ async function processVillageData(id, forceUpdate) {
             }
         }
 
-// -- FUNGSI EXPORT LAPORAN PROFESIONAL KE PDF --
+        // -- FUNGSI EXPORT LAPORAN PROFESIONAL KE PDF (NATIVE BROWSER PRINT) --
         function exportToPDF() {
             if (!currentVillageId) {
                 alert("Pilih desa di peta terlebih dahulu!");
@@ -1236,84 +1236,103 @@ async function processVillageData(id, forceUpdate) {
             const v = db.villages.find(x => x.id === currentVillageId);
             if (!v || !v.hasData) return;
 
-            showLoader("Menyiapkan Layout & Mencetak PDF...");
+            showLoader("Menyiapkan Tab Cetak...");
 
+            // 1. Ambil & Kloning elemen dashboard
             const dashboardElement = document.getElementById('dashboard-content');
-            
-            // Elemen container pembungkus yang membatasi scroll
-            const rightPanel = dashboardElement.parentElement;
-            const mainWrapper = rightPanel.parentElement;
-            
-            // 1. Simpan nilai scroll agar layar tidak berantakan setelah print
-            const originalScroll = rightPanel.scrollTop;
-            
-            // 2. Sembunyikan tombol-tombol UI (Refresh, Data Sosial, Download)
-            const buttons = dashboardElement.querySelectorAll('button');
-            const originalButtonsDisplay = [];
-            buttons.forEach((btn, i) => {
-                originalButtonsDisplay[i] = btn.style.display;
-                btn.style.display = 'none';
-            });
+            const clone = dashboardElement.cloneNode(true);
 
-            // 3. Trik Anti Terpotong (In-Place):
-            // Lepaskan batasan tinggi dan scroll (overflow) dari semua parent sementara.
-            // Ini membuat html2pdf bisa menjepret secara full dari atas ke bawah tanpa blank!
-            document.body.style.overflow = 'visible';
-            document.body.style.height = 'auto';
-            mainWrapper.style.overflow = 'visible';
-            mainWrapper.style.height = 'auto';
-            rightPanel.style.overflow = 'visible';
-            rightPanel.style.height = 'auto';
+            // 2. Hapus semua tombol dari hasil kloning
+            const buttons = clone.querySelectorAll('button');
+            buttons.forEach(btn => btn.remove());
 
-            // 4. Scroll paksa ke titik 0,0 agar tidak ada "Blank Space" di PDF
-            window.scrollTo(0, 0);
-            rightPanel.scrollTop = 0;
-
-            // 5. Konfigurasi HTML2PDF
-            const opt = {
-                margin:       [0.3, 0.3, 0.3, 0.3], // Margin Atas, Kiri, Bawah, Kanan
-                filename:     `Laporan_Iklim_${v.name.replace(/\s+/g, '_')}.pdf`,
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { 
-                    scale: 2, 
-                    useCORS: true, 
-                    scrollY: 0,
-                    backgroundColor: '#f8fafc' // Warna BG asli Dashboard
-                },
-                jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
-            };
-
-            // 6. Eksekusi rendering dengan jeda waktu sedikit
-            // Jeda ini memastikan grafik Chart.js dan Font bahasa Jepang/asing ter-load sempurna
-            setTimeout(() => {
-                html2pdf().set(opt).from(dashboardElement).save().then(() => {
-                    restoreLayout();
-                }).catch(err => {
-                    console.error(err);
-                    restoreLayout();
-                    alert("Gagal mencetak dokumen.");
-                });
-            }, 800);
-
-            // Fungsi untuk mengembalikan tampilan website seperti semula
-            function restoreLayout() {
-                // Kembalikan batas CSS Scroll
-                document.body.style.overflow = '';
-                document.body.style.height = '';
-                mainWrapper.style.overflow = '';
-                mainWrapper.style.height = '';
-                rightPanel.style.overflow = '';
-                rightPanel.style.height = '';
-                
-                // Munculkan kembali tombol-tombol
-                buttons.forEach((btn, i) => {
-                    btn.style.display = originalButtonsDisplay[i];
-                });
-
-                // Kembalikan posisi scroll
-                rightPanel.scrollTop = originalScroll;
-                hideLoader();
+            // 3. Konversi grafik Chart.js menjadi Gambar (Image) agar tidak hilang di Tab Baru
+            const originalCanvas = document.getElementById('weatherChart');
+            if (originalCanvas) {
+                const chartImageUrl = originalCanvas.toDataURL('image/png', 1.0);
+                const cloneCanvas = clone.querySelector('#weatherChart');
+                if (cloneCanvas) {
+                    const img = document.createElement('img');
+                    img.src = chartImageUrl;
+                    img.style.width = '100%';
+                    img.style.maxHeight = '250px';
+                    img.style.objectFit = 'contain';
+                    cloneCanvas.parentNode.replaceChild(img, cloneCanvas);
+                }
             }
+
+            // 4. Rapikan kotak prediksi 14 hari agar barisnya turun ke bawah (Wrap)
+            const forecastContainer = clone.querySelector('#forecast-14-days');
+            if (forecastContainer) {
+                forecastContainer.style.flexWrap = 'wrap';
+                forecastContainer.style.overflowX = 'visible';
+                forecastContainer.style.paddingBottom = '0';
+            }
+
+            // 5. Buka Tab Baru
+            const printWindow = window.open('', '_blank');
+            if (!printWindow) {
+                alert("Pop-up diblokir oleh browser. Izinkan pop-up untuk mencetak.");
+                hideLoader();
+                return;
+            }
+
+            // 6. Tulis kerangka dasar HTML super bersih (Tanpa script tag di string)
+            printWindow.document.open();
+            printWindow.document.write('<!DOCTYPE html><html lang="id"><head><title>Cetak Laporan - ' + v.name + '</title></head><body class="p-4 md:p-8"></body></html>');
+            printWindow.document.close();
+
+            // 7. Masukkan Tailwind CSS dengan aman
+            const twScript = printWindow.document.createElement('script');
+            twScript.src = "https://cdn.tailwindcss.com";
+            printWindow.document.head.appendChild(twScript);
+
+            // 8. Masukkan FontAwesome
+            const faLink = printWindow.document.createElement('link');
+            faLink.rel = "stylesheet";
+            faLink.href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css";
+            printWindow.document.head.appendChild(faLink);
+
+            // 9. Masukkan Google Fonts
+            const fontLink = printWindow.document.createElement('link');
+            fontLink.rel = "stylesheet";
+            fontLink.href = "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap";
+            printWindow.document.head.appendChild(fontLink);
+
+            // 10. Tambahkan CSS Cetak Khusus (A4 & Anti Terpotong Tengah)
+            const style = printWindow.document.createElement('style');
+            style.innerHTML = `
+                body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #ffffff; color: #1e293b; }
+                @media print {
+                    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                    @page { size: A4 portrait; margin: 10mm; }
+                    .grid > div, .mb-6, .border { page-break-inside: avoid; break-inside: avoid; }
+                }
+            `;
+            printWindow.document.head.appendChild(style);
+
+            // 11. Buat Container Utama dan masukkan Kloning Dashboard ke dalamnya
+            const container = printWindow.document.createElement('div');
+            container.style.maxWidth = '800px';
+            container.style.margin = '0 auto';
+
+            // Header Judul PDF
+            const header = printWindow.document.createElement('div');
+            header.className = 'border-b-2 border-slate-800 pb-3 mb-6';
+            header.innerHTML = '<h1 class="text-2xl font-black text-slate-800">Laporan Analisis Iklim Desa</h1><p class="text-sm text-slate-500">DESTANA Impact-Based Forecasting System</p>';
+            
+            container.appendChild(header);
+            container.appendChild(clone);
+            
+            // Render ke Layar Tab Baru
+            printWindow.document.body.appendChild(container);
+
+            // 12. Panggil jendela Print setelah jeda 2 detik (Menunggu Tailwind Loading Warna)
+            setTimeout(() => {
+                printWindow.print();
+            }, 2000);
+
+            hideLoader();
         }
 
         // INIT
