@@ -155,58 +155,66 @@ href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 
 <body class="text-slate-800 h-screen flex flex-col overflow-hidden">
 
     <!-- TOP NAVBAR -->
-    <nav class="bg-slate-900 text-white p-3 shrink-0 flex justify-between items-center shadow-lg z-20">
-        <div class="flex items-center gap-3 pl-2">
-            <div class="w-8 h-8 rounded bg-sky-500 flex items-center justify-center text-white font-bold">
+    <nav class="bg-slate-900 text-white p-2 md:p-3 shrink-0 flex flex-wrap md:flex-nowrap justify-between items-center gap-2 md:gap-4 shadow-lg z-20">
+        
+        <!-- 1. LOGO & BRAND -->
+        <div class="flex items-center gap-2 pl-1 order-1">
+            <div class="w-7 h-7 md:w-8 md:h-8 rounded bg-sky-500 flex items-center justify-center text-white font-bold text-xs md:text-base shadow-sm">
                 <i class="fa-solid fa-satellite-dish"></i>
             </div>
             <div>
-                <h1 class="font-bold text-sm tracking-wide">DESTANA / IBF SYSTEM</h1>
-                <p class="text-[10px] text-slate-400">Early Action Protocol</p>
+                <h1 class="font-bold text-[11px] md:text-sm tracking-wide leading-tight">DESTANA / IBF</h1>
+                <p class="text-[8px] md:text-[10px] text-slate-400 leading-tight">Early Action Protocol</p>
             </div>
         </div>
         
-        <!-- Global ENSO Widget -->
-        <div class="hidden md:flex items-center gap-4 bg-slate-800 px-4 py-1.5 rounded-lg border border-slate-700">
-            <div class="text-xs text-slate-300">
-                <span class="block text-[9px] uppercase tracking-wider text-slate-500">Status ENSO (NOAA)</span>
-                Oceanic Niño Index: <strong id="enso-val" class="text-orange-400">...</strong>
-                <span id="enso-trend" class="ml-1 text-[10px] px-1 rounded bg-slate-700"></span>
-            </div>
-            <div id="enso-badge" class="px-2 py-1 bg-slate-700 text-slate-400 border border-slate-600 rounded text-xs font-bold uppercase">
-                Loading...
-            </div>
-        </div>
-
-        <div class="flex gap-2">
-            <!-- Hidden input untuk Load File -->
+        <!-- 2. ACTION BUTTONS (Pindah ke samping logo di Mobile) -->
+        <div class="flex items-center gap-1.5 md:gap-2 order-2 md:order-3">
+            <!-- Hidden input -->
             <input type="file" id="file-import" accept=".json" class="hidden" onchange="importJSON(event)">
             
-            <!-- Tombol Load -->
-            <button onclick="document.getElementById('file-import').click()" class="bg-slate-700 hover:bg-slate-600 border border-slate-600 px-3 py-1.5 rounded text-xs font-semibold transition flex items-center gap-2" title="Load Data JSON">
-                <i class="fa-solid fa-folder-open text-amber-400"></i> <span class="hidden md:inline">Load</span>
+            <button onclick="document.getElementById('file-import').click()" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 w-7 h-7 md:w-auto md:px-3 md:py-1.5 rounded flex items-center justify-center transition shadow-sm" title="Load Data">
+                <i class="fa-solid fa-folder-open text-amber-400 text-xs md:text-sm"></i> 
+                <span class="hidden md:inline ml-1.5 text-xs font-semibold">Load</span>
             </button>
             
-            <!-- Tombol Save -->
-            <button onclick="exportJSON()" class="bg-slate-700 hover:bg-slate-600 border border-slate-600 px-3 py-1.5 rounded text-xs font-semibold transition flex items-center gap-2" title="Save Data JSON">
-                <i class="fa-solid fa-download text-emerald-400"></i> <span class="hidden md:inline">Save</span>
+            <button onclick="exportJSON()" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 w-7 h-7 md:w-auto md:px-3 md:py-1.5 rounded flex items-center justify-center transition shadow-sm" title="Save Data">
+                <i class="fa-solid fa-download text-emerald-400 text-xs md:text-sm"></i> 
+                <span class="hidden md:inline ml-1.5 text-xs font-semibold">Save</span>
             </button>
 
+            <!-- Translate (Dibuat Singkat 2 Huruf di Mobile) -->
             <div class="relative flex items-center">
-                <select onchange="triggerTranslate(this.value)" class="bg-slate-700 hover:bg-slate-600 border border-slate-600 text-white pl-3 pr-7 py-1.5 rounded text-xs font-semibold outline-none cursor-pointer appearance-none transition shadow-sm h-[30px]">
-                    <option value="" disabled selected>🌐 Bahasa</option>
-                    <option value="id">🇮🇩 Indonesia</option>
-                    <option value="en">🇬🇧 English</option>
-                    <option value="ja">🇯🇵 日本語</option>
-                    <option value="fr">🇫🇷 Français</option>
-                    <option value="zh-CN">🇨🇳 中文</option>
+                <select onchange="triggerTranslate(this.value)" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white pl-1.5 pr-4 md:pl-3 md:pr-7 rounded text-[10px] md:text-xs font-bold outline-none cursor-pointer appearance-none transition h-7 w-[54px] md:h-auto md:py-1.5 md:w-max">
+                    <option value="" disabled selected>🌐</option>
+                    <option value="id">🇮🇩 ID</option>
+                    <option value="en">🇬🇧 EN</option>
+                    <option value="ja">🇯🇵 JA</option>
+                    <option value="fr">🇫🇷 FR</option>
+                    <option value="zh-CN">🇨🇳 ZH</option>
                 </select>
-                <i class="fa-solid fa-chevron-down absolute right-2.5 text-[10px] text-slate-300 pointer-events-none"></i>
+                <i class="fa-solid fa-chevron-down absolute right-1.5 md:right-2.5 text-[8px] md:text-[10px] text-slate-400 pointer-events-none"></i>
             </div>
 
-            <button onclick="loadSampleData()" class="bg-sky-600 hover:bg-sky-500 px-3 py-1.5 rounded text-xs font-semibold transition flex items-center gap-2">
-                <i class="fa-solid fa-bolt"></i> <span class="hidden md:inline">Sampel Data</span>
+            <button onclick="loadSampleData()" class="bg-sky-600 hover:bg-sky-500 text-white w-7 h-7 md:w-auto md:px-3 md:py-1.5 rounded flex items-center justify-center transition shadow-sm" title="Sampel Data">
+                <i class="fa-solid fa-bolt text-yellow-300 text-xs md:text-sm"></i> 
+                <span class="hidden md:inline ml-1.5 text-xs font-semibold">Sampel</span>
             </button>
+        </div>
+
+        <!-- 3. ENSO WIDGET (Turun jadi baris ke-2 di Mobile, Tengah di Desktop) -->
+        <div class="flex items-center justify-between md:justify-center w-full md:w-max bg-slate-800 border border-slate-700 px-3 py-1.5 rounded-lg shadow-inner order-3 md:order-2">
+            <div class="flex items-center gap-2 text-[10px] md:text-xs text-slate-300">
+                <span class="text-[9px] uppercase tracking-wider text-slate-500 hidden md:block">Status ENSO (NOAA)</span>
+                <span class="md:hidden font-bold uppercase text-sky-400">ENSO NOAA:</span>
+                <div>
+                    ONI <strong id="enso-val" class="text-orange-400">...</strong>
+                    <span id="enso-trend" class="ml-1 text-[10px] px-1 rounded bg-slate-700"></span>
+                </div>
+            </div>
+            <div id="enso-badge" class="ml-2 px-2 py-0.5 md:py-1 bg-slate-700 text-slate-400 border border-slate-600 rounded text-[9px] md:text-xs font-bold uppercase tracking-wider">
+                Loading...
+            </div>
         </div>
 
     </nav>
@@ -1369,6 +1377,21 @@ function exportToPDF() {
     }
 </script>
 <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<!-- Pendaftaran Service Worker -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then((registration) => {
+                        console.log('ServiceWorker berhasil didaftarkan dengan scope: ', registration.scope);
+                    })
+                    .catch((err) => {
+                        console.error('Pendaftaran ServiceWorker gagal: ', err);
+                    });
+            });
+        }
+    </script>
 
 
 </body>
