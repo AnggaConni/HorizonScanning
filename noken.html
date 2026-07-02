@@ -87,25 +87,41 @@
             box-shadow: 0 1px 2px rgba(0,0,0,0.05);
             transition: transform 0.2s;
         }
+        
         .role-badge:hover {
             transform: translateY(-2px);
         }
+        
         .role-badge i {
             margin-right: 0.5rem;
         }
 
-        /* Editable text styling */
+        /* Generic Editable Text Styling */
+        [contenteditable="true"] {
+            outline: none;
+            transition: all 0.2s ease-in-out;
+            border-radius: 6px;
+            cursor: text;
+        }
+        [contenteditable="true"]:hover:not(.editable-role) {
+            background-color: rgba(20, 184, 166, 0.05); /* Soft brand color */
+            box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.05);
+        }
+        [contenteditable="true"]:focus:not(.editable-role) {
+            background-color: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 0 0 2px #14b8a6; 
+        }
+
+        /* Specific styling for roles */
         .editable-role {
             border-bottom: 1px dashed currentColor;
             padding: 0 2px;
-            cursor: text;
-            transition: background-color 0.2s;
+            border-radius: 2px;
         }
         .editable-role:focus {
-            outline: none;
             background-color: rgba(255, 255, 255, 0.7);
             border-bottom-style: solid;
-            border-radius: 2px;
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5);
         }
 
         /* Print Specific CSS for PDF Export */
@@ -143,14 +159,19 @@
                 justify-content: center !important;
                 padding: 40px !important;
             }
-            /* Hide the arrow button on the title slide in PDF */
-            .animate-bounce {
-                display: none !important;
-            }
         }
     </style>
 </head>
 <body class="bg-pattern h-screen w-screen text-slate-800">
+
+    <!-- Print Instruction Toast -->
+    <div id="toast-modal" class="fixed top-24 left-1/2 transform -translate-x-1/2 -translate-y-4 opacity-0 pointer-events-none bg-slate-800 text-white px-6 py-4 rounded-xl shadow-2xl z-[100] transition-all duration-300 flex items-center space-x-4 border border-slate-700">
+        <i class="fa-solid fa-print text-brand-400 text-2xl"></i>
+        <div>
+            <p class="font-bold text-sm">Siap untuk di-print!</p>
+            <p class="text-xs text-slate-300">Gunakan Layout: <strong class="text-white">Landscape</strong> & Save as PDF.</p>
+        </div>
+    </div>
 
     <!-- Navigation UI (Fixed Top & Bottom) -->
     <header class="fixed top-0 left-0 w-full p-6 flex justify-between items-center z-50">
@@ -158,14 +179,14 @@
             <div class="w-10 h-10 rounded-lg bg-brand-600 flex items-center justify-center text-white font-bold text-xl shadow-lg">
                 N
             </div>
-            <span class="font-semibold text-slate-600 tracking-wide">Project Noken</span>
+            <span class="font-semibold text-slate-600 tracking-wide" contenteditable="true" spellcheck="false">Project Noken</span>
         </div>
         <div class="flex items-center space-x-4">
             <div class="text-xs text-brand-600 bg-brand-50 px-3 py-1 rounded-full font-medium border border-brand-100 hidden md:block">
-                <i class="fa-solid fa-pen-to-square mr-1"></i> Click any role badge to edit
+                <i class="fa-solid fa-pen-to-square mr-1"></i> Click any text or role to edit
             </div>
             
-            <button onclick="exportToPDF()" class="flex items-center space-x-2 bg-slate-800 hover:bg-slate-900 text-white text-sm font-medium px-4 py-2 rounded-lg shadow-sm transition-colors">
+            <button onclick="exportToPDF()" class="flex items-center space-x-2 bg-slate-800 hover:bg-slate-900 text-white text-sm font-medium px-4 py-2 rounded-lg shadow-sm transition-colors no-print">
                 <i class="fa-solid fa-file-pdf"></i>
                 <span>Export PDF</span>
             </button>
@@ -206,11 +227,11 @@
                 <div class="inline-block p-4 rounded-2xl bg-brand-50 text-brand-600 mb-6 shadow-sm border border-brand-100">
                     <i class="fa-solid fa-leaf text-4xl"></i>
                 </div>
-                <h1 class="text-5xl md:text-7xl font-extrabold text-slate-900 mb-6 tracking-tight leading-tight">
+                <h1 class="text-5xl md:text-7xl font-extrabold text-slate-900 mb-6 tracking-tight leading-tight" contenteditable="true" spellcheck="false">
                     Preserving Heritage, <br>
                     <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-teal-400">Empowering Communities</span>
                 </h1>
-                <p class="text-xl md:text-2xl text-slate-500 max-w-3xl mx-auto mb-10 leading-relaxed">
+                <p class="text-xl md:text-2xl text-slate-500 max-w-3xl mx-auto mb-10 leading-relaxed" contenteditable="true" spellcheck="false">
                     Strategic Success Indicators and Key Roles for the Sustainable Development of Noken Culture in Papua.
                 </p>
                 <button onclick="nextSlide()" class="animate-bounce bg-white border border-slate-200 text-slate-600 w-12 h-12 rounded-full shadow-sm hover:bg-slate-50 transition-colors flex items-center justify-center mx-auto no-print">
@@ -223,14 +244,14 @@
         <section class="slide">
             <div class="grid md:grid-cols-2 gap-12 items-center w-full h-full pb-10">
                 <div class="order-2 md:order-1">
-                    <div class="text-brand-600 font-semibold tracking-wider uppercase text-sm mb-3">Indicator 1</div>
-                    <h2 class="text-4xl md:text-5xl font-bold text-slate-800 mb-6 leading-tight">Co-curricular Module Development</h2>
-                    <p class="text-lg text-slate-600 mb-8 leading-relaxed">
+                    <div class="text-brand-600 font-semibold tracking-wider uppercase text-sm mb-3" contenteditable="true" spellcheck="false">Indicator 1</div>
+                    <h2 class="text-4xl md:text-5xl font-bold text-slate-800 mb-6 leading-tight" contenteditable="true" spellcheck="false">Co-curricular Module Development</h2>
+                    <p class="text-lg text-slate-600 mb-8 leading-relaxed" contenteditable="true" spellcheck="false">
                         Successful development and compilation of Noken co-curricular modules tailored for all educational levels, ranging from Early Childhood Education (PAUD) through High School (SMA).
                     </p>
                     <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                        <h4 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">Strategic Roles</h4>
-                        <div class="flex flex-wrap gap-3">
+                        <h4 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4" contenteditable="true" spellcheck="false">Strategic Roles</h4>
+                        <div class="flex flex-wrap items-center gap-3">
                             <span class="role-badge bg-blue-50 text-blue-700 border border-blue-100">
                                 <i class="fa-solid fa-building-columns"></i> 
                                 <span contenteditable="true" class="editable-role" spellcheck="false">BGTK Papua</span>
@@ -239,6 +260,9 @@
                                 <i class="fa-solid fa-globe"></i> 
                                 <span contenteditable="true" class="editable-role" spellcheck="false">UNICEF</span>
                             </span>
+                            <button onclick="addRole(this, 'blue')" class="no-print w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-colors border border-dashed border-slate-300" title="Add Role">
+                                <i class="fa-solid fa-plus text-xs"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -255,14 +279,14 @@
         <section class="slide">
             <div class="grid md:grid-cols-2 gap-12 items-center w-full h-full pb-10">
                 <div class="order-2 md:order-1">
-                    <div class="text-accent-600 font-semibold tracking-wider uppercase text-sm mb-3">Indicator 2</div>
-                    <h2 class="text-4xl md:text-5xl font-bold text-slate-800 mb-6 leading-tight">Artisan Certification & Capacity Building</h2>
-                    <p class="text-lg text-slate-600 mb-8 leading-relaxed">
+                    <div class="text-accent-600 font-semibold tracking-wider uppercase text-sm mb-3" contenteditable="true" spellcheck="false">Indicator 2</div>
+                    <h2 class="text-4xl md:text-5xl font-bold text-slate-800 mb-6 leading-tight" contenteditable="true" spellcheck="false">Artisan Certification & Capacity Building</h2>
+                    <p class="text-lg text-slate-600 mb-8 leading-relaxed" contenteditable="true" spellcheck="false">
                         A minimum of <strong class="text-slate-800">140 Mama-Mama Noken artisans</strong> across 7 customary territories achieve IHPOS certification and master sustainable, natural dyeing techniques.
                     </p>
                     <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                        <h4 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">Strategic Roles</h4>
-                        <div class="flex flex-wrap gap-3">
+                        <h4 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4" contenteditable="true" spellcheck="false">Strategic Roles</h4>
+                        <div class="flex flex-wrap items-center gap-3">
                             <span class="role-badge bg-accent-100 text-accent-700 border border-accent-200">
                                 <i class="fa-solid fa-users-gear"></i> 
                                 <span contenteditable="true" class="editable-role" spellcheck="false">INDI</span>
@@ -271,6 +295,9 @@
                                 <i class="fa-solid fa-hand-holding-heart"></i> 
                                 <span contenteditable="true" class="editable-role" spellcheck="false">YWBH</span>
                             </span>
+                            <button onclick="addRole(this, 'orange')" class="no-print w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-colors border border-dashed border-slate-300" title="Add Role">
+                                <i class="fa-solid fa-plus text-xs"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -285,20 +312,20 @@
         <!-- Slide 4: Learning Quality -->
         <section class="slide">
             <div class="w-full max-w-4xl mx-auto text-center h-full flex flex-col justify-center pb-10">
-                <div class="text-brand-600 font-semibold tracking-wider uppercase text-sm mb-3">Indicator 3</div>
-                <h2 class="text-4xl md:text-5xl font-bold text-slate-800 mb-8 leading-tight">Learning Quality Improvement</h2>
+                <div class="text-brand-600 font-semibold tracking-wider uppercase text-sm mb-3" contenteditable="true" spellcheck="false">Indicator 3</div>
+                <h2 class="text-4xl md:text-5xl font-bold text-slate-800 mb-8 leading-tight" contenteditable="true" spellcheck="false">Learning Quality Improvement</h2>
                 
                 <div class="bg-white p-10 rounded-3xl shadow-xl border border-slate-100 mb-10 relative overflow-hidden">
                     <div class="absolute top-0 right-0 w-32 h-32 bg-brand-50 rounded-bl-full -z-0"></div>
                     <i class="fa-solid fa-chart-line text-5xl text-brand-500 mb-6 relative z-10"></i>
-                    <p class="text-xl text-slate-600 leading-relaxed relative z-10">
+                    <p class="text-xl text-slate-600 leading-relaxed relative z-10" contenteditable="true" spellcheck="false">
                         Demonstrable increase in student scores across <strong>literacy, numeracy, and character development</strong> as a direct result of implementing NUSA learning methodologies.
                     </p>
                 </div>
 
                 <div class="flex flex-col items-center">
-                    <h4 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">Driven By</h4>
-                    <div class="flex justify-center flex-wrap gap-4">
+                    <h4 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4" contenteditable="true" spellcheck="false">Driven By</h4>
+                    <div class="flex flex-wrap justify-center items-center gap-4">
                         <span class="role-badge bg-blue-50 text-blue-700 border border-blue-100 text-lg px-6 py-2">
                             <i class="fa-solid fa-building-columns"></i> 
                             <span contenteditable="true" class="editable-role" spellcheck="false">BGTK Papua</span>
@@ -307,6 +334,9 @@
                             <i class="fa-solid fa-globe"></i> 
                             <span contenteditable="true" class="editable-role" spellcheck="false">UNICEF</span>
                         </span>
+                        <button onclick="addRole(this, 'blue')" class="no-print w-10 h-10 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-colors border border-dashed border-slate-300" title="Add Role">
+                            <i class="fa-solid fa-plus"></i>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -321,20 +351,20 @@
                         <div class="relative bg-white p-8 rounded-3xl shadow-lg border border-slate-100 aspect-square flex flex-col items-center justify-center text-center">
                             <i class="fa-solid fa-database text-6xl text-indigo-500 mb-4"></i>
                             <div class="h-2 w-16 bg-indigo-100 rounded-full mb-4"></div>
-                            <h3 class="font-bold text-slate-700">Digital Registry</h3>
-                            <p class="text-sm text-slate-500 mt-2">FPIC Compliant</p>
+                            <h3 class="font-bold text-slate-700" contenteditable="true" spellcheck="false">Digital Registry</h3>
+                            <p class="text-sm text-slate-500 mt-2" contenteditable="true" spellcheck="false">FPIC Compliant</p>
                         </div>
                     </div>
                 </div>
                 <div>
-                    <div class="text-indigo-500 font-semibold tracking-wider uppercase text-sm mb-3">Indicator 4</div>
-                    <h2 class="text-4xl md:text-5xl font-bold text-slate-800 mb-6 leading-tight">Ethical Data Accessibility</h2>
-                    <p class="text-lg text-slate-600 mb-8 leading-relaxed">
+                    <div class="text-indigo-500 font-semibold tracking-wider uppercase text-sm mb-3" contenteditable="true" spellcheck="false">Indicator 4</div>
+                    <h2 class="text-4xl md:text-5xl font-bold text-slate-800 mb-6 leading-tight" contenteditable="true" spellcheck="false">Ethical Data Accessibility</h2>
+                    <p class="text-lg text-slate-600 mb-8 leading-relaxed" contenteditable="true" spellcheck="false">
                         Establishment of a verified, digital Noken database accessible to the public. This system operates with <strong>full compliance to FPIC</strong> (Free, Prior, and Informed Consent) principles, ensuring indigenous intellectual property is protected.
                     </p>
                     <div class="bg-indigo-50 p-6 rounded-2xl border border-indigo-100">
-                        <h4 class="text-sm font-semibold text-indigo-400 uppercase tracking-wider mb-4">Strategic Roles</h4>
-                        <div class="flex flex-wrap gap-3">
+                        <h4 class="text-sm font-semibold text-indigo-400 uppercase tracking-wider mb-4" contenteditable="true" spellcheck="false">Strategic Roles</h4>
+                        <div class="flex flex-wrap items-center gap-3">
                             <span class="role-badge bg-white text-indigo-700 border border-indigo-200 shadow-sm">
                                 <i class="fa-solid fa-landmark"></i> 
                                 <span contenteditable="true" class="editable-role" spellcheck="false">UNESCO</span>
@@ -343,6 +373,9 @@
                                 <i class="fa-solid fa-leaf"></i> 
                                 <span contenteditable="true" class="editable-role" spellcheck="false">LAWE</span>
                             </span>
+                            <button onclick="addRole(this, 'indigo')" class="no-print w-8 h-8 rounded-full bg-white hover:bg-slate-50 text-indigo-400 flex items-center justify-center transition-colors border border-dashed border-indigo-300 shadow-sm" title="Add Role">
+                                <i class="fa-solid fa-plus text-xs"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -353,22 +386,23 @@
         <section class="slide">
             <div class="grid md:grid-cols-12 gap-8 items-center w-full h-full pb-10">
                 <div class="md:col-span-7">
-                    <div class="text-emerald-500 font-semibold tracking-wider uppercase text-sm mb-3">Indicator 5</div>
-                    <h2 class="text-4xl md:text-5xl font-bold text-slate-800 mb-6 leading-tight">Measurable Economic Impact</h2>
+                    <div class="text-emerald-500 font-semibold tracking-wider uppercase text-sm mb-3" contenteditable="true" spellcheck="false">Indicator 5</div>
+                    <h2 class="text-4xl md:text-5xl font-bold text-slate-800 mb-6 leading-tight" contenteditable="true" spellcheck="false">Measurable Economic Impact</h2>
                     
                     <div class="prose prose-lg text-slate-600 mb-8">
-                        <p>Targeting tangible economic welfare improvements for Mama-Mama Noken artisans through:</p>
+                        <p contenteditable="true" spellcheck="false">Targeting tangible economic welfare improvements for Mama-Mama Noken artisans through:</p>
                         <ul class="space-y-2 mt-4 text-slate-700">
-                            <li class="flex items-start"><i class="fa-solid fa-check text-emerald-500 mt-1.5 mr-3"></i> Product value addition</li>
-                            <li class="flex items-start"><i class="fa-solid fa-check text-emerald-500 mt-1.5 mr-3"></i> Production efficiency optimization</li>
-                            <li class="flex items-start"><i class="fa-solid fa-check text-emerald-500 mt-1.5 mr-3"></i> Facilitating broader market access</li>
+                            <li class="flex items-start"><i class="fa-solid fa-check text-emerald-500 mt-1.5 mr-3 no-print"></i> <span contenteditable="true" spellcheck="false">Product value addition</span></li>
+                            <li class="flex items-start"><i class="fa-solid fa-check text-emerald-500 mt-1.5 mr-3 no-print"></i> <span contenteditable="true" spellcheck="false">Production efficiency optimization</span></li>
+                            <li class="flex items-start"><i class="fa-solid fa-check text-emerald-500 mt-1.5 mr-3 no-print"></i> <span contenteditable="true" spellcheck="false">Facilitating broader market access</span></li>
                         </ul>
                         <div class="mt-6 p-4 bg-emerald-50 rounded-xl border border-emerald-100 text-sm text-emerald-800">
-                            <strong>Success Metric:</strong> Growth is evaluated not just by total income, but by the sustainable ratio of <em>income vs. production costs vs. labor time</em>.
+                            <strong contenteditable="true" spellcheck="false">Success Metric:</strong> 
+                            <span contenteditable="true" spellcheck="false">Growth is evaluated not just by total income, but by the sustainable ratio of income vs. production costs vs. labor time.</span>
                         </div>
                     </div>
 
-                    <div class="flex flex-wrap gap-3">
+                    <div class="flex flex-wrap items-center gap-3">
                         <span class="role-badge bg-white text-emerald-700 border border-emerald-200 shadow-sm">
                             <i class="fa-solid fa-landmark"></i> 
                             <span contenteditable="true" class="editable-role" spellcheck="false">UNESCO</span>
@@ -377,6 +411,9 @@
                             <i class="fa-solid fa-leaf"></i> 
                             <span contenteditable="true" class="editable-role" spellcheck="false">LAWE</span>
                         </span>
+                        <button onclick="addRole(this, 'emerald')" class="no-print w-8 h-8 rounded-full bg-emerald-50 hover:bg-emerald-100 text-emerald-500 flex items-center justify-center transition-colors border border-dashed border-emerald-300" title="Add Role">
+                            <i class="fa-solid fa-plus text-xs"></i>
+                        </button>
                     </div>
                 </div>
                 <div class="md:col-span-5 flex justify-center">
@@ -384,15 +421,15 @@
                         <div class="bg-white rounded-3xl p-6 shadow-xl border border-slate-100 relative z-10">
                             <div class="flex justify-between items-end mb-6">
                                 <div>
-                                    <p class="text-sm text-slate-400 font-medium">Welfare Growth</p>
-                                    <h4 class="text-2xl font-bold text-slate-800">+Sustainable</h4>
+                                    <p class="text-sm text-slate-400 font-medium" contenteditable="true" spellcheck="false">Welfare Growth</p>
+                                    <h4 class="text-2xl font-bold text-slate-800" contenteditable="true" spellcheck="false">+Sustainable</h4>
                                 </div>
-                                <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-xl">
+                                <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-xl no-print">
                                     <i class="fa-solid fa-arrow-trend-up"></i>
                                 </div>
                             </div>
                             <!-- Mock Chart -->
-                            <div class="flex items-end space-x-2 h-32 mt-4">
+                            <div class="flex items-end space-x-2 h-32 mt-4 no-print">
                                 <div class="w-1/4 bg-slate-100 rounded-t-md h-1/3"></div>
                                 <div class="w-1/4 bg-emerald-200 rounded-t-md h-1/2"></div>
                                 <div class="w-1/4 bg-emerald-400 rounded-t-md h-3/4"></div>
@@ -410,31 +447,31 @@
         <!-- Slide 7: Networking & Collaboration -->
         <section class="slide">
             <div class="w-full max-w-4xl mx-auto text-center h-full flex flex-col justify-center pb-10">
-                <div class="text-orange-500 font-semibold tracking-wider uppercase text-sm mb-3">Indicator 6</div>
-                <h2 class="text-4xl md:text-5xl font-bold text-slate-800 mb-6 leading-tight">Networking & Collaboration Ecosystem</h2>
+                <div class="text-orange-500 font-semibold tracking-wider uppercase text-sm mb-3" contenteditable="true" spellcheck="false">Indicator 6</div>
+                <h2 class="text-4xl md:text-5xl font-bold text-slate-800 mb-6 leading-tight" contenteditable="true" spellcheck="false">Networking & Collaboration Ecosystem</h2>
                 
-                <p class="text-xl text-slate-600 leading-relaxed mb-10">
+                <p class="text-xl text-slate-600 leading-relaxed mb-10" contenteditable="true" spellcheck="false">
                     Establishment of a <strong>peer-to-peer craft networking</strong> and sharing platform under the <em>Indonesia ICH Consultative Group</em>. Designed to foster a sustainable, culture-based creative industry ecosystem.
                 </p>
 
                 <div class="grid grid-cols-3 gap-6 mb-12">
                     <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col items-center">
-                        <i class="fa-solid fa-users text-3xl text-orange-400 mb-3"></i>
-                        <span class="font-semibold text-slate-700">Peer Network</span>
+                        <i class="fa-solid fa-users text-3xl text-orange-400 mb-3 no-print"></i>
+                        <span class="font-semibold text-slate-700" contenteditable="true" spellcheck="false">Peer Network</span>
                     </div>
                     <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col items-center transform -translate-y-4">
-                        <i class="fa-solid fa-share-nodes text-3xl text-orange-500 mb-3"></i>
-                        <span class="font-semibold text-slate-700">Sharing Platform</span>
+                        <i class="fa-solid fa-share-nodes text-3xl text-orange-500 mb-3 no-print"></i>
+                        <span class="font-semibold text-slate-700" contenteditable="true" spellcheck="false">Sharing Platform</span>
                     </div>
                     <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col items-center">
-                        <i class="fa-solid fa-recycle text-3xl text-orange-600 mb-3"></i>
-                        <span class="font-semibold text-slate-700">Sustainable Industry</span>
+                        <i class="fa-solid fa-recycle text-3xl text-orange-600 mb-3 no-print"></i>
+                        <span class="font-semibold text-slate-700" contenteditable="true" spellcheck="false">Sustainable Industry</span>
                     </div>
                 </div>
 
                 <div class="flex flex-col items-center">
-                    <h4 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">Facilitated By</h4>
-                    <div class="flex justify-center flex-wrap gap-4">
+                    <h4 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4" contenteditable="true" spellcheck="false">Facilitated By</h4>
+                    <div class="flex flex-wrap justify-center items-center gap-4">
                         <span class="role-badge bg-orange-50 text-orange-700 border border-orange-100 text-lg px-6 py-2">
                             <i class="fa-solid fa-university"></i> 
                             <span contenteditable="true" class="editable-role" spellcheck="false">INDI UGM</span>
@@ -443,6 +480,9 @@
                             <i class="fa-solid fa-leaf"></i> 
                             <span contenteditable="true" class="editable-role" spellcheck="false">LAWE</span>
                         </span>
+                        <button onclick="addRole(this, 'orange')" class="no-print w-10 h-10 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-colors border border-dashed border-slate-300" title="Add Role">
+                            <i class="fa-solid fa-plus"></i>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -451,50 +491,53 @@
         <!-- Slide 8: Technology System Implementation -->
         <section class="slide">
             <div class="flex flex-col justify-center w-full h-full pb-10">
-                <div class="text-brand-600 font-semibold tracking-wider uppercase text-sm mb-3">Indicator 7</div>
-                <h2 class="text-3xl md:text-5xl font-bold text-slate-800 mb-6 leading-tight">Technology System Implementation (KMS/LCMS)</h2>
+                <div class="text-brand-600 font-semibold tracking-wider uppercase text-sm mb-3" contenteditable="true" spellcheck="false">Indicator 7</div>
+                <h2 class="text-3xl md:text-5xl font-bold text-slate-800 mb-6 leading-tight" contenteditable="true" spellcheck="false">Technology System Implementation (KMS/LCMS)</h2>
                 
                 <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-100 mb-8">
                     <div class="flex items-start mb-6">
-                        <div class="bg-brand-100 p-4 rounded-xl mr-6">
+                        <div class="bg-brand-100 p-4 rounded-xl mr-6 no-print">
                             <i class="fa-solid fa-laptop-code text-3xl text-brand-600"></i>
                         </div>
-                        <div>
-                            <h3 class="text-2xl font-bold text-slate-800 mb-2">Community-Based Digital Infrastructure</h3>
-                            <p class="text-slate-600 leading-relaxed">
+                        <div class="w-full">
+                            <h3 class="text-2xl font-bold text-slate-800 mb-2 w-full" contenteditable="true" spellcheck="false">Community-Based Digital Infrastructure</h3>
+                            <p class="text-slate-600 leading-relaxed w-full" contenteditable="true" spellcheck="false">
                                 Construction and operation of a Knowledge Management System / Learning Content Management System for Intangible Cultural Heritage (ICH) education and inventorying.
                             </p>
                         </div>
                     </div>
                     
-                    <div class="bg-slate-50 border-l-4 border-brand-500 p-4 rounded-r-lg mb-6">
-                        <p class="text-sm text-slate-700 font-medium">
-                            <i class="fa-solid fa-microchip mr-2 text-brand-500"></i>
+                    <div class="bg-slate-50 border-l-4 border-brand-500 p-4 rounded-r-lg mb-6 flex">
+                        <div class="no-print"><i class="fa-solid fa-microchip mr-2 text-brand-500 mt-1"></i></div>
+                        <p class="text-sm text-slate-700 font-medium" contenteditable="true" spellcheck="false">
                             <strong>Smart Feature:</strong> Applies an automated gatekeeping scheme through progress tracking and precise assessment to validate user competencies before unlocking advanced learning paths.
                         </p>
                     </div>
 
                     <div class="mt-4">
-                        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Extensive Collaboration Array</h4>
-                        <div class="flex flex-wrap gap-2">
-                            <span class="role-badge bg-slate-100 text-slate-700 text-xs py-1">
+                        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3" contenteditable="true" spellcheck="false">Extensive Collaboration Array</h4>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span class="role-badge bg-slate-100 text-slate-700 text-xs py-1 border border-slate-200">
                                 <i class="fa-solid fa-server"></i> <span contenteditable="true" class="editable-role" spellcheck="false">BGTK (Infra/Server)</span>
                             </span>
-                            <span class="role-badge bg-slate-100 text-slate-700 text-xs py-1">
+                            <span class="role-badge bg-slate-100 text-slate-700 text-xs py-1 border border-slate-200">
                                 <i class="fa-solid fa-building-columns"></i> <span contenteditable="true" class="editable-role" spellcheck="false">ISI</span>
                             </span>
-                            <span class="role-badge bg-slate-100 text-slate-700 text-xs py-1">
+                            <span class="role-badge bg-slate-100 text-slate-700 text-xs py-1 border border-slate-200">
                                 <i class="fa-solid fa-graduation-cap"></i> <span contenteditable="true" class="editable-role" spellcheck="false">UNICEF (Edu)</span>
                             </span>
-                            <span class="role-badge bg-slate-100 text-slate-700 text-xs py-1">
+                            <span class="role-badge bg-slate-100 text-slate-700 text-xs py-1 border border-slate-200">
                                 <i class="fa-solid fa-users-gear"></i> <span contenteditable="true" class="editable-role" spellcheck="false">INDI</span>
                             </span>
-                            <span class="role-badge bg-slate-100 text-slate-700 text-xs py-1">
+                            <span class="role-badge bg-slate-100 text-slate-700 text-xs py-1 border border-slate-200">
                                 <i class="fa-solid fa-leaf"></i> <span contenteditable="true" class="editable-role" spellcheck="false">LAWE</span>
                             </span>
                             <span class="role-badge bg-brand-600 text-white text-xs py-1 shadow-md">
                                 <i class="fa-solid fa-handshake"></i> <span contenteditable="true" class="editable-role outline-none focus:bg-white/30 rounded" spellcheck="false">Handover to BP3OKP Papua</span>
                             </span>
+                            <button onclick="addRole(this, 'slate')" class="no-print w-6 h-6 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-colors border border-dashed border-slate-300" title="Add Role">
+                                <i class="fa-solid fa-plus text-[10px]"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -517,7 +560,6 @@
         totalSlidesEl.innerText = totalSlides;
 
         function updateUI() {
-            // Update classes on slides
             slides.forEach((slide, index) => {
                 slide.classList.remove('active', 'prev');
                 if (index === currentSlide) {
@@ -527,7 +569,6 @@
                 }
             });
 
-            // Update Buttons
             prevBtn.disabled = currentSlide === 0;
             
             if (currentSlide === totalSlides - 1) {
@@ -540,11 +581,8 @@
                 nextBtn.classList.remove('bg-slate-800', 'hover:bg-slate-900');
             }
 
-            // Update Progress Bar
             const progress = ((currentSlide + 1) / totalSlides) * 100;
             progressBar.style.width = `${progress}%`;
-
-            // Update Counter
             slideCounter.innerText = currentSlide + 1;
         }
 
@@ -562,23 +600,54 @@
             }
         }
 
-        // Export to PDF Function
-        function exportToPDF() {
-            // Because of our specific @media print CSS, 
-            // calling window.print() will format all slides correctly into a landscape PDF.
-            // When the print dialog opens, the user just needs to select "Save as PDF"
-            alert("In the print dialog that opens, make sure to set the layout to 'Landscape' and select 'Save as PDF'.\n\n(Pada jendela print yang muncul, pastikan layout disetel ke 'Landscape' dan pilih 'Save as PDF' / Simpan sebagai PDF).");
-            window.print();
+        // Feature: Add Role dynamically
+        function addRole(btnElement, theme = 'slate') {
+            const container = btnElement.parentElement;
+            const newRole = document.createElement('span');
+            
+            // Define styling based on where the button was clicked
+            let colorClasses = 'bg-slate-100 text-slate-700 border-slate-200'; // default
+            
+            if (theme === 'blue') colorClasses = 'bg-blue-50 text-blue-700 border-blue-100 text-lg px-6 py-2';
+            else if (theme === 'orange') colorClasses = 'bg-orange-50 text-orange-700 border-orange-100 text-lg px-6 py-2';
+            else if (theme === 'indigo') colorClasses = 'bg-white text-indigo-700 border-indigo-200 shadow-sm';
+            else if (theme === 'emerald') colorClasses = 'bg-white text-emerald-700 border-emerald-200 shadow-sm';
+            else if (theme === 'slate') colorClasses = 'bg-slate-100 text-slate-700 text-xs py-1 border-slate-200';
+
+            newRole.className = `role-badge border ${colorClasses}`;
+            newRole.innerHTML = `
+                <i class="fa-solid fa-user"></i> 
+                <span contenteditable="true" class="editable-role" spellcheck="false">New Role</span>
+            `;
+            
+            // Insert before the + button
+            container.insertBefore(newRole, btnElement);
+            
+            // Automatically focus the new text
+            newRole.querySelector('[contenteditable]').focus();
         }
 
-        // Prevent spacebar from advancing slide if a user is currently typing/editing text
-        document.addEventListener('keydown', (e) => {
-            const isEditing = document.activeElement.hasAttribute('contenteditable');
+        // Export to PDF Function (Replaced alert with modern Toast)
+        function exportToPDF() {
+            const toast = document.getElementById('toast-modal');
+            // Show toast
+            toast.classList.remove('opacity-0', 'pointer-events-none', '-translate-y-4');
             
-            if (isEditing) {
-                // If they are editing, ignore navigation keys
-                return; 
-            }
+            // Trigger print shortly after so user sees toast
+            setTimeout(() => {
+                window.print();
+                // Hide toast after print dialog is closed/done
+                setTimeout(() => {
+                    toast.classList.add('opacity-0', 'pointer-events-none', '-translate-y-4');
+                }, 1000);
+            }, 300);
+        }
+
+        // Keyboard Navigation Control
+        document.addEventListener('keydown', (e) => {
+            // Prevent slide change if the user is typing in ANY contenteditable element
+            const isEditing = document.activeElement && document.activeElement.hasAttribute('contenteditable');
+            if (isEditing) return; 
 
             if (e.key === 'ArrowRight' || e.key === 'Space' || e.key === 'Enter') {
                 e.preventDefault(); 
@@ -588,7 +657,6 @@
             }
         });
 
-        // Initialize UI on load
         updateUI();
     </script>
 </body>
