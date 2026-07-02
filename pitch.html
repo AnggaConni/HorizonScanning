@@ -32,63 +32,25 @@
         }
 
         /* Styling khusus untuk isi dokumen hasil render Mammoth.js */
-        .doc-content {
-            color: #334155;
-            line-height: 1.7;
-        }
-        .doc-content p {
-            margin-bottom: 1rem;
-        }
-        .doc-content h1, .doc-content h2, .doc-content h3 {
-            color: #0f172a;
-            font-weight: 600;
-            margin-top: 2rem;
-            margin-bottom: 1rem;
-        }
+        .doc-content { color: #334155; line-height: 1.7; }
+        .doc-content p { margin-bottom: 1rem; }
+        .doc-content h1, .doc-content h2, .doc-content h3 { color: #0f172a; font-weight: 600; margin-top: 2rem; margin-bottom: 1rem; }
         .doc-content h1 { font-size: 2rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem; }
         .doc-content h2 { font-size: 1.5rem; }
         .doc-content h3 { font-size: 1.25rem; }
-        .doc-content ul, .doc-content ol {
-            margin-left: 1.5rem;
-            margin-bottom: 1rem;
-        }
+        .doc-content ul, .doc-content ol { margin-left: 1.5rem; margin-bottom: 1rem; }
         .doc-content ul { list-style-type: disc; }
         .doc-content ol { list-style-type: decimal; }
-        .doc-content table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 1rem;
-        }
-        .doc-content th, .doc-content td {
-            border: 1px solid #cbd5e1;
-            padding: 0.75rem;
-            text-align: left;
-        }
-        .doc-content th {
-            background-color: #f1f5f9;
-        }
-        .doc-content img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 0.5rem;
-            margin: 1rem 0;
-        }
+        .doc-content table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+        .doc-content th, .doc-content td { border: 1px solid #cbd5e1; padding: 0.75rem; text-align: left; }
+        .doc-content th { background-color: #f1f5f9; }
+        .doc-content img { max-width: 100%; height: auto; border-radius: 0.5rem; margin: 1rem 0; }
 
         /* Kustomisasi Scrollbar untuk Modal */
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 8px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: #f1f5f9; 
-            border-radius: 4px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #cbd5e1; 
-            border-radius: 4px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8; 
-        }
+        .custom-scrollbar::-webkit-scrollbar { width: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
 <body class="antialiased min-h-screen flex flex-col">
@@ -97,7 +59,6 @@
     <header class="bg-white shadow-sm sticky top-0 z-10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
             <div class="flex items-center gap-2">
-                <!-- Ikon Logo Sederhana -->
                 <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                     <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
@@ -126,30 +87,44 @@
         </div>
 
         <!-- Daftar Dokumen Section -->
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <div class="flex justify-between items-end mb-6 border-b border-slate-200 pb-4">
-                <h2 class="text-2xl font-bold text-slate-800">Document Directory</h2>
-                <span id="file-count" class="text-sm font-medium bg-blue-100 text-blue-800 py-1 px-3 rounded-full hidden">0 Documents</span>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            
+            <!-- Toolbar: Judul, Search (Filter), & View Toggle -->
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 border-b border-slate-200 pb-4">
+                <div class="flex items-center gap-3">
+                    <h2 class="text-2xl font-bold text-slate-800">Document Directory</h2>
+                    <span id="file-count" class="text-sm font-medium bg-blue-100 text-blue-800 py-1 px-3 rounded-full hidden">0</span>
+                </div>
+                
+                <div class="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+                    <!-- Input Search / Filter -->
+                    <div class="relative w-full sm:w-64">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </div>
+                        <input type="text" id="search-input" placeholder="Find document by name..." class="block w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg leading-5 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors">
+                    </div>
+
+                    <!-- Tombol Toggle Grid / List -->
+                    <div class="flex bg-slate-100 p-1 rounded-lg border border-slate-200 w-full sm:w-auto justify-center">
+                        <button id="btn-grid" class="p-1.5 rounded bg-white shadow-sm text-blue-600 transition-colors flex-1 sm:flex-none" title="Grid View">
+                            <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                        </button>
+                        <button id="btn-list" class="p-1.5 rounded text-slate-400 hover:text-slate-600 transition-colors flex-1 sm:flex-none" title="List View">
+                            <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                        </button>
+                    </div>
+                </div>
             </div>
 
             <!-- Kontainer Utama Daftar File -->
             <div id="file-list-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Skeleton Loading (ditampilkan saat memuat data) -->
-                <div class="animate-pulse bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                    <div class="h-10 w-10 bg-slate-200 rounded-lg mb-4"></div>
-                    <div class="h-4 bg-slate-200 rounded w-3/4 mb-2"></div>
-                    <div class="h-3 bg-slate-200 rounded w-1/2"></div>
-                </div>
-                <div class="animate-pulse bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                    <div class="h-10 w-10 bg-slate-200 rounded-lg mb-4"></div>
-                    <div class="h-4 bg-slate-200 rounded w-3/4 mb-2"></div>
-                    <div class="h-3 bg-slate-200 rounded w-1/2"></div>
-                </div>
-                <div class="animate-pulse bg-white p-6 rounded-xl border border-slate-200 shadow-sm hidden sm:block">
-                    <div class="h-10 w-10 bg-slate-200 rounded-lg mb-4"></div>
-                    <div class="h-4 bg-slate-200 rounded w-3/4 mb-2"></div>
-                    <div class="h-3 bg-slate-200 rounded w-1/2"></div>
-                </div>
+                <!-- Skeleton Loading -->
+                <div class="animate-pulse bg-white p-6 rounded-xl border border-slate-200 shadow-sm"><div class="h-10 w-10 bg-slate-200 rounded-lg mb-4"></div><div class="h-4 bg-slate-200 rounded w-3/4 mb-2"></div><div class="h-3 bg-slate-200 rounded w-1/2"></div></div>
+                <div class="animate-pulse bg-white p-6 rounded-xl border border-slate-200 shadow-sm"><div class="h-10 w-10 bg-slate-200 rounded-lg mb-4"></div><div class="h-4 bg-slate-200 rounded w-3/4 mb-2"></div><div class="h-3 bg-slate-200 rounded w-1/2"></div></div>
+                <div class="animate-pulse bg-white p-6 rounded-xl border border-slate-200 shadow-sm hidden sm:block"><div class="h-10 w-10 bg-slate-200 rounded-lg mb-4"></div><div class="h-4 bg-slate-200 rounded w-3/4 mb-2"></div><div class="h-3 bg-slate-200 rounded w-1/2"></div></div>
             </div>
         </div>
     </main>
@@ -163,15 +138,10 @@
 
     <!-- Modal Box untuk Membaca Dokumen -->
     <div id="docx-modal" class="fixed inset-0 z-50 hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-        <!-- Background Backdrop -->
         <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" aria-hidden="true" onclick="closeModal()"></div>
-
         <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
             <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-                <!-- Panel Modal -->
                 <div id="modal-panel" class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-4xl modal-enter w-full flex flex-col max-h-[90vh]">
-                    
-                    <!-- Header Modal -->
                     <div class="bg-white px-6 py-4 border-b border-slate-100 flex justify-between items-center sticky top-0 z-20">
                         <div class="flex items-center gap-3">
                             <div class="p-2 bg-blue-50 text-blue-600 rounded-lg">
@@ -179,25 +149,16 @@
                                     <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"></path>
                                 </svg>
                             </div>
-                            <h3 class="text-lg font-semibold leading-6 text-slate-900 truncate pr-4" id="modal-doc-title">
-                                Document Title
-                            </h3>
+                            <h3 class="text-lg font-semibold leading-6 text-slate-900 truncate pr-4" id="modal-doc-title">Document Title</h3>
                         </div>
                         <button type="button" onclick="closeModal()" class="rounded-md bg-white text-slate-400 hover:text-slate-600 hover:bg-slate-100 p-2 focus:outline-none transition-colors">
                             <span class="sr-only">Close</span>
-                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
                         </button>
                     </div>
-
-                    <!-- Body Modal (Isi Dokumen) -->
                     <div class="bg-white px-6 py-8 sm:p-10 overflow-y-auto custom-scrollbar flex-grow">
-                        <div id="modal-doc-body" class="doc-content max-w-3xl mx-auto">
-                            <!-- Konten dari Mammoth.js akan masuk ke sini -->
-                        </div>
+                        <div id="modal-doc-body" class="doc-content max-w-3xl mx-auto"></div>
                     </div>
-
                 </div>
             </div>
         </div>
@@ -205,112 +166,176 @@
 
     <script>
         // ==========================================
-        // KONFIGURASI GITHUB BERSARKAN GAMBAR
+        // KONFIGURASI GITHUB
         // ==========================================
         const GITHUB_USER = 'AnggaConni'; 
         const GITHUB_REPO = 'HorizonScanning';
         const FOLDER_PATH = 'dokumen'; 
-        const BRANCH = 'main'; // Diambil dari gambar
+        const BRANCH = 'main';
         // ==========================================
 
         const listContainer = document.getElementById('file-list-container');
         const fileCountBadge = document.getElementById('file-count');
+        const searchInput = document.getElementById('search-input');
+        const btnGrid = document.getElementById('btn-grid');
+        const btnList = document.getElementById('btn-list');
         
-        // Elemen Modal
         const modal = document.getElementById('docx-modal');
         const modalPanel = document.getElementById('modal-panel');
         const modalTitle = document.getElementById('modal-doc-title');
         const modalBody = document.getElementById('modal-doc-body');
 
+        // State Management
+        let allDocuments = []; // Menyimpan semua data asli dari API
+        let currentView = 'grid'; // Mode default: 'grid' atau 'list'
+
         const apiEndpoint = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${FOLDER_PATH}?ref=${BRANCH}`;
 
-        // Inisialisasi: Ambil data dari GitHub saat halaman siap
         document.addEventListener('DOMContentLoaded', fetchDocuments);
 
+        // Ambil dokumen dari API
         function fetchDocuments() {
             fetch(apiEndpoint)
                 .then(response => {
                     if (!response.ok) {
-                        if(response.status === 404) throw new Error(`Folder "${FOLDER_PATH}" not found in the repository.`);
-                        if(response.status === 403) throw new Error('Access denied by GitHub API (Rate Limit exceeded / Too many requests).');
-                        throw new Error('Failed to connect to the GitHub repository.');
+                        if(response.status === 404) throw new Error(`Folder "${FOLDER_PATH}" not found.`);
+                        if(response.status === 403) throw new Error('API Rate Limit exceeded.');
+                        throw new Error('Failed to connect to GitHub.');
                     }
                     return response.json();
                 })
                 .then(data => {
-                    // Hanya ambil file dengan ekstensi .docx
-                    const docxFiles = data.filter(file => file.name.toLowerCase().endsWith('.docx') && file.type === 'file');
+                    // Simpan file DOCX ke array utama
+                    allDocuments = data.filter(file => file.name.toLowerCase().endsWith('.docx') && file.type === 'file');
                     
-                    listContainer.innerHTML = ''; // Hapus skeleton loading
-                    
-                    if (docxFiles.length === 0) {
-                        renderEmptyState();
+                    if (allDocuments.length === 0) {
+                        renderEmptyState("No documents found in the repository.");
                         return;
                     }
 
-                    // Tampilkan jumlah file
-                    fileCountBadge.innerText = `${docxFiles.length} Documents`;
                     fileCountBadge.classList.remove('hidden');
-
-                    // Buat Card untuk setiap dokumen
-                    docxFiles.forEach(file => {
-                        const card = createDocumentCard(file);
-                        listContainer.appendChild(card);
-                    });
+                    renderDocuments(allDocuments); // Render pertama kali
                 })
-                .catch(error => {
-                    renderErrorState(error.message);
-                });
+                .catch(error => renderErrorState(error.message));
         }
 
-        // Helper untuk membuat elemen UI kartu dokumen
-        function createDocumentCard(file) {
-            const cleanName = file.name.replace(/\.docx$/i, ''); // Hapus ekstensi untuk tampilan
+        // Render dokumen ke layar berdasarkan array yang diberikan
+        function renderDocuments(docs) {
+            listContainer.innerHTML = ''; // Hapus isi kontainer
             
-            const div = document.createElement('div');
-            div.className = "group bg-white p-6 rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-blue-300 transition-all cursor-pointer flex flex-col justify-between h-full";
-            
-            div.innerHTML = `
-                <div class="flex items-start gap-4">
-                    <div class="flex-shrink-0 w-12 h-12 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"></path>
-                        </svg>
-                    </div>
-                    <div>
-                        <h3 class="font-semibold text-slate-800 text-lg leading-tight group-hover:text-blue-600 transition-colors line-clamp-2" title="${cleanName}">
-                            ${cleanName}
-                        </h3>
-                        <p class="text-xs text-slate-500 mt-2 font-medium uppercase tracking-wider">DOCX Document</p>
-                    </div>
-                </div>
-                <div class="mt-6 pt-4 border-t border-slate-100 flex justify-end">
-                    <span class="text-sm text-blue-600 font-medium group-hover:translate-x-1 transition-transform flex items-center gap-1">
-                        Read Document
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                    </span>
-                </div>
-            `;
+            fileCountBadge.innerText = `${docs.length} Documents`;
 
-            // Saat diklik, buka modal
-            div.onclick = () => openDocument(file.name, file.download_url);
+            if (docs.length === 0) {
+                renderEmptyState("No documents match your search.");
+                return;
+            }
+
+            // Tentukan layout grid/list pada kontainer
+            if (currentView === 'grid') {
+                listContainer.className = "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6";
+            } else {
+                listContainer.className = "flex flex-col gap-4"; // Tampilan list (menurun bawah)
+            }
+
+            docs.forEach(file => {
+                const card = createDocumentCard(file);
+                listContainer.appendChild(card);
+            });
+        }
+
+        // Helper untuk membuat HTML kartu
+        function createDocumentCard(file) {
+            const cleanName = file.name.replace(/\.docx$/i, '');
+            const div = document.createElement('div');
             
+            if (currentView === 'grid') {
+                div.className = "group bg-white p-6 rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-blue-300 transition-all cursor-pointer flex flex-col justify-between h-full";
+                div.innerHTML = `
+                    <div class="flex items-start gap-4">
+                        <div class="flex-shrink-0 w-12 h-12 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"></path></svg>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-slate-800 text-lg leading-tight group-hover:text-blue-600 transition-colors line-clamp-2" title="${cleanName}">${cleanName}</h3>
+                            <p class="text-xs text-slate-500 mt-2 font-medium uppercase tracking-wider">DOCX</p>
+                        </div>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-slate-100 flex justify-end">
+                        <span class="text-sm text-blue-600 font-medium group-hover:translate-x-1 transition-transform flex items-center gap-1">
+                            Read <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                        </span>
+                    </div>
+                `;
+            } else {
+                // Tampilan untuk List View (Horizontal Card)
+                div.className = "group bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-blue-300 transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-4";
+                div.innerHTML = `
+                    <div class="flex items-center gap-4">
+                        <div class="flex-shrink-0 w-10 h-10 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"></path></svg>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-slate-800 text-base leading-tight group-hover:text-blue-600 transition-colors" title="${cleanName}">${cleanName}</h3>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between sm:justify-end sm:border-none border-t border-slate-100 sm:pt-0 pt-3">
+                        <p class="text-xs text-slate-500 font-medium uppercase tracking-wider sm:hidden">DOCX</p>
+                        <span class="text-sm text-blue-600 font-medium group-hover:translate-x-1 transition-transform flex items-center gap-1">
+                            Read Document <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                        </span>
+                    </div>
+                `;
+            }
+
+            div.onclick = () => openDocument(file.name, file.download_url);
             return div;
         }
 
-        // Fungsi untuk mengunduh dan membaca dokumen dengan Mammoth
+        // ==========================================
+        // LOGIKA FILTER / PENCARIAN
+        // ==========================================
+        searchInput.addEventListener('input', (e) => {
+            const keyword = e.target.value.toLowerCase();
+            const filteredDocs = allDocuments.filter(doc => 
+                doc.name.toLowerCase().includes(keyword)
+            );
+            renderDocuments(filteredDocs);
+        });
+
+        // ==========================================
+        // LOGIKA PEMILIHAN VIEW (GRID/LIST)
+        // ==========================================
+        btnGrid.addEventListener('click', () => setViewMode('grid'));
+        btnList.addEventListener('click', () => setViewMode('list'));
+
+        function setViewMode(mode) {
+            currentView = mode;
+            
+            // Ubah gaya tombol yang aktif
+            if (mode === 'grid') {
+                btnGrid.className = "p-1.5 rounded bg-white shadow-sm text-blue-600 transition-colors flex-1 sm:flex-none";
+                btnList.className = "p-1.5 rounded text-slate-400 hover:text-slate-600 transition-colors flex-1 sm:flex-none";
+            } else {
+                btnList.className = "p-1.5 rounded bg-white shadow-sm text-blue-600 transition-colors flex-1 sm:flex-none";
+                btnGrid.className = "p-1.5 rounded text-slate-400 hover:text-slate-600 transition-colors flex-1 sm:flex-none";
+            }
+            
+            // Render ulang dokumen yang saat ini sedang tampil (menggunakan filter pencarian saat ini jika ada)
+            const keyword = searchInput.value.toLowerCase();
+            const filteredDocs = allDocuments.filter(doc => doc.name.toLowerCase().includes(keyword));
+            renderDocuments(filteredDocs);
+        }
+
+        // ==========================================
+        // FUNGSI MODAL DAN MAMMOTH.JS
+        // ==========================================
         function openDocument(fileName, downloadUrl) {
-            // Tampilkan Modal UI
             modal.classList.remove('hidden');
-            // Sedikit delay untuk memicu animasi CSS transition
-            setTimeout(() => {
-                modalPanel.classList.add('modal-enter-active');
-            }, 10);
+            setTimeout(() => { modalPanel.classList.add('modal-enter-active'); }, 10);
 
             const cleanName = fileName.replace(/\.docx$/i, '');
             modalTitle.innerText = cleanName;
             
-            // Tampilan Loading di dalam Modal
             modalBody.innerHTML = `
                 <div class="flex flex-col items-center justify-center py-12">
                     <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
@@ -318,29 +343,17 @@
                 </div>
             `;
 
-            // Ambil data file (Biner) dan convert menggunakan Mammoth
             fetch(downloadUrl)
                 .then(res => {
-                    if (!res.ok) throw new Error('Failed to download the document file.');
+                    if (!res.ok) throw new Error('Failed to download document.');
                     return res.arrayBuffer();
                 })
-                .then(arrayBuffer => {
-                    // Proses array buffer ke HTML
-                    return mammoth.convertToHtml({ arrayBuffer: arrayBuffer }, {
-                        // Konfigurasi tambahan untuk Mammoth (opsional)
-                        ignoreEmptyParagraphs: false
-                    });
-                })
+                .then(arrayBuffer => mammoth.convertToHtml({ arrayBuffer: arrayBuffer }, { ignoreEmptyParagraphs: false }))
                 .then(result => {
-                    // Masukkan hasil render HTML ke dalam modal
                     if(result.value.trim() === "") {
-                        modalBody.innerHTML = `<p class="text-slate-500 italic text-center py-10">The document is empty or has no readable text content.</p>`;
+                        modalBody.innerHTML = `<p class="text-slate-500 italic text-center py-10">Document is empty or contains unsupported formats.</p>`;
                     } else {
                         modalBody.innerHTML = result.value; 
-                    }
-                    
-                    if (result.messages.length > 0) {
-                        console.log('Mammoth Warning:', result.messages);
                     }
                 })
                 .catch(err => {
@@ -354,34 +367,28 @@
                 });
         }
 
-        // Menutup Modal
         function closeModal() {
             modalPanel.classList.remove('modal-enter-active');
-            
-            // Tunggu transisi selesai sebelum di-hide beneran
             setTimeout(() => {
                 modal.classList.add('hidden');
-                modalBody.innerHTML = ''; // Bersihkan memori isi dokumen
+                modalBody.innerHTML = '';
             }, 300);
         }
 
-        // Tutup saat pencet tombol Escape (Esc)
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
-                closeModal();
-            }
+            if (e.key === 'Escape' && !modal.classList.contains('hidden')) closeModal();
         });
 
         // UI Helpers
-        function renderEmptyState() {
+        function renderEmptyState(message) {
             listContainer.className = "col-span-full";
             listContainer.innerHTML = `
                 <div class="bg-white rounded-2xl border border-dashed border-slate-300 p-12 text-center">
                     <svg class="mx-auto h-16 w-16 text-slate-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
-                    <h3 class="text-lg font-medium text-slate-900">No Documents Yet</h3>
-                    <p class="mt-2 text-slate-500 max-w-sm mx-auto">Upload .docx files to the "${FOLDER_PATH}" folder in your GitHub repository.</p>
+                    <h3 class="text-lg font-medium text-slate-900">Oops!</h3>
+                    <p class="mt-2 text-slate-500 max-w-sm mx-auto">${message}</p>
                 </div>
             `;
         }
