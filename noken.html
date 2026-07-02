@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Noken Project Pitch | Success Indicators</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0fdfa',
+                            100: '#ccfbf1',
+                            500: '#14b8a6',
+                            600: '#0d9488',
+                            900: '#134e4a',
+                        },
+                        accent: {
+                            100: '#ffedd5',
+                            600: '#ea580c',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            overflow: hidden; 
+        }
+        
+        .bg-pattern {
+            background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+            background-size: 32px 32px;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateY(20px) scale(0.98);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+            z-index: 10;
+        }
+
+        .slide.prev {
+            transform: translateY(-20px) scale(0.98);
+        }
+
+        .role-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+        }
+        .role-badge:hover {
+            transform: translateY(-2px);
+        }
+        .role-badge i {
+            margin-right: 0.5rem;
+        }
+
+        /* Editable text styling */
+        .editable-role {
+            border-bottom: 1px dashed currentColor;
+            padding: 0 2px;
+            cursor: text;
+            transition: background-color 0.2s;
+        }
+        .editable-role:focus {
+            outline: none;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-bottom-style: solid;
+            border-radius: 2px;
+        }
+
+        /* Print Specific CSS for PDF Export */
+        @media print {
+            @page {
+                size: landscape;
+                margin: 0;
+            }
+            body {
+                overflow: visible !important;
+                background-color: #ffffff !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .bg-pattern {
+                background-image: none !important;
+            }
+            header, footer, .no-print {
+                display: none !important;
+            }
+            main#presentation {
+                padding: 0 !important;
+                max-width: none !important;
+            }
+            .slide {
+                position: relative !important;
+                opacity: 1 !important;
+                visibility: visible !important;
+                transform: none !important;
+                height: 100vh !important;
+                page-break-after: always !important;
+                page-break-inside: avoid !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                padding: 40px !important;
+            }
+            /* Hide the arrow button on the title slide in PDF */
+            .animate-bounce {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-pattern h-screen w-screen text-slate-800">
+
+    <!-- Navigation UI (Fixed Top & Bottom) -->
+    <header class="fixed top-0 left-0 w-full p-6 flex justify-between items-center z-50">
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-lg bg-brand-600 flex items-center justify-center text-white font-bold text-xl shadow-lg">
+                N
+            </div>
+            <span class="font-semibold text-slate-600 tracking-wide">Project Noken</span>
+        </div>
+        <div class="flex items-center space-x-4">
+            <div class="text-xs text-brand-600 bg-brand-50 px-3 py-1 rounded-full font-medium border border-brand-100 hidden md:block">
+                <i class="fa-solid fa-pen-to-square mr-1"></i> Click any role badge to edit
+            </div>
+            
+            <button onclick="exportToPDF()" class="flex items-center space-x-2 bg-slate-800 hover:bg-slate-900 text-white text-sm font-medium px-4 py-2 rounded-lg shadow-sm transition-colors">
+                <i class="fa-solid fa-file-pdf"></i>
+                <span>Export PDF</span>
+            </button>
+            
+            <div class="text-sm font-medium text-slate-400 bg-white px-4 py-2 rounded-full shadow-sm border border-slate-100">
+                <span id="slide-counter">1</span> / <span id="total-slides">8</span>
+            </div>
+        </div>
+    </header>
+
+    <footer class="fixed bottom-0 left-0 w-full z-50">
+        <!-- Progress Bar -->
+        <div class="h-1.5 w-full bg-slate-200">
+            <div id="progress-bar" class="h-full bg-brand-500 transition-all duration-500 ease-out" style="width: 0%;"></div>
+        </div>
+        <!-- Controls -->
+        <div class="p-6 flex justify-between items-center bg-white/80 backdrop-blur-md border-t border-slate-100">
+            <button id="prev-btn" class="flex items-center space-x-2 text-slate-500 hover:text-brand-600 transition-colors disabled:opacity-30 disabled:cursor-not-allowed font-medium px-4 py-2 rounded-lg hover:bg-brand-50">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>Previous</span>
+            </button>
+            <div class="text-xs text-slate-400 hidden sm:block">
+                Use <kbd class="px-2 py-1 bg-slate-100 rounded border border-slate-200 mx-1 font-mono">←</kbd> <kbd class="px-2 py-1 bg-slate-100 rounded border border-slate-200 mx-1 font-mono">→</kbd> keys to navigate
+            </div>
+            <button id="next-btn" class="flex items-center space-x-2 bg-brand-600 hover:bg-brand-700 text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed font-medium px-6 py-2.5 rounded-lg shadow-md hover:shadow-lg">
+                <span>Next</span>
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+        </div>
+    </footer>
+
+    <!-- Presentation Container -->
+    <main id="presentation" class="relative w-full h-full max-w-6xl mx-auto px-6 pb-24 pt-20">
+
+        <!-- Slide 1: Title -->
+        <section class="slide active">
+            <div class="text-center px-4 w-full">
+                <div class="inline-block p-4 rounded-2xl bg-brand-50 text-brand-600 mb-6 shadow-sm border border-brand-100">
+                    <i class="fa-solid fa-leaf text-4xl"></i>
+                </div>
+                <h1 class="text-5xl md:text-7xl font-extrabold text-slate-900 mb-6 tracking-tight leading-tight">
+                    Preserving Heritage, <br>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-teal-400">Empowering Communities</span>
+                </h1>
+                <p class="text-xl md:text-2xl text-slate-500 max-w-3xl mx-auto mb-10 leading-relaxed">
+                    Strategic Success Indicators and Key Roles for the Sustainable Development of Noken Culture in Papua.
+                </p>
+                <button onclick="nextSlide()" class="animate-bounce bg-white border border-slate-200 text-slate-600 w-12 h-12 rounded-full shadow-sm hover:bg-slate-50 transition-colors flex items-center justify-center mx-auto no-print">
+                    <i class="fa-solid fa-arrow-down"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- Slide 2: Co-curricular Module -->
+        <section class="slide">
+            <div class="grid md:grid-cols-2 gap-12 items-center w-full h-full pb-10">
+                <div class="order-2 md:order-1">
+                    <div class="text-brand-600 font-semibold tracking-wider uppercase text-sm mb-3">Indicator 1</div>
+                    <h2 class="text-4xl md:text-5xl font-bold text-slate-800 mb-6 leading-tight">Co-curricular Module Development</h2>
+                    <p class="text-lg text-slate-600 mb-8 leading-relaxed">
+                        Successful development and compilation of Noken co-curricular modules tailored for all educational levels, ranging from Early Childhood Education (PAUD) through High School (SMA).
+                    </p>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                        <h4 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">Strategic Roles</h4>
+                        <div class="flex flex-wrap gap-3">
+                            <span class="role-badge bg-blue-50 text-blue-700 border border-blue-100">
+                                <i class="fa-solid fa-building-columns"></i> 
+                                <span contenteditable="true" class="editable-role" spellcheck="false">BGTK Papua</span>
+                            </span>
+                            <span class="role-badge bg-cyan-50 text-cyan-700 border border-cyan-100">
+                                <i class="fa-solid fa-globe"></i> 
+                                <span contenteditable="true" class="editable-role" spellcheck="false">UNICEF</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="order-1 md:order-2 flex justify-center">
+                    <div class="w-full max-w-md aspect-square bg-gradient-to-br from-blue-100 to-brand-100 rounded-full flex items-center justify-center shadow-inner relative overflow-hidden">
+                        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-20"></div>
+                        <i class="fa-solid fa-book-open-reader text-8xl text-brand-600 relative z-10"></i>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 3: Artisan Certification -->
+        <section class="slide">
+            <div class="grid md:grid-cols-2 gap-12 items-center w-full h-full pb-10">
+                <div class="order-2 md:order-1">
+                    <div class="text-accent-600 font-semibold tracking-wider uppercase text-sm mb-3">Indicator 2</div>
+                    <h2 class="text-4xl md:text-5xl font-bold text-slate-800 mb-6 leading-tight">Artisan Certification & Capacity Building</h2>
+                    <p class="text-lg text-slate-600 mb-8 leading-relaxed">
+                        A minimum of <strong class="text-slate-800">140 Mama-Mama Noken artisans</strong> across 7 customary territories achieve IHPOS certification and master sustainable, natural dyeing techniques.
+                    </p>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                        <h4 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">Strategic Roles</h4>
+                        <div class="flex flex-wrap gap-3">
+                            <span class="role-badge bg-accent-100 text-accent-700 border border-accent-200">
+                                <i class="fa-solid fa-users-gear"></i> 
+                                <span contenteditable="true" class="editable-role" spellcheck="false">INDI</span>
+                            </span>
+                            <span class="role-badge bg-amber-50 text-amber-700 border border-amber-200">
+                                <i class="fa-solid fa-hand-holding-heart"></i> 
+                                <span contenteditable="true" class="editable-role" spellcheck="false">YWBH</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="order-1 md:order-2 flex justify-center">
+                    <div class="w-full max-w-md aspect-square bg-gradient-to-br from-accent-100 to-amber-100 rounded-3xl flex items-center justify-center shadow-inner transform rotate-3">
+                        <i class="fa-solid fa-award text-9xl text-accent-600"></i>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 4: Learning Quality -->
+        <section class="slide">
+            <div class="w-full max-w-4xl mx-auto text-center h-full flex flex-col justify-center pb-10">
+                <div class="text-brand-600 font-semibold tracking-wider uppercase text-sm mb-3">Indicator 3</div>
+                <h2 class="text-4xl md:text-5xl font-bold text-slate-800 mb-8 leading-tight">Learning Quality Improvement</h2>
+                
+                <div class="bg-white p-10 rounded-3xl shadow-xl border border-slate-100 mb-10 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-brand-50 rounded-bl-full -z-0"></div>
+                    <i class="fa-solid fa-chart-line text-5xl text-brand-500 mb-6 relative z-10"></i>
+                    <p class="text-xl text-slate-600 leading-relaxed relative z-10">
+                        Demonstrable increase in student scores across <strong>literacy, numeracy, and character development</strong> as a direct result of implementing NUSA learning methodologies.
+                    </p>
+                </div>
+
+                <div class="flex flex-col items-center">
+                    <h4 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">Driven By</h4>
+                    <div class="flex justify-center flex-wrap gap-4">
+                        <span class="role-badge bg-blue-50 text-blue-700 border border-blue-100 text-lg px-6 py-2">
+                            <i class="fa-solid fa-building-columns"></i> 
+                            <span contenteditable="true" class="editable-role" spellcheck="false">BGTK Papua</span>
+                        </span>
+                        <span class="role-badge bg-cyan-50 text-cyan-700 border border-cyan-100 text-lg px-6 py-2">
+                            <i class="fa-solid fa-globe"></i> 
+                            <span contenteditable="true" class="editable-role" spellcheck="false">UNICEF</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 5: Ethical Data Accessibility -->
+        <section class="slide">
+            <div class="grid md:grid-cols-2 gap-12 items-center w-full h-full pb-10">
+                <div class="flex justify-center">
+                    <div class="relative w-full max-w-sm">
+                        <div class="absolute inset-0 bg-indigo-200 rounded-3xl transform -rotate-6 scale-105"></div>
+                        <div class="relative bg-white p-8 rounded-3xl shadow-lg border border-slate-100 aspect-square flex flex-col items-center justify-center text-center">
+                            <i class="fa-solid fa-database text-6xl text-indigo-500 mb-4"></i>
+                            <div class="h-2 w-16 bg-indigo-100 rounded-full mb-4"></div>
+                            <h3 class="font-bold text-slate-700">Digital Registry</h3>
+                            <p class="text-sm text-slate-500 mt-2">FPIC Compliant</p>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div class="text-indigo-500 font-semibold tracking-wider uppercase text-sm mb-3">Indicator 4</div>
+                    <h2 class="text-4xl md:text-5xl font-bold text-slate-800 mb-6 leading-tight">Ethical Data Accessibility</h2>
+                    <p class="text-lg text-slate-600 mb-8 leading-relaxed">
+                        Establishment of a verified, digital Noken database accessible to the public. This system operates with <strong>full compliance to FPIC</strong> (Free, Prior, and Informed Consent) principles, ensuring indigenous intellectual property is protected.
+                    </p>
+                    <div class="bg-indigo-50 p-6 rounded-2xl border border-indigo-100">
+                        <h4 class="text-sm font-semibold text-indigo-400 uppercase tracking-wider mb-4">Strategic Roles</h4>
+                        <div class="flex flex-wrap gap-3">
+                            <span class="role-badge bg-white text-indigo-700 border border-indigo-200 shadow-sm">
+                                <i class="fa-solid fa-landmark"></i> 
+                                <span contenteditable="true" class="editable-role" spellcheck="false">UNESCO</span>
+                            </span>
+                            <span class="role-badge bg-white text-indigo-700 border border-indigo-200 shadow-sm">
+                                <i class="fa-solid fa-leaf"></i> 
+                                <span contenteditable="true" class="editable-role" spellcheck="false">LAWE</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 6: Measurable Economic Impact -->
+        <section class="slide">
+            <div class="grid md:grid-cols-12 gap-8 items-center w-full h-full pb-10">
+                <div class="md:col-span-7">
+                    <div class="text-emerald-500 font-semibold tracking-wider uppercase text-sm mb-3">Indicator 5</div>
+                    <h2 class="text-4xl md:text-5xl font-bold text-slate-800 mb-6 leading-tight">Measurable Economic Impact</h2>
+                    
+                    <div class="prose prose-lg text-slate-600 mb-8">
+                        <p>Targeting tangible economic welfare improvements for Mama-Mama Noken artisans through:</p>
+                        <ul class="space-y-2 mt-4 text-slate-700">
+                            <li class="flex items-start"><i class="fa-solid fa-check text-emerald-500 mt-1.5 mr-3"></i> Product value addition</li>
+                            <li class="flex items-start"><i class="fa-solid fa-check text-emerald-500 mt-1.5 mr-3"></i> Production efficiency optimization</li>
+                            <li class="flex items-start"><i class="fa-solid fa-check text-emerald-500 mt-1.5 mr-3"></i> Facilitating broader market access</li>
+                        </ul>
+                        <div class="mt-6 p-4 bg-emerald-50 rounded-xl border border-emerald-100 text-sm text-emerald-800">
+                            <strong>Success Metric:</strong> Growth is evaluated not just by total income, but by the sustainable ratio of <em>income vs. production costs vs. labor time</em>.
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap gap-3">
+                        <span class="role-badge bg-white text-emerald-700 border border-emerald-200 shadow-sm">
+                            <i class="fa-solid fa-landmark"></i> 
+                            <span contenteditable="true" class="editable-role" spellcheck="false">UNESCO</span>
+                        </span>
+                        <span class="role-badge bg-white text-emerald-700 border border-emerald-200 shadow-sm">
+                            <i class="fa-solid fa-leaf"></i> 
+                            <span contenteditable="true" class="editable-role" spellcheck="false">LAWE</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="md:col-span-5 flex justify-center">
+                    <div class="w-full relative">
+                        <div class="bg-white rounded-3xl p-6 shadow-xl border border-slate-100 relative z-10">
+                            <div class="flex justify-between items-end mb-6">
+                                <div>
+                                    <p class="text-sm text-slate-400 font-medium">Welfare Growth</p>
+                                    <h4 class="text-2xl font-bold text-slate-800">+Sustainable</h4>
+                                </div>
+                                <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-xl">
+                                    <i class="fa-solid fa-arrow-trend-up"></i>
+                                </div>
+                            </div>
+                            <!-- Mock Chart -->
+                            <div class="flex items-end space-x-2 h-32 mt-4">
+                                <div class="w-1/4 bg-slate-100 rounded-t-md h-1/3"></div>
+                                <div class="w-1/4 bg-emerald-200 rounded-t-md h-1/2"></div>
+                                <div class="w-1/4 bg-emerald-400 rounded-t-md h-3/4"></div>
+                                <div class="w-1/4 bg-emerald-600 rounded-t-md h-full relative">
+                                    <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 w-3 h-3 bg-white rounded-full border-2 border-emerald-600"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="absolute top-4 -right-4 w-full h-full bg-emerald-100 rounded-3xl -z-0"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 7: Networking & Collaboration -->
+        <section class="slide">
+            <div class="w-full max-w-4xl mx-auto text-center h-full flex flex-col justify-center pb-10">
+                <div class="text-orange-500 font-semibold tracking-wider uppercase text-sm mb-3">Indicator 6</div>
+                <h2 class="text-4xl md:text-5xl font-bold text-slate-800 mb-6 leading-tight">Networking & Collaboration Ecosystem</h2>
+                
+                <p class="text-xl text-slate-600 leading-relaxed mb-10">
+                    Establishment of a <strong>peer-to-peer craft networking</strong> and sharing platform under the <em>Indonesia ICH Consultative Group</em>. Designed to foster a sustainable, culture-based creative industry ecosystem.
+                </p>
+
+                <div class="grid grid-cols-3 gap-6 mb-12">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col items-center">
+                        <i class="fa-solid fa-users text-3xl text-orange-400 mb-3"></i>
+                        <span class="font-semibold text-slate-700">Peer Network</span>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col items-center transform -translate-y-4">
+                        <i class="fa-solid fa-share-nodes text-3xl text-orange-500 mb-3"></i>
+                        <span class="font-semibold text-slate-700">Sharing Platform</span>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col items-center">
+                        <i class="fa-solid fa-recycle text-3xl text-orange-600 mb-3"></i>
+                        <span class="font-semibold text-slate-700">Sustainable Industry</span>
+                    </div>
+                </div>
+
+                <div class="flex flex-col items-center">
+                    <h4 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">Facilitated By</h4>
+                    <div class="flex justify-center flex-wrap gap-4">
+                        <span class="role-badge bg-orange-50 text-orange-700 border border-orange-100 text-lg px-6 py-2">
+                            <i class="fa-solid fa-university"></i> 
+                            <span contenteditable="true" class="editable-role" spellcheck="false">INDI UGM</span>
+                        </span>
+                        <span class="role-badge bg-orange-50 text-orange-700 border border-orange-100 text-lg px-6 py-2">
+                            <i class="fa-solid fa-leaf"></i> 
+                            <span contenteditable="true" class="editable-role" spellcheck="false">LAWE</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 8: Technology System Implementation -->
+        <section class="slide">
+            <div class="flex flex-col justify-center w-full h-full pb-10">
+                <div class="text-brand-600 font-semibold tracking-wider uppercase text-sm mb-3">Indicator 7</div>
+                <h2 class="text-3xl md:text-5xl font-bold text-slate-800 mb-6 leading-tight">Technology System Implementation (KMS/LCMS)</h2>
+                
+                <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-100 mb-8">
+                    <div class="flex items-start mb-6">
+                        <div class="bg-brand-100 p-4 rounded-xl mr-6">
+                            <i class="fa-solid fa-laptop-code text-3xl text-brand-600"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold text-slate-800 mb-2">Community-Based Digital Infrastructure</h3>
+                            <p class="text-slate-600 leading-relaxed">
+                                Construction and operation of a Knowledge Management System / Learning Content Management System for Intangible Cultural Heritage (ICH) education and inventorying.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-slate-50 border-l-4 border-brand-500 p-4 rounded-r-lg mb-6">
+                        <p class="text-sm text-slate-700 font-medium">
+                            <i class="fa-solid fa-microchip mr-2 text-brand-500"></i>
+                            <strong>Smart Feature:</strong> Applies an automated gatekeeping scheme through progress tracking and precise assessment to validate user competencies before unlocking advanced learning paths.
+                        </p>
+                    </div>
+
+                    <div class="mt-4">
+                        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Extensive Collaboration Array</h4>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="role-badge bg-slate-100 text-slate-700 text-xs py-1">
+                                <i class="fa-solid fa-server"></i> <span contenteditable="true" class="editable-role" spellcheck="false">BGTK (Infra/Server)</span>
+                            </span>
+                            <span class="role-badge bg-slate-100 text-slate-700 text-xs py-1">
+                                <i class="fa-solid fa-building-columns"></i> <span contenteditable="true" class="editable-role" spellcheck="false">ISI</span>
+                            </span>
+                            <span class="role-badge bg-slate-100 text-slate-700 text-xs py-1">
+                                <i class="fa-solid fa-graduation-cap"></i> <span contenteditable="true" class="editable-role" spellcheck="false">UNICEF (Edu)</span>
+                            </span>
+                            <span class="role-badge bg-slate-100 text-slate-700 text-xs py-1">
+                                <i class="fa-solid fa-users-gear"></i> <span contenteditable="true" class="editable-role" spellcheck="false">INDI</span>
+                            </span>
+                            <span class="role-badge bg-slate-100 text-slate-700 text-xs py-1">
+                                <i class="fa-solid fa-leaf"></i> <span contenteditable="true" class="editable-role" spellcheck="false">LAWE</span>
+                            </span>
+                            <span class="role-badge bg-brand-600 text-white text-xs py-1 shadow-md">
+                                <i class="fa-solid fa-handshake"></i> <span contenteditable="true" class="editable-role outline-none focus:bg-white/30 rounded" spellcheck="false">Handover to BP3OKP Papua</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const progressBar = document.getElementById('progress-bar');
+        const slideCounter = document.getElementById('slide-counter');
+        const totalSlidesEl = document.getElementById('total-slides');
+        
+        let currentSlide = 0;
+        const totalSlides = slides.length;
+        
+        totalSlidesEl.innerText = totalSlides;
+
+        function updateUI() {
+            // Update classes on slides
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active', 'prev');
+                if (index === currentSlide) {
+                    slide.classList.add('active');
+                } else if (index < currentSlide) {
+                    slide.classList.add('prev');
+                }
+            });
+
+            // Update Buttons
+            prevBtn.disabled = currentSlide === 0;
+            
+            if (currentSlide === totalSlides - 1) {
+                nextBtn.innerHTML = '<span>Finish</span> <i class="fa-solid fa-check"></i>';
+                nextBtn.classList.remove('bg-brand-600', 'hover:bg-brand-700');
+                nextBtn.classList.add('bg-slate-800', 'hover:bg-slate-900');
+            } else {
+                nextBtn.innerHTML = '<span>Next</span> <i class="fa-solid fa-arrow-right"></i>';
+                nextBtn.classList.add('bg-brand-600', 'hover:bg-brand-700');
+                nextBtn.classList.remove('bg-slate-800', 'hover:bg-slate-900');
+            }
+
+            // Update Progress Bar
+            const progress = ((currentSlide + 1) / totalSlides) * 100;
+            progressBar.style.width = `${progress}%`;
+
+            // Update Counter
+            slideCounter.innerText = currentSlide + 1;
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                updateUI();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateUI();
+            }
+        }
+
+        // Export to PDF Function
+        function exportToPDF() {
+            // Because of our specific @media print CSS, 
+            // calling window.print() will format all slides correctly into a landscape PDF.
+            // When the print dialog opens, the user just needs to select "Save as PDF"
+            alert("In the print dialog that opens, make sure to set the layout to 'Landscape' and select 'Save as PDF'.\n\n(Pada jendela print yang muncul, pastikan layout disetel ke 'Landscape' dan pilih 'Save as PDF' / Simpan sebagai PDF).");
+            window.print();
+        }
+
+        // Prevent spacebar from advancing slide if a user is currently typing/editing text
+        document.addEventListener('keydown', (e) => {
+            const isEditing = document.activeElement.hasAttribute('contenteditable');
+            
+            if (isEditing) {
+                // If they are editing, ignore navigation keys
+                return; 
+            }
+
+            if (e.key === 'ArrowRight' || e.key === 'Space' || e.key === 'Enter') {
+                e.preventDefault(); 
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                prevSlide();
+            }
+        });
+
+        // Initialize UI on load
+        updateUI();
+    </script>
+</body>
+</html>
