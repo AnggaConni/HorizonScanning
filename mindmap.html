@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Peta Konsep · Kokurikuler Noken per Fase</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-0:#191309;
+    --bg-1:#211809;
+    --fiber:#2b2011;
+    --card:#2a2013;
+    --card-edge:#3c2f1a;
+    --ink:#f1e6cf;
+    --ink-dim:#c9b898;
+    --ink-faint:#9d8a68;
+    --root:#e9c46a;
+
+    --a:#d69b3f;   /* Fase A - ochre / kunyit */
+    --a-soft:#3a2c14;
+    --b:#c1552e;   /* Fase B - terakota / tanah liat */
+    --b-soft:#3a2113;
+    --c:#7fa563;   /* Fase C - lumut / daun */
+    --c-soft:#233018;
+    --d:#3f9482;   /* Fase D - hutan / tosca gelap */
+    --d-soft:#173029;
+    --e:#8a6a4a;   /* Fase E - kayu / kulit kayu */
+    --e-soft:#2c2419;
+    --f:#8471b0;   /* Fase F - nila / pewarna gelap */
+    --f-soft:#251f34;
+
+    --shadow: 0 10px 26px -12px rgba(0,0,0,.65);
+    --radius: 7px 14px 7px 14px;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0; padding:0; height:100%;
+    background:var(--bg-0);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    overflow:hidden;
+  }
+
+  body{
+    background-image:
+      radial-gradient(ellipse at 15% 0%, rgba(214,155,63,.08), transparent 45%),
+      radial-gradient(ellipse at 85% 100%, rgba(132,113,176,.08), transparent 45%);
+  }
+
+  /* ---------- woven texture backdrop ---------- */
+  #weave{
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    opacity:.5;
+  }
+
+  /* ---------- header ---------- */
+  header{
+    position:relative; z-index:5;
+    display:flex; align-items:center; gap:18px;
+    padding:14px 22px;
+    background:linear-gradient(180deg, rgba(25,19,9,.97), rgba(25,19,9,.86));
+    border-bottom:1px solid var(--card-edge);
+    backdrop-filter: blur(6px);
+  }
+  header .brand{display:flex; flex-direction:column; gap:2px; margin-right:8px;}
+  header .brand .eyebrow{
+    font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.16em;
+    color:var(--ink-faint); text-transform:uppercase;
+  }
+  header .brand h1{
+    margin:0; font-family:'Fraunces',serif; font-weight:600; font-size:21px;
+    color:var(--root); letter-spacing:.01em;
+  }
+
+  .toolbar{display:flex; align-items:center; gap:8px; flex-wrap:wrap; flex:1;}
+  .search-wrap{position:relative; min-width:200px;}
+  .search-wrap input{
+    width:100%; background:var(--fiber); border:1px solid var(--card-edge); color:var(--ink);
+    padding:8px 12px 8px 30px; border-radius:8px; font-family:'Inter'; font-size:13px;
+    outline:none;
+  }
+  .search-wrap input:focus{border-color:var(--root);}
+  .search-wrap svg{position:absolute; left:9px; top:50%; transform:translateY(-50%); opacity:.55;}
+
+  button.btn{
+    font-family:'Inter'; font-size:12.5px; font-weight:600;
+    background:var(--fiber); color:var(--ink-dim); border:1px solid var(--card-edge);
+    padding:8px 12px; border-radius:8px; cursor:pointer; letter-spacing:.01em;
+    display:flex; align-items:center; gap:6px; white-space:nowrap;
+    transition:border-color .15s, color .15s, background .15s;
+  }
+  button.btn:hover{ color:var(--ink); border-color:var(--root); background:#332510; }
+  .zoomgroup{display:flex; border:1px solid var(--card-edge); border-radius:8px; overflow:hidden;}
+  .zoomgroup button{border:none; border-right:1px solid var(--card-edge); border-radius:0;}
+  .zoomgroup button:last-child{border-right:none;}
+
+  .legend{
+    display:flex; gap:10px; align-items:center; margin-left:auto; flex-wrap:wrap;
+    font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--ink-faint);
+  }
+  .legend .chip{display:flex; align-items:center; gap:5px;}
+  .legend .dot{width:8px; height:8px; border-radius:2px; display:inline-block;}
+
+  /* ---------- viewport ---------- */
+  #viewport{
+    position:absolute; top:60px; left:0; right:0; bottom:0;
+    overflow:hidden; cursor:grab; z-index:2;
+  }
+  #viewport.grabbing{cursor:grabbing;}
+  #world{
+    position:absolute; top:0; left:0; transform-origin:0 0;
+    will-change:transform;
+  }
+  svg#links{position:absolute; top:0; left:0; overflow:visible; z-index:1;}
+
+  /* ---------- nodes ---------- */
+  .node{
+    position:absolute; z-index:2;
+    transform:translate(0,0);
+    transition:left .45s cubic-bezier(.2,.8,.2,1), top .45s cubic-bezier(.2,.8,.2,1), opacity .3s ease;
+  }
+  .card{
+    position:relative;
+    background:var(--card);
+    border:1px solid var(--card-edge);
+    border-radius:var(--radius);
+    padding:9px 13px;
+    box-shadow:var(--shadow);
+    cursor:pointer;
+    user-select:none;
+  }
+  .card .label{
+    font-family:'Fraunces',serif; font-weight:600; font-size:14px; line-height:1.32;
+    color:var(--ink);
+  }
+  .card .sub{
+    margin-top:3px; font-size:11.6px; line-height:1.4; color:var(--ink-dim);
+  }
+  .card .badges{margin-top:6px; display:flex; gap:5px; flex-wrap:wrap;}
+  .card .badge{
+    font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:.03em;
+    padding:2px 6px; border-radius:4px; color:var(--ink);
+    background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08);
+  }
+  .toggle{
+    position:absolute; right:-9px; top:50%; transform:translateY(-50%);
+    width:18px; height:18px; border-radius:50%;
+    background:var(--bg-0); border:1.5px solid var(--card-edge);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-dim);
+    z-index:3;
+  }
+
+  .node[data-type="root"] .card{ background:linear-gradient(160deg,#3a2c14,#241a0c); border-color:var(--root); }
+  .node[data-type="root"] .label{ font-size:20px; color:var(--root); }
+  .node[data-type="fase"] .card{ border-left:4px solid var(--accent); }
+  .node[data-type="fase"] .label{ color:var(--accent); font-size:15.5px;}
+  .node[data-type="kelas"] .card{ background:var(--accent-soft); border-color:var(--accent); }
+  .node[data-type="category"] .card{ border-style:dashed; }
+  .node[data-type="category"] .label{ font-size:12.5px; letter-spacing:.04em; text-transform:uppercase; color:var(--accent); font-family:'IBM Plex Mono',monospace; font-weight:500;}
+  .node[data-type="group"] .label{ font-size:12px; color:var(--ink-dim); font-family:'IBM Plex Mono',monospace; text-transform:uppercase; letter-spacing:.03em;}
+  .node[data-type="group"] .card{ padding:6px 11px; }
+  .node[data-type="leaf"] .card{ box-shadow:none; background:rgba(255,255,255,.02);}
+  .node[data-type="leaf"] .label{ font-size:12.5px; font-family:'Inter'; font-weight:500; line-height:1.42;}
+
+  .node.match .card{ outline:2px solid var(--root); outline-offset:2px;}
+  .node.dim{ opacity:.28; }
+  .node.hidden{ display:none; }
+
+  .knot{ fill:var(--knot-color); }
+
+  /* ---------- detail drawer ---------- */
+  #drawer{
+    position:fixed; top:60px; right:0; bottom:0; width:340px;
+    background:var(--bg-1); border-left:1px solid var(--card-edge);
+    transform:translateX(100%); transition:transform .3s ease;
+    z-index:20; padding:20px; overflow-y:auto;
+  }
+  #drawer.open{ transform:translateX(0); }
+  #drawer h2{ font-family:'Fraunces',serif; font-size:18px; margin:0 0 4px; color:var(--root);}
+  #drawer .path{ font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--ink-faint); margin-bottom:16px;}
+  #drawer .body{ font-size:13.5px; line-height:1.6; color:var(--ink-dim); white-space:pre-line;}
+  #drawer .close{
+    position:absolute; top:16px; right:16px; background:none; border:none; color:var(--ink-faint);
+    font-size:20px; cursor:pointer; line-height:1;
+  }
+
+  /* ---------- footer hint ---------- */
+  #hint{
+    position:fixed; left:16px; bottom:14px; z-index:5;
+    font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--ink-faint);
+    background:rgba(25,19,9,.85); border:1px solid var(--card-edge); padding:7px 11px; border-radius:8px;
+  }
+
+  #empty-note{
+    position:fixed; z-index:6; top:80px; left:50%; transform:translateX(-50%);
+    font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--ink-faint);
+    background:rgba(25,19,9,.9); border:1px solid var(--card-edge); padding:8px 14px; border-radius:8px;
+    display:none;
+  }
+</style>
+</head>
+<body>
+
+<svg id="weave" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <pattern id="weavePattern" width="26" height="26" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="26" stroke="#3a2c14" stroke-width="1"></line>
+      <line x1="13" y1="0" x2="13" y2="26" stroke="#241a0c" stroke-width="1"></line>
+    </pattern>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#weavePattern)"></rect>
+</svg>
+
+<header>
+  <div class="brand">
+    <span class="eyebrow">Rencana Kokurikuler · Warisan Tak Benda UNESCO</span>
+    <h1>Peta Konsep NOKEN — per Fase</h1>
+  </div>
+  <div class="toolbar">
+    <div class="search-wrap">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c9b898" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input id="search" type="text" placeholder="Cari tema, kelas, tujuan, mata pelajaran…">
+    </div>
+    <button class="btn" id="expandAll">＋ Perluas Semua</button>
+    <button class="btn" id="collapseAll">－ Ciutkan ke Fase</button>
+    <div class="zoomgroup">
+      <button class="btn" id="zoomOut">−</button>
+      <button class="btn" id="zoomReset">100%</button>
+      <button class="btn" id="zoomIn">+</button>
+    </div>
+    <div class="legend" id="legend"></div>
+  </div>
+</header>
+
+<div id="viewport">
+  <div id="world">
+    <svg id="links" xmlns="http://www.w3.org/2000/svg"></svg>
+  </div>
+</div>
+
+<div id="empty-note">Tidak ada hasil yang cocok — coba kata kunci lain.</div>
+<div id="hint">Klik simpul untuk membuka/menutup cabang &nbsp;·&nbsp; Klik kartu tujuan untuk detail &nbsp;·&nbsp; Seret untuk geser, gulir untuk zoom</div>
+
+<div id="drawer">
+  <button class="close" id="drawerClose">✕</button>
+  <div class="path" id="drawerPath"></div>
+  <h2 id="drawerTitle"></h2>
+  <div class="body" id="drawerBody"></div>
+</div>
+
+<script>
+/* =========================================================================
+   DATA MODEL
+   Sumber: Rencana Pembelajaran Kokurikuler "Noken" Fase A–F (Kelas I–XII)
+   ========================================================================= */
+
+let uid = 0;
+const nid = () => 'n' + (uid++);
+
+function leaf(label, sub){ return { id:nid(), type:'leaf', label, sub, children:[] }; }
+function group(label, items){ return { id:nid(), type:'group', label, children:items.map(t=>leaf(t)) }; }
+function category(label, items){ return { id:nid(), type:'category', label, children:items, collapsed:true }; }
+
+function kelas(opts){
+  const kids = [];
+  kids.push(category('Tema & Identitas', [
+    leaf(opts.tema, `Alokasi ${opts.jp} · ${opts.lokasi}`)
+  ]));
+  if(opts.mapel){
+    kids.push(category('Mata Pelajaran Terkait', opts.mapel.map(m=>leaf(m))));
+  }
+  kids.push(category('Dimensi Profil Lulusan', opts.dimensi.map(d=>leaf(d))));
+  if(opts.tujuanPerMapel){
+    kids.push(category('Tujuan Pembelajaran', opts.tujuanPerMapel.map(g=>group(g.mapel, g.items))));
+  } else {
+    kids.push(category('Tujuan Pembelajaran', opts.tujuan.map(t=>leaf(t))));
+  }
+  kids.push(category('Praktik Pedagogis', opts.praktik.map(p=>leaf(p))));
+  kids.push(category('Alur Kegiatan (Pertemuan)', opts.kegiatan.map(k=>leaf(k.judul, k.fokus))));
+  return {
+    id:nid(), type:'kelas', label:opts.label, sub:opts.tema,
+    badges:[opts.jp], collapsed:true, children:kids
+  };
+}
+
+function fase(label, sub, colorKey, kelasList){
+  return { id:nid(), type:'fase', label, sub, colorKey, collapsed:false, children:kelasList };
+}
+
+const DATA = {
+  id:nid(), type:'root', label:'NOKEN', sub:'Warisan Budaya Tak Benda UNESCO · Papua', collapsed:false,
+  children:[
+
+    fase('FASE A','Kelas I–II · SD','a',[
+      kelas({
+        label:'Kelas I', jp:'4 JP', lokasi:'Kelas dan lingkungan sekolah',
+        tema:'Aku Bangga dengan Noken',
+        dimensi:[
+          'Keimanan & Ketakwaan — bersyukur dan bangga pada budaya lokal sebagai anugerah Tuhan',
+          'Kreativitas — membuat karya sederhana terinspirasi noken (mewarnai, noken mini)',
+          'Kemandirian — menyelesaikan tugas dengan bimbingan minimal, percaya diri menampilkan karya'
+        ],
+        tujuan:[
+          'Mengenal Noken sebagai salah satu warisan budaya Papua',
+          'Mengidentifikasi bentuk dan warna Noken secara sederhana',
+          'Membuat karya sederhana terinspirasi Noken (mewarnai & noken mini)',
+          'Mengungkapkan perasaan bangga terhadap budaya lokal melalui refleksi sederhana'
+        ],
+        praktik:['Project-Based Learning (PjBL) sederhana','Pembelajaran berbasis bermain (play-based learning)','Kontekstual berbasis pengalaman langsung'],
+        kegiatan:[
+          {judul:'Pertemuan 1 (2 JP)', fokus:'Mengenal Noken — video singkat, diskusi bentuk/warna/fungsi, mewarnai pola'},
+          {judul:'Pertemuan 2 (2 JP)', fokus:'Membuat Karya Noken Sederhana — membuat "noken mini" dari kertas/kain perca'}
+        ]
+      }),
+      kelas({
+        label:'Kelas II', jp:'6 JP', lokasi:'Kelas, lingkungan sekolah, pasar tradisional',
+        tema:'Jelajah Noken di Sekitarku',
+        dimensi:[
+          'Kewargaan — menghargai keberagaman budaya lokal, sadar hak/kewajiban menjaga lingkungan',
+          'Komunikasi — menyampaikan gagasan hasil observasi, berdiskusi dengan teman & guru',
+          'Kemandirian — bertanggung jawab atas proses & hasil belajar dalam observasi dan praktik anyaman'
+        ],
+        tujuan:[
+          'Mengidentifikasi bahan-bahan alami yang digunakan untuk membuat Noken',
+          'Menceritakan fungsi Noken dalam kehidupan sehari-hari masyarakat Papua',
+          'Membuat anyaman sederhana dari bahan alami atau penggantinya'
+        ],
+        praktik:['Pembelajaran berbasis pengamatan (observasi)','Pembelajaran berbasis proyek (PjBL)','Kontekstual melalui praktik langsung'],
+        kegiatan:[
+          {judul:'Pertemuan 1 (2 JP)', fokus:'Mengenal Bahan Alami Noken'},
+          {judul:'Pertemuan 2 (2 JP)', fokus:'Fungsi dan Makna Noken'},
+          {judul:'Pertemuan 3 (2 JP)', fokus:'Praktik Membuat Anyaman Sederhana'}
+        ]
+      })
+    ]),
+
+    fase('FASE B','Kelas III–IV · SD','b',[
+      kelas({
+        label:'Kelas III', jp:'8 JP', lokasi:'Kelas, rumah pengrajin',
+        tema:'Tas Ajaib dari Serat Pohon',
+        dimensi:[
+          'Kolaborasi — bekerja sama dalam kelompok kecil, berempati, bergotong royong',
+          'Kreativitas — menghasilkan gagasan & karya anyaman yang orisinal dan fleksibel',
+          'Kemandirian — bertanggung jawab atas proses dan hasil belajar menyelesaikan proyek'
+        ],
+        tujuan:[
+          'Mempraktikkan teknik dasar menganyam atau merajut dengan pola sederhana',
+          'Bekerja sama dalam kelompok kecil untuk menyelesaikan proyek bersama',
+          'Menjelaskan perbedaan antara bahan alami dan bahan buatan dalam pembuatan noken'
+        ],
+        praktik:['Pembelajaran berbasis proyek (PjBL)','Kontekstual dengan pendampingan pengrajin','Kolaboratif dalam kelompok kecil'],
+        kegiatan:[
+          {judul:'Pertemuan 1 (2 JP)', fokus:'Mengenal Bahan Asli dari Alam (kulit kayu & pewarna alami)'},
+          {judul:'Pertemuan 2 (2 JP)', fokus:'Menyiapkan Bahan Simulasi & Perencanaan Proyek'},
+          {judul:'Pertemuan 3 (2 JP)', fokus:'Proses Pembuatan — Teknik Simpul Dasar'},
+          {judul:'Pertemuan 4 (2 JP)', fokus:'Penyelesaian Proyek & Pameran Hasil Karya'}
+        ]
+      }),
+      kelas({
+        label:'Kelas IV', jp:'8 JP', lokasi:'Lingkungan sekolah dan kelas',
+        tema:'Kearifan Lokal — Mengenal dan Melestarikan Noken',
+        dimensi:[
+          'Kewargaan — memahami noken sebagai warisan budaya tak benda yang diakui UNESCO',
+          'Kolaborasi — bekerja sama dengan teman, pengrajin lokal, dan orang tua',
+          'Kreativitas — menghasilkan karya modifikasi noken yang orisinal untuk pelestarian budaya'
+        ],
+        tujuan:[
+          'Mengidentifikasi asal-usul, bahan, dan fungsi noken sebagai warisan budaya tak benda UNESCO',
+          'Memahami nilai filosofis noken sebagai simbol kehidupan, kesuburan, dan perdamaian',
+          'Mempraktikkan keterampilan dasar menganyam atau membuat replika noken sederhana'
+        ],
+        praktik:['Pembelajaran berbasis proyek (PjBL)','Kontekstual melalui eksplorasi langsung','Kolaboratif dengan melibatkan pengrajin lokal'],
+        kegiatan:[
+          {judul:'Pertemuan 1 (2 JP)', fokus:'Eksplorasi Noken — Mengenal Warisan Budaya'},
+          {judul:'Pertemuan 2 (2 JP)', fokus:'Merancang Modifikasi Noken'},
+          {judul:'Pertemuan 3 (2 JP)', fokus:'Praktik Menganyam — Teknik Dasar Noken'},
+          {judul:'Pertemuan 4 (2 JP)', fokus:'Festival Noken Sekolah — Pameran & Presentasi'}
+        ]
+      })
+    ]),
+
+    fase('FASE C','Kelas V–VI · SD','c',[
+      kelas({
+        label:'Kelas V', jp:'10 JP', lokasi:'Lingkungan satuan pendidikan & sekitar',
+        tema:'Noken Kreatif untuk Koperasi Sekolah',
+        dimensi:[
+          'Kemandirian — bertanggung jawab atas proses produksi, penentuan harga, dan pemasaran',
+          'Kreativitas — menghasilkan produk noken (tempat pensil, tas kecil) bernilai jual',
+          'Kolaborasi — bekerja sama dalam kelompok, berbagi ide, bergotong royong'
+        ],
+        tujuan:[
+          'Membuat produk noken sederhana (tempat pensil, tas kecil) dengan teknik dasar yang rapi dan kuat',
+          'Memasarkan produk noken di koperasi sekolah melalui promosi dan penjualan sederhana',
+          'Menunjukkan sikap jujur, tanggung jawab, dan percaya diri dalam kegiatan kewirausahaan'
+        ],
+        praktik:['PjBL berorientasi produk & pasar','Literasi finansial (harga, untung, penjualan)','Kontekstual di koperasi sekolah'],
+        kegiatan:[
+          {judul:'Pertemuan 1 (2 JP)', fokus:'Brainstorming Ide Produk'},
+          {judul:'Pertemuan 2–3 (4 JP)', fokus:'Produksi Noken'},
+          {judul:'Pertemuan 4 (2 JP)', fokus:'Membuat Label Harga & Promosi'},
+          {judul:'Pertemuan 5 (2 JP)', fokus:'Pemasaran di Koperasi & Evaluasi'}
+        ]
+      }),
+      kelas({
+        label:'Kelas VI', jp:'12 JP', lokasi:'Ruang kelas, lingkungan sekitar, ruang pameran',
+        tema:'Gelar Karya Noken: Dari Nenek Moyang Untuk Masa Depan',
+        dimensi:[
+          'Kreativitas — karya inovatif berbasis noken (produk fungsional modern) untuk pameran',
+          'Kolaborasi — riset, wawancara, produksi, dan penyelenggaraan pameran bersama komunitas adat',
+          'Kewargaan — memahami dan melestarikan noken sebagai warisan budaya tak benda UNESCO'
+        ],
+        tujuan:[
+          'Mengidentifikasi jenis, bahan, dan nilai budaya noken melalui riset dan wawancara pengrajin',
+          'Membuat produk inovatif berbasis noken (tas, tempat pensil, dompet) dengan sentuhan modern',
+          'Menyelenggarakan pameran karya "Gelar Karya Noken" dan menjelaskan makna budayanya'
+        ],
+        praktik:['PjBL dengan puncak kegiatan pameran','Kontekstual melalui riset lapangan & wawancara','Kolaboratif dalam kelompok riset, produksi, dan pameran'],
+        kegiatan:[
+          {judul:'Riset · Pertemuan 1 (2 JP)', fokus:'Mengenal Nilai Budaya Noken'},
+          {judul:'Riset · Pertemuan 2 (2 JP)', fokus:'Wawancara dengan Pengrajin'},
+          {judul:'Produksi · Pertemuan 1 (2 JP)', fokus:'Praktik Membuat Noken — Teknik Dasar'},
+          {judul:'Produksi · Pertemuan 2 (2 JP)', fokus:'Sentuhan Inovasi pada Produk Noken'},
+          {judul:'Pameran · Pertemuan 1 (1 JP)', fokus:'Persiapan Pameran'},
+          {judul:'Pameran · Pertemuan 2 (3 JP)', fokus:'Pelaksanaan Pameran & Pembuatan Konten'}
+        ]
+      })
+    ]),
+
+    fase('FASE D','Kelas VII–IX · SMP · Lintas Mapel','d',[
+      kelas({
+        label:'Kelas VII', jp:'20 JP', lokasi:'Kelas, lab IPA, hutan kota/kebun masyarakat, tempat pengrajin',
+        tema:'Eksplorasi Bahan Baku Noken: Mengenal, Mengidentifikasi, Melestarikan',
+        mapel:['IPA','Bahasa Indonesia','Seni Budaya'],
+        dimensi:[
+          'Penalaran Kritis — mengidentifikasi tanaman bahan baku, menganalisis serat, mengevaluasi dampak kelangkaan',
+          'Komunikasi — menyampaikan gagasan, observasi, dan rekomendasi konservasi secara efektif',
+          'Kewargaan — bangga budaya lokal, memahami WBTB UNESCO, peduli pelestarian lingkungan'
+        ],
+        tujuanPerMapel:[
+          {mapel:'IPA', items:[
+            'Mengidentifikasi jenis tanaman penghasil serat noken (genemo, manduam, dll.) berdasarkan ciri morfologi',
+            'Menjelaskan karakteristik serat alami (kekuatan, elastisitas, keawetan) dan proses pengolahannya',
+            'Menganalisis dampak eksploitasi bahan baku dan menyusun rekomendasi konservasi'
+          ]},
+          {mapel:'Bahasa Indonesia', items:[
+            'Menyusun daftar pertanyaan wawancara yang baik dan sistematis',
+            'Mempresentasikan hasil observasi dan identifikasi secara lisan',
+            'Menulis laporan singkat, caption, atau teks deskripsi eksplorasi noken'
+          ]},
+          {mapel:'Seni Budaya', items:[
+            'Menjelaskan motif, warna, dan filosofi seni anyam noken tradisional',
+            'Mendokumentasikan hasil observasi lapangan (foto, sketsa) dengan komposisi estetis',
+            'Membuat poster atau media presentasi hasil eksplorasi'
+          ]}
+        ],
+        praktik:['Pembelajaran berbasis inkuiri ilmiah','Pendidikan berbasis tempat (hutan kota/kebun/pengrajin)','Project-Based Learning (PjBL)','Kolaborasi lintas mata pelajaran'],
+        kegiatan:[
+          {judul:'Pertemuan 1 (4 JP)', fokus:'Orientasi'},
+          {judul:'Pertemuan 2 (4 JP)', fokus:'Perencanaan & Analisis Awal'},
+          {judul:'Pertemuan 3 (4 JP)', fokus:'Observasi Lapangan & Identifikasi Laboratorium'},
+          {judul:'Pertemuan 4 (4 JP)', fokus:'Evaluasi & Refleksi'}
+        ]
+      }),
+      kelas({
+        label:'Kelas VIII', jp:'20 JP', lokasi:'Kelas, ruang kesenian, sentra kerajinan, studio kreatif, lab IPA',
+        tema:'Inovasi Produk Noken untuk Remaja di Era Modern',
+        mapel:['IPA','IPS','Seni Budaya'],
+        dimensi:[
+          'Kreativitas — desain produk noken modern yang orisinal, estetis, dan fungsional bagi remaja',
+          'Penalaran Kritis — menganalisis bahan baku (IPA) serta nilai ekonomi & kearifan lokal (IPS)',
+          'Kolaborasi — bekerja dalam tim desain bersama pengrajin, ahli lingkungan, pelaku ekonomi kreatif'
+        ],
+        tujuanPerMapel:[
+          {mapel:'IPA', items:[
+            'Mengidentifikasi karakteristik serat alami bahan baku noken',
+            'Menjelaskan proses pengolahan bahan alami menjadi serat siap pakai',
+            'Menganalisis dampak eksploitasi bahan baku terhadap lingkungan'
+          ]},
+          {mapel:'IPS', items:[
+            'Menjelaskan nilai budaya dan sejarah noken sebagai warisan tak benda UNESCO',
+            'Menganalisis potensi ekonomi kreatif noken dalam konteks kewirausahaan remaja',
+            'Merumuskan strategi pemasaran sederhana berbasis kearifan lokal'
+          ]},
+          {mapel:'Seni Budaya', items:[
+            'Menjelaskan motif, warna, dan filosofi seni anyam noken tradisional',
+            'Merancang sketsa desain produk noken modern (tote bag, pouch, tas HP)',
+            'Mengapresiasi karya desain sendiri dan orang lain'
+          ]}
+        ],
+        praktik:['Design Thinking (empathize–define–ideate–prototype–test)','Project-Based Learning (PjBL)','Kolaborasi lintas mata pelajaran','Kontekstual melalui pengamatan bahan serat'],
+        kegiatan:[
+          {judul:'Pertemuan 1 (4 JP)', fokus:'Orientasi'},
+          {judul:'Pertemuan 2 (4 JP)', fokus:'Perencanaan Desain & Analisis'},
+          {judul:'Pertemuan 3 (4 JP)', fokus:'Produksi Digital & Simulasi Pemasaran'},
+          {judul:'Pertemuan 4 (4 JP)', fokus:'Evaluasi & Refleksi'}
+        ]
+      }),
+      kelas({
+        label:'Kelas IX', jp:'20 JP', lokasi:'Sekolah, media sosial, ruang publik (dengan izin)',
+        tema:'Menilai Dampak dan Makna Proyek Budaya Noken',
+        mapel:['Bahasa Inggris','TIK (Informatika)','Seni Budaya'],
+        dimensi:[
+          'Penalaran Kritis — menganalisis informasi digital, merumuskan pertanyaan riset, evaluasi dampak konten',
+          'Kreativitas — menghasilkan konten digital (video edukasi, poster) yang orisinal dan bermakna',
+          'Kewargaan — bangga dan peduli budaya lokal, aktif melestarikan lewat media digital'
+        ],
+        tujuanPerMapel:[
+          {mapel:'Bahasa Inggris', items:[
+            'Menyusun naskah video dalam bahasa Inggris dengan struktur sederhana',
+            'Menulis caption dan narasi promosi dalam bahasa Inggris yang persuasif',
+            'Mempresentasikan hasil proyek dalam bahasa Inggris dengan percaya diri'
+          ]},
+          {mapel:'TIK (Informatika)', items:[
+            'Mencari dan memilah informasi digital tentang noken dan UNESCO secara kritis',
+            'Menggunakan aplikasi pengolah video dan desain untuk produksi konten digital',
+            'Mempublikasikan konten di media sosial dengan etika digital yang baik',
+            'Memantau dan menganalisis data engagement (tayangan, like, komentar)'
+          ]},
+          {mapel:'Seni Budaya', items:[
+            'Menjelaskan nilai budaya, filosofi, dan sejarah noken sebagai WBTB UNESCO',
+            'Merancang storyboard dan visualisasi video yang estetis',
+            'Mengapresiasi karya seni budaya dalam bentuk konten digital'
+          ]}
+        ],
+        praktik:['PjBL model Lucas (2007): questioning–investigating–creating–discussing–reflecting','Kolaborasi lintas mata pelajaran','Pembelajaran berbasis digital dan kontekstual'],
+        kegiatan:[
+          {judul:'Pertemuan 1 (4 JP)', fokus:'Orientasi'},
+          {judul:'Pertemuan 2 (4 JP)', fokus:'Perencanaan Konten'},
+          {judul:'Pertemuan 3 (4 JP)', fokus:'Produksi & Publikasi'},
+          {judul:'Pertemuan 4 (4 JP)', fokus:'Evaluasi & Refleksi'}
+        ]
+      })
+    ]),
+
+    fase('FASE E','Kelas X · SMA · Lintas Mapel','e',[
+      kelas({
+        label:'Kelas X', jp:'20 JP', lokasi:'Sekolah, sentra kerajinan Noken, Dinas Perindustrian & Perdagangan',
+        tema:'Noken sebagai Produk Kreatif: Membangun Usaha Berbasis Budaya',
+        mapel:['Ekonomi / Kewirausahaan','Seni Budaya','Bahasa Indonesia'],
+        dimensi:[
+          'Kreativitas — gagasan inovatif branding & kemasan, menyusun proposal usaha yang orisinal',
+          'Kemandirian — riset pasar, analisis konsumen, dan perencanaan bisnis secara bertanggung jawab',
+          'Kolaborasi — bekerja sama dalam tim, berkoordinasi dengan mitra industri, presentasi di hadapan panelis'
+        ],
+        tujuanPerMapel:[
+          {mapel:'Ekonomi / Kewirausahaan', items:[
+            'Menganalisis peluang pasar dan segmentasi konsumen untuk produk Noken',
+            'Menyusun perencanaan usaha (produksi, pemasaran, keuangan sederhana) dalam proposal',
+            'Menentukan strategi penetapan harga dan distribusi berdasarkan studi banding'
+          ]},
+          {mapel:'Seni Budaya', items:[
+            'Menjelaskan nilai estetika, filosofi, dan keunikan motif Noken sebagai dasar branding',
+            'Merancang desain kemasan (packaging) yang menarik, fungsional, dan sesuai identitas budaya',
+            'Membuat visualisasi produk (sketsa, mockup) untuk mendukung proposal usaha'
+          ]},
+          {mapel:'Bahasa Indonesia', items:[
+            'Menyusun proposal usaha dengan struktur logis dan bahasa persuasif',
+            'Menulis narasi produk (brand story) yang komunikatif dan menggugah minat konsumen',
+            'Mempresentasikan proposal bisnis di depan panelis dengan argumentasi yang kuat'
+          ]}
+        ],
+        praktik:['PjBL — produk akhir proposal usaha + desain kemasan','Kunjungan industri (study tour) ke sentra kerajinan','Design Thinking','Kolaborasi lintas mata pelajaran'],
+        kegiatan:[
+          {judul:'Pertemuan 1 (4 JP)', fokus:'Orientasi'},
+          {judul:'Pertemuan 2 (4 JP)', fokus:'Kunjungan Industri & Analisis Pasar'},
+          {judul:'Pertemuan 3 (4 JP)', fokus:'Perancangan Produk & Proposal'},
+          {judul:'Pertemuan 4 (4 JP)', fokus:'Presentasi & Evaluasi'}
+        ]
+      })
+    ]),
+
+    fase('FASE F','Kelas XI–XII · SMA · Lintas Mapel','f',[
+      kelas({
+        label:'Kelas XI', jp:'20 JP', lokasi:'Sekolah, UMKM binaan, komunitas pengrajin (Konopa), Dinas Perindustrian, platform digital',
+        tema:'Inkubasi Usaha Noken: Menjalankan dan Mengevaluasi Dampak Usaha',
+        mapel:['Ekonomi / Kewirausahaan','Sosiologi / Antropologi','Matematika'],
+        dimensi:[
+          'Kemandirian — menjalankan usaha kreatif dari produksi hingga pemasaran, mengevaluasi kinerja',
+          'Kolaborasi — bermitra dengan pelaku usaha, komunitas pengrajin, dan dinas terkait',
+          'Penalaran Kritis — menganalisis data usaha secara matematis, menyusun rekomendasi berbasis bukti'
+        ],
+        tujuanPerMapel:[
+          {mapel:'Ekonomi / Kewirausahaan', items:[
+            'Menjalankan usaha kreatif berbasis Noken sesuai proposal fase sebelumnya',
+            'Menyusun laporan keuangan sederhana (pendapatan, biaya, laba, titik impas)',
+            'Mengevaluasi kinerja usaha berdasarkan hasil penjualan dan umpan balik konsumen'
+          ]},
+          {mapel:'Sosiologi / Antropologi', items:[
+            'Menganalisis dampak sosial usaha terhadap masyarakat pengrajin dan komunitas lokal',
+            'Mengevaluasi peran usaha dalam pelestarian budaya Noken dan dampaknya terhadap lingkungan',
+            'Menyusun laporan studi dampak sosial, budaya, dan lingkungan secara kritis'
+          ]},
+          {mapel:'Matematika', items:[
+            'Menerapkan statistik deskriptif untuk menganalisis data penjualan (mean, median, modus, diagram)',
+            'Menggunakan rasio keuangan (ROI, margin laba, BEP) untuk evaluasi kinerja usaha',
+            'Menyajikan data usaha dalam bentuk grafik dan tabel yang informatif'
+          ]}
+        ],
+        praktik:['PjBL — implementasi usaha nyata','Magang / Praktik Kerja Lapangan (PKL)','Inkubasi bisnis dengan pendampingan mentor','Pemasaran digital','Analisis data matematis','Kolaborasi lintas mata pelajaran'],
+        kegiatan:[
+          {judul:'Pertemuan 1 (4 JP)', fokus:'Orientasi & Perencanaan Implementasi'},
+          {judul:'Pertemuan 2 (8 JP)', fokus:'Magang / Produksi & Pengumpulan Data'},
+          {judul:'Pertemuan 3 (4 JP)', fokus:'Pemasaran Digital & Analisis Data'},
+          {judul:'Pertemuan 4 (4 JP)', fokus:'Pameran Akhir & Evaluasi'}
+        ]
+      }),
+      kelas({
+        label:'Kelas XII', jp:'20 JP', lokasi:'Sekolah (ruang pameran, aula), platform digital, komunitas pengrajin',
+        tema:'Pameran Akhir & Keberlanjutan Usaha Noken',
+        mapel:['Ekonomi / Kewirausahaan','Sosiologi / Antropologi','Bahasa Inggris'],
+        dimensi:[
+          'Kemandirian — mengevaluasi & menyempurnakan usaha, merencanakan keberlanjutan setelah lulus',
+          'Kreativitas — mengemas produk dan presentasi pameran akhir secara inovatif',
+          'Kolaborasi — bermitra dengan pengrajin, alumni, dan dinas terkait untuk pameran akhir'
+        ],
+        tujuanPerMapel:[
+          {mapel:'Ekonomi / Kewirausahaan', items:[
+            'Mengevaluasi kinerja usaha secara menyeluruh (laba, pertumbuhan, efisiensi) & rencana keberlanjutan',
+            'Menganalisis potensi pengembangan usaha (skala produksi, diversifikasi, perluasan pasar)',
+            'Menyusun laporan keuangan final dan presentasi bisnis dalam pameran'
+          ]},
+          {mapel:'Sosiologi / Antropologi', items:[
+            'Menganalisis dampak jangka panjang usaha terhadap komunitas pengrajin dan pelestarian budaya',
+            'Mengevaluasi kontribusi usaha terhadap perubahan sosial dan lingkungan',
+            'Menyusun rekomendasi keberlanjutan berbasis nilai sosial-budaya'
+          ]},
+          {mapel:'Bahasa Inggris', items:[
+            'Menyusun laporan akhir proyek inkubasi usaha dalam bahasa Inggris',
+            'Membuat materi promosi (katalog, booklet, konten digital) dalam bahasa Inggris',
+            'Mempresentasikan hasil usaha dan rencana keberlanjutan dalam bahasa Inggris'
+          ]}
+        ],
+        praktik:['PjBL — puncak kegiatan pameran akhir','Pembelajaran berbasis evaluasi dan refleksi','Kolaborasi lintas mata pelajaran','Inkubasi bisnis bersama praktisi, alumni, dan mitra industri'],
+        kegiatan:[
+          {judul:'Pertemuan 1 (4 JP)', fokus:'Orientasi & Evaluasi Awal'},
+          {judul:'Pertemuan 2 (4 JP)', fokus:'Finalisasi Produk & Laporan'},
+          {judul:'Pertemuan 3 (4 JP)', fokus:'Persiapan Pameran & Promosi'},
+          {judul:'Pertemuan 4 (4 JP)', fokus:'Pameran Akhir & Evaluasi'}
+        ]
+      })
+    ])
+  ]
+};
+
+/* =========================================================================
+   INDEX + FASE COLOR PROPAGATION
+   ========================================================================= */
+const COLORS = {a:'--a', b:'--b', c:'--c', d:'--d', e:'--e', f:'--f'};
+const byId = {};
+function indexAndTag(node, colorKey, ancestors){
+  byId[node.id] = node;
+  node._ancestors = ancestors;
+  if(colorKey) node.colorKey = node.colorKey || colorKey;
+  (node.children||[]).forEach(c => indexAndTag(c, node.colorKey, [...ancestors, node]));
+}
+indexAndTag(DATA, null, []);
+
+/* =========================================================================
+   LAYOUT ENGINE
+   ========================================================================= */
+const UNIT_PX = 21;
+const COLUMN_W = 300;
+const SIB_GAP_UNITS = 0.55;
+const TOP_PAD = 40, LEFT_PAD = 40;
+
+function isCollapsed(node){
+  return !node.children || node.children.length === 0 || node.collapsed;
+}
+function textLines(text, cpl){
+  if(!text) return 0;
+  return Math.max(1, Math.ceil(text.length / cpl));
+}
+function selfUnits(node){
+  let lines = textLines(node.label, node.type==='root' ? 20 : 30);
+  if(node.sub) lines += textLines(node.sub, 34);
+  if(node.badges && node.badges.length) lines += 0.9;
+  return lines * 1.0 + 1.6;
+}
+function assignUnits(node){
+  const self = selfUnits(node);
+  if(isCollapsed(node)){
+    node._units = Math.max(self, 2.2);
+  } else {
+    let sum = 0;
+    node.children.forEach((c,i)=>{
+      assignUnits(c);
+      sum += c._units;
+      if(i>0) sum += SIB_GAP_UNITS;
+    });
+    node._units = Math.max(self, sum);
+  }
+}
+function assignPos(node, depth, top){
+  node._depth = depth;
+  node._x = LEFT_PAD + depth * COLUMN_W;
+  if(isCollapsed(node)){
+    node._top = top;
+    node._center = top + (node._units*UNIT_PX)/2;
+    return top + node._units*UNIT_PX;
+  }
+  let cursor = top;
+  node.children.forEach((c,i)=>{
+    if(i>0) cursor += SIB_GAP_UNITS*UNIT_PX;
+    cursor = assignPos(c, depth+1, cursor);
+  });
+  node._top = top;
+  const firstC = node.children[0]._center, lastC = node.children[node.children.length-1]._center;
+  node._center = (firstC + lastC) / 2;
+  return cursor;
+}
+function runLayout(){
+  assignUnits(DATA);
+  assignPos(DATA, 0, TOP_PAD);
+}
+
+/* =========================================================================
+   RENDER
+   ========================================================================= */
+const world = document.getElementById('world');
+const linksSvg = document.getElementById('links');
+const domNodes = {};   // id -> element
+const domLinks = {};   // parentId-childId -> path element
+
+function cardWidthFor(type){
+  return {root:270, fase:250, kelas:250, category:230, group:210, leaf:250}[type] || 240;
+}
+
+function nodeVisible(node){
+  // visible if all ancestors are not collapsed
+  return node._ancestors.every(a => !a.collapsed);
+}
+
+function ensureNode(node){
+  let el = domNodes[node.id];
+  if(!el){
+    el = document.createElement('div');
+    el.className = 'node';
+    el.dataset.type = node.type;
+    el.dataset.id = node.id;
+    const accent = node.colorKey ? `var(${COLORS[node.colorKey]})` : 'var(--root)';
+    const accentSoft = node.colorKey ? `var(${COLORS[node.colorKey]}-soft)` : 'var(--fiber)';
+    el.style.setProperty('--accent', accent);
+    el.style.setProperty('--accent-soft', accentSoft);
+    el.style.width = cardWidthFor(node.type) + 'px';
+
+    const card = document.createElement('div');
+    card.className = 'card';
+
+    const label = document.createElement('div');
+    label.className = 'label';
+    label.textContent = node.label;
+    card.appendChild(label);
+
+    if(node.sub){
+      const sub = document.createElement('div');
+      sub.className = 'sub';
+      sub.textContent = node.sub;
+      card.appendChild(sub);
+    }
+    if(node.badges && node.badges.length){
+      const b = document.createElement('div');
+      b.className = 'badges';
+      node.badges.forEach(t=>{
+        const s = document.createElement('span');
+        s.className = 'badge'; s.textContent = t;
+        b.appendChild(s);
+      });
+      card.appendChild(b);
+    }
+    if(node.children && node.children.length){
+      const tg = document.createElement('div');
+      tg.className = 'toggle';
+      tg.textContent = node.collapsed ? '+' : '–';
+      card.appendChild(tg);
+    }
+    el.appendChild(card);
+    card.addEventListener('click', (e) => onNodeClick(node));
+    world.appendChild(el);
+    domNodes[node.id] = el;
+  } else {
+    const tg = el.querySelector('.toggle');
+    if(tg) tg.textContent = node.collapsed ? '+' : '–';
+  }
+  return el;
+}
+
+function layoutPath(x1,y1,x2,y2){
+  const dx = Math.max(40, (x2-x1)*0.5);
+  return `M ${x1} ${y1} C ${x1+dx} ${y1}, ${x2-dx} ${y2}, ${x2} ${y2}`;
+}
+
+function ensureLink(parent, child){
+  const key = parent.id + '-' + child.id;
+  let path = domLinks[key];
+  if(!path){
+    const ns = 'http://www.w3.org/2000/svg';
+    path = document.createElementNS(ns, 'path');
+    path.setAttribute('fill', 'none');
+    path.setAttribute('stroke-linecap', 'round');
+    const accent = child.colorKey ? `var(${COLORS[child.colorKey]})` : 'var(--root)';
+    path.setAttribute('stroke', accent);
+    path.setAttribute('stroke-width', parent.type==='root' ? 2.4 : 1.6);
+    path.setAttribute('opacity', parent.type==='root' ? 0.85 : 0.5);
+    linksSvg.appendChild(path);
+    domLinks[key] = path;
+  }
+  return path;
+}
+
+let maxX = 0, maxY = 0;
+function render(){
+  runLayout();
+  const seen = new Set();
+  const seenLinks = new Set();
+  maxX = 0; maxY = 0;
+
+  function walk(node){
+    if(!nodeVisible(node)) return;
+    const el = ensureNode(node);
+    seen.add(node.id);
+    const w = cardWidthFor(node.type);
+    el.style.left = node._x + 'px';
+    el.style.top = (node._center - 10) + 'px';
+    maxX = Math.max(maxX, node._x + w + 80);
+    maxY = Math.max(maxY, node._center + 60);
+
+    if(node.children && !node.collapsed){
+      node.children.forEach(child=>{
+        const path = ensureLink(node, child);
+        seenLinks.add(node.id+'-'+child.id);
+        const x1 = node._x + w, y1 = node._center;
+        const x2 = child._x, y2 = child._center;
+        path.setAttribute('d', layoutPath(x1,y1,x2,y2));
+        walk(child);
+      });
+    }
+  }
+  walk(DATA);
+
+  // remove stale nodes/links
+  Object.keys(domNodes).forEach(id=>{
+    if(!seen.has(id)){ domNodes[id].remove(); delete domNodes[id]; }
+  });
+  Object.keys(domLinks).forEach(key=>{
+    if(!seenLinks.has(key)){ domLinks[key].remove(); delete domLinks[key]; }
+  });
+
+  world.style.width = maxX + 'px';
+  world.style.height = maxY + 'px';
+  linksSvg.setAttribute('width', maxX);
+  linksSvg.setAttribute('height', maxY);
+  linksSvg.style.width = maxX + 'px';
+  linksSvg.style.height = maxY + 'px';
+
+  applyFilter();
+}
+
+/* =========================================================================
+   INTERACTION: expand/collapse, drawer
+   ========================================================================= */
+const drawer = document.getElementById('drawer');
+function onNodeClick(node){
+  if(node.children && node.children.length){
+    node.collapsed = !node.collapsed;
+    render();
+  }
+  if(node.type === 'leaf'){
+    openDrawer(node);
+  }
+}
+function openDrawer(node){
+  const pathStr = node._ancestors.map(a=>a.label).filter(l=>l!=='NOKEN').join(' › ');
+  document.getElementById('drawerPath').textContent = pathStr;
+  document.getElementById('drawerTitle').textContent = node.label;
+  document.getElementById('drawerBody').textContent = node.sub || '';
+  drawer.classList.add('open');
+}
+document.getElementById('drawerClose').addEventListener('click', ()=> drawer.classList.remove('open'));
+
+document.getElementById('expandAll').addEventListener('click', ()=>{
+  Object.values(byId).forEach(n=> n.collapsed = false);
+  render();
+});
+document.getElementById('collapseAll').addEventListener('click', ()=>{
+  Object.values(byId).forEach(n=>{
+    if(n.type==='root') n.collapsed = false;
+    else if(n.type==='fase') n.collapsed = false;
+    else n.collapsed = true;
+  });
+  render();
+  resetView();
+});
+
+/* =========================================================================
+   PAN & ZOOM
+   ========================================================================= */
+const viewport = document.getElementById('viewport');
+let panX = 60, panY = 20, zoom = 0.82;
+function applyTransform(){
+  world.style.transform = `translate(${panX}px, ${panY}px) scale(${zoom})`;
+}
+function resetView(){ panX=60; panY=20; zoom=0.82; applyTransform(); }
+
+let isDragging=false, dragStart={x:0,y:0}, panStart={x:0,y:0};
+viewport.addEventListener('mousedown', e=>{
+  isDragging=true; viewport.classList.add('grabbing');
+  dragStart={x:e.clientX, y:e.clientY}; panStart={x:panX, y:panY};
+});
+window.addEventListener('mousemove', e=>{
+  if(!isDragging) return;
+  panX = panStart.x + (e.clientX - dragStart.x);
+  panY = panStart.y + (e.clientY - dragStart.y);
+  applyTransform();
+});
+window.addEventListener('mouseup', ()=>{ isDragging=false; viewport.classList.remove('grabbing'); });
+
+viewport.addEventListener('wheel', e=>{
+  e.preventDefault();
+  const rect = viewport.getBoundingClientRect();
+  const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+  const worldX = (mx - panX)/zoom, worldY = (my - panY)/zoom;
+  const factor = e.deltaY < 0 ? 1.1 : 0.9;
+  zoom = Math.min(2.2, Math.max(0.25, zoom*factor));
+  panX = mx - worldX*zoom;
+  panY = my - worldY*zoom;
+  applyTransform();
+}, {passive:false});
+
+document.getElementById('zoomIn').addEventListener('click', ()=>{ zoom=Math.min(2.2, zoom*1.15); applyTransform(); });
+document.getElementById('zoomOut').addEventListener('click', ()=>{ zoom=Math.max(0.25, zoom*0.87); applyTransform(); });
+document.getElementById('zoomReset').addEventListener('click', resetView);
+
+/* =========================================================================
+   SEARCH
+   ========================================================================= */
+const searchInput = document.getElementById('search');
+const emptyNote = document.getElementById('empty-note');
+function matches(node, q){
+  return (node.label && node.label.toLowerCase().includes(q)) ||
+         (node.sub && node.sub.toLowerCase().includes(q));
+}
+function applyFilter(){
+  const q = searchInput.value.trim().toLowerCase();
+  Object.values(domNodes).forEach(el=> el.classList.remove('match','dim'));
+  if(!q){ emptyNote.style.display='none'; return; }
+  let anyMatch = false;
+  Object.values(byId).forEach(node=>{
+    const el = domNodes[node.id];
+    if(!el) return;
+    if(matches(node, q)){ el.classList.add('match'); anyMatch = true; }
+    else el.classList.add('dim');
+  });
+  emptyNote.style.display = anyMatch ? 'none' : 'block';
+}
+let searchTimer;
+searchInput.addEventListener('input', ()=>{
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(()=>{
+    const q = searchInput.value.trim().toLowerCase();
+    if(q){
+      // expand ancestors of any match so it becomes visible
+      Object.values(byId).forEach(node=>{
+        if(matches(node, q)){
+          node._ancestors.forEach(a=> a.collapsed = false);
+        }
+      });
+    }
+    render();
+  }, 180);
+});
+
+/* =========================================================================
+   LEGEND
+   ========================================================================= */
+const legendData = [
+  ['a','Fase A · SD I–II'], ['b','Fase B · SD III–IV'], ['c','Fase C · SD V–VI'],
+  ['d','Fase D · SMP VII–IX'], ['e','Fase E · SMA X'], ['f','Fase F · SMA XI–XII']
+];
+const legend = document.getElementById('legend');
+legendData.forEach(([key,label])=>{
+  const chip = document.createElement('span');
+  chip.className = 'chip';
+  chip.innerHTML = `<span class="dot" style="background:var(${COLORS[key]})"></span>${label}`;
+  legend.appendChild(chip);
+});
+
+/* =========================================================================
+   INIT
+   ========================================================================= */
+render();
+resetView();
+</script>
+</body>
+</html>
