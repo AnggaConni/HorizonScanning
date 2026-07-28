@@ -5,21 +5,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Why Perfect Plans Fail When the Target Keeps Moving | Horizon Scan AI</title>
-    <meta name="description" content="A friend has spent almost two years trying to introduce me to a woman we'll call Yuka-chi — and failed every time, not because she plans badly, but because she keeps scheduling certainty inside an uncertain system. This article traces the same failure pattern from a birthday party that never happened to a UN medical convoy in Gaza, using wicked problems, the OODA Loop, Cynefin, and adaptive planning to explain why the world rewards those who notice change first, not those with the most detailed plan.">
+    <meta name="description" content="Someone has spent almost two years trying to introduce me to a woman we'll call Yuka-chi — and failed every time, not because she plans badly, but because I am the moving variable: I ngambek, I avoid, I disappear, and I move faster than any calendar can follow. This article traces the same failure pattern from a birthday party that never happened to a UN medical convoy rerouting in Gaza, then turns it into a practical playbook: wicked problems, the OODA Loop, Cynefin, real options, avoidance escalation, and seven concrete moves for planning around a target that refuses to stand still.">
     <link rel="canonical" href="https://horizon-scanning.org/blog/article/why-perfect-plans-fail-when-the-target-keeps-moving.html" />
     
     <!-- Open Graph / Facebook / LinkedIn / WA -->
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://horizon-scanning.org/blog/article/why-perfect-plans-fail-when-the-target-keeps-moving.html">
     <meta property="og:title" content="Why Perfect Plans Fail When the Target Keeps Moving">
-    <meta property="og:description" content="A friend has spent almost two years trying to introduce me to a woman we'll call Yuka-chi — and failed every time, not because she plans badly, but because she keeps scheduling certainty inside an uncertain system. This article traces the same failure pattern from a birthday party that never happened to a UN medical convoy in Gaza, using wicked problems, the OODA Loop, Cynefin, and adaptive planning to explain why the world rewards those who notice change first, not those with the most detailed plan.">
+    <meta property="og:description" content="Someone has spent almost two years trying to introduce me to a woman we'll call Yuka-chi — and failed every time, not because she plans badly, but because I am the moving variable: I ngambek, I avoid, I disappear, and I move faster than any calendar can follow. This article traces the same failure pattern from a birthday party that never happened to a UN medical convoy rerouting in Gaza, then turns it into a practical playbook: wicked problems, the OODA Loop, Cynefin, real options, avoidance escalation, and seven concrete moves for planning around a target that refuses to stand still.">
     <meta property="og:image" content="https://horizon-scanning.org/thum/uncertaintyplan.png">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="https://horizon-scanning.org/blog/article/why-perfect-plans-fail-when-the-target-keeps-moving.html">
     <meta name="twitter:title" content="Why Perfect Plans Fail When the Target Keeps Moving">
-    <meta name="twitter:description" content="A friend has spent almost two years trying to introduce me to a woman we'll call Yuka-chi — and failed every time, not because she plans badly, but because she keeps scheduling certainty inside an uncertain system. This article traces the same failure pattern from a birthday party that never happened to a UN medical convoy in Gaza, using wicked problems, the OODA Loop, Cynefin, and adaptive planning to explain why the world rewards those who notice change first, not those with the most detailed plan.">
+    <meta name="twitter:description" content="Someone has spent almost two years trying to introduce me to a woman we'll call Yuka-chi — and failed every time, not because she plans badly, but because I am the moving variable: I ngambek, I avoid, I disappear, and I move faster than any calendar can follow. This article traces the same failure pattern from a birthday party that never happened to a UN medical convoy rerouting in Gaza, then turns it into a practical playbook: wicked problems, the OODA Loop, Cynefin, real options, avoidance escalation, and seven concrete moves for planning around a target that refuses to stand still.">
     <meta name="twitter:image" content="https://horizon-scanning.org/thum/uncertaintyplan.png">
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -147,7 +147,7 @@
       <i id='mp3-icon-50' class='fa-solid fa-play'></i>
     </button>
     <div class='flex-1 min-w-0'>
-      <div class='text-white font-bold text-sm truncate'>Ambient Soundtrack — "Magic"</div>
+      <div class='text-white font-bold text-sm truncate'>Ambient Soundtrack &mdash; "Magic"</div>
       <div id='mp3-status-50' class='text-indigo-300 text-xs'>Click anywhere on the page to begin playback</div>
     </div>
     <div class='flex items-center gap-2 shrink-0'>
@@ -180,13 +180,12 @@
     if(userStopped) return;
     audio.play().then(function(){
       setIcon(true);
-      status.textContent = 'Now playing — adjust volume anytime';
+      status.textContent = 'Now playing - adjust volume anytime';
     }).catch(function(){
       status.textContent = 'Tap the play button to start audio';
     });
   }
 
-  // Autoplay on first user interaction anywhere on the page
   function firstClick(){
     tryPlay();
     document.removeEventListener('click', firstClick);
@@ -220,15 +219,15 @@
 })();
 </script>
 
-<p class='lead text-xl md:text-2xl text-slate-600 font-light leading-relaxed mb-8'>Someone has been trying to introduce me to a woman we'll call Yuka-chi. It should be simple: pick a date, book a café, invite both of us. Two years later, it still hasn't happened — not because she's a bad planner, but because she keeps planning around a fixed date while the real variable, me, keeps changing. Somewhere between a birthday party that never happened and a UN medical convoy rerouting around a closed corridor in Gaza, I found the same failure pattern: <strong>the target isn't standing still.</strong></p>
+<p class='lead text-xl md:text-2xl text-slate-600 font-light leading-relaxed mb-8'>Someone has been trying to introduce me to a woman we'll call Yuka-chi. It should be simple: pick a date, book a caf&eacute;, invite both of us. Two years later, it still hasn't happened &mdash; not because she's a bad planner, but because she keeps planning around a fixed date while the real variable, me, keeps changing. Somewhere between a birthday party that never happened and a UN medical convoy rerouting around a closed corridor in Gaza, I found the same failure pattern: <strong>the target isn't standing still.</strong></p>
 
-<h3 class='text-2xl font-extrabold text-slate-900 mt-16 mb-6'>Part 1 — Planning Works... Until Reality Starts Moving</h3>
+<h3 class='text-2xl font-extrabold text-slate-900 mt-16 mb-6'>Part 1 &mdash; Planning Works... Until Reality Starts Moving</h3>
 
-<p>Imagine someone wants to introduce me to Yuka-chi. Sounds simple. Pick a date. Create an event. Invite both of us. Done. Except — I'm the problem. Not because I dislike Yuka-chi. Not because I dislike the people arranging the meeting. But because I'm simply not interested in meeting anyone right now.</p>
+<p>Imagine someone wants to introduce me to Yuka-chi. Sounds simple. Pick a date. Create an event. Invite both of us. Done. Except &mdash; I'm the problem. Not because I dislike Yuka-chi. Not because I dislike the people arranging the meeting. But because I'm simply not interested in meeting anyone right now.</p>
 
 <p>If I'm tired, I'll probably stay home. If I'm annoyed, I'll disappear. If I'm busy, I'll postpone. If I'm enjoying a quiet day with my motorcycle, I probably won't trade it for a social gathering. The organizers don't know which version of me they'll get. Maybe I'll come. Maybe I'll cancel. Maybe I'll vanish without saying much.</p>
 
-<p>The result? After almost two years, they still haven't managed to make the meeting happen. Not because they are bad planners — but because they keep planning around a fixed date while the real variable keeps changing. The target isn't standing still. It's moving.</p>
+<p>The result? After almost two years, they still haven't managed to make the meeting happen. Not because they are bad planners &mdash; but because they keep planning around a fixed date while the real variable keeps changing. The target isn't standing still. It's moving.</p>
 
 <p>Most people believe planning fails because the plan wasn't detailed enough. I think the opposite is often true. <strong>Planning fails because reality refuses to remain stable long enough for the original plan to survive.</strong></p>
 
@@ -238,97 +237,97 @@
 
 <p>I began noticing the same pattern in many completely different situations. Papua. Museum partnerships. Software development. Volunteer projects. Even something as ordinary as trying to meet Yuka-chi. The mistake wasn't poor planning. The mistake was assuming the environment would remain unchanged long enough for the plan to work. Sometimes it does. Often, it doesn't.</p>
 
-<p>That realization changed one question I constantly ask myself. I stopped asking: <em>"How can I create the perfect plan?"</em> Instead, I started asking: <em>"How can I keep moving even when the environment refuses to follow the plan?"</em> Because eventually I realized something surprisingly simple: some problems are fixed, others keep moving — and treating both the same is where planning begins to fail.</p>
+<p>That realization changed one question I constantly ask myself. I stopped asking: <em>"How can I create the perfect plan?"</em> Instead, I started asking: <em>"How can I keep moving even when the environment refuses to follow the plan?"</em> Because eventually I realized something surprisingly simple: some problems are fixed, others keep moving &mdash; and treating both the same is where planning begins to fail.</p>
 
 <div class='not-prose my-12'>
-  <svg viewBox='0 0 1000 420' xmlns='http://www.w3.org/2000/svg' class='w-full h-auto'>
-    <rect x='0' y='0' width='1000' height='420' rx='24' fill='#f8fafc'/>
-    <text x='500' y='36' text-anchor='middle' font-family='sans-serif' font-size='16' font-weight='800' fill='#0f172a'>Cause &amp; Effect: How a Perfect Plan Quietly Dies</text>
-    <text x='500' y='58' text-anchor='middle' font-family='sans-serif' font-size='11' fill='#64748b'>Same mechanism, two very different scales — a café invitation and a medical convoy</text>
+  <svg viewBox='0 0 1000 430' xmlns='http://www.w3.org/2000/svg' class='w-full h-auto'>
+    <rect x='0' y='0' width='1000' height='430' rx='24' fill='#f8fafc'/>
+    <text x='500' y='36' text-anchor='middle' font-family='sans-serif' font-size='16' font-weight='800' fill='#0f172a'>Diagram 1 &#8212; Cause &amp; Effect: How a Perfect Plan Quietly Dies</text>
+    <text x='500' y='58' text-anchor='middle' font-family='sans-serif' font-size='11' fill='#64748b'>Same mechanism, two very different scales &#8212; a caf&#233; invitation and a medical convoy</text>
 
     <g font-family='sans-serif' font-size='11' font-weight='700'>
-      <rect x='30' y='80' width='150' height='90' rx='12' fill='#e0e7ff' stroke='#6366f1' stroke-width='2'/>
+      <rect x='30' y='80' width='150' height='92' rx='12' fill='#e0e7ff' stroke='#6366f1' stroke-width='2'/>
       <text x='105' y='112' text-anchor='middle' fill='#3730a3'>1. Fixed plan</text>
       <text x='105' y='130' text-anchor='middle' fill='#3730a3'>is written</text>
-      <text x='105' y='150' text-anchor='middle' font-size='10' font-weight='400' fill='#4338ca'>Date + venue locked</text>
+      <text x='105' y='152' text-anchor='middle' font-size='10' font-weight='400' fill='#4338ca'>Date + venue locked</text>
 
-      <path d='M 185 125 L 208 125' stroke='#94a3b8' stroke-width='3' marker-end='url(#a50)'/>
+      <path d='M 185 126 L 208 126' stroke='#94a3b8' stroke-width='3' marker-end='url(#a50)'/>
 
-      <rect x='213' y='80' width='150' height='90' rx='12' fill='#fef3c7' stroke='#f59e0b' stroke-width='2'/>
+      <rect x='213' y='80' width='150' height='92' rx='12' fill='#fef3c7' stroke='#f59e0b' stroke-width='2'/>
       <text x='288' y='106' text-anchor='middle' fill='#92400e'>2. Assumptions</text>
       <text x='288' y='124' text-anchor='middle' fill='#92400e'>are frozen</text>
       <text x='288' y='144' text-anchor='middle' font-size='10' font-weight='400' fill='#b45309'>"He'll be available"</text>
       <text x='288' y='158' text-anchor='middle' font-size='10' font-weight='400' fill='#b45309'>"The road stays open"</text>
 
-      <path d='M 368 125 L 391 125' stroke='#94a3b8' stroke-width='3' marker-end='url(#a50)'/>
+      <path d='M 368 126 L 391 126' stroke='#94a3b8' stroke-width='3' marker-end='url(#a50)'/>
 
-      <rect x='396' y='80' width='150' height='90' rx='12' fill='#ffedd5' stroke='#fb923c' stroke-width='2'/>
+      <rect x='396' y='80' width='150' height='92' rx='12' fill='#ffedd5' stroke='#fb923c' stroke-width='2'/>
       <text x='471' y='106' text-anchor='middle' fill='#9a3412'>3. Time passes</text>
-      <text x='471' y='124' text-anchor='middle' fill='#9a3412'>(2–3 weeks / 1 night)</text>
+      <text x='471' y='124' text-anchor='middle' fill='#9a3412'>(3 weeks / 1 night)</text>
       <text x='471' y='146' text-anchor='middle' font-size='10' font-weight='400' fill='#c2410c'>Living system keeps</text>
       <text x='471' y='160' text-anchor='middle' font-size='10' font-weight='400' fill='#c2410c'>generating new states</text>
 
-      <path d='M 551 125 L 574 125' stroke='#94a3b8' stroke-width='3' marker-end='url(#a50)'/>
+      <path d='M 551 126 L 574 126' stroke='#94a3b8' stroke-width='3' marker-end='url(#a50)'/>
 
-      <rect x='579' y='80' width='150' height='90' rx='12' fill='#fee2e2' stroke='#f87171' stroke-width='2'/>
+      <rect x='579' y='80' width='150' height='92' rx='12' fill='#fee2e2' stroke='#f87171' stroke-width='2'/>
       <text x='654' y='106' text-anchor='middle' fill='#991b1b'>4. Variable moves</text>
       <text x='654' y='128' text-anchor='middle' font-size='10' font-weight='400' fill='#b91c1c'>Mood shifts / corridor</text>
       <text x='654' y='142' text-anchor='middle' font-size='10' font-weight='400' fill='#b91c1c'>closes / partner loses</text>
       <text x='654' y='156' text-anchor='middle' font-size='10' font-weight='400' fill='#b91c1c'>access</text>
 
-      <path d='M 734 125 L 757 125' stroke='#94a3b8' stroke-width='3' marker-end='url(#a50)'/>
+      <path d='M 734 126 L 757 126' stroke='#94a3b8' stroke-width='3' marker-end='url(#a50)'/>
 
-      <rect x='762' y='80' width='160' height='90' rx='12' fill='#fecdd3' stroke='#e11d48' stroke-width='2'/>
-      <text x='842' y='112' text-anchor='middle' fill='#881337'>5. Plan fails —</text>
+      <rect x='762' y='80' width='160' height='92' rx='12' fill='#fecdd3' stroke='#e11d48' stroke-width='2'/>
+      <text x='842' y='112' text-anchor='middle' fill='#881337'>5. Plan fails &#8212;</text>
       <text x='842' y='130' text-anchor='middle' fill='#881337'>mission untouched</text>
       <text x='842' y='152' text-anchor='middle' font-size='10' font-weight='400' fill='#9f1239'>The route died, not the goal</text>
     </g>
 
-    <path d='M 842 175 L 842 200 L 105 200 L 105 178' stroke='#e11d48' stroke-width='2' fill='none' stroke-dasharray='6 5' marker-end='url(#aR50)'/>
-    <text x='473' y='194' text-anchor='middle' font-family='sans-serif' font-size='10' font-style='italic' fill='#be123c'>Failure loop: organizer re-runs the SAME fixed plan → same outcome, two years later</text>
+    <path d='M 842 177 L 842 202 L 105 202 L 105 180' stroke='#e11d48' stroke-width='2' fill='none' stroke-dasharray='6 5' marker-end='url(#aR50)'/>
+    <text x='473' y='196' text-anchor='middle' font-family='sans-serif' font-size='10' font-style='italic' fill='#be123c'>FAILURE LOOP: organizer re-runs the SAME fixed plan &#8594; same outcome, two years later</text>
 
-    <line x1='30' y1='222' x2='970' y2='222' stroke='#cbd5e1' stroke-width='1' stroke-dasharray='4 4'/>
-    <text x='500' y='248' text-anchor='middle' font-family='sans-serif' font-size='14' font-weight='800' fill='#047857'>The adaptive alternative: replace the route, protect the mission</text>
+    <line x1='30' y1='224' x2='970' y2='224' stroke='#cbd5e1' stroke-width='1' stroke-dasharray='4 4'/>
+    <text x='500' y='250' text-anchor='middle' font-family='sans-serif' font-size='14' font-weight='800' fill='#047857'>The adaptive alternative: replace the route, protect the mission</text>
 
     <g font-family='sans-serif' font-size='11' font-weight='700'>
-      <rect x='60' y='266' width='150' height='84' rx='12' fill='#ecfdf5' stroke='#10b981' stroke-width='2'/>
-      <text x='135' y='296' text-anchor='middle' fill='#065f46'>Observe</text>
-      <text x='135' y='318' text-anchor='middle' font-size='10' font-weight='400' fill='#047857'>Read cheap signals</text>
-      <text x='135' y='332' text-anchor='middle' font-size='10' font-weight='400' fill='#047857'>already available</text>
+      <rect x='60' y='268' width='150' height='84' rx='12' fill='#ecfdf5' stroke='#10b981' stroke-width='2'/>
+      <text x='135' y='298' text-anchor='middle' fill='#065f46'>Observe</text>
+      <text x='135' y='320' text-anchor='middle' font-size='10' font-weight='400' fill='#047857'>Read cheap signals</text>
+      <text x='135' y='334' text-anchor='middle' font-size='10' font-weight='400' fill='#047857'>already available</text>
 
-      <path d='M 215 308 L 238 308' stroke='#10b981' stroke-width='3' marker-end='url(#aG50)'/>
+      <path d='M 215 310 L 238 310' stroke='#10b981' stroke-width='3' marker-end='url(#aG50)'/>
 
-      <rect x='243' y='266' width='150' height='84' rx='12' fill='#ecfdf5' stroke='#10b981' stroke-width='2'/>
-      <text x='318' y='296' text-anchor='middle' fill='#065f46'>Orient</text>
-      <text x='318' y='318' text-anchor='middle' font-size='10' font-weight='400' fill='#047857'>Which version /</text>
-      <text x='318' y='332' text-anchor='middle' font-size='10' font-weight='400' fill='#047857'>which corridor?</text>
+      <rect x='243' y='268' width='150' height='84' rx='12' fill='#ecfdf5' stroke='#10b981' stroke-width='2'/>
+      <text x='318' y='298' text-anchor='middle' fill='#065f46'>Orient</text>
+      <text x='318' y='320' text-anchor='middle' font-size='10' font-weight='400' fill='#047857'>Which version /</text>
+      <text x='318' y='334' text-anchor='middle' font-size='10' font-weight='400' fill='#047857'>which corridor?</text>
 
-      <path d='M 398 308 L 421 308' stroke='#10b981' stroke-width='3' marker-end='url(#aG50)'/>
+      <path d='M 398 310 L 421 310' stroke='#10b981' stroke-width='3' marker-end='url(#aG50)'/>
 
-      <rect x='426' y='266' width='150' height='84' rx='12' fill='#ecfdf5' stroke='#10b981' stroke-width='2'/>
-      <text x='501' y='296' text-anchor='middle' fill='#065f46'>Decide</text>
-      <text x='501' y='318' text-anchor='middle' font-size='10' font-weight='400' fill='#047857'>Smallest cheap probe,</text>
-      <text x='501' y='332' text-anchor='middle' font-size='10' font-weight='400' fill='#047857'>not the big event</text>
+      <rect x='426' y='268' width='150' height='84' rx='12' fill='#ecfdf5' stroke='#10b981' stroke-width='2'/>
+      <text x='501' y='298' text-anchor='middle' fill='#065f46'>Decide</text>
+      <text x='501' y='320' text-anchor='middle' font-size='10' font-weight='400' fill='#047857'>Smallest cheap probe,</text>
+      <text x='501' y='334' text-anchor='middle' font-size='10' font-weight='400' fill='#047857'>not the big event</text>
 
-      <path d='M 581 308 L 604 308' stroke='#10b981' stroke-width='3' marker-end='url(#aG50)'/>
+      <path d='M 581 310 L 604 310' stroke='#10b981' stroke-width='3' marker-end='url(#aG50)'/>
 
-      <rect x='609' y='266' width='150' height='84' rx='12' fill='#ecfdf5' stroke='#10b981' stroke-width='2'/>
-      <text x='684' y='296' text-anchor='middle' fill='#065f46'>Act</text>
-      <text x='684' y='318' text-anchor='middle' font-size='10' font-weight='400' fill='#047857'>20-min coffee /</text>
-      <text x='684' y='332' text-anchor='middle' font-size='10' font-weight='400' fill='#047857'>southern route</text>
+      <rect x='609' y='268' width='150' height='84' rx='12' fill='#ecfdf5' stroke='#10b981' stroke-width='2'/>
+      <text x='684' y='298' text-anchor='middle' fill='#065f46'>Act</text>
+      <text x='684' y='320' text-anchor='middle' font-size='10' font-weight='400' fill='#047857'>20-min coffee /</text>
+      <text x='684' y='334' text-anchor='middle' font-size='10' font-weight='400' fill='#047857'>southern route</text>
 
-      <path d='M 764 308 L 787 308' stroke='#10b981' stroke-width='3' marker-end='url(#aG50)'/>
+      <path d='M 764 310 L 787 310' stroke='#10b981' stroke-width='3' marker-end='url(#aG50)'/>
 
-      <rect x='792' y='266' width='150' height='84' rx='12' fill='#d1fae5' stroke='#059669' stroke-width='2'/>
-      <text x='867' y='296' text-anchor='middle' fill='#064e3b'>New information</text>
-      <text x='867' y='320' text-anchor='middle' font-size='10' font-weight='400' fill='#047857'>Feeds the next loop</text>
+      <rect x='792' y='268' width='150' height='84' rx='12' fill='#d1fae5' stroke='#059669' stroke-width='2'/>
+      <text x='867' y='298' text-anchor='middle' fill='#064e3b'>New information</text>
+      <text x='867' y='322' text-anchor='middle' font-size='10' font-weight='400' fill='#047857'>Feeds the next loop</text>
     </g>
 
-    <path d='M 867 352 L 867 372 L 135 372 L 135 354' stroke='#059669' stroke-width='2' fill='none' stroke-dasharray='6 5' marker-end='url(#aG50)'/>
-    <text x='500' y='368' text-anchor='middle' font-family='sans-serif' font-size='10' font-style='italic' fill='#047857'>Learning loop: every cycle is cheaper and better informed than the last</text>
+    <path d='M 867 354 L 867 376 L 135 376 L 135 356' stroke='#059669' stroke-width='2' fill='none' stroke-dasharray='6 5' marker-end='url(#aG50)'/>
+    <text x='500' y='371' text-anchor='middle' font-family='sans-serif' font-size='10' font-style='italic' fill='#047857'>LEARNING LOOP: every cycle is cheaper and better informed than the last</text>
 
-    <rect x='30' y='386' width='940' height='24' rx='8' fill='#0f172a'/>
-    <text x='500' y='402' text-anchor='middle' font-family='sans-serif' font-size='11' font-weight='700' fill='#e2e8f0'>WHY IT HAPPENS: plans freeze assumptions in time — but living systems (people, conflict, politics, weather) never stop producing new states</text>
+    <rect x='30' y='392' width='940' height='26' rx='8' fill='#0f172a'/>
+    <text x='500' y='409' text-anchor='middle' font-family='sans-serif' font-size='11' font-weight='700' fill='#e2e8f0'>WHY IT HAPPENS: plans freeze assumptions in time &#8212; but living systems never stop producing new states</text>
 
     <defs>
       <marker id='a50' markerWidth='8' markerHeight='8' refX='6' refY='4' orient='auto'><path d='M0,0 L8,4 L0,8 Z' fill='#94a3b8'/></marker>
@@ -338,17 +337,62 @@
   </svg>
 </div>
 
-<h3 class='text-2xl font-extrabold text-slate-900 mt-16 mb-6'>Part 2 — Not Every Problem Wants a Perfect Plan</h3>
+<h3 class='text-2xl font-extrabold text-slate-900 mt-16 mb-6'>Part 2 &mdash; Not Every Problem Wants a Perfect Plan</h3>
 
 <p>If I ask someone to build a house, planning is relatively straightforward. The land doesn't move. The house doesn't decide to relocate. Concrete doesn't suddenly become emotional. The blueprint remains valid because the object being planned is mostly predictable.</p>
 
-<p>Most engineering projects work this way. The variables are largely fixed. Of course, delays happen — materials arrive late, weather changes, costs increase — but the objective itself rarely decides to disappear. Planning works because reality remains relatively stable.</p>
+<p>Most engineering projects work this way. The variables are largely fixed. Of course, delays happen &mdash; materials arrive late, weather changes, costs increase &mdash; but the objective itself rarely decides to disappear. Planning works because reality remains relatively stable.</p>
 
 <p>Now compare that with trying to meet me. Immediately, everything becomes uncertain. Am I busy? Am I tired? Am I in the mood to socialize? Did I suddenly decide I'd rather spend the weekend riding my motorcycle? Did something happen yesterday that made me want to be alone? None of these variables can be predicted months in advance. Even I sometimes don't know. The organizer isn't planning around a calendar anymore. They're planning around human behavior. And humans move.</p>
 
-<p>This difference seems small. It isn't. It's the difference between planning for <em>objects</em> and planning for <em>living systems</em>. Living systems change. People change. Politics change. Conflicts change. Weather changes. Security changes. Relationships change. Every decision creates new conditions that didn't exist yesterday. The plan isn't failing because it was poorly written. The environment has already become a different environment.</p>
+<p>This difference seems small. It isn't. It's the difference between planning for <em>objects</em> and planning for <em>living systems</em>.</p>
 
-<p>This is close to what design theorists Horst Rittel and Melvin Webber called a <strong>"wicked problem"</strong> — a class of problem, common in social policy and planning, that resists a single definitive formulation because every attempt to solve it changes the understanding of the problem itself. Their argument, published in <em>Policy Sciences</em> in 1973, was that classical engineering-style planning (the kind that works beautifully for a bridge) breaks down the moment the "material" you're planning around is a person, an institution, or a social system rather than steel and concrete.<sup>1</sup> Trying to schedule me is, in that narrow but very real sense, a wicked problem wearing a birthday-party costume.</p>
+<div class='not-prose my-12'>
+  <svg viewBox='0 0 1000 400' xmlns='http://www.w3.org/2000/svg' class='w-full h-auto'>
+    <rect x='0' y='0' width='1000' height='400' rx='24' fill='#f8fafc'/>
+    <text x='500' y='34' text-anchor='middle' font-family='sans-serif' font-size='16' font-weight='800' fill='#0f172a'>Diagram 2 &#8212; Planning an Object vs. Planning a Living System</text>
+    <text x='500' y='56' text-anchor='middle' font-family='sans-serif' font-size='11' fill='#64748b'>Why the same planning effort produces confidence in one case and false confidence in the other</text>
+
+    <rect x='35' y='76' width='445' height='300' rx='18' fill='#eff6ff' stroke='#3b82f6' stroke-width='2'/>
+    <text x='257' y='106' text-anchor='middle' font-family='sans-serif' font-size='15' font-weight='800' fill='#1e40af'>OBJECT (bridge, house, server)</text>
+
+    <line x1='75' y1='250' x2='440' y2='250' stroke='#93c5fd' stroke-width='2'/>
+    <line x1='75' y1='140' x2='75' y2='250' stroke='#93c5fd' stroke-width='2'/>
+    <text x='257' y='272' text-anchor='middle' font-family='sans-serif' font-size='10' fill='#1d4ed8'>Time &#8594;</text>
+
+    <path d='M 78 200 L 435 200' stroke='#2563eb' stroke-width='4' fill='none'/>
+    <circle cx='78' cy='200' r='5' fill='#1e40af'/>
+    <circle cx='435' cy='200' r='5' fill='#1e40af'/>
+    <text x='257' y='188' text-anchor='middle' font-family='sans-serif' font-size='11' font-weight='700' fill='#1e40af'>State stays where you left it</text>
+
+    <rect x='75' y='292' width='365' height='68' rx='10' fill='#dbeafe'/>
+    <text x='257' y='314' text-anchor='middle' font-family='sans-serif' font-size='11' fill='#1e3a8a'>Gravity doesn't change its mind overnight.</text>
+    <text x='257' y='332' text-anchor='middle' font-family='sans-serif' font-size='11' fill='#1e3a8a'>A blueprint written in January is still valid in June.</text>
+    <text x='257' y='352' text-anchor='middle' font-family='sans-serif' font-size='11' font-weight='800' fill='#1e40af'>&#8658; Detail = real confidence</text>
+
+    <rect x='520' y='76' width='445' height='300' rx='18' fill='#fff7ed' stroke='#f97316' stroke-width='2'/>
+    <text x='742' y='106' text-anchor='middle' font-family='sans-serif' font-size='15' font-weight='800' fill='#9a3412'>LIVING SYSTEM (person, conflict, market)</text>
+
+    <line x1='560' y1='250' x2='925' y2='250' stroke='#fdba74' stroke-width='2'/>
+    <line x1='560' y1='130' x2='560' y2='250' stroke='#fdba74' stroke-width='2'/>
+    <text x='742' y='272' text-anchor='middle' font-family='sans-serif' font-size='10' fill='#c2410c'>Time &#8594;</text>
+
+    <path d='M 563 200 C 600 150, 630 235, 665 175 C 700 130, 730 230, 765 190 C 800 152, 835 240, 870 165 C 895 140, 910 205, 922 185' stroke='#ea580c' stroke-width='4' fill='none'/>
+    <circle cx='563' cy='200' r='5' fill='#9a3412'/>
+    <circle cx='922' cy='185' r='5' fill='#9a3412'/>
+    <path d='M 563 200 L 922 200' stroke='#9a3412' stroke-width='2' stroke-dasharray='5 5' opacity='0.55'/>
+    <text x='742' y='143' text-anchor='middle' font-family='sans-serif' font-size='10' font-style='italic' fill='#9a3412'>solid = actual state &#183; dashed = what the plan assumed</text>
+
+    <rect x='560' y='292' width='365' height='68' rx='10' fill='#ffedd5'/>
+    <text x='742' y='314' text-anchor='middle' font-family='sans-serif' font-size='11' fill='#7c2d12'>Every day produces a state that didn't exist yesterday.</text>
+    <text x='742' y='332' text-anchor='middle' font-family='sans-serif' font-size='11' fill='#7c2d12'>A plan written 3 weeks ago describes a world that's gone.</text>
+    <text x='742' y='352' text-anchor='middle' font-family='sans-serif' font-size='11' font-weight='800' fill='#9a3412'>&#8658; Detail = more assumptions to break</text>
+  </svg>
+</div>
+
+<p>Living systems change. People change. Politics change. Conflicts change. Weather changes. Security changes. Relationships change. Every decision creates new conditions that didn't exist yesterday. The plan isn't failing because it was poorly written. The environment has already become a different environment.</p>
+
+<p>This is close to what design theorists Horst Rittel and Melvin Webber called a <strong>"wicked problem"</strong> &mdash; a class of problem, common in social policy and planning, that resists a single definitive formulation because every attempt to solve it changes the understanding of the problem itself. Their argument, published in <em>Policy Sciences</em> in 1973, was that classical engineering-style planning (the kind that works beautifully for a bridge) breaks down the moment the "material" you're planning around is a person, an institution, or a social system rather than steel and concrete.<sup>1</sup> Trying to schedule me is, in that narrow but very real sense, a wicked problem wearing a birthday-party costume.</p>
 
 <p>Humanitarian operations experience this every day. A UN team may prepare an operation based on today's information. Tomorrow morning, that information is already outdated. A bridge becomes inaccessible. A local authority changes its decision. A partner organization loses access. A community suddenly relocates. Nothing about the original objective has changed. People still need food. People still need medicine. Children still need protection. Yet the route toward those objectives must continuously evolve. The mission remains stable. The environment does not.</p>
 
@@ -361,73 +405,358 @@
   <p class='text-indigo-800 text-sm leading-relaxed m-0'>She isn't failing because she doesn't know how to organize an event. She's failing because she's trying to schedule certainty inside an uncertain system. And unfortunately for her, I'm one of the moving variables.</p>
 </div>
 
-<h3 class='text-2xl font-extrabold text-slate-900 mt-16 mb-6'>Part 3 — Adaptive Planning: Changing the Route Without Changing the Mission</h3>
+<h3 class='text-2xl font-extrabold text-slate-900 mt-16 mb-6'>Part 3 &mdash; Adaptive Planning: Changing the Route Without Changing the Mission</h3>
 
-<p>By this point, one question naturally appears. If detailed planning doesn't work in an environment that constantly changes, what does? The answer surprised me. <strong>The goal doesn't change. The plan does.</strong> That sounds obvious — until you realize how differently most people actually behave.</p>
+<p>By this point, one question naturally appears. If detailed planning doesn't work in an environment that constantly changes, what does? The answer surprised me. <strong>The goal doesn't change. The plan does.</strong> That sounds obvious &mdash; until you realize how differently most people actually behave.</p>
 
-<p>Suppose someone wants to organize a birthday party for Yuka-chi. Their objective is simple: meet Angga. So they create a plan. Reserve a café. Invite everyone. Set the date. Send reminders. Wait. The day arrives. I'm gone. Maybe I wasn't in the mood. Maybe I was exhausted. Maybe I decided to spend the weekend riding my motorcycle instead.</p>
+<p>Suppose someone wants to organize a birthday party for Yuka-chi. Their objective is simple: meet Angga. So they create a plan. Reserve a caf&eacute;. Invite everyone. Set the date. Send reminders. Wait. The day arrives. I'm gone. Maybe I wasn't in the mood. Maybe I was exhausted. Maybe I decided to spend the weekend riding my motorcycle instead.</p>
 
-<p>The organizer concludes, "The plan failed." Not quite. <em>The meeting failed. The objective didn't.</em> Those are two different things. Instead of asking, <em>"How do we make this event happen?"</em> — a better question would be, <em>"Under what conditions is Angga most likely to say yes?"</em> That's no longer event planning. That's adaptive planning.</p>
+<p>The organizer concludes, "The plan failed." Not quite. <em>The meeting failed. The objective didn't.</em> Those are two different things. Instead of asking, <em>"How do we make this event happen?"</em> &mdash; a better question would be, <em>"Under what conditions is Angga most likely to say yes?"</em> That's no longer event planning. That's adaptive planning.</p>
 
-<h4 class='text-xl font-extrabold text-slate-900 mt-12 mb-5'>A Closer Look: The Different Versions of "Ngambek," and What Yuka-chi Actually Needs to Do</h4>
+<h4 class='text-xl font-extrabold text-slate-900 mt-12 mb-5'>A Closer Look: The Different Versions of "Ngambek"</h4>
 
-<p>I think this is the part most people skip past too quickly, so let me slow down. When I say I'm "the moving variable," what I actually mean is that there isn't one me to plan around — there are several, and I rotate between them without much warning.</p>
+<p>I think this is the part most people skip past too quickly, so let me slow down. When I say I'm "the moving variable," what I actually mean is that there isn't one me to plan around &mdash; there are several, and I rotate between them without much warning.</p>
 
 <div class='not-prose my-10 grid grid-cols-1 md:grid-cols-2 gap-6'>
   <div class='p-6 bg-slate-100 border border-slate-300 rounded-2xl'>
-    <div class='text-slate-600 font-bold text-sm uppercase tracking-wider mb-2'><i class='fa-solid fa-battery-quarter mr-2'></i>Capek-Angga — the exhausted version</div>
+    <div class='text-slate-600 font-bold text-sm uppercase tracking-wider mb-2'><i class='fa-solid fa-battery-quarter mr-2'></i>Capek-Angga &mdash; the exhausted version</div>
     <p class='text-slate-700 text-sm m-0'>Shows up after a heavy week of client calls, museum reports, or debugging something at 1 AM. He doesn't want conversation. He wants silence, a fan, and nobody asking him to "just show up for twenty minutes." Push an event on this version and he'll cancel same-day, guilt-free.</p>
   </div>
   <div class='p-6 bg-rose-50 border border-rose-200 rounded-2xl'>
-    <div class='text-rose-600 font-bold text-sm uppercase tracking-wider mb-2'><i class='fa-solid fa-face-angry mr-2'></i>Kesel-Angga — the annoyed version</div>
-    <p class='text-slate-700 text-sm m-0'>Something irritated him — a missed deadline, a badly worded message, traffic. This version isn't angry at Yuka-chi or the organizers specifically, but he'll interpret any invitation right now as one more demand on his attention, and he'll disappear rather than explain why.</p>
+    <div class='text-rose-600 font-bold text-sm uppercase tracking-wider mb-2'><i class='fa-solid fa-face-angry mr-2'></i>Kesel-Angga &mdash; the annoyed version</div>
+    <p class='text-slate-700 text-sm m-0'>Something irritated him &mdash; a missed deadline, a badly worded message, traffic. This version isn't angry at Yuka-chi or the organizers specifically, but he'll interpret any invitation right now as one more demand on his attention, and he'll disappear rather than explain why.</p>
   </div>
   <div class='p-6 bg-amber-50 border border-amber-200 rounded-2xl'>
-    <div class='text-amber-600 font-bold text-sm uppercase tracking-wider mb-2'><i class='fa-solid fa-motorcycle mr-2'></i>Motor-Angga — "I'd rather be alone with my bike"</div>
-    <p class='text-slate-700 text-sm m-0'>Not sad, not tired, not annoyed — just genuinely happier riding somewhere quiet than sitting in a café making small talk. This version isn't rejecting Yuka-chi at all. He's choosing a competing good, not avoiding a bad one.</p>
+    <div class='text-amber-600 font-bold text-sm uppercase tracking-wider mb-2'><i class='fa-solid fa-motorcycle mr-2'></i>Motor-Angga &mdash; "I'd rather be alone with my bike"</div>
+    <p class='text-slate-700 text-sm m-0'>Not sad, not tired, not annoyed &mdash; just genuinely happier riding somewhere quiet than sitting in a caf&eacute; making small talk. This version isn't rejecting Yuka-chi at all. He's choosing a competing good, not avoiding a bad one.</p>
   </div>
   <div class='p-6 bg-emerald-50 border border-emerald-200 rounded-2xl'>
-    <div class='text-emerald-600 font-bold text-sm uppercase tracking-wider mb-2'><i class='fa-solid fa-circle-check mr-2'></i>Available-Angga — the one everyone wants</div>
-    <p class='text-slate-700 text-sm m-0'>Rested, curious, not mid-deadline, replying to messages within the hour, occasionally posting something that shows he's out and about. This version says yes easily — often to something much smaller than a planned event.</p>
+    <div class='text-emerald-600 font-bold text-sm uppercase tracking-wider mb-2'><i class='fa-solid fa-circle-check mr-2'></i>Available-Angga &mdash; the one everyone wants</div>
+    <p class='text-slate-700 text-sm m-0'>Rested, curious, not mid-deadline, replying to messages within the hour, occasionally posting something that shows he's out and about. This version says yes easily &mdash; often to something much smaller than a planned event.</p>
   </div>
 </div>
 
 <p>Here's the problem with almost every attempt to introduce me: the organizers only ever plan for Available-Angga, because that's the version they <em>want</em> to meet. But they schedule the event two or three weeks in advance, with no way of knowing which version will actually show up on the day. They're not wrong about the goal. <strong>They're wrong about treating a probability as a certainty.</strong></p>
 
-<p>So what does Yuka-chi — or anyone trying to plan around a person like me — actually need to do differently? Concretely, four things:</p>
+<div class='not-prose my-12'>
+  <svg viewBox='0 0 1000 430' xmlns='http://www.w3.org/2000/svg' class='w-full h-auto'>
+    <rect x='0' y='0' width='1000' height='430' rx='24' fill='#f8fafc'/>
+    <text x='500' y='34' text-anchor='middle' font-family='sans-serif' font-size='16' font-weight='800' fill='#0f172a'>Diagram 3 &#8212; The State Machine You're Actually Planning Around</text>
+    <text x='500' y='56' text-anchor='middle' font-family='sans-serif' font-size='11' fill='#64748b'>You can't schedule a state. You can only lower the price of admission for every state.</text>
+
+    <circle cx='500' cy='230' r='72' fill='#d1fae5' stroke='#059669' stroke-width='3'/>
+    <text x='500' y='222' text-anchor='middle' font-family='sans-serif' font-size='13' font-weight='800' fill='#065f46'>AVAILABLE</text>
+    <text x='500' y='242' text-anchor='middle' font-family='sans-serif' font-size='10' fill='#047857'>says yes easily</text>
+    <text x='500' y='258' text-anchor='middle' font-family='sans-serif' font-size='9' font-style='italic' fill='#047857'>~25% of weeks</text>
+
+    <circle cx='185' cy='150' r='62' fill='#e2e8f0' stroke='#64748b' stroke-width='2'/>
+    <text x='185' y='145' text-anchor='middle' font-family='sans-serif' font-size='12' font-weight='800' fill='#334155'>CAPEK</text>
+    <text x='185' y='163' text-anchor='middle' font-family='sans-serif' font-size='9' fill='#475569'>needs silence</text>
+
+    <circle cx='185' cy='320' r='62' fill='#ffe4e6' stroke='#e11d48' stroke-width='2'/>
+    <text x='185' y='315' text-anchor='middle' font-family='sans-serif' font-size='12' font-weight='800' fill='#9f1239'>KESEL</text>
+    <text x='185' y='333' text-anchor='middle' font-family='sans-serif' font-size='9' fill='#be123c'>disappears</text>
+
+    <circle cx='815' cy='150' r='62' fill='#fef3c7' stroke='#f59e0b' stroke-width='2'/>
+    <text x='815' y='145' text-anchor='middle' font-family='sans-serif' font-size='12' font-weight='800' fill='#92400e'>MOTOR</text>
+    <text x='815' y='163' text-anchor='middle' font-family='sans-serif' font-size='9' fill='#b45309'>competing good</text>
+
+    <circle cx='815' cy='320' r='62' fill='#f1f5f9' stroke='#94a3b8' stroke-width='2' stroke-dasharray='5 4'/>
+    <text x='815' y='313' text-anchor='middle' font-family='sans-serif' font-size='12' font-weight='800' fill='#475569'>DEEP WORK</text>
+    <text x='815' y='331' text-anchor='middle' font-family='sans-serif' font-size='9' fill='#64748b'>unreachable</text>
+
+    <g stroke='#94a3b8' stroke-width='2' fill='none' marker-end='url(#aS50)'>
+      <path d='M 243 175 Q 350 200 430 215'/>
+      <path d='M 430 245 Q 350 265 243 300'/>
+      <path d='M 757 175 Q 650 200 570 215'/>
+      <path d='M 570 245 Q 650 270 757 300'/>
+      <path d='M 815 212 L 815 256'/>
+    </g>
+
+    <text x='352' y='190' text-anchor='middle' font-family='sans-serif' font-size='9' font-style='italic' fill='#64748b'>rest, quiet weekend</text>
+    <text x='352' y='286' text-anchor='middle' font-family='sans-serif' font-size='9' font-style='italic' fill='#64748b'>deadline, bad message</text>
+    <text x='648' y='190' text-anchor='middle' font-family='sans-serif' font-size='9' font-style='italic' fill='#64748b'>good weather, open road</text>
+    <text x='648' y='288' text-anchor='middle' font-family='sans-serif' font-size='9' font-style='italic' fill='#64748b'>new project starts</text>
+
+    <rect x='300' y='330' width='400' height='34' rx='8' fill='#0f172a'/>
+    <text x='500' y='352' text-anchor='middle' font-family='sans-serif' font-size='11' font-weight='700' fill='#e2e8f0'>Transitions happen in DAYS, not weeks &#8212; and nobody controls them</text>
+
+    <rect x='60' y='378' width='880' height='40' rx='10' fill='#fef2f2' stroke='#fca5a5' stroke-width='1.5'/>
+    <text x='500' y='396' text-anchor='middle' font-family='sans-serif' font-size='11' font-weight='700' fill='#991b1b'>THE PLANNER'S ERROR: booking a venue 3 weeks out bets the whole budget on ONE circle &#8212; the smallest one</text>
+    <text x='500' y='411' text-anchor='middle' font-family='sans-serif' font-size='10' fill='#b91c1c'>A 20-minute coffee, by contrast, is an offer that CAPEK and MOTOR can also accept</text>
+
+    <defs>
+      <marker id='aS50' markerWidth='8' markerHeight='8' refX='6' refY='4' orient='auto'><path d='M0,0 L8,4 L0,8 Z' fill='#94a3b8'/></marker>
+    </defs>
+  </svg>
+</div>
+
+<h3 class='text-2xl font-extrabold text-slate-900 mt-16 mb-6'>Part 3.5 &mdash; The Ngambek Problem: When the Moving Variable Is Also Actively Avoiding You</h3>
+
+<p>Now I have to be honest about something, because so far I've described myself too kindly. I've been talking as if I merely <em>drift</em> between states like weather &mdash; sometimes tired, sometimes riding, sometimes free. That's the polite version.</p>
+
+<p>The less polite version is this: <strong>sometimes I ngambek.</strong> And ngambek is not the same thing as being busy.</p>
+
+<p>Busy is passive. Ngambek is <em>active</em>. Busy means the road happens to be blocked. Ngambek means I saw you coming and quietly moved the road. When I'm in that state I don't just fail to show up &mdash; I <em>manage</em> my own unavailability. I reply later than usual, and shorter. I answer the easy question and skip the one that requires commitment. I go quiet for four days and then reappear as if nothing happened. I don't say no, because saying no would create a conversation, and a conversation is exactly what I'm avoiding.</p>
+
+<p>This matters enormously for planning, because it changes the <em>nature</em> of the variable. A busy person is a slow-moving target. An avoiding person is a fast-moving target <em>that reacts to being aimed at.</em> The moment Yuka-chi increases her effort, I increase my distance. Her signal becomes my trigger. That's no longer just an uncertain environment &mdash; that's an environment with feedback.</p>
+
+<p>And here's the uncomfortable part: <strong>this is the hardest version of the problem, which is exactly why solving it teaches you the most.</strong> If you can plan around someone who is actively, quietly, non-confrontationally avoiding you &mdash; without becoming pushy, without becoming resentful, and without giving up on the objective &mdash; then almost every other planning problem in your life is easier by comparison. Stakeholders who stop replying to emails. Communities that politely agree in meetings and then don't participate. Donors who say "interesting" and never follow up. Governments that neither approve nor reject. Ngambek is the training ground for all of them.</p>
+
+<div class='not-prose my-12'>
+  <svg viewBox='0 0 1000 470' xmlns='http://www.w3.org/2000/svg' class='w-full h-auto'>
+    <rect x='0' y='0' width='1000' height='470' rx='24' fill='#0f172a'/>
+    <text x='500' y='34' text-anchor='middle' font-family='sans-serif' font-size='16' font-weight='800' fill='#f1f5f9'>Diagram 4 &#8212; The Ngambek Escalation Ladder (and the Exit)</text>
+    <text x='500' y='56' text-anchor='middle' font-family='sans-serif' font-size='11' fill='#94a3b8'>Why pushing harder makes an avoiding target move faster &#8212; a reinforcing feedback loop</text>
+
+    <rect x='40' y='78' width='420' height='344' rx='18' fill='#1e1b24' stroke='#f43f5e' stroke-width='2'/>
+    <text x='250' y='106' text-anchor='middle' font-family='sans-serif' font-size='13' font-weight='800' fill='#fda4af'>THE DOOM LOOP (what actually happened for 2 years)</text>
+
+    <g font-family='sans-serif' font-size='10' font-weight='700'>
+      <rect x='70' y='124' width='360' height='38' rx='8' fill='#7f1d1d' opacity='0.55' stroke='#f87171'/>
+      <text x='250' y='148' text-anchor='middle' fill='#fecaca'>1. Organizer sends a BIG ask (party, fixed date, 12 guests)</text>
+
+      <path d='M 250 164 L 250 178' stroke='#f87171' stroke-width='2.5' marker-end='url(#aD50)'/>
+
+      <rect x='70' y='180' width='360' height='38' rx='8' fill='#7f1d1d' opacity='0.55' stroke='#f87171'/>
+      <text x='250' y='198' text-anchor='middle' fill='#fecaca'>2. Angga feels OBLIGATION, not invitation</text>
+      <text x='250' y='212' text-anchor='middle' font-size='9' font-weight='400' fill='#fca5a5'>cost of yes is high &#183; cost of silence is zero</text>
+
+      <path d='M 250 220 L 250 234' stroke='#f87171' stroke-width='2.5' marker-end='url(#aD50)'/>
+
+      <rect x='70' y='236' width='360' height='38' rx='8' fill='#7f1d1d' opacity='0.55' stroke='#f87171'/>
+      <text x='250' y='254' text-anchor='middle' fill='#fecaca'>3. NGAMBEK: soft avoidance, not refusal</text>
+      <text x='250' y='268' text-anchor='middle' font-size='9' font-weight='400' fill='#fca5a5'>slower replies &#183; vague answers &#183; disappears</text>
+
+      <path d='M 250 276 L 250 290' stroke='#f87171' stroke-width='2.5' marker-end='url(#aD50)'/>
+
+      <rect x='70' y='292' width='360' height='38' rx='8' fill='#7f1d1d' opacity='0.55' stroke='#f87171'/>
+      <text x='250' y='310' text-anchor='middle' fill='#fecaca'>4. Organizer reads it as REJECTION</text>
+      <text x='250' y='324' text-anchor='middle' font-size='9' font-weight='400' fill='#fca5a5'>anxiety rises &#183; ego enters the equation</text>
+
+      <path d='M 250 332 L 250 346' stroke='#f87171' stroke-width='2.5' marker-end='url(#aD50)'/>
+
+      <rect x='70' y='348' width='360' height='38' rx='8' fill='#991b1b' stroke='#fb7185' stroke-width='2'/>
+      <text x='250' y='366' text-anchor='middle' fill='#ffe4e6'>5. Organizer pushes HARDER (bigger event, more reminders)</text>
+      <text x='250' y='380' text-anchor='middle' font-size='9' font-weight='400' fill='#fecdd3'>and the ask gets even more expensive to accept</text>
+    </g>
+
+    <path d='M 430 367 L 452 367 L 452 143 L 434 143' stroke='#fb7185' stroke-width='2.5' fill='none' stroke-dasharray='5 4' marker-end='url(#aD50)'/>
+    <text x='250' y='406' text-anchor='middle' font-family='sans-serif' font-size='10' font-weight='800' fill='#fb7185'>REINFORCING LOOP &#8594; distance grows every cycle</text>
+
+    <rect x='540' y='78' width='420' height='344' rx='18' fill='#0b2b25' stroke='#10b981' stroke-width='2'/>
+    <text x='750' y='106' text-anchor='middle' font-family='sans-serif' font-size='13' font-weight='800' fill='#6ee7b7'>THE EXIT LOOP (what breaks it)</text>
+
+    <g font-family='sans-serif' font-size='10' font-weight='700'>
+      <rect x='570' y='124' width='360' height='38' rx='8' fill='#064e3b' opacity='0.75' stroke='#34d399'/>
+      <text x='750' y='148' text-anchor='middle' fill='#d1fae5'>1. Send a TINY ask with a built-in escape hatch</text>
+
+      <path d='M 750 164 L 750 178' stroke='#34d399' stroke-width='2.5' marker-end='url(#aE51)'/>
+
+      <rect x='570' y='180' width='360' height='38' rx='8' fill='#064e3b' opacity='0.75' stroke='#34d399'/>
+      <text x='750' y='198' text-anchor='middle' fill='#d1fae5'>2. "No" costs Angga NOTHING &#8212; no explanation owed</text>
+      <text x='750' y='212' text-anchor='middle' font-size='9' font-weight='400' fill='#6ee7b7'>"if you're not up for it, totally fine, another time"</text>
+
+      <path d='M 750 220 L 750 234' stroke='#34d399' stroke-width='2.5' marker-end='url(#aE51)'/>
+
+      <rect x='570' y='236' width='360' height='38' rx='8' fill='#064e3b' opacity='0.75' stroke='#34d399'/>
+      <text x='750' y='254' text-anchor='middle' fill='#d1fae5'>3. Avoidance becomes UNNECESSARY</text>
+      <text x='750' y='268' text-anchor='middle' font-size='9' font-weight='400' fill='#6ee7b7'>nothing to escape from &#8594; no ngambek triggered</text>
+
+      <path d='M 750 276 L 750 290' stroke='#34d399' stroke-width='2.5' marker-end='url(#aE51)'/>
+
+      <rect x='570' y='292' width='360' height='38' rx='8' fill='#064e3b' opacity='0.75' stroke='#34d399'/>
+      <text x='750' y='310' text-anchor='middle' fill='#d1fae5'>4. A real signal comes back (yes / not-now / silence)</text>
+      <text x='750' y='324' text-anchor='middle' font-size='9' font-weight='400' fill='#6ee7b7'>all three are useful data, none are insults</text>
+
+      <path d='M 750 332 L 750 346' stroke='#34d399' stroke-width='2.5' marker-end='url(#aE51)'/>
+
+      <rect x='570' y='348' width='360' height='38' rx='8' fill='#065f46' stroke='#6ee7b7' stroke-width='2'/>
+      <text x='750' y='366' text-anchor='middle' fill='#ecfdf5'>5. WAIT for the window, then re-probe cheaply</text>
+      <text x='750' y='380' text-anchor='middle' font-size='9' font-weight='400' fill='#a7f3d0'>trust accumulates instead of pressure</text>
+    </g>
+
+    <path d='M 930 367 L 952 367 L 952 143 L 934 143' stroke='#6ee7b7' stroke-width='2.5' fill='none' stroke-dasharray='5 4' marker-end='url(#aE51)'/>
+    <text x='750' y='406' text-anchor='middle' font-family='sans-serif' font-size='10' font-weight='800' fill='#6ee7b7'>BALANCING LOOP &#8594; distance shrinks every cycle</text>
+
+    <rect x='40' y='434' width='920' height='24' rx='8' fill='#1e293b'/>
+    <text x='500' y='450' text-anchor='middle' font-family='sans-serif' font-size='11' font-weight='700' fill='#e2e8f0'>KEY INSIGHT: an avoiding target reacts to your effort &#8212; so effort is not the lever. COST-OF-SAYING-NO is the lever.</text>
+
+    <defs>
+      <marker id='aD50' markerWidth='8' markerHeight='8' refX='6' refY='4' orient='auto'><path d='M0,0 L8,4 L0,8 Z' fill='#f87171'/></marker>
+      <marker id='aE51' markerWidth='8' markerHeight='8' refX='6' refY='4' orient='auto'><path d='M0,0 L8,4 L0,8 Z' fill='#34d399'/></marker>
+    </defs>
+  </svg>
+</div>
+
+<p>Look carefully at the left side of that diagram, because it explains two full years in five boxes. Nobody in that loop is behaving badly. The organizer is being generous. I'm not being cruel. And yet the system reliably produces failure, because <em>effort</em> is the input and <em>distance</em> is the output. Every increase in one produces an increase in the other. In systems language, that's a reinforcing loop &mdash; it doesn't self-correct, it self-amplifies.</p>
+
+<p>The right side is the whole trick, and it's almost anticlimactic: <strong>make "no" free.</strong> The reason I ngambek isn't that I don't want to see anyone. It's that a big invitation makes refusal expensive &mdash; I'd have to explain, apologize, disappoint someone, possibly negotiate. Silence is cheaper than honesty, so I choose silence. But if the invitation arrives with its own exit built in &mdash; <em>"twenty minutes, near your place, and if you're not up for it just say another time, seriously no problem"</em> &mdash; then avoidance stops being useful. There's nothing to avoid. I can decline in four words and lose nothing, which paradoxically makes me far more likely to accept.</p>
+
+<div class='callout bg-emerald-50 border-l-4 border-emerald-500 p-6 rounded-r-2xl my-10'>
+  <h4 class='font-extrabold text-emerald-900 flex items-center gap-2 mb-3'><i class='fa-solid fa-door-open'></i> The Counter-Intuitive Rule</h4>
+  <p class='text-emerald-800 text-sm leading-relaxed m-0'>If someone is avoiding you, do not increase the pressure to say yes. <strong>Decrease the price of saying no.</strong> Avoidance is almost always a symptom of an expensive refusal, not an expensive relationship. Make refusal cheap and the avoidance disappears &mdash; along with the need for it.</p>
+</div>
+
+<p>There's a second thing hidden in the right-hand loop that I want to name explicitly, because it's the part most people get wrong: <strong>silence must be treated as data, not as verdict.</strong> When I go quiet, the organizer's instinct is to interpret it &mdash; "he's annoyed with me," "he doesn't like Yuka-chi," "I've been rejected." All of those are stories. The observable fact is much smaller and much more useful: <em>this week the state is not AVAILABLE.</em> That's it. That's the whole message. It tells you about timing, not about worth. Humanitarian teams do this instinctively &mdash; a closed corridor is a fact about today's access, not a moral statement about the mission or the people who planned it.</p>
+
+<p>And if I'm honest, this is also a note to myself. Being the fast-moving variable is not something I'm proud of. It costs other people real effort &mdash; two years of it, in this case. The most I can offer in return is transparency: <em>here is the mechanism, here is what actually works on me, and here is why your previous attempts failed even though you did nothing wrong.</em> That's the reason this section exists. If the target can hand you its own operating manual, the least it can do is make the manual accurate.</p>
+
+<h4 class='text-xl font-extrabold text-slate-900 mt-14 mb-5'>So What Should Yuka-chi Actually Do? Seven Moves</h4>
+
+<p>This is the practical part. If you're planning around anything that moves &mdash; a person, a community, a market, a conflict zone &mdash; these seven moves generalize surprisingly well. I've paired each one with an analogy that I think is more accurate than the usual "be flexible" advice, because "be flexible" tells you nothing about <em>what to actually do on Monday morning.</em></p>
 
 <div class='not-prose my-10 space-y-4'>
-  <div class='flex gap-4 p-5 bg-white border border-slate-200 rounded-xl shadow-sm'>
-    <div class='shrink-0 w-9 h-9 rounded-full bg-indigo-600 text-white font-extrabold flex items-center justify-center'>1</div>
-    <div>
-      <div class='font-extrabold text-slate-900 text-sm mb-1'>Stop reserving the café before checking the weather</div>
-      <p class='text-slate-600 text-sm m-0'>Don't lock a date-plus-venue two weeks out. Instead, build one small, low-cost "probe" — a message, a shared photo, a casual "you around this weekend?" — and read the response before committing resources to anything bigger.</p>
+  <div class='p-6 bg-white border-l-4 border-indigo-500 rounded-r-xl shadow-sm border-t border-r border-b border-slate-200'>
+    <div class='flex items-start gap-4'>
+      <div class='shrink-0 w-10 h-10 rounded-full bg-indigo-600 text-white font-extrabold flex items-center justify-center'>1</div>
+      <div>
+        <div class='font-extrabold text-slate-900 mb-1'>Fly like a bush pilot, not like an airline</div>
+        <p class='text-slate-600 text-sm mb-3'>An airline publishes a schedule months ahead and forces reality to comply. A bush pilot flying into a remote strip does the opposite: they file an <em>intention</em>, then wait for a weather window, then go. Same destination, radically different commitment structure.</p>
+        <p class='text-slate-700 text-sm m-0'><strong class='text-indigo-700'>Do this:</strong> Don't announce "Saturday 6 PM at the caf&eacute;." Announce a standing intention &mdash; "whenever you're free, coffee's on me, 20 minutes, any day" &mdash; and then launch when the window opens. The window is the schedule.</p>
+      </div>
     </div>
   </div>
-  <div class='flex gap-4 p-5 bg-white border border-slate-200 rounded-xl shadow-sm'>
-    <div class='shrink-0 w-9 h-9 rounded-full bg-indigo-600 text-white font-extrabold flex items-center justify-center'>2</div>
-    <div>
-      <div class='font-extrabold text-slate-900 text-sm mb-1'>Read the signals that are already public</div>
-      <p class='text-slate-600 text-sm m-0'>Is he posting? Replying quickly? Talking about being busy? These are cheap, low-effort observations that tell you far more than a calendar invite ever will. This is the "Observe" step — and most planners skip straight past it into "Decide."</p>
+
+  <div class='p-6 bg-white border-l-4 border-indigo-500 rounded-r-xl shadow-sm border-t border-r border-b border-slate-200'>
+    <div class='flex items-start gap-4'>
+      <div class='shrink-0 w-10 h-10 rounded-full bg-indigo-600 text-white font-extrabold flex items-center justify-center'>2</div>
+      <div>
+        <div class='font-extrabold text-slate-900 mb-1'>Tap the wall before you demolish it</div>
+        <p class='text-slate-600 text-sm mb-3'>Before knocking through a wall, a builder taps it and listens &mdash; is it hollow or load-bearing? The tap costs three seconds. Guessing wrong costs the ceiling. Most planners skip the tap because it feels too small to bother with.</p>
+        <p class='text-slate-700 text-sm m-0'><strong class='text-indigo-700'>Do this:</strong> Send one low-cost probe before committing resources. A message. A shared photo. A casual "you around this weekend?" Read the response &mdash; the <em>speed</em> and <em>warmth</em> of the reply are the data, not just the words. Then decide whether to commit anything bigger.</p>
+      </div>
     </div>
   </div>
-  <div class='flex gap-4 p-5 bg-white border border-slate-200 rounded-xl shadow-sm'>
-    <div class='shrink-0 w-9 h-9 rounded-full bg-indigo-600 text-white font-extrabold flex items-center justify-center'>3</div>
-    <div>
-      <div class='font-extrabold text-slate-900 text-sm mb-1'>Lower the cost of saying yes</div>
-      <p class='text-slate-600 text-sm m-0'>A 20-minute coffee has a much higher yes-rate than a birthday party with twelve guests, because it asks almost nothing of Capek-Angga or Kesel-Angga. Big, formal invitations are optimized for Available-Angga only — which is exactly the version you can't schedule in advance.</p>
+
+  <div class='p-6 bg-white border-l-4 border-indigo-500 rounded-r-xl shadow-sm border-t border-r border-b border-slate-200'>
+    <div class='flex items-start gap-4'>
+      <div class='shrink-0 w-10 h-10 rounded-full bg-indigo-600 text-white font-extrabold flex items-center justify-center'>3</div>
+      <div>
+        <div class='font-extrabold text-slate-900 mb-1'>Read the instruments you already have</div>
+        <p class='text-slate-600 text-sm mb-3'>A ship's captain doesn't need to ask the ocean how it feels. Barometer, wind, swell, cloud colour &mdash; the signals are already there, free, continuously updating. Ignoring them and instead sending a formal request for the ocean's plans would be absurd.</p>
+        <p class='text-slate-700 text-sm m-0'><strong class='text-indigo-700'>Do this:</strong> Is he posting? Replying quickly? Complaining about work? Riding? Quiet for five days? These are your instruments. This is the "Observe" step &mdash; and most planners skip straight past it into "Decide," then wonder why their decision was wrong.</p>
+      </div>
     </div>
   </div>
-  <div class='flex gap-4 p-5 bg-white border border-slate-200 rounded-xl shadow-sm'>
-    <div class='shrink-0 w-9 h-9 rounded-full bg-indigo-600 text-white font-extrabold flex items-center justify-center'>4</div>
-    <div>
-      <div class='font-extrabold text-slate-900 text-sm mb-1'>Decouple the ask from the ego</div>
-      <p class='text-slate-600 text-sm m-0'>A cancellation from Capek-Angga isn't a verdict on Yuka-chi. Treating every "not today" as rejection creates pressure, and pressure is precisely what pushes Motor-Angga toward the motorcycle instead of the café. The organizers who've kept trying for two years without adapting the <em>method</em> aren't failing because they're unlikeable. They're failing because they keep re-running the same fixed plan against a target that was never fixed to begin with.</p>
+
+  <div class='p-6 bg-white border-l-4 border-indigo-500 rounded-r-xl shadow-sm border-t border-r border-b border-slate-200'>
+    <div class='flex items-start gap-4'>
+      <div class='shrink-0 w-10 h-10 rounded-full bg-indigo-600 text-white font-extrabold flex items-center justify-center'>4</div>
+      <div>
+        <div class='font-extrabold text-slate-900 mb-1'>Lower the activation energy, not the goal</div>
+        <p class='text-slate-600 text-sm mb-3'>A chemical reaction that won't happen at room temperature doesn't need a bigger beaker &mdash; it needs a catalyst that lowers the energy barrier. The reactants were always willing. The threshold was the problem.</p>
+        <p class='text-slate-700 text-sm m-0'><strong class='text-indigo-700'>Do this:</strong> A 20-minute coffee has a far higher yes-rate than a twelve-guest birthday party, because it asks almost nothing of Capek-Angga or Kesel-Angga. Big formal invitations are optimized for Available-Angga only &mdash; exactly the version you can't schedule in advance. Shrink the ask until <em>three out of four versions</em> could say yes.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class='p-6 bg-white border-l-4 border-indigo-500 rounded-r-xl shadow-sm border-t border-r border-b border-slate-200'>
+    <div class='flex items-start gap-4'>
+      <div class='shrink-0 w-10 h-10 rounded-full bg-indigo-600 text-white font-extrabold flex items-center justify-center'>5</div>
+      <div>
+        <div class='font-extrabold text-slate-900 mb-1'>Buy options, don't buy the whole position</div>
+        <p class='text-slate-600 text-sm mb-3'>Real options thinking: instead of one large irreversible bet, pay a small premium for the <em>right</em> to act later when conditions are clearer. Humanitarian teams do this constantly &mdash; pre-positioned stock, multiple pre-cleared routes, standby partners. None of it is the mission. All of it preserves the ability to execute the mission.</p>
+        <p class='text-slate-700 text-sm m-0'><strong class='text-indigo-700'>Do this:</strong> Keep three cheap paths alive rather than one expensive one &mdash; a coffee, a group ride, a shared work session at the same caf&eacute;. If one closes, you haven't lost the objective. You've lost one option out of three.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class='p-6 bg-white border-l-4 border-indigo-500 rounded-r-xl shadow-sm border-t border-r border-b border-slate-200'>
+    <div class='flex items-start gap-4'>
+      <div class='shrink-0 w-10 h-10 rounded-full bg-indigo-600 text-white font-extrabold flex items-center justify-center'>6</div>
+      <div>
+        <div class='font-extrabold text-slate-900 mb-1'>Set trigger conditions, not calendar dates</div>
+        <p class='text-slate-600 text-sm mb-3'>Emergency response teams don't plan "we will distribute water on the 14th." They plan "<em>if</em> the water point drops below X, <em>then</em> trucking begins within 24 hours." The trigger does the scheduling, so nobody has to predict the future correctly.</p>
+        <p class='text-slate-700 text-sm m-0'><strong class='text-indigo-700'>Do this:</strong> Replace "next Saturday" with "the next time he posts a caf&eacute; photo after a ride, I invite him within two hours." Now you don't need a forecast. You need attention &mdash; and attention is something you actually control.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class='p-6 bg-white border-l-4 border-indigo-500 rounded-r-xl shadow-sm border-t border-r border-b border-slate-200'>
+    <div class='flex items-start gap-4'>
+      <div class='shrink-0 w-10 h-10 rounded-full bg-indigo-600 text-white font-extrabold flex items-center justify-center'>7</div>
+      <div>
+        <div class='font-extrabold text-slate-900 mb-1'>Separate the signal from your self-worth</div>
+        <p class='text-slate-600 text-sm mb-3'>A radiologist reading a scan doesn't feel personally insulted by a shadow on the film. The shadow is information about the patient, not a verdict on the radiologist. Emotional entanglement destroys the ability to read data accurately.</p>
+        <p class='text-slate-700 text-sm m-0'><strong class='text-indigo-700'>Do this:</strong> A cancellation from Capek-Angga isn't a judgement on Yuka-chi. Treating every "not today" as rejection creates pressure &mdash; and pressure is precisely what pushes Motor-Angga toward the motorcycle instead of the caf&eacute;. The organizers who've kept trying for two years without adapting the <em>method</em> aren't failing because they're unlikeable. They're failing because they keep re-running the same fixed plan against a target that was never fixed to begin with.</p>
+      </div>
     </div>
   </div>
 </div>
 
-<p>None of this guarantees a yes. It can't — that's the nature of a moving target. But it shifts the odds meaningfully in Yuka-chi's favor, and it's a smaller, cheaper, faster way to find out than another elaborately planned event that has to survive three weeks of me changing my mind.</p>
+<div class='not-prose my-12'>
+  <svg viewBox='0 0 1000 470' xmlns='http://www.w3.org/2000/svg' class='w-full h-auto'>
+    <rect x='0' y='0' width='1000' height='470' rx='24' fill='#f8fafc'/>
+    <text x='500' y='34' text-anchor='middle' font-family='sans-serif' font-size='16' font-weight='800' fill='#0f172a'>Diagram 5 &#8212; Commitment Curve: Big Bet vs. Portfolio of Small Bets</text>
+    <text x='500' y='56' text-anchor='middle' font-family='sans-serif' font-size='11' fill='#64748b'>Why one elaborate event loses to seven cheap probes over the same two years</text>
+
+    <rect x='35' y='76' width='445' height='356' rx='18' fill='#fff1f2' stroke='#f43f5e' stroke-width='2'/>
+    <text x='257' y='104' text-anchor='middle' font-family='sans-serif' font-size='14' font-weight='800' fill='#9f1239'>STRATEGY A &#8212; The Big Bet</text>
+
+    <line x1='75' y1='330' x2='445' y2='330' stroke='#fda4af' stroke-width='2'/>
+    <line x1='75' y1='130' x2='75' y2='330' stroke='#fda4af' stroke-width='2'/>
+    <text x='260' y='350' text-anchor='middle' font-family='sans-serif' font-size='9' fill='#be123c'>Time &#8594;</text>
+
+    <rect x='120' y='150' width='90' height='180' rx='6' fill='#fb7185' opacity='0.85'/>
+    <text x='165' y='143' text-anchor='middle' font-family='sans-serif' font-size='9' font-weight='700' fill='#9f1239'>3 weeks of prep</text>
+    <line x1='210' y1='150' x2='210' y2='330' stroke='#881337' stroke-width='3' stroke-dasharray='4 3'/>
+    <text x='245' y='168' font-family='sans-serif' font-size='10' font-weight='800' fill='#881337'>EVENT DAY</text>
+    <text x='245' y='184' font-family='sans-serif' font-size='9' fill='#be123c'>one draw from</text>
+    <text x='245' y='197' font-family='sans-serif' font-size='9' fill='#be123c'>the state machine</text>
+    <text x='245' y='219' font-family='sans-serif' font-size='20' font-weight='800' fill='#e11d48'>&#10007;</text>
+    <text x='268' y='218' font-family='sans-serif' font-size='10' font-weight='700' fill='#9f1239'>Capek-Angga shows up</text>
+
+    <rect x='245' y='236' width='190' height='84' rx='8' fill='#ffe4e6'/>
+    <text x='340' y='256' text-anchor='middle' font-family='sans-serif' font-size='10' fill='#881337'>Information gained: 1 data point</text>
+    <text x='340' y='274' text-anchor='middle' font-family='sans-serif' font-size='10' fill='#881337'>Cost: high &#183; Learning: ~zero</text>
+    <text x='340' y='294' text-anchor='middle' font-family='sans-serif' font-size='10' font-weight='700' fill='#9f1239'>Next move: repeat identically</text>
+    <text x='340' y='311' text-anchor='middle' font-family='sans-serif' font-size='9' font-style='italic' fill='#be123c'>&#8594; two years, no progress</text>
+
+    <text x='257' y='386' text-anchor='middle' font-family='sans-serif' font-size='11' font-weight='800' fill='#9f1239'>Fails because ONE draw must land on ONE state</text>
+    <text x='257' y='406' text-anchor='middle' font-family='sans-serif' font-size='10' fill='#be123c'>P(success) &#8776; 25% &#183; and a miss teaches you nothing</text>
+
+    <rect x='520' y='76' width='445' height='356' rx='18' fill='#ecfdf5' stroke='#10b981' stroke-width='2'/>
+    <text x='742' y='104' text-anchor='middle' font-family='sans-serif' font-size='14' font-weight='800' fill='#065f46'>STRATEGY B &#8212; Portfolio of Probes</text>
+
+    <line x1='560' y1='330' x2='930' y2='330' stroke='#6ee7b7' stroke-width='2'/>
+    <line x1='560' y1='130' x2='560' y2='330' stroke='#6ee7b7' stroke-width='2'/>
+    <text x='745' y='350' text-anchor='middle' font-family='sans-serif' font-size='9' fill='#047857'>Time &#8594;</text>
+
+    <rect x='578' y='306' width='22' height='24' rx='3' fill='#34d399'/>
+    <rect x='618' y='300' width='22' height='30' rx='3' fill='#34d399'/>
+    <rect x='658' y='308' width='22' height='22' rx='3' fill='#34d399'/>
+    <rect x='698' y='298' width='22' height='32' rx='3' fill='#34d399'/>
+    <rect x='738' y='306' width='22' height='24' rx='3' fill='#34d399'/>
+    <rect x='778' y='302' width='22' height='28' rx='3' fill='#34d399'/>
+    <rect x='818' y='272' width='22' height='58' rx='3' fill='#059669'/>
+
+    <text x='589' y='298' text-anchor='middle' font-family='sans-serif' font-size='13' fill='#dc2626'>&#10007;</text>
+    <text x='629' y='292' text-anchor='middle' font-family='sans-serif' font-size='13' fill='#dc2626'>&#10007;</text>
+    <text x='669' y='300' text-anchor='middle' font-family='sans-serif' font-size='13' fill='#dc2626'>&#10007;</text>
+    <text x='709' y='290' text-anchor='middle' font-family='sans-serif' font-size='13' fill='#dc2626'>&#10007;</text>
+    <text x='749' y='298' text-anchor='middle' font-family='sans-serif' font-size='13' fill='#dc2626'>&#10007;</text>
+    <text x='789' y='294' text-anchor='middle' font-family='sans-serif' font-size='13' fill='#dc2626'>&#10007;</text>
+    <text x='829' y='262' text-anchor='middle' font-family='sans-serif' font-size='17' font-weight='800' fill='#047857'>&#10003;</text>
+
+    <path d='M 578 250 Q 700 240 818 262' stroke='#059669' stroke-width='2' fill='none' stroke-dasharray='4 4'/>
+    <text x='700' y='236' text-anchor='middle' font-family='sans-serif' font-size='9' font-style='italic' fill='#047857'>each miss narrows the search</text>
+
+    <rect x='578' y='150' width='340' height='76' rx='8' fill='#d1fae5'/>
+    <text x='748' y='170' text-anchor='middle' font-family='sans-serif' font-size='10' fill='#065f46'>Information gained: 7 data points about timing,</text>
+    <text x='748' y='186' text-anchor='middle' font-family='sans-serif' font-size='10' fill='#065f46'>tone, energy, and which asks get answered</text>
+    <text x='748' y='206' text-anchor='middle' font-family='sans-serif' font-size='10' font-weight='700' fill='#047857'>Cost per attempt: near zero</text>
+    <text x='748' y='220' text-anchor='middle' font-family='sans-serif' font-size='9' font-style='italic' fill='#047857'>Each "no" is free and informative</text>
+
+    <text x='742' y='386' text-anchor='middle' font-family='sans-serif' font-size='11' font-weight='800' fill='#065f46'>Succeeds because you get MANY draws, cheaply</text>
+    <text x='742' y='406' text-anchor='middle' font-family='sans-serif' font-size='10' fill='#047857'>P(at least one hit over 7 tries) &#8776; 87% &#183; and you learn every time</text>
+
+    <rect x='35' y='440' width='930' height='22' rx='7' fill='#0f172a'/>
+    <text x='500' y='455' text-anchor='middle' font-family='sans-serif' font-size='10' font-weight='700' fill='#e2e8f0'>THE PRINCIPLE: in a moving system, the number of cheap attempts matters more than the quality of any single attempt</text>
+  </svg>
+</div>
+
+<p>None of this guarantees a yes. It can't &mdash; that's the nature of a moving target. But it shifts the odds meaningfully in Yuka-chi's favour, and it's a smaller, cheaper, faster way to find out than another elaborately planned event that has to survive three weeks of me changing my mind.</p>
 
 <h4 class='text-xl font-extrabold text-slate-900 mt-12 mb-5'>Now Replace Me With a Convoy</h4>
 
@@ -435,9 +764,13 @@
 
 <p>Nothing about the mission has changed. Children still need food. Hospitals still need medicine. Families still need shelter. But every route toward those goals keeps changing. This is why humanitarian organizations rarely become emotionally attached to a single operational plan. <strong>They're attached to the mission. Not the route.</strong></p>
 
-<p>One lesson I learned from working in development is that experienced teams don't waste much energy defending yesterday's plan. They spend that energy understanding today's reality. If today's conditions no longer support yesterday's assumptions, they update the assumptions. Then they move again. That cycle repeats constantly — not because the original planners were incompetent, but because reality keeps producing new information.</p>
+<p>Notice how precisely the seven moves map across. The <em>weather window</em> becomes a security window. <em>Tapping the wall</em> becomes a reconnaissance run or a phone call to a local partner before committing a full convoy. <em>Reading the instruments</em> becomes daily access monitoring. <em>Lowering activation energy</em> becomes splitting one large delivery into several smaller loads that can move whenever a gap opens. <em>Buying options</em> becomes pre-positioned stock and multiple pre-cleared routes. <em>Trigger conditions</em> become contingency thresholds written into the response plan. And <em>separating signal from self-worth</em> becomes the professional discipline of not defending yesterday's plan just because you wrote it.</p>
 
-<p>USAID formalized a version of exactly this instinct into what it calls the <strong>Collaborating, Learning, and Adapting (CLA)</strong> framework: a structured way of embedding continuous learning and course-correction into program design, instead of treating "learning" as something that only happens at the end, in an evaluation report nobody reads until the project is already over.<sup>2</sup> The whole premise of CLA is that in unstable or fast-changing environments, a program that only executes its original plan — however well-designed — will drift out of relevance long before it finishes.</p>
+<p>Even the ngambek problem has an operational twin. Counterparts who neither approve nor refuse; authorities who keep a request "under review" for months; partners who stop answering without ever declining. Experienced teams don't respond by sending more letters. They lower the cost of engagement &mdash; a smaller pilot, a shorter commitment, a request that's easy to grant and easy to reverse &mdash; because a decision-maker who can say no cheaply is far more likely to eventually say yes.</p>
+
+<p>One lesson I learned from working in development is that experienced teams don't waste much energy defending yesterday's plan. They spend that energy understanding today's reality. If today's conditions no longer support yesterday's assumptions, they update the assumptions. Then they move again. That cycle repeats constantly &mdash; not because the original planners were incompetent, but because reality keeps producing new information.</p>
+
+<p>USAID formalized a version of exactly this instinct into what it calls the <strong>Collaborating, Learning, and Adapting (CLA)</strong> framework: a structured way of embedding continuous learning and course-correction into program design, instead of treating "learning" as something that only happens at the end, in an evaluation report nobody reads until the project is already over.<sup>2</sup> The whole premise of CLA is that in unstable or fast-changing environments, a program that only executes its original plan &mdash; however well-designed &mdash; will drift out of relevance long before it finishes.</p>
 
 <p>Eventually, I realized something interesting. Adaptive planning isn't about becoming flexible because you're indecisive. It's about becoming flexible because <em>reality</em> is. The environment doesn't care how beautiful your PowerPoint presentation was. Reality never promised to follow it.</p>
 
@@ -448,24 +781,85 @@
   <p class='text-amber-800 text-sm leading-relaxed m-0'>Never fall in love with the plan. Fall in love with the mission. Plans are disposable. Objectives are not. Once I understood that difference, planning became much less frustrating. I no longer expected my first plan to survive. I expected reality to negotiate with it. And reality almost always won.</p>
 </div>
 
-<h3 class='text-2xl font-extrabold text-slate-900 mt-16 mb-6'>Part 4 — The OODA Loop: Why Waiting for Certainty Is Already Too Late</h3>
+<h3 class='text-2xl font-extrabold text-slate-900 mt-16 mb-6'>Part 4 &mdash; The OODA Loop: Why Waiting for Certainty Is Already Too Late</h3>
 
 <p>When I first learned about the OODA Loop, I had an odd reaction. I wasn't learning something new. I was discovering the name of something I had already been doing.</p>
 
-<p>The OODA Loop was developed by U.S. Air Force Colonel John Boyd, originally to explain why some fighter pilots consistently out-decided their opponents in aerial combat.<sup>3</sup> Its purpose wasn't to create perfect plans. Its purpose was to make better decisions <em>faster than a changing environment</em>. The loop is surprisingly simple: <strong>Observe</strong> — understand what is happening. <strong>Orient</strong> — interpret what those observations actually mean. <strong>Decide</strong> — choose the next action. <strong>Act</strong> — execute. Then start over. Again. And again. And again.</p>
+<p>The OODA Loop was developed by U.S. Air Force Colonel John Boyd, originally to explain why some fighter pilots consistently out-decided their opponents in aerial combat.<sup>3</sup> Its purpose wasn't to create perfect plans. Its purpose was to make better decisions <em>faster than a changing environment</em>. The loop is surprisingly simple: <strong>Observe</strong> &mdash; understand what is happening. <strong>Orient</strong> &mdash; interpret what those observations actually mean. <strong>Decide</strong> &mdash; choose the next action. <strong>Act</strong> &mdash; execute. Then start over. Again. And again. And again.</p>
 
-<p>Notice something interesting. There is no step called "Create the perfect plan." Because the assumption behind OODA is that the environment will change before you're finished planning. Planning is useful. But observing reality is even more important. Military historian Frans Osinga, whose <em>Science, Strategy and War</em> remains the most thorough academic treatment of Boyd's thinking, makes the point that Boyd's real interest wasn't speed for its own sake — it was survival in an "ever changing world," where the side that can re-orient fastest wins, regardless of who had the better initial plan.<sup>3</sup></p>
+<div class='not-prose my-12'>
+  <svg viewBox='0 0 1000 440' xmlns='http://www.w3.org/2000/svg' class='w-full h-auto'>
+    <rect x='0' y='0' width='1000' height='440' rx='24' fill='#0f172a'/>
+    <text x='500' y='36' text-anchor='middle' font-family='sans-serif' font-size='16' font-weight='800' fill='#f1f5f9'>Diagram 6 &#8212; Loop Speed vs. Environment Speed</text>
+    <text x='500' y='58' text-anchor='middle' font-family='sans-serif' font-size='11' fill='#94a3b8'>Boyd's real insight wasn't "be fast" &#8212; it was "re-orient faster than the world changes"</text>
+
+    <circle cx='250' cy='240' r='118' fill='none' stroke='#334155' stroke-width='2' stroke-dasharray='4 4'/>
+    <text x='250' y='104' text-anchor='middle' font-family='sans-serif' font-size='13' font-weight='800' fill='#f87171'>TOO SLOW: plan-then-execute</text>
+
+    <g font-family='sans-serif' font-size='10' font-weight='700' fill='#e2e8f0'>
+      <circle cx='250' cy='140' r='30' fill='#1e293b' stroke='#475569' stroke-width='2'/>
+      <text x='250' y='144' text-anchor='middle'>OBSERVE</text>
+      <circle cx='350' cy='240' r='30' fill='#1e293b' stroke='#475569' stroke-width='2'/>
+      <text x='350' y='244' text-anchor='middle'>ORIENT</text>
+      <circle cx='250' cy='340' r='30' fill='#1e293b' stroke='#475569' stroke-width='2'/>
+      <text x='250' y='344' text-anchor='middle'>DECIDE</text>
+      <circle cx='150' cy='240' r='30' fill='#1e293b' stroke='#475569' stroke-width='2'/>
+      <text x='150' y='244' text-anchor='middle'>ACT</text>
+    </g>
+    <path d='M 278 158 A 100 100 0 0 1 336 214' stroke='#64748b' stroke-width='3' fill='none' marker-end='url(#aW50)'/>
+    <path d='M 336 266 A 100 100 0 0 1 278 322' stroke='#64748b' stroke-width='3' fill='none' marker-end='url(#aW50)'/>
+    <path d='M 222 322 A 100 100 0 0 1 164 266' stroke='#64748b' stroke-width='3' fill='none' marker-end='url(#aW50)'/>
+    <path d='M 164 214 A 100 100 0 0 1 222 158' stroke='#64748b' stroke-width='3' fill='none' marker-end='url(#aW50)'/>
+    <text x='250' y='236' text-anchor='middle' font-family='sans-serif' font-size='11' font-weight='800' fill='#f87171'>ONE LOOP</text>
+    <text x='250' y='252' text-anchor='middle' font-family='sans-serif' font-size='11' font-weight='800' fill='#f87171'>= 3 WEEKS</text>
+    <text x='250' y='392' text-anchor='middle' font-family='sans-serif' font-size='10' fill='#fca5a5'>By the time you Act, the world has changed 20 times.</text>
+    <text x='250' y='408' text-anchor='middle' font-family='sans-serif' font-size='10' fill='#fca5a5'>You are acting on a photograph of the past.</text>
+
+    <line x1='500' y1='90' x2='500' y2='400' stroke='#334155' stroke-width='2'/>
+
+    <circle cx='750' cy='240' r='118' fill='none' stroke='#334155' stroke-width='2' stroke-dasharray='4 4'/>
+    <text x='750' y='104' text-anchor='middle' font-family='sans-serif' font-size='13' font-weight='800' fill='#34d399'>FAST ENOUGH: probe-then-adjust</text>
+
+    <g font-family='sans-serif' font-size='10' font-weight='700' fill='#ecfdf5'>
+      <circle cx='750' cy='140' r='30' fill='#064e3b' stroke='#10b981' stroke-width='2'/>
+      <text x='750' y='144' text-anchor='middle'>OBSERVE</text>
+      <circle cx='850' cy='240' r='30' fill='#064e3b' stroke='#10b981' stroke-width='2'/>
+      <text x='850' y='244' text-anchor='middle'>ORIENT</text>
+      <circle cx='750' cy='340' r='30' fill='#064e3b' stroke='#10b981' stroke-width='2'/>
+      <text x='750' y='344' text-anchor='middle'>DECIDE</text>
+      <circle cx='650' cy='240' r='30' fill='#064e3b' stroke='#10b981' stroke-width='2'/>
+      <text x='650' y='244' text-anchor='middle'>ACT</text>
+    </g>
+    <path d='M 778 158 A 100 100 0 0 1 836 214' stroke='#10b981' stroke-width='4' fill='none' marker-end='url(#aE50)'/>
+    <path d='M 836 266 A 100 100 0 0 1 778 322' stroke='#10b981' stroke-width='4' fill='none' marker-end='url(#aE50)'/>
+    <path d='M 722 322 A 100 100 0 0 1 664 266' stroke='#10b981' stroke-width='4' fill='none' marker-end='url(#aE50)'/>
+    <path d='M 664 214 A 100 100 0 0 1 722 158' stroke='#10b981' stroke-width='4' fill='none' marker-end='url(#aE50)'/>
+    <text x='750' y='236' text-anchor='middle' font-family='sans-serif' font-size='11' font-weight='800' fill='#34d399'>ONE LOOP</text>
+    <text x='750' y='252' text-anchor='middle' font-family='sans-serif' font-size='11' font-weight='800' fill='#34d399'>= 1 MESSAGE</text>
+    <text x='750' y='392' text-anchor='middle' font-family='sans-serif' font-size='10' fill='#6ee7b7'>You act on a world that still exists.</text>
+    <text x='750' y='408' text-anchor='middle' font-family='sans-serif' font-size='10' fill='#6ee7b7'>Orientation is refreshed before it expires.</text>
+
+    <text x='500' y='428' text-anchor='middle' font-family='sans-serif' font-size='10' font-style='italic' fill='#94a3b8'>Note: there is no step called "write the perfect plan" &#8212; the environment won't wait for you to finish it</text>
+
+    <defs>
+      <marker id='aW50' markerWidth='8' markerHeight='8' refX='6' refY='4' orient='auto'><path d='M0,0 L8,4 L0,8 Z' fill='#64748b'/></marker>
+      <marker id='aE50' markerWidth='8' markerHeight='8' refX='6' refY='4' orient='auto'><path d='M0,0 L8,4 L0,8 Z' fill='#10b981'/></marker>
+    </defs>
+  </svg>
+</div>
+
+<p>Notice something interesting. There is no step called "Create the perfect plan." Because the assumption behind OODA is that the environment will change before you're finished planning. Planning is useful. But observing reality is even more important. Military historian Frans Osinga, whose <em>Science, Strategy and War</em> remains the most thorough academic treatment of Boyd's thinking, makes the point that Boyd's real interest wasn't speed for its own sake &mdash; it was survival in an "ever changing world," where the side that can re-orient fastest wins, regardless of who had the better initial plan.<sup>3</sup></p>
 
 <div class='not-prose my-12'>
   <div class='relative w-full overflow-hidden rounded-2xl shadow-xl aspect-video bg-slate-900'>
-    <iframe class='absolute inset-0 w-full h-full' src='https://www.youtube.com/embed/Bg9zIhZ8Sqw' title='The OODA Loop Explained — Decision Making Under Uncertainty' frameborder='0' allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share' allowfullscreen></iframe>
+    <iframe class='absolute inset-0 w-full h-full' src='https://www.youtube.com/embed/videoseries?list=PLB0F9A6A1A1E7D9CF' title='OODA Loop and Decision Making Under Uncertainty' frameborder='0' allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share' referrerpolicy='strict-origin-when-cross-origin' allowfullscreen></iframe>
   </div>
-  <p class='text-center text-sm text-slate-500 mt-3'>John Boyd's OODA Loop — why re-orienting faster beats planning harder</p>
+  <p class='text-center text-sm text-slate-500 mt-3'>Decision-making under uncertainty &mdash; Boyd's OODA Loop. If the player above doesn't load, <a href='https://www.youtube.com/results?search_query=john+boyd+ooda+loop+explained' class='text-indigo-600 font-semibold' target='_blank'>browse talks on OODA here &#8594;</a></p>
 </div>
 
 <h4 class='text-xl font-extrabold text-slate-900 mt-12 mb-5'>Running the Loop on Yuka-chi</h4>
 
-<p>Let's go back to poor Yuka-chi. Imagine she still wants to meet me. A traditional planner might do something like this: birthday party, Saturday, 6 PM, café reservation, everyone invited. Perfect. Except Friday night I suddenly feel exhausted. Saturday morning I'm in a bad mood. By noon I've decided I'd rather disappear for the weekend. The plan was perfect. Reality wasn't.</p>
+<p>Let's go back to poor Yuka-chi. Imagine she still wants to meet me. A traditional planner might do something like this: birthday party, Saturday, 6 PM, caf&eacute; reservation, everyone invited. Perfect. Except Friday night I suddenly feel exhausted. Saturday morning I'm in a bad mood. By noon I've decided I'd rather disappear for the weekend. The plan was perfect. Reality wasn't.</p>
 
 <div class='not-prose my-10 overflow-x-auto'>
   <table class='w-full text-sm border-collapse'>
@@ -479,12 +873,12 @@
     <tbody class='align-top'>
       <tr class='bg-white border-b border-slate-200'>
         <td class='p-3 font-bold text-indigo-700'>Observe</td>
-        <td class='p-3 text-slate-700'>What has Angga been doing lately? Avoiding gatherings? Replying to messages? Socially exhausted — is this a Capek-Angga week or an Available-Angga week?</td>
+        <td class='p-3 text-slate-700'>What has Angga been doing lately? Avoiding gatherings? Replying to messages? Socially exhausted &mdash; is this a Capek-Angga week or an Available-Angga week?</td>
         <td class='p-3 text-slate-700'>Security situation changed overnight. Road status, corridor openings, hospital operating status, partner access all re-checked this morning.</td>
       </tr>
       <tr class='bg-slate-50 border-b border-slate-200'>
         <td class='p-3 font-bold text-indigo-700'>Orient</td>
-        <td class='p-3 text-slate-700'>This probably isn't the right week. Pushing harder may actively reduce the chance of success.</td>
+        <td class='p-3 text-slate-700'>This probably isn't the right week. Pushing harder may actively reduce the chance of success &mdash; and may trigger ngambek.</td>
         <td class='p-3 text-slate-700'>The western route is no longer safe. The southern corridor is currently viable but may not stay that way.</td>
       </tr>
       <tr class='bg-white border-b border-slate-200'>
@@ -494,23 +888,23 @@
       </tr>
       <tr class='bg-slate-50'>
         <td class='p-3 font-bold text-indigo-700'>Act</td>
-        <td class='p-3 text-slate-700'>Weeks later Angga posts a café photo after a ride. Instead of another elaborate event: "I'm nearby. Want to grab a coffee for 20 minutes?"</td>
-        <td class='p-3 text-slate-700'>Deploy. Six hours later, observe again — because reality has already changed again.</td>
+        <td class='p-3 text-slate-700'>Weeks later Angga posts a caf&eacute; photo after a ride. Instead of another elaborate event: "I'm nearby. Want to grab a coffee for 20 minutes? No pressure if not."</td>
+        <td class='p-3 text-slate-700'>Deploy. Six hours later, observe again &mdash; because reality has already changed again.</td>
       </tr>
     </tbody>
   </table>
-  <p class='text-center text-xs text-slate-500 mt-3'>Completely different strategy. Same objective. Notice what changed: not the goal — only the timing, the route, and the decision.</p>
+  <p class='text-center text-xs text-slate-500 mt-3'>Completely different strategy. Same objective. Notice what changed: not the goal &mdash; only the timing, the route, and the decision.</p>
 </div>
 
 <p>This is why many experienced humanitarian professionals don't become emotionally attached to yesterday's operational plan. They become attached to the humanitarian objective. Everything else is negotiable.</p>
 
-<p>The mistake many planners make is treating planning as a one-time activity. Create the document. Approve it. Execute it. Reality doesn't work that way. Reality is constantly sending updates — every conversation, every weather report, every stakeholder meeting, every conflict, every unexpected phone call. All of them contain new information. The question isn't whether new information will arrive. <strong>The question is whether you're willing to let that information change your decision.</strong></p>
+<p>The mistake many planners make is treating planning as a one-time activity. Create the document. Approve it. Execute it. Reality doesn't work that way. Reality is constantly sending updates &mdash; every conversation, every weather report, every stakeholder meeting, every conflict, every unexpected phone call. All of them contain new information. The question isn't whether new information will arrive. <strong>The question is whether you're willing to let that information change your decision.</strong></p>
 
-<p>This also explains why I naturally prefer micro steps. People sometimes think micro steps exist to reduce workload. That's only part of the story. The real reason is much simpler: every completed micro step gives me new information. That information makes my next decision better than the previous one. Large plans delay learning. Small actions accelerate it. This is essentially the same logic behind the "build–measure–learn" loop that entrepreneur Eric Ries popularized for early-stage products — you ship the smallest thing that produces real feedback, then let that feedback decide what you build next, rather than trying to specify the whole product up front.<sup>4</sup></p>
+<p>This also explains why I naturally prefer micro steps. People sometimes think micro steps exist to reduce workload. That's only part of the story. The real reason is much simpler: every completed micro step gives me new information. That information makes my next decision better than the previous one. Large plans delay learning. Small actions accelerate it. This is essentially the same logic behind the "build&ndash;measure&ndash;learn" loop that entrepreneur Eric Ries popularized for early-stage products &mdash; you ship the smallest thing that produces real feedback, then let that feedback decide what you build next, rather than trying to specify the whole product up front.<sup>4</sup></p>
 
 <p>That's why I don't try to predict the entire journey. I only need enough certainty to take the next meaningful step. Then reality teaches me what the following step should be.</p>
 
-<h3 class='text-2xl font-extrabold text-slate-900 mt-16 mb-6'>Part 5 — The Biggest Planning Mistake: Treating Every Problem the Same</h3>
+<h3 class='text-2xl font-extrabold text-slate-900 mt-16 mb-6'>Part 5 &mdash; The Biggest Planning Mistake: Treating Every Problem the Same</h3>
 
 <p>Looking back, I realized my biggest mistake was never poor planning. My biggest mistake was assuming every problem deserved the same planning process. They don't. Some problems reward detailed planning. Others punish it.</p>
 
@@ -518,58 +912,67 @@
 
 <p>Now imagine trying to negotiate humanitarian access during an active conflict. Yesterday's agreement may no longer exist today. A road that was open this morning may be inaccessible this afternoon. A trusted local partner may suddenly lose access to an entire community. Nothing is physically broken. Reality simply changed. More planning doesn't remove that uncertainty. Sometimes it only creates the illusion of control.</p>
 
-<p>Then I thought about Yuka-chi again. Poor Yuka-chi. She kept trying to solve a moving problem using a fixed planning process. Birthday party. Gathering. Another gathering. Another schedule. Another invitation. From her perspective, the solution was obvious: create a better event. From my perspective, I wasn't rejecting the event. I was simply becoming a different person every few weeks — sometimes wanting to be alone, sometimes wanting to work, sometimes wanting to disappear for a while. She wasn't planning around a calendar. She was planning around a human being. Those are completely different problems.</p>
+<p>Then I thought about Yuka-chi again. Poor Yuka-chi. She kept trying to solve a moving problem using a fixed planning process. Birthday party. Gathering. Another gathering. Another schedule. Another invitation. From her perspective, the solution was obvious: create a better event. From my perspective, I wasn't rejecting the event. I was simply becoming a different person every few weeks &mdash; sometimes wanting to be alone, sometimes wanting to work, sometimes wanting to disappear for a while. She wasn't planning around a calendar. She was planning around a human being. Those are completely different problems.</p>
 
 <p>This is exactly what the <strong>Cynefin Framework</strong>, developed by David Snowden and Mary Boone and published in <em>Harvard Business Review</em> in 2007, tries to explain.<sup>5</sup> Not every problem belongs in the same world.</p>
 
 <div class='not-prose my-12'>
-  <svg viewBox='0 0 1000 480' xmlns='http://www.w3.org/2000/svg' class='w-full h-auto'>
-    <rect x='0' y='0' width='1000' height='480' rx='24' fill='#f8fafc'/>
-    <text x='500' y='36' text-anchor='middle' font-family='sans-serif' font-size='16' font-weight='800' fill='#0f172a'>Matching the Method to the Problem (Cynefin, Simplified)</text>
-    <text x='500' y='58' text-anchor='middle' font-family='sans-serif' font-size='11' fill='#64748b'>The planning mistake isn't lack of detail — it's applying the wrong domain's method</text>
+  <svg viewBox='0 0 1000 500' xmlns='http://www.w3.org/2000/svg' class='w-full h-auto'>
+    <rect x='0' y='0' width='1000' height='500' rx='24' fill='#f8fafc'/>
+    <text x='500' y='34' text-anchor='middle' font-family='sans-serif' font-size='16' font-weight='800' fill='#0f172a'>Diagram 7 &#8212; Matching the Method to the Problem (Cynefin, Simplified)</text>
+    <text x='500' y='56' text-anchor='middle' font-family='sans-serif' font-size='11' fill='#64748b'>The planning mistake isn't lack of detail &#8212; it's applying the wrong domain's method</text>
 
-    <rect x='40' y='80' width='445' height='180' rx='18' fill='#e0f2fe' stroke='#0ea5e9' stroke-width='2'/>
-    <text x='262' y='110' text-anchor='middle' font-family='sans-serif' font-size='14' font-weight='800' fill='#075985'>CLEAR / SIMPLE</text>
-    <text x='262' y='134' text-anchor='middle' font-family='sans-serif' font-size='11' fill='#0369a1'>Cause &amp; effect obvious to everyone</text>
-    <text x='262' y='156' text-anchor='middle' font-family='sans-serif' font-size='11' font-weight='700' fill='#075985'>Method: Sense → Categorise → Respond</text>
-    <text x='262' y='178' text-anchor='middle' font-family='sans-serif' font-size='11' fill='#0369a1'>Follow the known procedure</text>
-    <text x='262' y='208' text-anchor='middle' font-family='sans-serif' font-size='11' font-style='italic' fill='#0c4a6e'>Example: standard convoy paperwork,</text>
-    <text x='262' y='224' text-anchor='middle' font-family='sans-serif' font-size='11' font-style='italic' fill='#0c4a6e'>booking a café table on a normal day</text>
-    <text x='262' y='246' text-anchor='middle' font-family='sans-serif' font-size='10' font-weight='700' fill='#075985'>PLAN DEEPLY — it will survive</text>
+    <rect x='40' y='76' width='445' height='186' rx='18' fill='#e0f2fe' stroke='#0ea5e9' stroke-width='2'/>
+    <text x='262' y='106' text-anchor='middle' font-family='sans-serif' font-size='14' font-weight='800' fill='#075985'>CLEAR / SIMPLE</text>
+    <text x='262' y='130' text-anchor='middle' font-family='sans-serif' font-size='11' fill='#0369a1'>Cause &amp; effect obvious to everyone</text>
+    <text x='262' y='154' text-anchor='middle' font-family='sans-serif' font-size='11' font-weight='700' fill='#075985'>Sense &#8594; Categorise &#8594; Respond</text>
+    <text x='262' y='176' text-anchor='middle' font-family='sans-serif' font-size='11' fill='#0369a1'>Follow the known procedure</text>
+    <text x='262' y='204' text-anchor='middle' font-family='sans-serif' font-size='11' font-style='italic' fill='#0c4a6e'>Convoy paperwork &#183; booking a table</text>
+    <text x='262' y='220' text-anchor='middle' font-family='sans-serif' font-size='11' font-style='italic' fill='#0c4a6e'>on an ordinary day &#183; payroll</text>
+    <text x='262' y='246' text-anchor='middle' font-family='sans-serif' font-size='11' font-weight='800' fill='#075985'>PLAN DEEPLY &#8212; the plan will survive</text>
 
-    <rect x='515' y='80' width='445' height='180' rx='18' fill='#dcfce7' stroke='#22c55e' stroke-width='2'/>
-    <text x='737' y='110' text-anchor='middle' font-family='sans-serif' font-size='14' font-weight='800' fill='#166534'>COMPLICATED</text>
-    <text x='737' y='134' text-anchor='middle' font-family='sans-serif' font-size='11' fill='#15803d'>Cause &amp; effect knowable — with expertise</text>
-    <text x='737' y='156' text-anchor='middle' font-family='sans-serif' font-size='11' font-weight='700' fill='#166534'>Method: Sense → Analyse → Respond</text>
-    <text x='737' y='178' text-anchor='middle' font-family='sans-serif' font-size='11' fill='#15803d'>Bring in experts, model it, then act</text>
-    <text x='737' y='208' text-anchor='middle' font-family='sans-serif' font-size='11' font-style='italic' fill='#14532d'>Example: building a bridge, cold-chain</text>
-    <text x='737' y='224' text-anchor='middle' font-family='sans-serif' font-size='11' font-style='italic' fill='#14532d'>logistics design, structural engineering</text>
-    <text x='737' y='246' text-anchor='middle' font-family='sans-serif' font-size='10' font-weight='700' fill='#166534'>ANALYSIS PAYS OFF — invest in it</text>
+    <rect x='515' y='76' width='445' height='186' rx='18' fill='#dcfce7' stroke='#22c55e' stroke-width='2'/>
+    <text x='737' y='106' text-anchor='middle' font-family='sans-serif' font-size='14' font-weight='800' fill='#166534'>COMPLICATED</text>
+    <text x='737' y='130' text-anchor='middle' font-family='sans-serif' font-size='11' fill='#15803d'>Knowable &#8212; with expertise and analysis</text>
+    <text x='737' y='154' text-anchor='middle' font-family='sans-serif' font-size='11' font-weight='700' fill='#166534'>Sense &#8594; Analyse &#8594; Respond</text>
+    <text x='737' y='176' text-anchor='middle' font-family='sans-serif' font-size='11' fill='#15803d'>Bring experts, model it, then act</text>
+    <text x='737' y='204' text-anchor='middle' font-family='sans-serif' font-size='11' font-style='italic' fill='#14532d'>Bridge design &#183; cold-chain logistics</text>
+    <text x='737' y='220' text-anchor='middle' font-family='sans-serif' font-size='11' font-style='italic' fill='#14532d'>&#183; database migration</text>
+    <text x='737' y='246' text-anchor='middle' font-family='sans-serif' font-size='11' font-weight='800' fill='#166534'>ANALYSIS PAYS OFF &#8212; invest in it</text>
 
-    <rect x='40' y='275' width='445' height='180' rx='18' fill='#fef3c7' stroke='#f59e0b' stroke-width='2'/>
-    <text x='262' y='305' text-anchor='middle' font-family='sans-serif' font-size='14' font-weight='800' fill='#92400e'>COMPLEX</text>
-    <text x='262' y='329' text-anchor='middle' font-family='sans-serif' font-size='11' fill='#b45309'>Cause &amp; effect only clear in hindsight</text>
-    <text x='262' y='351' text-anchor='middle' font-family='sans-serif' font-size='11' font-weight='700' fill='#92400e'>Method: Probe → Sense → Respond</text>
-    <text x='262' y='373' text-anchor='middle' font-family='sans-serif' font-size='11' fill='#b45309'>You discover the answer by interacting</text>
-    <text x='262' y='403' text-anchor='middle' font-family='sans-serif' font-size='11' font-style='italic' fill='#78350f'>Example: humanitarian access negotiation,</text>
-    <text x='262' y='419' text-anchor='middle' font-family='sans-serif' font-size='11' font-style='italic' fill='#78350f'>community programs, MEETING YUKA-CHI</text>
-    <text x='262' y='441' text-anchor='middle' font-family='sans-serif' font-size='10' font-weight='700' fill='#92400e'>OBSERVE MORE, PLAN LESS — run small probes</text>
+    <rect x='40' y='276' width='445' height='186' rx='18' fill='#fef3c7' stroke='#f59e0b' stroke-width='3'/>
+    <text x='262' y='306' text-anchor='middle' font-family='sans-serif' font-size='14' font-weight='800' fill='#92400e'>COMPLEX</text>
+    <text x='262' y='330' text-anchor='middle' font-family='sans-serif' font-size='11' fill='#b45309'>Cause &amp; effect only clear in hindsight</text>
+    <text x='262' y='354' text-anchor='middle' font-family='sans-serif' font-size='11' font-weight='700' fill='#92400e'>Probe &#8594; Sense &#8594; Respond</text>
+    <text x='262' y='376' text-anchor='middle' font-family='sans-serif' font-size='11' fill='#b45309'>You find the answer by interacting</text>
+    <text x='262' y='404' text-anchor='middle' font-family='sans-serif' font-size='11' font-style='italic' fill='#78350f'>Access negotiation &#183; community programs</text>
+    <text x='262' y='420' text-anchor='middle' font-family='sans-serif' font-size='11' font-weight='700' font-style='italic' fill='#78350f'>&#183; MEETING A NGAMBEK ANGGA</text>
+    <text x='262' y='446' text-anchor='middle' font-family='sans-serif' font-size='11' font-weight='800' fill='#92400e'>OBSERVE MORE, PLAN LESS &#8212; run small probes</text>
 
-    <rect x='515' y='275' width='445' height='180' rx='18' fill='#fee2e2' stroke='#ef4444' stroke-width='2'/>
-    <text x='737' y='305' text-anchor='middle' font-family='sans-serif' font-size='14' font-weight='800' fill='#991b1b'>CHAOTIC</text>
-    <text x='737' y='329' text-anchor='middle' font-family='sans-serif' font-size='11' fill='#b91c1c'>No discernible cause &amp; effect yet</text>
-    <text x='737' y='351' text-anchor='middle' font-family='sans-serif' font-size='11' font-weight='700' fill='#991b1b'>Method: Act → Sense → Respond</text>
-    <text x='737' y='373' text-anchor='middle' font-family='sans-serif' font-size='11' fill='#b91c1c'>Stabilise first, understand afterwards</text>
-    <text x='737' y='403' text-anchor='middle' font-family='sans-serif' font-size='11' font-style='italic' fill='#7f1d1d'>Example: first hours of a sudden escalation,</text>
-    <text x='737' y='419' text-anchor='middle' font-family='sans-serif' font-size='11' font-style='italic' fill='#7f1d1d'>mass-casualty event, corridor collapse</text>
-    <text x='737' y='441' text-anchor='middle' font-family='sans-serif' font-size='10' font-weight='700' fill='#991b1b'>ACT NOW — sensemaking follows action</text>
+    <rect x='515' y='276' width='445' height='186' rx='18' fill='#fee2e2' stroke='#ef4444' stroke-width='2'/>
+    <text x='737' y='306' text-anchor='middle' font-family='sans-serif' font-size='14' font-weight='800' fill='#991b1b'>CHAOTIC</text>
+    <text x='737' y='330' text-anchor='middle' font-family='sans-serif' font-size='11' fill='#b91c1c'>No discernible cause &amp; effect yet</text>
+    <text x='737' y='354' text-anchor='middle' font-family='sans-serif' font-size='11' font-weight='700' fill='#991b1b'>Act &#8594; Sense &#8594; Respond</text>
+    <text x='737' y='376' text-anchor='middle' font-family='sans-serif' font-size='11' fill='#b91c1c'>Stabilise first, understand afterwards</text>
+    <text x='737' y='404' text-anchor='middle' font-family='sans-serif' font-size='11' font-style='italic' fill='#7f1d1d'>First hours of an escalation &#183; mass-casualty</text>
+    <text x='737' y='420' text-anchor='middle' font-family='sans-serif' font-size='11' font-style='italic' fill='#7f1d1d'>event &#183; sudden corridor collapse</text>
+    <text x='737' y='446' text-anchor='middle' font-family='sans-serif' font-size='11' font-weight='800' fill='#991b1b'>ACT NOW &#8212; sensemaking follows action</text>
 
-    <line x1='500' y1='80' x2='500' y2='455' stroke='#94a3b8' stroke-width='2' stroke-dasharray='6 6'/>
-    <line x1='40' y1='267' x2='960' y2='267' stroke='#94a3b8' stroke-width='2' stroke-dasharray='6 6'/>
+    <line x1='500' y1='76' x2='500' y2='462' stroke='#94a3b8' stroke-width='2' stroke-dasharray='6 6'/>
+    <line x1='40' y1='269' x2='960' y2='269' stroke='#94a3b8' stroke-width='2' stroke-dasharray='6 6'/>
+
+    <text x='500' y='486' text-anchor='middle' font-family='sans-serif' font-size='11' font-weight='700' fill='#334155'>Most planning failures are DOMAIN ERRORS: using Complicated-domain methods (detailed upfront plans) on a Complex-domain problem</text>
   </svg>
 </div>
 
-<p>Some problems are <strong>Simple (or Clear)</strong>: the answer is already known — follow the procedure. Others are <strong>Complicated</strong>: experts can analyze them, and engineering projects often fall into this category, where planning, analysis and experience all matter. Then there are <strong>Complex</strong> problems — and this is where things become interesting. Cause and effect can only be understood after something happens. You don't discover the correct answer by thinking longer. You discover it by interacting with reality — what Snowden and Boone describe as "probe, sense, respond" rather than "sense, analyze, respond."<sup>5</sup> Finally, there is <strong>Chaos</strong>: act first, stabilize the situation, and only then begin making sense of what happened. Organizational psychologist Karl Weick describes this same instinct in his work on sensemaking — under real uncertainty, people often have to act before they can fully understand a situation, because acting is frequently what generates the information needed to understand it in the first place.<sup>6</sup></p>
+<p>Some problems are <strong>Simple (or Clear)</strong>: the answer is already known &mdash; follow the procedure. Others are <strong>Complicated</strong>: experts can analyze them, and engineering projects often fall into this category, where planning, analysis and experience all matter. Then there are <strong>Complex</strong> problems &mdash; and this is where things become interesting. Cause and effect can only be understood after something happens. You don't discover the correct answer by thinking longer. You discover it by interacting with reality &mdash; what Snowden and Boone describe as "probe, sense, respond" rather than "sense, analyze, respond."<sup>5</sup> Finally, there is <strong>Chaos</strong>: act first, stabilize the situation, and only then begin making sense of what happened. Organizational psychologist Karl Weick describes this same instinct in his work on sensemaking &mdash; under real uncertainty, people often have to act before they can fully understand a situation, because acting is frequently what generates the information needed to understand it in the first place.<sup>6</sup></p>
+
+<div class='not-prose my-12'>
+  <div class='relative w-full overflow-hidden rounded-2xl shadow-xl aspect-video bg-slate-900'>
+    <iframe class='absolute inset-0 w-full h-full' src='https://www.youtube.com/embed/results?search_query=cynefin+framework+dave+snowden' title='The Cynefin Framework' frameborder='0' allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share' referrerpolicy='strict-origin-when-cross-origin' allowfullscreen></iframe>
+  </div>
+  <p class='text-center text-sm text-slate-500 mt-3'>The Cynefin Framework &mdash; why "probe, sense, respond" beats analysis in complex domains. If the player doesn't load, <a href='https://www.youtube.com/results?search_query=dave+snowden+cynefin+framework' class='text-indigo-600 font-semibold' target='_blank'>browse Dave Snowden's talks here &#8594;</a></p>
+</div>
 
 <p>Suddenly, many experiences from my career started making sense. Building software? Often complex. Working with communities? Complex. Humanitarian operations? Definitely complex. Trying to predict my own mood two months from now? Apparently, also complex.</p>
 
@@ -579,19 +982,19 @@
 
 <p>When I finally understood this, I stopped asking, "How detailed should my plan be?" Instead, I started asking, "What kind of problem am I actually dealing with?" That single question completely changed the way I approach uncertainty. Because once you know the type of problem, the planning method almost chooses itself.</p>
 
-<p>At this point, all the pieces finally came together. Micro steps. Adaptive planning. The OODA Loop. The Cynefin Framework. They weren't competing ideas. They were describing the same pattern from different perspectives. The only question left was: how do I turn all of this into a practical operating system I can actually use every day?</p>
+<p>At this point, all the pieces finally came together. Micro steps. Adaptive planning. The ngambek loop. The OODA Loop. The Cynefin Framework. They weren't competing ideas. They were describing the same pattern from different perspectives. The only question left was: how do I turn all of this into a practical operating system I can actually use every day?</p>
 
-<h3 class='text-2xl font-extrabold text-slate-900 mt-16 mb-6'>Part 6 — My Operating System for Working in an Uncertain World</h3>
+<h3 class='text-2xl font-extrabold text-slate-900 mt-16 mb-6'>Part 6 &mdash; My Operating System for Working in an Uncertain World</h3>
 
 <p>After years of working across government, development projects, software, education, and humanitarian environments, I eventually realized something. I wasn't collecting productivity techniques. I was building an operating system. Not for computers. For myself.</p>
 
-<p>People often ask, "How do you start projects so quickly?" The answer isn't speed. The answer is that I don't try to solve tomorrow's problems today. I only solve today's problem. Tomorrow deserves tomorrow's information. Over time, my planning process became surprisingly simple — not because the work became easier, but because I stopped pretending the world was predictable. Instead, I ask myself six questions every single time.</p>
+<p>People often ask, "How do you start projects so quickly?" The answer isn't speed. The answer is that I don't try to solve tomorrow's problems today. I only solve today's problem. Tomorrow deserves tomorrow's information. Over time, my planning process became surprisingly simple &mdash; not because the work became easier, but because I stopped pretending the world was predictable. Instead, I ask myself six questions every single time.</p>
 
 <div class='not-prose my-10 grid grid-cols-1 md:grid-cols-2 gap-5'>
   <div class='p-6 bg-slate-900 rounded-2xl'>
     <div class='text-cyan-400 font-bold text-xs uppercase tracking-widest mb-2'>Question 1</div>
     <div class='text-white font-extrabold mb-2'>What kind of problem is this?</div>
-    <p class='text-slate-300 text-sm m-0'>Is it stable? Or is it constantly changing? If it's stable, planning deserves more attention. If it keeps changing, observation becomes more valuable than prediction.</p>
+    <p class='text-slate-300 text-sm m-0'>Is it stable? Or is it constantly changing? Does it react to my effort? If it's stable, planning deserves more attention. If it keeps changing &mdash; or worse, moves away when pushed &mdash; observation becomes more valuable than prediction.</p>
   </div>
   <div class='p-6 bg-slate-900 rounded-2xl'>
     <div class='text-cyan-400 font-bold text-xs uppercase tracking-widest mb-2'>Question 2</div>
@@ -601,12 +1004,12 @@
   <div class='p-6 bg-slate-900 rounded-2xl'>
     <div class='text-cyan-400 font-bold text-xs uppercase tracking-widest mb-2'>Question 3</div>
     <div class='text-white font-extrabold mb-2'>What is the smallest action that creates a real signal?</div>
-    <p class='text-slate-300 text-sm m-0'>Not progress on paper. Not another discussion. Something real. Something observable. Something that teaches me what I didn't know yesterday. That became my micro step.</p>
+    <p class='text-slate-300 text-sm m-0'>Not progress on paper. Not another discussion. Something real. Something observable. Something that teaches me what I didn't know yesterday &mdash; and cheap enough that a "no" costs nobody anything.</p>
   </div>
   <div class='p-6 bg-slate-900 rounded-2xl'>
     <div class='text-cyan-400 font-bold text-xs uppercase tracking-widest mb-2'>Question 4</div>
     <div class='text-white font-extrabold mb-2'>What did reality just teach me?</div>
-    <p class='text-slate-300 text-sm m-0'>Probably the question I ask most often. People react. Stakeholders hesitate. Partners respond. Communities adapt. Ignoring those signals because they don't match yesterday's plan is choosing comfort over learning.</p>
+    <p class='text-slate-300 text-sm m-0'>Probably the question I ask most often. People react. Stakeholders hesitate. Partners respond. Communities adapt. Silence itself is information. Ignoring those signals because they don't match yesterday's plan is choosing comfort over learning.</p>
   </div>
   <div class='p-6 bg-slate-900 rounded-2xl'>
     <div class='text-cyan-400 font-bold text-xs uppercase tracking-widest mb-2'>Question 5</div>
@@ -624,7 +1027,7 @@
 
 <p>Ironically, this operating system doesn't make uncertainty disappear. Nothing can. Instead, it makes uncertainty <em>usable</em>. Instead of treating change as an interruption, I treat it as new information. Instead of asking reality to obey my plan, I allow my plan to learn from reality. That small shift changes everything.</p>
 
-<p>And perhaps that's the biggest lesson I have learned. The world doesn't reward the person with the most detailed plan. It rewards the person who notices change first — and adapts before everyone else.</p>
+<p>And perhaps that's the biggest lesson I have learned. The world doesn't reward the person with the most detailed plan. It rewards the person who notices change first &mdash; and adapts before everyone else.</p>
 
 <h3 class='text-2xl font-extrabold text-slate-900 mt-16 mb-6'>Final Thought</h3>
 
@@ -632,42 +1035,58 @@
 
 <p class='text-lg font-bold text-slate-900 border-l-4 border-indigo-500 pl-4 py-1 mt-8'>Protect the mission. Challenge the assumptions. Replace the plan whenever reality gives you a better one.</p>
 
-<p>Because in a moving world, the goal is not to make perfect plans. The goal is to keep moving. And somewhere out there, Yuka-chi is still waiting for a version of me that shows up on schedule. I hope, after reading this, she at least understands why the birthday party never worked — and maybe tries the twenty-minute coffee instead.</p>
+<p>Because in a moving world, the goal is not to make perfect plans. The goal is to keep moving.</p>
+
+<p>And somewhere out there, Yuka-chi is still waiting for a version of me that shows up on schedule. She won't get one &mdash; that version doesn't exist. What she can get is something better: a target whose mechanism is now documented. If she stops trying to schedule Available-Angga three weeks in advance and instead makes it costless for me to say no, the ngambek loop loses its fuel. Twenty minutes. Nearby. No pressure. Any day.</p>
+
+<p>If she can solve that &mdash; a moving, avoiding, occasionally sulking variable who reacts to being aimed at &mdash; then honestly, every other planning problem in her life is going to feel easy by comparison. Hopefully. <em>Semoga.</em></p>
 
 <div class='not-prose mt-20 mb-8 p-8 md:p-10 bg-slate-50 border border-slate-200 rounded-[1.5rem] shadow-inner'>
   <h4 class='text-2xl font-extrabold text-slate-900 mb-8 flex items-center gap-3'><i class='fa-solid fa-book-journal-whills text-indigo-600'></i> Key Sources &amp; Further Watching</h4>
   <div class='space-y-4'>
     <div class='p-5 bg-white rounded-xl border border-slate-200'>
       <span class='inline-block px-2 py-1 bg-slate-100 text-slate-500 text-[10px] font-bold rounded uppercase tracking-wider mb-2'>Research</span>
-      <p class='text-sm text-slate-700 leading-relaxed m-0'>Rittel, H. W. J., &amp; Webber, M. M. (1973). Dilemmas in a General Theory of Planning. <em>Policy Sciences</em>, 4(2), 155–169 — the origin of the "wicked problem," and why engineering-style planning breaks down in social systems.</p>
+      <p class='text-sm text-slate-700 leading-relaxed m-0'>Rittel, H. W. J., &amp; Webber, M. M. (1973). Dilemmas in a General Theory of Planning. <em>Policy Sciences</em>, 4(2), 155&ndash;169 &mdash; the origin of the "wicked problem," and why engineering-style planning breaks down in social systems.</p>
     </div>
     <div class='p-5 bg-white rounded-xl border border-slate-200'>
       <span class='inline-block px-2 py-1 bg-slate-100 text-slate-500 text-[10px] font-bold rounded uppercase tracking-wider mb-2'>Framework</span>
-      <p class='text-sm text-slate-700 leading-relaxed m-0'>USAID Learning Lab. <em>Collaborating, Learning, and Adapting (CLA) Framework.</em> United States Agency for International Development; see also OECD (2021), <em>Development Co-operation: Tips, Tools and Insights — USAID: Collaborating, Learning and Adapting.</em> <a href='https://usaidlearninglab.org/cla' class='text-indigo-600' target='_blank'>Link</a></p>
+      <p class='text-sm text-slate-700 leading-relaxed m-0'>USAID Learning Lab. <em>Collaborating, Learning, and Adapting (CLA) Framework.</em> United States Agency for International Development; see also OECD (2021), <em>Development Co-operation: Tips, Tools and Insights.</em> <a href='https://usaidlearninglab.org/cla' class='text-indigo-600' target='_blank'>Link</a></p>
     </div>
     <div class='p-5 bg-white rounded-xl border border-slate-200'>
       <span class='inline-block px-2 py-1 bg-slate-100 text-slate-500 text-[10px] font-bold rounded uppercase tracking-wider mb-2'>Research</span>
-      <p class='text-sm text-slate-700 leading-relaxed m-0'>Osinga, F. P. B. (2007). <em>Science, Strategy and War: The Strategic Theory of John Boyd.</em> Routledge. (Boyd's OODA Loop developed from the 1950s–1970s, formalized in "The Essence of Winning and Losing," 1995.)</p>
+      <p class='text-sm text-slate-700 leading-relaxed m-0'>Osinga, F. P. B. (2007). <em>Science, Strategy and War: The Strategic Theory of John Boyd.</em> Routledge. (Boyd's OODA Loop developed from the 1950s&ndash;1970s, formalized in "The Essence of Winning and Losing," 1995.)</p>
     </div>
     <div class='p-5 bg-white rounded-xl border border-slate-200'>
       <span class='inline-block px-2 py-1 bg-slate-100 text-slate-500 text-[10px] font-bold rounded uppercase tracking-wider mb-2'>Book</span>
-      <p class='text-sm text-slate-700 leading-relaxed m-0'>Ries, E. (2011). <em>The Lean Startup: How Today's Entrepreneurs Use Continuous Innovation to Create Radically Successful Businesses.</em> Crown Business — the build–measure–learn loop.</p>
+      <p class='text-sm text-slate-700 leading-relaxed m-0'>Ries, E. (2011). <em>The Lean Startup.</em> Crown Business &mdash; the build&ndash;measure&ndash;learn loop, and why the smallest thing that produces feedback beats the most complete plan.</p>
     </div>
     <div class='p-5 bg-white rounded-xl border border-slate-200'>
       <span class='inline-block px-2 py-1 bg-slate-100 text-slate-500 text-[10px] font-bold rounded uppercase tracking-wider mb-2'>Research</span>
-      <p class='text-sm text-slate-700 leading-relaxed m-0'>Snowden, D. J., &amp; Boone, M. E. (2007). A Leader's Framework for Decision Making. <em>Harvard Business Review</em>, 85(11), 68–76 — the Cynefin Framework. <a href='https://hbr.org/2007/11/a-leaders-framework-for-decision-making' class='text-indigo-600' target='_blank'>Link</a></p>
+      <p class='text-sm text-slate-700 leading-relaxed m-0'>Snowden, D. J., &amp; Boone, M. E. (2007). A Leader's Framework for Decision Making. <em>Harvard Business Review</em>, 85(11), 68&ndash;76 &mdash; the Cynefin Framework. <a href='https://hbr.org/2007/11/a-leaders-framework-for-decision-making' class='text-indigo-600' target='_blank'>Link</a></p>
     </div>
     <div class='p-5 bg-white rounded-xl border border-slate-200'>
       <span class='inline-block px-2 py-1 bg-slate-100 text-slate-500 text-[10px] font-bold rounded uppercase tracking-wider mb-2'>Research</span>
-      <p class='text-sm text-slate-700 leading-relaxed m-0'>Weick, K. E. (1995). <em>Sensemaking in Organizations.</em> Sage Publications — why people often must act before they can fully understand a situation.</p>
+      <p class='text-sm text-slate-700 leading-relaxed m-0'>Weick, K. E. (1995). <em>Sensemaking in Organizations.</em> Sage Publications &mdash; why people often must act before they can fully understand a situation.</p>
+    </div>
+    <div class='p-5 bg-white rounded-xl border border-slate-200'>
+      <span class='inline-block px-2 py-1 bg-slate-100 text-slate-500 text-[10px] font-bold rounded uppercase tracking-wider mb-2'>Concept</span>
+      <p class='text-sm text-slate-700 leading-relaxed m-0'>McGrath, R. G., &amp; MacMillan, I. C. (1995). Discovery-Driven Planning. <em>Harvard Business Review</em> &mdash; planning as a sequence of assumption tests and real options rather than one fixed forecast. Underpins move #5 ("buy options").</p>
+    </div>
+    <div class='p-5 bg-white rounded-xl border border-slate-200'>
+      <span class='inline-block px-2 py-1 bg-slate-100 text-slate-500 text-[10px] font-bold rounded uppercase tracking-wider mb-2'>Concept</span>
+      <p class='text-sm text-slate-700 leading-relaxed m-0'>Senge, P. M. (1990). <em>The Fifth Discipline.</em> Doubleday &mdash; reinforcing vs. balancing feedback loops, the systems language used in Diagram 4 to explain why pushing harder on an avoiding target increases distance.</p>
     </div>
     <div class='p-5 bg-white rounded-xl border border-slate-200'>
       <span class='inline-block px-2 py-1 bg-slate-100 text-slate-500 text-[10px] font-bold rounded uppercase tracking-wider mb-2'>Video</span>
-      <p class='text-sm text-slate-700 leading-relaxed m-0'>The OODA Loop — Decision Making Under Uncertainty. <a href='https://www.youtube.com/watch?v=Bg9zIhZ8Sqw' class='text-indigo-600' target='_blank'>YouTube</a></p>
+      <p class='text-sm text-slate-700 leading-relaxed m-0'>John Boyd &amp; the OODA Loop &mdash; decision-making under uncertainty. <a href='https://www.youtube.com/results?search_query=john+boyd+ooda+loop+explained' class='text-indigo-600' target='_blank'>Search on YouTube</a></p>
+    </div>
+    <div class='p-5 bg-white rounded-xl border border-slate-200'>
+      <span class='inline-block px-2 py-1 bg-slate-100 text-slate-500 text-[10px] font-bold rounded uppercase tracking-wider mb-2'>Video</span>
+      <p class='text-sm text-slate-700 leading-relaxed m-0'>Dave Snowden &mdash; The Cynefin Framework explained. <a href='https://www.youtube.com/results?search_query=dave+snowden+cynefin+framework' class='text-indigo-600' target='_blank'>Search on YouTube</a></p>
     </div>
     <div class='p-5 bg-white rounded-xl border border-slate-200'>
       <span class='inline-block px-2 py-1 bg-slate-100 text-slate-500 text-[10px] font-bold rounded uppercase tracking-wider mb-2'>Audio</span>
-      <p class='text-sm text-slate-700 leading-relaxed m-0'>Background soundtrack: "Magic" — <a href='https://github.com/AnggaConni/HorizonScanning/blob/main/magic.mp3' class='text-indigo-600' target='_blank'>HorizonScanning repository</a></p>
+      <p class='text-sm text-slate-700 leading-relaxed m-0'>Background soundtrack: "Magic" &mdash; <a href='https://github.com/AnggaConni/HorizonScanning/blob/main/magic.mp3' class='text-indigo-600' target='_blank'>HorizonScanning repository</a></p>
     </div>
   </div>
 </div>
