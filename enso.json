@@ -273,5 +273,11 @@
     "oni_value": 1.39,
     "status": "El Ni\u00f1o",
     "periode": "MJJ 2026"
+  },
+  {
+    "date": "2026-08-05",
+    "oni_value": 0.98,
+    "status": "El Ni\u00f1o",
+    "periode": "AMJ 2026"
   }
 ]
