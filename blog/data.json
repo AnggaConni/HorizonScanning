@@ -797,7 +797,7 @@
     "date": "August 1, 2026",
     "imageUrl": "thum/eyes.png"
   },
-  {
+   {
     "id": "56",
     "title": "The Hidden Price of Waiting: Mastering Cost of Delay in High-Stakes Decisions",
     "excerpt": "Every day a decision is postponed, value quietly leaks away — sometimes linearly, sometimes off a cliff. This article unpacks the economics of delay through Real Options Theory, WSJF, and ISO 31000 risk principles, and includes a fully interactive Enterprise Cost of Delay & Time-Criticality Simulator embedded seamlessly in the middle of the article.",
