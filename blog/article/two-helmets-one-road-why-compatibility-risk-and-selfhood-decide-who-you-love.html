@@ -141,7 +141,79 @@
             prose-a:text-teal-600 hover:prose-a:text-teal-500 prose-a:font-semibold prose-a:no-underline hover:prose-a:underline
             prose-img:rounded-xl prose-img:shadow-md
             prose-li:marker:text-teal-500">
-            <p class='lead text-xl md:text-2xl text-slate-600 font-light leading-relaxed mb-8'>I used to think love was the whole test. If you love someone enough, everything else finds a way to fit. Then I loved two people who didn't want what I wanted &mdash; one who wouldn't get on the back of a motorcycle, another who couldn't enjoy a plate of food from a roadside stall &mdash; and I learned love was never the whole test. It was just the entry fee.</p>
+            <div id='mp3-player-58' class='not-prose sticky top-4 z-40 mb-10 mx-auto max-w-2xl'>
+  <style>
+    #mp3-player-58 .disc-58{animation:spin-58 3.2s linear infinite;animation-play-state:paused;}
+    #mp3-player-58 .disc-58.spinning{animation-play-state:running;}
+    @keyframes spin-58{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+    #mp3-player-58 input[type=range]{accent-color:#38bdf8;}
+  </style>
+  <div class='flex items-center gap-4 px-5 py-3 bg-gradient-to-r from-slate-950 via-sky-950 to-indigo-950 rounded-full shadow-2xl border border-sky-400/30'>
+    <button id='mp3-toggle-58' aria-label='Play or pause background music' class='shrink-0 w-12 h-12 rounded-full bg-slate-900 border-2 border-sky-400 flex items-center justify-center text-sky-300 shadow-lg relative overflow-hidden'>
+      <span id='mp3-disc-58' class='disc-58 absolute inset-0 rounded-full' style='background:conic-gradient(#38bdf8 0deg,#0f172a 40deg,#0f172a 320deg,#38bdf8 360deg);'></span>
+      <i id='mp3-icon-58' class='fa-solid fa-play relative z-10 text-xs'></i>
+    </button>
+    <div class='flex-1 min-w-0'>
+      <div class='text-white font-bold text-sm truncate'>Ambient Soundtrack &mdash; "Two Helmets, One Road"</div>
+      <div id='mp3-status-58' class='text-sky-300 text-xs'>Tap play to begin</div>
+    </div>
+    <div class='flex items-center gap-2 shrink-0 pr-1'>
+      <i class='fa-solid fa-headphones text-sky-300 text-xs'></i>
+      <input id='mp3-vol-58' type='range' min='0' max='100' value='40' aria-label='Volume' class='w-16 md:w-24 cursor-pointer'>
+    </div>
+  </div>
+  <audio id='mp3-audio-58' loop preload='none' src='https://raw.githubusercontent.com/AnggaConni/HorizonScanning/main/thum/bukti.mp3'></audio>
+</div>
+
+<script>
+(function(){
+  var container = document.getElementById('mp3-player-58');
+  var audio = document.getElementById('mp3-audio-58');
+  var btn = document.getElementById('mp3-toggle-58');
+  var icon = document.getElementById('mp3-icon-58');
+  var status = document.getElementById('mp3-status-58');
+  var disc = document.getElementById('mp3-disc-58');
+  var vol = document.getElementById('mp3-vol-58');
+  if(!audio || !btn || !container) return;
+
+  audio.volume = 0.40;
+
+  function setIcon(playing){
+    icon.className = 'fa-solid ' + (playing ? 'fa-pause' : 'fa-play') + ' relative z-10 text-xs';
+    if(disc){ disc.classList.toggle('spinning', playing); }
+  }
+
+  function tryPlay(){
+    audio.play().then(function(){
+      setIcon(true);
+      status.textContent = 'Now playing \u2014 adjust volume anytime';
+    }).catch(function(){
+      status.textContent = 'Tap the play button to start audio';
+    });
+  }
+
+  btn.addEventListener('click', function(e){
+    e.stopPropagation();
+    if(audio.paused){
+      tryPlay();
+    } else {
+      audio.pause();
+      setIcon(false);
+      status.textContent = 'Paused';
+    }
+  });
+
+  vol.addEventListener('input', function(){
+    audio.volume = Number(vol.value) / 100;
+    if(audio.volume === 0){ status.textContent = 'Muted'; }
+  });
+
+  audio.addEventListener('ended', function(){ setIcon(false); });
+  audio.addEventListener('error', function(){ status.textContent = 'Audio failed to load'; });
+})();
+</script>
+
+<p class='lead text-xl md:text-2xl text-slate-600 font-light leading-relaxed mb-8'>I used to think love was the whole test. If you love someone enough, everything else finds a way to fit. Then I loved two people who didn't want what I wanted &mdash; one who wouldn't get on the back of a motorcycle, another who couldn't enjoy a plate of food from a roadside stall &mdash; and I learned love was never the whole test. It was just the entry fee.</p>
 
 <p>This is a story in three parts, and one long argument I've been having with myself for years: about what compatibility actually means, why I still ride a motorcycle knowing exactly what it can do to a body, and why I stopped wanting a partner who would destroy herself for me.</p>
 
@@ -149,7 +221,7 @@
 
 <p>I once dated someone who didn't want to ride a motorcycle with me. I was genuinely sad about it &mdash; not because she was wrong. Motorcycles are risky, and she had every right to say no. But riding was never just transportation to me. I love going nowhere in particular, discovering places along the way, having someone behind me to share the road, the weather, the random stops, and the stories that come out of them.</p>
 
-<p>I had a similar moment with someone I was interested in who couldn't really enjoy street food. Again &mdash; nothing wrong with that. But I love culinary adventures. I want to spot a crowded little stall on the side of the road and say, \"That looks suspiciously good. Let's try it.\" 😂 I want to travel, wander, discover strange little places, eat things I've never tried, and occasionally have no idea where I'm going. And someday, I want to share that with the person I love.</p>
+<p>I had a similar moment with someone I was interested in who couldn't really enjoy street food. Again &mdash; nothing wrong with that. But I love culinary adventures. I want to spot a crowded little stall on the side of the road and say, "That looks suspiciously good. Let's try it." 😂 I want to travel, wander, discover strange little places, eat things I've never tried, and occasionally have no idea where I'm going. And someday, I want to share that with the person I love.</p>
 
 <p>Eventually I understood something simple that took me a long time to accept: compatibility isn't about finding someone who likes everything you like. It's about finding someone whose way of enjoying life can coexist with yours.</p>
 
@@ -191,7 +263,7 @@
 
 <div class='callout bg-sky-50 border-l-4 border-sky-500 p-6 rounded-r-2xl my-10'>
   <h4 class='font-extrabold text-sky-900 flex items-center gap-2 mb-3'><i class='fa-solid fa-road'></i> Not a Villain Story</h4>
-  <p class='text-sky-800 text-sm leading-relaxed m-0'>Neither of us was wrong. Love can be completely real while two lifestyles are simply incompatible. Sometimes you walk away not because you don't love someone, but because you already know you'll be walking through life in different directions. I don't need someone to change herself to fit into my life. I'd rather meet someone who sees the things that make me excited about being alive and says, \"That actually sounds fun.\"</p>
+  <p class='text-sky-800 text-sm leading-relaxed m-0'>Neither of us was wrong. Love can be completely real while two lifestyles are simply incompatible. Sometimes you walk away not because you don't love someone, but because you already know you'll be walking through life in different directions. I don't need someone to change herself to fit into my life. I'd rather meet someone who sees the things that make me excited about being alive and says, "That actually sounds fun."</p>
 </div>
 
 <p class='text-lg font-bold text-slate-900 border-l-4 border-sky-500 pl-4 py-1 mt-8'>Compatibility isn't finding someone who sacrifices the life she loves to join mine. It's finding someone whose idea of living makes us both want to walk the same road.</p>
@@ -200,7 +272,7 @@
 
 <p>I know motorcycles are dangerous. That's exactly why I check my brakes. Before I ride, I check the brakes, the tires, the lights, anything that feels off. And when someone I love is sitting behind me, I become even more careful, because I'm no longer responsible for just one life. I'm responsible for two.</p>
 
-<p>People sometimes ask, \"If you know motorcycles are dangerous, why do you still ride?\" It's a fair question. I've met doctors who are bikers &mdash; people who know better than almost anyone what accidents can do to the human body. Yet some of them still ride. Understanding risk doesn't automatically mean avoiding everything that carries risk. Sometimes it means learning how to manage it. Safety isn't the absence of risk. Safety is the management of risk.</p>
+<p>People sometimes ask, "If you know motorcycles are dangerous, why do you still ride?" It's a fair question. I've met doctors who are bikers &mdash; people who know better than almost anyone what accidents can do to the human body. Yet some of them still ride. Understanding risk doesn't automatically mean avoiding everything that carries risk. Sometimes it means learning how to manage it. Safety isn't the absence of risk. Safety is the management of risk.</p>
 
 <h4 class='text-xl font-extrabold text-slate-900 mt-12 mb-5'>Chosen Risk Feels Different &mdash; And It Is Different</h4>
 
@@ -234,16 +306,16 @@
   </svg>
 </div>
 
-<p>That's also why I don't want a partner who rides with me simply out of obligation. I don't want, \"I'm scared, but if you love me, I'll do it.\" That's not romantic to me. I want someone who understands what she's getting into &mdash; someone who sees me checking the brakes, checking the tires, prepping the bike, putting on my gear, and understands why I do it. Being adventurous doesn't have to mean being careless.</p>
+<p>That's also why I don't want a partner who rides with me simply out of obligation. I don't want, "I'm scared, but if you love me, I'll do it." That's not romantic to me. I want someone who understands what she's getting into &mdash; someone who sees me checking the brakes, checking the tires, prepping the bike, putting on my gear, and understands why I do it. Being adventurous doesn't have to mean being careless.</p>
 
 <div class='callout bg-amber-50 border-l-4 border-amber-500 p-6 rounded-r-2xl my-10'>
-  <h4 class='font-extrabold text-amber-900 flex items-center gap-2 mb-3'><i class='fa-solid fa-helmet-safety'></i> What \"Let's Go\" Actually Means</h4>
-  <p class='text-amber-800 text-sm leading-relaxed m-0'>Maybe one day she'll look at me, put on her helmet, and simply say, \"Let's go.\" That's romantic to me &mdash; not because she's willing to risk her life for me, but because she trusts me enough to share a piece of her life with me. And I respect that trust enough to take her safety seriously. Not reckless together. Responsibly crazy together.</p>
+  <h4 class='font-extrabold text-amber-900 flex items-center gap-2 mb-3'><i class='fa-solid fa-helmet-safety'></i> What "Let's Go" Actually Means</h4>
+  <p class='text-amber-800 text-sm leading-relaxed m-0'>Maybe one day she'll look at me, put on her helmet, and simply say, "Let's go." That's romantic to me &mdash; not because she's willing to risk her life for me, but because she trusts me enough to share a piece of her life with me. And I respect that trust enough to take her safety seriously. Not reckless together. Responsibly crazy together.</p>
 </div>
 
 <h3 class='text-2xl font-extrabold text-slate-900 mt-16 mb-6'>Part III &mdash; Don't Be My Harley Quinn</h3>
 
-<p>I've joked before that someday I want to find my own Harley Quinn. Yes, I know how ridiculous that sounds. 😂 Harley Quinn was Dr. Harleen Quinzel &mdash; a psychiatrist. Of all people, she should have understood exactly how deeply troubled and dangerous the Joker was. She was supposed to study the madness. Instead, she joined it. Somewhere in that absurdity is a metaphor I always found strangely romantic: \"You already know I'm crazy, and somehow, you still want to be crazy with me.\"</p>
+<p>I've joked before that someday I want to find my own Harley Quinn. Yes, I know how ridiculous that sounds. 😂 Harley Quinn was Dr. Harleen Quinzel &mdash; a psychiatrist. Of all people, she should have understood exactly how deeply troubled and dangerous the Joker was. She was supposed to study the madness. Instead, she joined it. Somewhere in that absurdity is a metaphor I always found strangely romantic: "You already know I'm crazy, and somehow, you still want to be crazy with me."</p>
 
 <p>But as I've gotten older, I've realized something. I don't actually want a Harley Quinn who destroys herself for me. I don't want blind loyalty, or someone who abandons her boundaries, her identity, or her common sense just because she loves me. That's not the kind of love I'm looking for.</p>
 
@@ -251,13 +323,13 @@
 
 <p>The Harley-and-Joker dynamic isn't just a comic book trope &mdash; it maps almost exactly onto a documented clinical pattern called <em>folie &agrave; deux</em>, or shared psychotic disorder, first described by Charles Las&egrave;gue and Jean-Pierre Falret in 1877: one person's distorted beliefs absorbed by a partner in an isolated, dependent relationship, until neither one can see clearly anymore.<sup>6</sup> It's the clinical shadow of what pop culture romanticizes as devotion.</p>
 
-<p>The healthier alternative shows up in John Bowlby's attachment theory. Bowlby described securely attached partners as functioning like a \"secure base\" for each other &mdash; a stable foundation that makes it safer, not more dangerous, to explore, take risks, and try new things, rather than merging identities the way anxious or disorganized attachment tends to.<sup>7</sup> Murray Bowen's concept of differentiation of self makes a related point from family-systems theory: the healthiest closeness comes from two people who stay distinct individuals with intact judgment and boundaries, not from fusing into one shared identity.<sup>8</sup></p>
+<p>The healthier alternative shows up in John Bowlby's attachment theory. Bowlby described securely attached partners as functioning like a "secure base" for each other &mdash; a stable foundation that makes it safer, not more dangerous, to explore, take risks, and try new things, rather than merging identities the way anxious or disorganized attachment tends to.<sup>7</sup> Murray Bowen's concept of differentiation of self makes a related point from family-systems theory: the healthiest closeness comes from two people who stay distinct individuals with intact judgment and boundaries, not from fusing into one shared identity.<sup>8</sup></p>
 
 <div class='not-prose my-12'>
   <svg viewBox='0 0 1000 380' xmlns='http://www.w3.org/2000/svg' class='w-full h-auto'>
     <rect width='1000' height='380' rx='24' fill='#0f172a'/>
     <text x='500' y='36' text-anchor='middle' font-family='sans-serif' font-size='16' font-weight='800' fill='#f1f5f9'>Diagram 3 &#8212; Fusion vs. Secure Base</text>
-    <text x='500' y='58' text-anchor='middle' font-family='sans-serif' font-size='11' fill='#94a3b8'>Two very different ways of being \"crazy together\"</text>
+    <text x='500' y='58' text-anchor='middle' font-family='sans-serif' font-size='11' fill='#94a3b8'>Two very different ways of being "crazy together"</text>
 
     <rect x='50' y='90' width='420' height='250' rx='18' fill='#1e293b' stroke='#f87171' stroke-width='2'/>
     <text x='260' y='118' text-anchor='middle' font-family='sans-serif' font-size='12' font-weight='800' fill='#fecaca'>FUSION (folie &agrave; deux)</text>
@@ -279,9 +351,9 @@
   </svg>
 </div>
 
-<p>What I actually want is the spirit behind the metaphor, not the self-destruction underneath it. Someone who won't be surprised when I say \"Let's go somewhere\" and can't yet tell her where. Someone who won't blink when I suddenly stop the bike because I spotted a tiny street-food stall that looks interesting. Someone who can laugh when the plan changes &mdash; who looks at my ridiculous ideas and says, \"This is stupid,\" and five seconds later, \"Okay, how are we doing this safely?\" 😂</p>
+<p>What I actually want is the spirit behind the metaphor, not the self-destruction underneath it. Someone who won't be surprised when I say "Let's go somewhere" and can't yet tell her where. Someone who won't blink when I suddenly stop the bike because I spotted a tiny street-food stall that looks interesting. Someone who can laugh when the plan changes &mdash; who looks at my ridiculous ideas and says, "This is stupid," and five seconds later, "Okay, how are we doing this safely?" 😂</p>
 
-<p>Because maybe the best partner isn't someone who follows you blindly. It's someone who can be crazy and sensible with you. Someone who says \"Slow down,\" \"Check the brakes first,\" \"Bring a raincoat,\" \"Wear your helmet\" &mdash; and then, \"Okay. Let's go.\"</p>
+<p>Because maybe the best partner isn't someone who follows you blindly. It's someone who can be crazy and sensible with you. Someone who says "Slow down," "Check the brakes first," "Bring a raincoat," "Wear your helmet" &mdash; and then, "Okay. Let's go."</p>
 
 <div class='callout bg-indigo-50 border-l-4 border-indigo-500 p-6 rounded-r-2xl my-10'>
   <h4 class='font-extrabold text-indigo-900 flex items-center gap-2 mb-3'><i class='fa-solid fa-heart-circle-check'></i> The Correction</h4>
@@ -352,7 +424,7 @@
     </div>
     <div class='p-5 bg-white rounded-xl border border-slate-200'>
       <span class='inline-block px-2 py-1 bg-slate-100 text-slate-500 text-[10px] font-bold rounded uppercase tracking-wider mb-2'>Research</span>
-      <p class='text-sm text-slate-700 leading-relaxed m-0'><sup>7</sup> Bowlby, J. (1969/1982). <em>Attachment and Loss, Vol. 1: Attachment.</em> Basic Books &mdash; the \"secure base\" concept; see also Ainsworth, M. D. S., Blehar, M. C., Waters, E., &amp; Wall, S. (1978). <em>Patterns of Attachment.</em> Erlbaum.</p>
+      <p class='text-sm text-slate-700 leading-relaxed m-0'><sup>7</sup> Bowlby, J. (1969/1982). <em>Attachment and Loss, Vol. 1: Attachment.</em> Basic Books &mdash; the "secure base" concept; see also Ainsworth, M. D. S., Blehar, M. C., Waters, E., &amp; Wall, S. (1978). <em>Patterns of Attachment.</em> Erlbaum.</p>
     </div>
     <div class='p-5 bg-white rounded-xl border border-slate-200'>
       <span class='inline-block px-2 py-1 bg-slate-100 text-slate-500 text-[10px] font-bold rounded uppercase tracking-wider mb-2'>Clinical Theory</span>
