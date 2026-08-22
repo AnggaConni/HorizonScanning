@@ -2666,6 +2666,119 @@
 </script>
 <!-- ========== END ENGLISH WIDGET ========== -->
 
+<!-- ========== HAZARD RADAR WIDGET (NASA FIRMS & AIR QUALITY) ========== -->
+<section id="hazard-radar-widget" class="py-16 bg-white border-t border-slate-200">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Header Widget -->
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center gap-2 bg-red-50 rounded-full px-4 py-1.5 shadow-sm border border-red-200 mb-4">
+                <i class="ph-fill ph-fire text-red-500 text-sm"></i>
+                <span class="text-xs font-mono font-bold text-red-700 tracking-wider uppercase">Live Threat Intelligence</span>
+            </div>
+            <h2 class="text-2xl md:text-3xl font-extrabold text-navy-900 tracking-tight">
+                Regional <span class="text-red-500">Fire Hazard</span> & Smoke Scanner
+            </h2>
+            <p class="text-slate-500 max-w-xl mx-auto mt-3 text-sm leading-relaxed">
+                Aggregating live thermal anomalies from NASA FIRMS and real-time PM2.5 data. Select a location to assess immediate respiratory (ARI) risks.
+            </p>
+        </div>
+
+        <!-- Widget Container -->
+        <div class="bg-navy-950 rounded-3xl overflow-hidden shadow-2xl border border-navy-800 p-6 md:p-10 relative">
+            <!-- Background Accent -->
+            <div class="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-red-500 opacity-10 rounded-full blur-3xl"></div>
+            
+            <div class="relative z-10">
+                <!-- Top Bar: Title & Controls -->
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 border-b border-slate-800 pb-6">
+                    <div>
+                        <h3 class="text-white font-bold text-xl flex items-center gap-2">
+                            <i class="ph-fill ph-radar text-teal-400"></i> HazeGuard Mini EWS
+                        </h3>
+                        <p class="text-slate-400 text-xs mt-1 font-mono">SOURCE: NASA FIRMS & CAMS Air Quality</p>
+                    </div>
+                    
+                    <!-- Location Selector & Button -->
+                    <div class="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+                        <div class="relative w-full sm:w-auto">
+                            <i class="ph-fill ph-map-pin absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                            <select id="hz-location-select" class="w-full sm:w-56 bg-navy-900 border border-slate-700 text-slate-200 text-sm rounded-lg pl-9 pr-4 py-2.5 focus:outline-none focus:border-teal-500 appearance-none cursor-pointer">
+                                <option value="gps">📍 Detect My Location (GPS)</option>
+                                <option value="-2.2083,113.9167">Palangka Raya, Kalteng</option>
+                                <option value="-0.0227,109.3333">Pontianak, Kalbar</option>
+                                <option value="0.5071,101.4478">Pekanbaru, Riau</option>
+                                <option value="-3.4406,114.8315">Banjarbaru, Kalsel</option>
+                                <option value="-1.6115,103.5855">Jambi, Sumatera</option>
+                                <option value="-6.2088,106.8456">Jakarta, DKI</option>
+                            </select>
+                            <i class="ph-bold ph-caret-down absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none text-xs"></i>
+                        </div>
+                        
+                        <button id="btnScanHazard" class="w-full sm:w-auto bg-teal-600 hover:bg-teal-500 text-white px-5 py-2.5 rounded-lg font-bold text-sm transition-all shadow-[0_0_15px_rgba(20,184,166,0.2)] hover:shadow-[0_0_20px_rgba(20,184,166,0.4)] flex items-center justify-center gap-2 shrink-0">
+                            <i class="ph-bold ph-crosshair"></i> Scan Area
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 6 Metrics Grid (Expanded to include Haze functions) -->
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
+                    <!-- Row 1: Fire & Distance -->
+                    <div class="bg-navy-900/80 border border-slate-800 rounded-xl p-3.5 flex flex-col justify-center">
+                        <span class="text-[9px] font-mono text-slate-500 uppercase block mb-1">Regional Fires</span>
+                        <div class="text-xl font-black text-white" id="hz-total">--</div>
+                    </div>
+                    <div class="bg-navy-900/80 border border-slate-800 rounded-xl p-3.5 flex flex-col justify-center">
+                        <span class="text-[9px] font-mono text-slate-500 uppercase block mb-1">Nearest Threat</span>
+                        <div class="text-xl font-black text-rose-400" id="hz-dist">-- <span class="text-[10px] font-normal text-slate-500">km</span></div>
+                    </div>
+                    <div class="bg-navy-900/80 border border-slate-800 rounded-xl p-3.5 flex flex-col justify-center">
+                        <span class="text-[9px] font-mono text-slate-500 uppercase block mb-1">Wind Vector</span>
+                        <div class="text-lg font-black text-slate-200 mt-1" id="hz-wind">--</div>
+                    </div>
+                    
+                    <!-- Row 2: Air Quality & Health (New) -->
+                    <div class="bg-navy-900/80 border border-slate-800 rounded-xl p-3.5 flex flex-col justify-center">
+                        <span class="text-[9px] font-mono text-slate-500 uppercase block mb-1">Current PM2.5</span>
+                        <div class="text-xl font-black text-amber-400" id="hz-pm25">-- <span class="text-[10px] font-normal text-slate-500">µg/m³</span></div>
+                    </div>
+                    <div class="bg-navy-900/80 border border-slate-800 rounded-xl p-3.5 flex flex-col justify-center">
+                        <span class="text-[9px] font-mono text-slate-500 uppercase block mb-1">Visibility Est.</span>
+                        <div class="text-xl font-black text-sky-400" id="hz-vis">-- <span class="text-[10px] font-normal text-slate-500">km</span></div>
+                    </div>
+                    <div class="bg-navy-900/80 border border-slate-800 rounded-xl p-3.5 flex flex-col justify-center border-b-2 border-b-teal-500">
+                        <span class="text-[9px] font-mono text-slate-500 uppercase block mb-1">ARI / ISPA Risk</span>
+                        <div class="text-lg font-black text-emerald-400" id="hz-risk">STANDBY</div>
+                    </div>
+                </div>
+
+                <!-- Alert / Output Box -->
+                <div id="hz-alert-box" class="bg-slate-800/50 border border-slate-700 rounded-xl p-4 flex items-start gap-3 transition-all mb-6">
+                    <i class="ph-fill ph-info text-sky-400 text-xl mt-0.5"></i>
+                    <div>
+                        <strong class="text-slate-200 text-sm block mb-1">Awaiting Coordinates</strong>
+                        <p class="text-slate-400 text-xs leading-relaxed" id="hz-alert-text">
+                            Select a location from the dropdown and click "Scan Area". The system will calculate proximity to active fires and analyze live air quality/PM2.5 to determine respiratory health risks.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Link to Full HazeGuard EWS -->
+                <div class="text-center pt-4 border-t border-slate-800/80">
+                    <a href="hazard.html" class="inline-flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white px-6 py-3 rounded-xl font-bold text-sm transition-all group">
+                        <i class="ph-fill ph-dashboard text-teal-400 group-hover:scale-110 transition-transform"></i> 
+                        Launch Full HazeGuard Dashboard
+                        <i class="ph-bold ph-arrow-right ml-1 text-slate-400 group-hover:text-white transition-colors"></i>
+                    </a>
+                    <p class="text-[10px] text-slate-500 mt-3 font-mono">The full dashboard includes 5-day forecasts, protective capacity matrices, and historical logging.</p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+<!-- ========== END HAZARD RADAR WIDGET ========== -->
+
 
     <!-- ═══════════════════════════════════════════════════════
      FAQ (SEO-FRIENDLY)
@@ -3418,6 +3531,171 @@ document.getElementById('prevPageBtn')?.addEventListener('click', () => changePa
     }
 
 })();
+</script>
+
+<!-- SCRIPT HAZARD RADAR WIDGET -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    let hazardData = [];
+
+    // Fungsi fetch data dari hazard.json (Aman jika file tidak ada)
+    async function loadHazardData() {
+        try {
+            const res = await fetch('hazard.json?t=' + Date.now());
+            if (!res.ok) throw new Error("JSON not found");
+            hazardData = await res.json();
+            
+            document.getElementById('hz-total').innerText = hazardData.length.toLocaleString();
+        } catch (e) {
+            console.warn("hazard.json offline/kosong. Pastikan file ada.");
+            document.getElementById('hz-total').innerText = "0 Data";
+            hazardData = []; // Kosongkan agar tidak error
+        }
+    }
+
+    // Kalkulasi jarak Haversine (km)
+    function calcDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371; 
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                  Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                  Math.sin(dLon/2) * Math.sin(dLon/2);
+        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    }
+
+    // Arah Mata Angin
+    function getCompassDir(deg) {
+        const val = Math.floor((deg / 22.5) + 0.5);
+        const arr = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"];
+        return arr[(val % 16)];
+    }
+
+    const btnScan = document.getElementById('btnScanHazard');
+    const alertBox = document.getElementById('hz-alert-box');
+    const locSelect = document.getElementById('hz-location-select');
+
+    if(btnScan) {
+        loadHazardData(); // Load awal
+
+        btnScan.addEventListener('click', async () => {
+            const selectedVal = locSelect.value;
+            let uLat, uLon;
+
+            // UBAH STATE UI KE LOADING
+            btnScan.disabled = true;
+            btnScan.innerHTML = '<i class="ph-bold ph-spinner animate-spin"></i> Scanning...';
+            alertBox.className = 'bg-slate-800/50 border border-slate-700 rounded-xl p-4 flex items-start gap-3 transition-all mb-6';
+            alertBox.innerHTML = `<i class="ph-fill ph-spinner animate-spin text-teal-400 text-xl mt-0.5"></i>
+                                  <div><strong class="text-slate-200 text-sm block mb-1">Acquiring Data...</strong>
+                                  <p class="text-slate-400 text-xs">Fetching NASA FIRMS and CAMS Air Quality data...</p></div>`;
+
+            // FUNGSI EKSEKUSI DATA
+            const processData = async (lat, lon) => {
+                if (hazardData.length === 0) await loadHazardData();
+
+                let minDistance = Infinity;
+                let nearbyCount = 0;
+
+                // Cek jarak hotspot
+                if(hazardData.length > 0) {
+                    hazardData.forEach(h => {
+                        const d = calcDistance(lat, lon, h.lat, h.lon);
+                        if (d < minDistance) minDistance = d;
+                        if (d <= 100) nearbyCount++;
+                    });
+                }
+
+                try {
+                    // Fetch Cuaca & Kualitas Udara secara bersamaan
+                    const urlWeather = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=wind_speed_10m,wind_direction_10m`;
+                    const urlAQ = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=pm2_5`;
+                    
+                    const [resW, resAQ] = await Promise.all([fetch(urlWeather), fetch(urlAQ)]);
+                    const wData = await resW.json();
+                    const aqData = await resAQ.json();
+
+                    const windSpeed = wData.current?.wind_speed_10m || 0;
+                    const windDir = wData.current?.wind_direction_10m || 0;
+                    const pm25 = Math.round(aqData.current?.pm2_5 || 0);
+                    
+                    const windComp = getCompassDir(windDir);
+                    
+                    // Estimasi Visibilitas (Rumus Koschmieder sederhana)
+                    const visKm = pm25 > 0 ? Math.max(0.1, Math.min(30, 2500/(pm25*8+30))).toFixed(1) : '> 30';
+
+                    // Update UI Metrics
+                    document.getElementById('hz-dist').innerHTML = minDistance === Infinity ? 'None' : `${minDistance.toFixed(1)} <span class="text-[10px] font-normal text-slate-500">km</span>`;
+                    document.getElementById('hz-wind').innerHTML = `<span class="text-base">${windComp}</span> <span class="text-xs text-slate-500">${windSpeed}km/h</span>`;
+                    document.getElementById('hz-pm25').innerHTML = `${pm25} <span class="text-[10px] font-normal text-slate-500">µg/m³</span>`;
+                    document.getElementById('hz-vis').innerHTML = `${visKm} <span class="text-[10px] font-normal text-slate-500">km</span>`;
+
+                    // Simple Risk Engine
+                    let riskLvl, icon, bgColor, title, desc, riskColor;
+                    
+                    if (pm25 >= 55 || minDistance <= 30) {
+                        riskLvl = "HIGH RISK"; riskColor = "text-rose-500";
+                        icon = 'ph-warning-octagon text-rose-500';
+                        bgColor = 'bg-rose-500/10 border-rose-500/30';
+                        title = 'CRITICAL SMOKE ALERT';
+                        desc = `PM2.5 is at <b>${pm25} µg/m³</b> (Unhealthy). Nearest fire is ${minDistance === Infinity ? 'unknown' : minDistance.toFixed(1) + ' km away'}. <b>Action:</b> Vulnerable groups must stay indoors. Prepare N95 masks.`;
+                    } else if (pm25 >= 35 || minDistance <= 100) {
+                        riskLvl = "MODERATE"; riskColor = "text-amber-400";
+                        icon = 'ph-warning text-amber-500';
+                        bgColor = 'bg-amber-500/10 border-amber-500/30';
+                        title = 'ELEVATED HAZARD';
+                        desc = `PM2.5 is at <b>${pm25} µg/m³</b>. Nearest fire is ${minDistance === Infinity ? 'unknown' : minDistance.toFixed(1) + ' km away'}. <b>Action:</b> Sensitive groups should limit outdoor exertion.`;
+                    } else {
+                        riskLvl = "LOW RISK"; riskColor = "text-emerald-400";
+                        icon = 'ph-check-circle text-emerald-400';
+                        bgColor = 'bg-emerald-500/10 border-emerald-500/30';
+                        title = 'AIR QUALITY NORMAL';
+                        desc = `PM2.5 is at a safe level (<b>${pm25} µg/m³</b>). No immediate fire threats nearby. Visibility is good.`;
+                    }
+
+                    document.getElementById('hz-risk').className = `text-lg font-black ${riskColor}`;
+                    document.getElementById('hz-risk').innerText = riskLvl;
+
+                    alertBox.className = `${bgColor} border rounded-xl p-4 flex items-start gap-3 transition-all mb-6`;
+                    alertBox.innerHTML = `<i class="ph-fill ${icon} text-2xl mt-0.5"></i>
+                                          <div><strong class="text-white text-sm block mb-1">${title}</strong>
+                                          <p class="text-slate-300 text-xs leading-relaxed">${desc}</p></div>`;
+
+                } catch (e) {
+                    console.error("Gagal mengambil data cuaca/udara:", e);
+                    alertBox.innerHTML = `<strong class="text-rose-400">Error fetching environmental data.</strong>`;
+                } finally {
+                    btnScan.disabled = false;
+                    btnScan.innerHTML = '<i class="ph-bold ph-crosshair"></i> Scan Area';
+                }
+            };
+
+            // CEK PILIHAN LOKASI
+            if (selectedVal === 'gps') {
+                if (!navigator.geolocation) {
+                    alert("Geolocation is not supported.");
+                    btnScan.disabled = false;
+                    btnScan.innerHTML = '<i class="ph-bold ph-crosshair"></i> Scan Area';
+                    return;
+                }
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => { processData(pos.coords.latitude, pos.coords.longitude); },
+                    (err) => {
+                        alertBox.innerHTML = `<div class="text-rose-400 text-sm"><b>GPS Access Denied.</b> Please select a city from the dropdown instead.</div>`;
+                        btnScan.disabled = false;
+                        btnScan.innerHTML = '<i class="ph-bold ph-crosshair"></i> Scan Area';
+                    }
+                );
+            } else {
+                // Parse lat lon dari value dropdown (e.g. "-2.2083,113.9167")
+                const coords = selectedVal.split(',');
+                uLat = parseFloat(coords[0]);
+                uLon = parseFloat(coords[1]);
+                processData(uLat, uLon);
+            }
+        });
+    }
+});
 </script>
 
 </body>
