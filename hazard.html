@@ -1,0 +1,1615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<title>HazeGuard | Wildfire Smoke & ARI Early Warning System</title>
+<meta name="title" content="HazeGuard | Wildfire Smoke & ARI (ISPA) Early Warning System">
+<meta name="description" content="Early Warning System for wildfire smoke, peatland haze and Acute Respiratory Infection (ARI/ISPA) risk. Monitors NASA FIRMS hotspots, PM2.5, wind transport and vulnerable-group exposure.">
+<meta name="keywords" content="haze, wildfire smoke, karhutla, ISPA, ARI, PM2.5, NASA FIRMS, air quality, Kalimantan, peatland fire, early warning system">
+<meta name="author" content="Angga Saputra">
+<meta name="robots" content="index,follow">
+
+<meta name="theme-color" content="#c2410c">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="HazeGuard">
+<meta name="format-detection" content="telephone=no">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="HazeGuard">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="HazeGuard | Wildfire Smoke & ARI Early Warning System">
+<meta property="og:description" content="Monitor wildfire hotspots, haze transport, PM2.5 and respiratory (ARI/ISPA) health risk in one dashboard.">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="HazeGuard | Smoke & ARI EWS">
+<meta name="twitter:description" content="Wildfire smoke and respiratory health early warning dashboard.">
+
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
+
+<style>
+  body{font-family:'Plus Jakarta Sans',sans-serif;background-color:#f8fafc;}
+  ::-webkit-scrollbar{width:6px;height:6px;}
+  ::-webkit-scrollbar-track{background:transparent;}
+  ::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:10px;}
+  ::-webkit-scrollbar-thumb:hover{background:#94a3b8;}
+  .loader-spinner{border:3px solid #f3f3f3;border-top:3px solid #c2410c;border-radius:50%;width:26px;height:26px;animation:spin 1s linear infinite;}
+  @keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
+  .picking-mode{cursor:crosshair!important;}
+  .tab-active{color:#c2410c;border-color:#c2410c;}
+  .mtab-active{color:#c2410c;background:#fff7ed;}
+  .fade-in{animation:fade .35s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+  .leaflet-container{font-family:inherit;}
+  .pulse-fire{animation:pf 1.6s ease-in-out infinite;}
+  @keyframes pf{0%,100%{opacity:.85}50%{opacity:.35}}
+
+  /* Hide Google Translate chrome */
+  .goog-te-banner-frame{display:none!important;}
+  body{top:0!important;}
+  #google_translate_element{display:none;}
+  .goog-tooltip,.goog-tooltip:hover{display:none!important;}
+  .goog-text-highlight{background:none!important;box-shadow:none!important;}
+
+  @media print {
+    nav, #map-container, .md\:hidden, #welcome-state, button, #map-picker-instruction, .modal, #loader, #lang-menu { display:none !important; }
+    body, html, body > div.flex-1 { display:block !important; height:auto !important; min-height:auto !important; overflow:visible !important; background:#fff !important; }
+    #dash-panel, #dashboard-content { display:block !important; width:100% !important; height:auto !important; overflow:visible !important; position:static !important; padding:0 !important; }
+    .tabpane { display:block !important; opacity:1 !important; visibility:visible !important; margin-bottom:24px !important; height:auto !important; }
+    #forecast-days { flex-wrap:wrap !important; overflow-x:visible !important; gap:12px !important; }
+    .flex.gap-1.overflow-x-auto { display:none !important; }
+    .bg-white.rounded-xl, #actions-list > div, .p-3.rounded-lg { page-break-inside:avoid !important; break-inside:avoid !important; }
+    canvas { max-width:100% !important; height:auto !important; page-break-inside:avoid !important; }
+    .sticky { position:static !important; }
+  }
+
+  html, body { height:100vh; height:100dvh; }
+  @supports (-webkit-touch-callout: none){ body{height:-webkit-fill-available;} }
+</style>
+</head>
+
+<body class="text-slate-800 flex flex-col overflow-hidden">
+
+<!-- ===== NAVBAR ===== -->
+<nav class="bg-slate-900 text-white px-3 py-2.5 shrink-0 flex justify-between items-center shadow-lg z-30 border-b border-orange-600/40">
+  <div class="flex items-center gap-2.5 pl-1">
+    <div class="w-8 h-8 rounded-lg bg-orange-600 flex items-center justify-center"><i class="fa-solid fa-smog"></i></div>
+    <div>
+      <h1 class="font-bold text-sm tracking-wide leading-none">HAZEGUARD EWS</h1>
+      <p class="text-[10px] text-slate-400 mt-0.5">Wildfire Smoke &amp; ARI Risk</p>
+    </div>
+  </div>
+
+  <div class="flex gap-2 items-center">
+    <!-- LANGUAGE -->
+    <div class="relative">
+      <button onclick="toggleLangMenu()" title="Language" class="bg-slate-700 hover:bg-slate-600 h-8 px-2.5 rounded-lg text-xs transition flex items-center gap-1.5">
+        <i class="fa-solid fa-language"></i><span class="hidden sm:inline" id="lang-current">EN</span><i class="fa-solid fa-chevron-down text-[8px]"></i>
+      </button>
+      <div id="lang-menu" class="hidden absolute right-0 mt-1.5 w-56 bg-white text-slate-700 rounded-xl shadow-2xl border border-slate-200 z-[300] overflow-hidden">
+        <div class="px-3 py-2 bg-slate-50 border-b text-[10px] font-bold text-slate-500 uppercase tracking-wider">Translate this page</div>
+        <button onclick="setLang('en')" class="w-full text-left px-3 py-2.5 text-xs hover:bg-orange-50 flex items-center gap-2"><span class="text-base">🇬🇧</span> English <span class="text-[9px] text-slate-400 ml-auto">Original</span></button>
+        <button onclick="setLang('id')" class="w-full text-left px-3 py-2.5 text-xs hover:bg-orange-50 flex items-center gap-2"><span class="text-base">🇮🇩</span> Bahasa Indonesia</button>
+        <button onclick="setLang('ms')" class="w-full text-left px-3 py-2.5 text-xs hover:bg-orange-50 flex items-center gap-2"><span class="text-base">🇲🇾</span> Bahasa Melayu</button>
+        <button onclick="setLang('zh-CN')" class="w-full text-left px-3 py-2.5 text-xs hover:bg-orange-50 flex items-center gap-2"><span class="text-base">🇨🇳</span> 中文 (简体)</button>
+        <button onclick="setLang('th')" class="w-full text-left px-3 py-2.5 text-xs hover:bg-orange-50 flex items-center gap-2"><span class="text-base">🇹🇭</span> ไทย</button>
+        <div class="border-t">
+          <a id="gt-external" target="_blank" rel="noopener" href="#" class="block px-3 py-2.5 text-[10px] text-sky-700 hover:bg-sky-50"><i class="fa-solid fa-arrow-up-right-from-square mr-1"></i> Open in Google Translate (new tab)</a>
+        </div>
+      </div>
+    </div>
+
+    <button onclick="openModal('modal-settings')" title="API Settings" class="bg-slate-700 hover:bg-slate-600 w-8 h-8 rounded-lg text-xs transition flex items-center justify-center"><i class="fa-solid fa-gear"></i></button>
+    <button onclick="window.print()" class="bg-orange-700 hover:bg-orange-600 px-3 py-1.5 rounded-lg text-xs font-semibold shadow transition flex items-center gap-2" title="Print or Save as PDF">
+      <i class="fa-solid fa-print"></i><span class="hidden sm:inline">Print Report</span>
+    </button>
+  </div>
+</nav>
+
+<div id="google_translate_element"></div>
+
+<!-- ===== MAIN ===== -->
+<div class="flex-1 flex flex-col md:flex-row overflow-hidden">
+
+  <!-- MAP -->
+  <div id="map-container" class="w-full md:w-[38%] lg:w-1/3 flex flex-col border-r border-slate-200 bg-white shrink-0 relative h-full">
+    <div class="p-3 bg-slate-50 border-b flex justify-between items-center z-20 shrink-0">
+      <h2 class="font-bold text-sm text-slate-700"><i class="fa-solid fa-fire-flame-curved mr-1 text-orange-600"></i> Hotspot &amp; Haze Map</h2>
+      <button onclick="openModal('modal-add-site')" class="text-xs bg-slate-800 text-white px-2.5 py-1.5 rounded-lg hover:bg-slate-700 shadow flex items-center gap-1"><i class="fa-solid fa-plus"></i> Add Area</button>
+    </div>
+    <div id="map-wrapper" class="flex-1 relative p-2">
+      <div id="map" class="shadow-inner border border-slate-200 w-full h-full rounded-lg relative z-10"></div>
+      <div id="map-picker-instruction" class="absolute top-4 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-4 py-2 rounded-full text-xs font-bold shadow-2xl z-[1000] hidden items-center gap-3 border border-orange-500 w-max">
+        <span class="flex items-center gap-2"><i class="fa-solid fa-hand-pointer text-orange-400 animate-bounce"></i> Click a location on the map</span>
+        <button type="button" onclick="cancelMapPick()" class="bg-slate-700 hover:bg-slate-600 rounded-full w-6 h-6 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="dash-panel" class="w-full md:w-[62%] lg:w-2/3 flex-1 md:h-full overflow-y-auto bg-slate-50 relative hidden md:block">
+
+    <div id="welcome-state" class="h-full flex flex-col items-center justify-center p-6 md:p-8 text-center">
+      <div class="bg-orange-50 w-20 h-20 rounded-full flex items-center justify-center mb-5 border border-orange-100">
+        <i class="fa-solid fa-lungs text-4xl text-orange-400"></i>
+      </div>
+      <h2 class="text-xl font-bold text-slate-800 mb-2">Welcome to HazeGuard EWS</h2>
+      <p class="text-sm text-slate-500 max-w-md mb-6 leading-relaxed">
+        Register a village, school, clinic or household location to monitor wildfire hotspots, smoke transport, PM2.5 and Acute Respiratory Infection (ARI/ISPA) risk — or load sample Kalimantan data.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-3 w-full max-w-[220px] sm:max-w-none sm:justify-center">
+        <button onclick="openModal('modal-add-site')" class="bg-slate-800 hover:bg-slate-700 text-white text-sm font-semibold px-5 py-2.5 rounded-lg shadow-md flex items-center justify-center gap-2 transition-all">
+          <i class="fa-solid fa-plus"></i> Add Monitoring Area
+        </button>
+        <button onclick="loadSampleData()" class="bg-orange-100 hover:bg-orange-200 text-orange-700 border border-orange-200 text-sm font-semibold px-5 py-2.5 rounded-lg shadow flex items-center justify-center gap-2 transition-all">
+          <i class="fa-solid fa-bolt"></i> Load Sample
+        </button>
+      </div>
+      <button onclick="openModal('modal-onboard')" class="mt-5 text-[11px] text-orange-700 underline underline-offset-2 hover:text-orange-800"><i class="fa-solid fa-key mr-1"></i> How to get a free NASA FIRMS key</button>
+    </div>
+
+    <div id="dashboard-content" class="hidden">
+      <!-- Header -->
+      <div class="bg-white border-b border-slate-200 px-4 md:px-6 pt-4 pb-0 sticky top-0 z-20">
+        <div class="flex flex-col md:flex-row md:justify-between md:items-start gap-3 mb-3">
+          <div>
+            <span id="d-type" class="px-2 py-0.5 bg-orange-100 text-orange-800 rounded text-[10px] font-bold uppercase tracking-wider border border-orange-200">Village</span>
+            <h2 id="d-name" class="font-extrabold text-2xl text-slate-800 tracking-tight mt-1">—</h2>
+            <p class="text-xs text-slate-500 mt-0.5">Vulnerable groups: <strong id="d-groups" class="text-slate-700">—</strong> · <span id="d-coord"></span></p>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="openModal('modal-capacity')" class="bg-white border border-slate-300 text-slate-600 hover:bg-slate-50 px-3 py-2 rounded-lg text-xs font-semibold shadow-sm flex items-center gap-2"><i class="fa-solid fa-shield-halved"></i> Capacity</button>
+            <button onclick="processSiteData(currentSiteId)" class="bg-slate-800 text-white hover:bg-slate-700 px-3 py-2 rounded-lg text-xs font-semibold shadow flex items-center gap-2"><i class="fa-solid fa-rotate-right"></i> Refresh</button>
+          </div>
+        </div>
+        <div class="flex gap-1 overflow-x-auto text-xs font-semibold -mb-px">
+          <button data-tab="overview" onclick="switchTab('overview')" class="dtab tab-active px-3 py-2.5 border-b-2 whitespace-nowrap">Overview</button>
+          <button data-tab="indicators" onclick="switchTab('indicators')" class="dtab text-slate-500 border-transparent px-3 py-2.5 border-b-2 whitespace-nowrap">Air &amp; Health</button>
+          <button data-tab="destana" onclick="switchTab('destana')" class="dtab text-slate-500 border-transparent px-3 py-2.5 border-b-2 whitespace-nowrap">Risk Matrix</button>
+          <button data-tab="forecast" onclick="switchTab('forecast')" class="dtab text-slate-500 border-transparent px-3 py-2.5 border-b-2 whitespace-nowrap">Forecast</button>
+          <button data-tab="actions" onclick="switchTab('actions')" class="dtab text-slate-500 border-transparent px-3 py-2.5 border-b-2 whitespace-nowrap">Actions</button>
+          <button data-tab="history" onclick="switchTab('history')" class="dtab text-slate-500 border-transparent px-3 py-2.5 border-b-2 whitespace-nowrap">History</button>
+        </div>
+      </div>
+
+      <div class="p-4 md:p-6 pb-24">
+        <!-- OVERVIEW -->
+        <div id="tab-overview" class="tabpane fade-in">
+          <div id="ibf-alert" class="mb-5 rounded-xl border p-4 shadow-sm flex gap-3 items-start"></div>
+
+          <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-5">
+            <div class="md:col-span-2 bg-white rounded-xl p-5 border border-slate-200 shadow-sm flex flex-col items-center text-center">
+              <h3 class="text-[11px] font-bold text-slate-400 uppercase mb-3">ARI / ISPA Risk Score</h3>
+              <div id="risk-gauge" class="relative w-36 h-36 rounded-full flex items-center justify-center mb-3" style="background:conic-gradient(#e2e8f0 0deg,#e2e8f0 360deg)">
+                <div class="absolute inset-[10px] bg-white rounded-full flex flex-col items-center justify-center shadow-inner">
+                  <span id="risk-score" class="text-3xl font-black text-slate-700">0%</span>
+                  <span id="risk-badge" class="text-[10px] font-bold px-2 py-0.5 rounded-full mt-1 border">—</span>
+                </div>
+              </div>
+              <p class="text-[10px] text-slate-500 leading-tight max-w-[95%]">Smoke Hazard × Population Vulnerability ÷ Protective Capacity</p>
+            </div>
+
+            <div class="md:col-span-3 grid grid-cols-2 gap-3">
+              <div class="bg-white p-3 rounded-lg border border-slate-100 shadow-sm">
+                <span class="text-[10px] font-bold text-slate-400 block"><i class="fa-solid fa-smog text-slate-500"></i> PM2.5 (now)</span>
+                <div class="flex items-end gap-1 mt-1"><span id="ov-pm25" class="text-xl font-bold text-slate-700">—</span><span class="text-[10px] text-slate-400 mb-1">µg/m³</span></div>
+                <span id="ov-pm25-badge" class="text-[9px] px-1.5 py-0.5 rounded inline-block mt-0.5 bg-slate-100 text-slate-500">—</span>
+              </div>
+              <div class="bg-white p-3 rounded-lg border border-slate-100 shadow-sm">
+                <span class="text-[10px] font-bold text-slate-400 block"><i class="fa-solid fa-fire text-orange-500"></i> Fire Hotspots</span>
+                <div class="flex items-end gap-1 mt-1"><span id="ov-fire" class="text-xl font-bold text-slate-700">—</span><span class="text-[10px] text-slate-400 mb-1">/ 48h</span></div>
+                <span id="ov-fire-sub" class="text-[9px] text-slate-400 block mt-0.5">NASA FIRMS</span>
+              </div>
+              <div class="bg-white p-3 rounded-lg border border-slate-100 shadow-sm">
+                <span class="text-[10px] font-bold text-slate-400 block"><i class="fa-solid fa-eye text-sky-500"></i> Visibility (est.)</span>
+                <div class="flex items-end gap-1 mt-1"><span id="ov-vis" class="text-xl font-bold text-slate-700">—</span></div>
+                <span class="text-[9px] text-slate-400 block mt-0.5">Derived from PM2.5</span>
+              </div>
+              <div class="bg-white p-3 rounded-lg border border-slate-100 shadow-sm">
+                <span class="text-[10px] font-bold text-slate-400 block"><i class="fa-solid fa-wind text-teal-500"></i> Smoke Transport</span>
+                <div class="flex items-end gap-1 mt-1"><span id="ov-wind" class="text-base font-bold text-slate-700">—</span></div>
+                <span id="ov-wind-sub" class="text-[9px] text-slate-400 block mt-0.5">Wind toward site</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 mb-4">
+            <h3 class="text-[11px] font-bold text-slate-500 uppercase mb-3">Hourly PM2.5 &amp; Air Quality Index (Next 72h)</h3>
+            <div class="h-52 w-full"><canvas id="envChart"></canvas></div>
+          </div>
+
+          <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+            <h3 class="text-[11px] font-bold text-slate-500 uppercase mb-3">Exposure Dose Estimator</h3>
+            <div id="dose-box" class="text-xs text-slate-600 leading-relaxed"></div>
+          </div>
+        </div>
+
+        <!-- INDICATORS -->
+        <div id="tab-indicators" class="tabpane hidden fade-in">
+          <h3 class="text-sm font-bold text-slate-800 mb-1"><i class="fa-solid fa-lungs mr-1 text-orange-600"></i> <span id="ind-title">Air Quality &amp; Respiratory Indicators</span></h3>
+          <p class="text-[11px] text-slate-500 mb-4">Computed from live satellite &amp; reanalysis APIs. ⚠ = modelled estimate (ground sensor recommended).</p>
+          <div id="indicator-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+
+          <div class="mt-5 bg-white rounded-xl border border-slate-200 shadow-sm p-4">
+            <h4 class="text-[11px] font-bold text-slate-500 uppercase mb-3">Who is most at risk here</h4>
+            <div id="vuln-breakdown" class="space-y-2 text-xs"></div>
+          </div>
+        </div>
+
+        <!-- RISK MATRIX -->
+        <div id="tab-destana" class="tabpane hidden fade-in">
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 mb-4">
+            <div class="bg-white rounded-xl border border-rose-200 shadow-sm overflow-hidden">
+              <div class="bg-rose-50 px-3 py-2 border-b border-rose-100 flex justify-between items-center"><span class="font-bold text-xs text-rose-700 uppercase"><i class="fa-solid fa-fire mr-1"></i> Smoke Hazard</span><span id="hz-score" class="text-[10px] font-bold text-rose-600"></span></div>
+              <ul id="hz-list" class="p-3 space-y-2 text-xs"></ul>
+            </div>
+            <div class="bg-white rounded-xl border border-amber-200 shadow-sm overflow-hidden">
+              <div class="bg-amber-50 px-3 py-2 border-b border-amber-100 flex justify-between items-center"><span class="font-bold text-xs text-amber-700 uppercase"><i class="fa-solid fa-people-group mr-1"></i> Vulnerability</span><span id="vu-score" class="text-[10px] font-bold text-amber-600"></span></div>
+              <ul id="vu-list" class="p-3 space-y-2 text-xs"></ul>
+            </div>
+            <div class="bg-white rounded-xl border border-emerald-200 shadow-sm overflow-hidden">
+              <div class="bg-emerald-50 px-3 py-2 border-b border-emerald-100 flex justify-between items-center"><span class="font-bold text-xs text-emerald-700 uppercase"><i class="fa-solid fa-shield-halved mr-1"></i> Capacity</span><span id="cp-score" class="text-[10px] font-bold text-emerald-600"></span></div>
+              <ul id="cp-list" class="p-3 space-y-2 text-xs"></ul>
+            </div>
+          </div>
+          <div id="destana-eq" class="bg-slate-800 text-white rounded-xl p-4 text-center shadow"></div>
+
+          <div class="mt-4 bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+            <h4 class="text-[11px] font-bold text-slate-500 uppercase mb-2">Reference Thresholds (WHO 2021 / US EPA AQI)</h4>
+            <div class="overflow-x-auto">
+              <table class="w-full text-[10px] text-left">
+                <thead class="text-slate-500 border-b"><tr><th class="py-1.5 pr-2">PM2.5 µg/m³ (24h)</th><th class="py-1.5 pr-2">Category</th><th class="py-1.5">Meaning for ARI/ISPA</th></tr></thead>
+                <tbody class="text-slate-600">
+                  <tr class="border-b"><td class="py-1.5 pr-2 font-bold text-emerald-600">0–15</td><td>Good</td><td>WHO 24h guideline ≤15. Normal activity safe.</td></tr>
+                  <tr class="border-b"><td class="py-1.5 pr-2 font-bold text-lime-600">15–35</td><td>Moderate</td><td>Sensitive groups may notice throat/eye irritation.</td></tr>
+                  <tr class="border-b"><td class="py-1.5 pr-2 font-bold text-amber-600">35–55</td><td>Unhealthy (Sensitive)</td><td>Children, elderly, asthma/COPD should stay indoors.</td></tr>
+                  <tr class="border-b"><td class="py-1.5 pr-2 font-bold text-orange-600">55–150</td><td>Unhealthy</td><td>ARI/ISPA cases rise sharply. Masks + clean room needed.</td></tr>
+                  <tr class="border-b"><td class="py-1.5 pr-2 font-bold text-rose-600">150–250</td><td>Very Unhealthy</td><td>Emergency conditions. School closure recommended.</td></tr>
+                  <tr><td class="py-1.5 pr-2 font-bold text-fuchsia-700">250+</td><td>Hazardous</td><td>Health emergency. Consider evacuation of vulnerable.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- FORECAST -->
+        <div id="tab-forecast" class="tabpane hidden fade-in">
+          <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-sm mb-4">
+            <h3 class="text-[11px] font-bold text-slate-500 uppercase mb-3">5-Day Haze &amp; Fire-Weather Outlook</h3>
+            <div id="forecast-days" class="flex gap-2 overflow-x-auto pb-2"></div>
+          </div>
+          <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 mb-4">
+            <h3 class="text-[11px] font-bold text-slate-500 uppercase mb-3">Fire Danger Drivers — Rain vs Temperature vs Wind</h3>
+            <div class="h-48 w-full"><canvas id="floodChart"></canvas></div>
+          </div>
+          <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+            <h3 class="text-[11px] font-bold text-slate-500 uppercase mb-3">Peat Dryness Context — NASA POWER</h3>
+            <p id="nasa-power" class="text-xs text-slate-600">Loading climate context…</p>
+          </div>
+        </div>
+
+        <!-- ACTIONS -->
+        <div id="tab-actions" class="tabpane hidden fade-in">
+          <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 mb-4">
+            <h3 class="text-sm font-bold text-slate-800 mb-1"><i class="fa-solid fa-list-check mr-1 text-orange-600"></i> Health Protection Actions</h3>
+            <p class="text-[11px] text-slate-500">Auto-generated protective steps based on current smoke levels, vulnerable groups present, and available equipment.</p>
+          </div>
+          <div id="actions-list" class="space-y-3"></div>
+
+          <div class="mt-5 bg-rose-50 border border-rose-200 rounded-xl p-4">
+            <h4 class="text-xs font-bold text-rose-800 mb-2"><i class="fa-solid fa-truck-medical mr-1"></i> Emergency Red Flags — Go To Hospital Immediately</h4>
+            <ul class="text-[11px] text-rose-700 space-y-1 list-disc list-inside leading-relaxed">
+              <li>Breathing difficulty at rest, or unable to speak a full sentence</li>
+              <li>Bluish lips or fingertips (cyanosis)</li>
+              <li>Chest pain, or heart palpitations that will not settle</li>
+              <li>Confusion, extreme drowsiness, or fainting</li>
+              <li>Infant refusing to feed, or chest wall sucking inward when breathing</li>
+              <li>Asthma reliever inhaler not working after 2 doses</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- HISTORY -->
+        <div id="tab-history" class="tabpane hidden fade-in">
+          <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 mb-4">
+            <h3 class="text-sm font-bold text-slate-800 mb-1"><i class="fa-solid fa-clock-rotate-left mr-1 text-orange-600"></i> Haze Event History</h3>
+            <p class="text-[11px] text-slate-500">Automatically logs every MODERATE/HIGH smoke exposure day. Stores up to 5 years.</p>
+          </div>
+          <div id="history-list" class="space-y-3"></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MOBILE NAV -->
+<div class="md:hidden bg-white border-t border-slate-200 shrink-0 flex z-30 shadow-[0_-2px_8px_rgba(0,0,0,0.04)] pb-[env(safe-area-inset-bottom)]">
+  <button id="mtab-map" onclick="mobileView('map')" class="mtab-active flex-1 py-2.5 flex flex-col items-center text-[10px] font-semibold text-slate-500"><i class="fa-solid fa-map text-base mb-0.5"></i>Map</button>
+  <button id="mtab-dash" onclick="mobileView('dash')" class="flex-1 py-2.5 flex flex-col items-center text-[10px] font-semibold text-slate-500"><i class="fa-solid fa-chart-pie text-base mb-0.5"></i>Analysis</button>
+</div>
+
+<!-- ===== ONBOARDING MODAL (NASA FIRMS) ===== -->
+<div id="modal-onboard" class="fixed inset-0 bg-slate-900/70 z-[150] hidden flex items-center justify-center backdrop-blur-sm px-4 py-6 overflow-y-auto">
+  <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden my-auto">
+    <div class="bg-gradient-to-r from-orange-600 to-rose-600 text-white p-5">
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 rounded-xl bg-white/20 flex items-center justify-center shrink-0"><i class="fa-solid fa-satellite text-xl"></i></div>
+        <div>
+          <h3 class="font-extrabold text-lg leading-tight">One-Time Setup Required</h3>
+          <p class="text-[11px] text-orange-100 mt-0.5">HazeGuard needs a free NASA FIRMS key to detect fire hotspots</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="p-5 text-sm max-h-[60vh] overflow-y-auto">
+      <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-4 flex gap-2.5">
+        <i class="fa-solid fa-circle-info text-amber-600 mt-0.5"></i>
+        <p class="text-[11px] text-amber-800 leading-relaxed">
+          <b>It is 100% free and takes about 2 minutes.</b> NASA gives every user a personal "MAP_KEY" so their servers can manage traffic. Without it, this app can still show PM2.5 and weather, but <b>fire hotspot detection will be disabled</b> — which is the core of smoke source tracking.
+        </p>
+      </div>
+
+      <h4 class="font-bold text-slate-800 text-xs uppercase tracking-wide mb-3">How to get your key</h4>
+      <ol class="space-y-3 text-xs text-slate-700">
+        <li class="flex gap-3">
+          <span class="w-5 h-5 rounded-full bg-orange-600 text-white flex items-center justify-center text-[10px] font-bold shrink-0">1</span>
+          <div>Click the big orange button below. It opens NASA's official FIRMS Map Key page in a new tab.</div>
+        </li>
+        <li class="flex gap-3">
+          <span class="w-5 h-5 rounded-full bg-orange-600 text-white flex items-center justify-center text-[10px] font-bold shrink-0">2</span>
+          <div>Enter your <b>email address</b> in the form and submit. (No password, no credit card, no account approval wait.)</div>
+        </li>
+        <li class="flex gap-3">
+          <span class="w-5 h-5 rounded-full bg-orange-600 text-white flex items-center justify-center text-[10px] font-bold shrink-0">3</span>
+          <div>NASA instantly displays your <b>MAP_KEY</b> on screen and also emails it to you. It looks like a long string of letters and numbers, e.g. <code class="bg-slate-100 px-1 rounded text-[10px]">a1b2c3d4e5f6...</code></div>
+        </li>
+        <li class="flex gap-3">
+          <span class="w-5 h-5 rounded-full bg-orange-600 text-white flex items-center justify-center text-[10px] font-bold shrink-0">4</span>
+          <div><b>Copy</b> that key, come back to this tab, and <b>paste</b> it into the box below. Then press Save.</div>
+        </li>
+      </ol>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-4">
+        <a href="https://firms.modaps.eosdis.nasa.gov/api/map_key/" target="_blank" rel="noopener"
+           class="bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 rounded-lg text-xs flex items-center justify-center gap-2 shadow-md transition">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i> Open NASA FIRMS Key Page
+        </a>
+        <a href="https://urs.earthdata.nasa.gov/users/new" target="_blank" rel="noopener"
+           class="bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 font-semibold py-3 rounded-lg text-xs flex items-center justify-center gap-2 transition">
+          <i class="fa-solid fa-user-plus"></i> Earthdata Sign-Up (optional)
+        </a>
+      </div>
+
+      <div class="mt-5">
+        <label class="block font-semibold text-slate-700 mb-1 text-xs">Paste your NASA FIRMS MAP_KEY here</label>
+        <div class="flex gap-2">
+          <input type="text" id="onb-firms" class="flex-1 border-2 border-slate-200 focus:border-orange-500 rounded-lg p-2.5 text-xs outline-none font-mono" placeholder="e.g. 8f2a1c93b7e0d4...">
+          <button onclick="pasteFromClipboard()" title="Paste from clipboard" class="bg-slate-100 hover:bg-slate-200 border border-slate-300 px-3 rounded-lg text-slate-600"><i class="fa-solid fa-paste"></i></button>
+        </div>
+        <p id="onb-msg" class="text-[10px] mt-1.5 h-3"></p>
+      </div>
+
+      <div class="mt-3 flex items-start gap-2 bg-slate-50 border border-slate-200 rounded-lg p-2.5">
+        <i class="fa-solid fa-lock text-slate-400 text-[11px] mt-0.5"></i>
+        <p class="text-[10px] text-slate-500 leading-relaxed">Your key is stored only in this browser (IndexedDB). It is never sent to any server other than NASA's own API.</p>
+      </div>
+    </div>
+
+    <div class="p-4 bg-slate-50 border-t flex flex-col sm:flex-row gap-2">
+      <button onclick="saveOnboardKey()" class="flex-1 bg-slate-800 hover:bg-slate-900 text-white font-bold py-2.5 rounded-lg text-xs flex items-center justify-center gap-2"><i class="fa-solid fa-check"></i> Save Key &amp; Start</button>
+      <button onclick="skipOnboard()" class="sm:w-40 bg-white hover:bg-slate-100 text-slate-500 border border-slate-300 font-semibold py-2.5 rounded-lg text-xs">Skip for now</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD SITE MODAL -->
+<div id="modal-add-site" class="fixed inset-0 bg-slate-900/60 z-[100] hidden flex items-center justify-center backdrop-blur-sm px-4 py-6 overflow-y-auto">
+  <div class="bg-white w-full max-w-md rounded-xl shadow-2xl overflow-hidden my-auto">
+    <div class="p-4 border-b bg-slate-50 flex justify-between items-center"><h3 class="font-bold text-slate-800">Register Monitoring Area</h3><button onclick="closeModal('modal-add-site')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button></div>
+    <div class="p-5 max-h-[70vh] overflow-y-auto">
+      <form id="form-site" onsubmit="saveSite(event)" class="space-y-4 text-sm">
+        <div><label class="block font-semibold text-slate-700 mb-1">Location Name</label><input type="text" id="s-name" required class="w-full border rounded-lg p-2 focus:ring-2 focus:ring-orange-500 outline-none" placeholder="e.g. Palangka Raya – SDN 3"></div>
+
+        <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg">
+          <div class="flex justify-between items-end mb-2"><label class="block font-semibold text-slate-700 text-xs">Coordinates</label><button type="button" onclick="startMapPick()" class="text-[10px] bg-orange-100 text-orange-700 border border-orange-200 px-2 py-1 rounded hover:bg-orange-200 font-bold"><i class="fa-solid fa-map-pin"></i> Pick on Map</button></div>
+          <div class="grid grid-cols-2 gap-3"><input type="number" step="any" id="s-lat" required class="w-full border rounded p-2 text-xs" placeholder="Latitude"><input type="number" step="any" id="s-lon" required class="w-full border rounded p-2 text-xs" placeholder="Longitude"></div>
+        </div>
+
+        <div><label class="block font-semibold text-slate-700 mb-1">Location Type</label>
+          <select id="s-type" class="w-full border rounded-lg p-2 outline-none">
+            <option value="Village">Village / Settlement</option>
+            <option value="School">School / Daycare</option>
+            <option value="Health Facility">Health Facility (Puskesmas/Clinic)</option>
+            <option value="Household">Household</option>
+            <option value="Workplace">Outdoor Workplace</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Vulnerable Groups Present <span class="text-[10px] font-normal text-slate-400">(Check all that apply)</span></label>
+          <div class="grid grid-cols-1 gap-2 p-3 bg-slate-50 border border-slate-200 rounded-lg max-h-44 overflow-y-auto">
+            <label class="flex items-center gap-2 text-xs cursor-pointer hover:bg-slate-100 p-1 rounded"><input type="checkbox" value="Infants" class="grp-chk w-3.5 h-3.5 text-orange-600"> Infants &amp; toddlers (&lt;5 years)</label>
+            <label class="flex items-center gap-2 text-xs cursor-pointer hover:bg-slate-100 p-1 rounded"><input type="checkbox" value="Children" class="grp-chk w-3.5 h-3.5 text-orange-600"> School-age children (5–17)</label>
+            <label class="flex items-center gap-2 text-xs cursor-pointer hover:bg-slate-100 p-1 rounded"><input type="checkbox" value="Elderly" class="grp-chk w-3.5 h-3.5 text-orange-600"> Elderly (65+)</label>
+            <label class="flex items-center gap-2 text-xs cursor-pointer hover:bg-slate-100 p-1 rounded"><input type="checkbox" value="Pregnant" class="grp-chk w-3.5 h-3.5 text-orange-600"> Pregnant women</label>
+            <label class="flex items-center gap-2 text-xs cursor-pointer hover:bg-slate-100 p-1 rounded"><input type="checkbox" value="Asthma" class="grp-chk w-3.5 h-3.5 text-orange-600"> Asthma patients</label>
+            <label class="flex items-center gap-2 text-xs cursor-pointer hover:bg-slate-100 p-1 rounded"><input type="checkbox" value="COPD" class="grp-chk w-3.5 h-3.5 text-orange-600"> COPD / chronic lung disease</label>
+            <label class="flex items-center gap-2 text-xs cursor-pointer hover:bg-slate-100 p-1 rounded"><input type="checkbox" value="Heart" class="grp-chk w-3.5 h-3.5 text-orange-600"> Heart disease patients</label>
+            <label class="flex items-center gap-2 text-xs cursor-pointer hover:bg-slate-100 p-1 rounded"><input type="checkbox" value="Outdoor" class="grp-chk w-3.5 h-3.5 text-orange-600"> Outdoor workers (farmers, drivers)</label>
+            <label class="flex items-center gap-2 text-xs cursor-pointer hover:bg-slate-100 p-1 rounded"><input type="checkbox" value="Healthy" class="grp-chk w-3.5 h-3.5 text-orange-600"> Healthy adults only</label>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1 text-xs">Approx. population exposed <span class="text-[10px] font-normal text-slate-400">(optional)</span></label>
+          <input type="number" id="s-pop" min="0" class="w-full border rounded-lg p-2 text-xs" placeholder="e.g. 450">
+        </div>
+
+        <button type="submit" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 rounded-lg mt-2">Save Location</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- CAPACITY MODAL -->
+<div id="modal-capacity" class="fixed inset-0 bg-slate-900/60 z-[100] hidden flex items-center justify-center backdrop-blur-sm px-4 py-6 overflow-y-auto">
+  <div class="bg-white w-full max-w-md rounded-xl shadow-2xl overflow-hidden my-auto">
+    <div class="p-4 border-b bg-orange-50 flex justify-between items-center"><h3 class="font-bold text-orange-900"><i class="fa-solid fa-shield-halved mr-1"></i> Protective Capacity</h3><button onclick="closeModal('modal-capacity')" class="text-orange-700 hover:text-orange-900"><i class="fa-solid fa-xmark"></i></button></div>
+    <div class="p-5 text-sm max-h-[70vh] overflow-y-auto">
+      <p class="text-[11px] text-slate-500 mb-4">Tick the protective resources you actually have. More capacity lowers the ARI risk score.</p>
+      <form id="form-capacity" onsubmit="saveCapacity(event)" class="space-y-2.5">
+        <label class="flex items-start gap-3 p-2.5 border rounded-lg cursor-pointer hover:bg-slate-50"><input type="checkbox" id="cap-n95" class="w-4 h-4 text-orange-600 mt-0.5"><span><span class="font-semibold text-slate-700 block">N95 / KN95 respirators</span><span class="text-[10px] text-slate-400">Enough for all vulnerable people, not cloth masks</span></span></label>
+        <label class="flex items-start gap-3 p-2.5 border rounded-lg cursor-pointer hover:bg-slate-50"><input type="checkbox" id="cap-purifier" class="w-4 h-4 text-orange-600 mt-0.5"><span><span class="font-semibold text-slate-700 block">HEPA air purifier</span><span class="text-[10px] text-slate-400">Or DIY box-fan filter (Corsi-Rosenthal)</span></span></label>
+        <label class="flex items-start gap-3 p-2.5 border rounded-lg cursor-pointer hover:bg-slate-50"><input type="checkbox" id="cap-cleanroom" class="w-4 h-4 text-orange-600 mt-0.5"><span><span class="font-semibold text-slate-700 block">Sealed clean-air room / shelter</span><span class="text-[10px] text-slate-400">Room with sealed gaps people can retreat into</span></span></label>
+        <label class="flex items-start gap-3 p-2.5 border rounded-lg cursor-pointer hover:bg-slate-50"><input type="checkbox" id="cap-clinic" class="w-4 h-4 text-orange-600 mt-0.5"><span><span class="font-semibold text-slate-700 block">Clinic reachable within 30 min</span><span class="text-[10px] text-slate-400">Puskesmas / hospital with respiratory care</span></span></label>
+        <label class="flex items-start gap-3 p-2.5 border rounded-lg cursor-pointer hover:bg-slate-50"><input type="checkbox" id="cap-meds" class="w-4 h-4 text-orange-600 mt-0.5"><span><span class="font-semibold text-slate-700 block">Inhalers / nebuliser / oxygen stocked</span><span class="text-[10px] text-slate-400">At least 2 weeks of asthma medication supply</span></span></label>
+        <label class="flex items-start gap-3 p-2.5 border rounded-lg cursor-pointer hover:bg-slate-50"><input type="checkbox" id="cap-alert" class="w-4 h-4 text-orange-600 mt-0.5"><span><span class="font-semibold text-slate-700 block">Community alert system &amp; SOP</span><span class="text-[10px] text-slate-400">WA group / loudspeaker + trained volunteers</span></span></label>
+        <button type="submit" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-2.5 rounded-lg mt-3">Update Capacity</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div id="modal-settings" class="fixed inset-0 bg-slate-900/60 z-[100] hidden flex items-center justify-center backdrop-blur-sm px-4 py-6 overflow-y-auto">
+  <div class="bg-white w-full max-w-md rounded-xl shadow-2xl overflow-hidden my-auto">
+    <div class="p-4 border-b bg-slate-50 flex justify-between items-center"><h3 class="font-bold text-slate-800"><i class="fa-solid fa-gear mr-1"></i> API Settings &amp; Data</h3><button onclick="closeModal('modal-settings')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button></div>
+    <div class="p-5 text-sm space-y-4 max-h-[70vh] overflow-y-auto">
+
+      <div id="key-status" class="rounded-lg p-3 text-[11px] border flex items-start gap-2"></div>
+
+      <div>
+        <label class="block font-semibold text-slate-700 mb-1 text-xs">NASA FIRMS MAP_KEY <span class="text-rose-600 font-bold">(required for hotspots)</span></label>
+        <input type="text" id="set-firms" class="w-full border rounded-lg p-2 text-xs font-mono" placeholder="paste your MAP_KEY here">
+        <div class="flex gap-2 mt-1.5">
+          <a href="https://firms.modaps.eosdis.nasa.gov/api/map_key/" target="_blank" rel="noopener" class="text-[10px] text-orange-700 underline underline-offset-2"><i class="fa-solid fa-arrow-up-right-from-square"></i> Get a free key</a>
+          <button onclick="openModal('modal-onboard')" class="text-[10px] text-slate-500 underline underline-offset-2">Show step-by-step guide</button>
+        </div>
+      </div>
+
+      <div><label class="block font-semibold text-slate-700 mb-1 text-xs">FIRMS Satellite Source</label>
+        <select id="set-sat" class="w-full border rounded-lg p-2 text-xs">
+          <option value="VIIRS_SNPP_NRT">VIIRS S-NPP (375m, recommended)</option>
+          <option value="VIIRS_NOAA20_NRT">VIIRS NOAA-20 (375m)</option>
+          <option value="VIIRS_NOAA21_NRT">VIIRS NOAA-21 (375m)</option>
+          <option value="MODIS_NRT">MODIS Terra/Aqua (1km)</option>
+        </select>
+      </div>
+
+      <div><label class="block font-semibold text-slate-700 mb-1 text-xs">Search radius for hotspots</label>
+        <select id="set-radius" class="w-full border rounded-lg p-2 text-xs">
+          <option value="0.5">~55 km (local)</option>
+          <option value="1.0" selected>~110 km (regional)</option>
+          <option value="2.0">~220 km (wide transport)</option>
+        </select>
+      </div>
+
+      <button onclick="saveSettings()" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 rounded-lg">Save Settings</button>
+
+      <hr class="border-slate-200 my-1">
+      <h4 class="font-bold text-slate-800 text-xs">Database Management</h4>
+      <div class="grid grid-cols-2 gap-2">
+        <button onclick="exportData()" class="bg-sky-100 hover:bg-sky-200 text-sky-700 font-semibold py-2 rounded-lg text-xs flex items-center justify-center gap-1 transition"><i class="fa-solid fa-download"></i> Backup (JSON)</button>
+        <button onclick="document.getElementById('import-file').click()" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-700 font-semibold py-2 rounded-lg text-xs flex items-center justify-center gap-1 transition"><i class="fa-solid fa-upload"></i> Load (JSON)</button>
+      </div>
+      <button onclick="loadSampleData()" class="w-full bg-orange-100 hover:bg-orange-200 text-orange-700 font-semibold py-2 rounded-lg text-xs flex items-center justify-center gap-1 transition"><i class="fa-solid fa-bolt"></i> Load Sample Data (Kalimantan)</button>
+      <button onclick="clearData()" class="w-full bg-rose-100 hover:bg-rose-200 text-rose-700 font-semibold py-2 rounded-lg text-xs flex items-center justify-center gap-1 transition"><i class="fa-solid fa-trash"></i> Clear All Data</button>
+      <input type="file" id="import-file" class="hidden" accept=".json" onchange="importData(event)">
+    </div>
+  </div>
+</div>
+
+<!-- LOADER -->
+<div id="loader" class="fixed inset-0 bg-white/85 z-[200] hidden items-center justify-center flex-col backdrop-blur-sm">
+  <div class="loader-spinner mb-3"></div>
+  <p class="font-bold text-orange-700 text-sm animate-pulse" id="loader-text">Contacting satellites…</p>
+</div>
+
+<script>
+/* ============================================================
+   STATE
+============================================================ */
+let db = { sites: [] };
+let map=null, markers={}, currentSiteId=null, envChart=null, floodChart=null, isPickingMap=false;
+let settings = { firms:'', sat:'VIIRS_SNPP_NRT', radius:'1.0', onboarded:false, lang:'en' };
+let hazardLayers = null;
+
+/* ============================================================
+   GOOGLE TRANSLATE
+============================================================ */
+function googleTranslateElementInit(){
+  new google.translate.TranslateElement({
+    pageLanguage:'en',
+    includedLanguages:'en,id,ms,zh-CN,th,ja,ko,ar,nl,de,fr,es',
+    autoDisplay:false
+  },'google_translate_element');
+}
+(function(){
+  const s=document.createElement('script');
+  s.src='https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+  s.async=true; document.head.appendChild(s);
+})();
+
+function toggleLangMenu(){
+  const m=document.getElementById('lang-menu');
+  m.classList.toggle('hidden');
+  document.getElementById('gt-external').href =
+    'https://translate.google.com/translate?sl=en&tl=id&u='+encodeURIComponent(location.href);
+}
+document.addEventListener('click',e=>{
+  const m=document.getElementById('lang-menu');
+  if(!m) return;
+  if(!e.target.closest('#lang-menu') && !e.target.closest('button[onclick="toggleLangMenu()"]')) m.classList.add('hidden');
+});
+
+function setLang(code){
+  document.getElementById('lang-menu').classList.add('hidden');
+  document.getElementById('lang-current').innerText = code.toUpperCase().slice(0,2);
+  settings.lang = code; localforage.setItem('haze_settings', settings);
+
+  if(code==='en'){ // reset to original
+    setGTCookie('/en/en'); location.reload(); return;
+  }
+  const trySelect = (n)=>{
+    const sel=document.querySelector('.goog-te-combo');
+    if(sel){ sel.value=code; sel.dispatchEvent(new Event('change')); }
+    else if(n<25){ setTimeout(()=>trySelect(n+1),250); }
+    else { window.open('https://translate.google.com/translate?sl=en&tl='+code+'&u='+encodeURIComponent(location.href),'_blank'); }
+  };
+  trySelect(0);
+}
+function setGTCookie(v){
+  document.cookie='googtrans='+v+';path=/';
+  document.cookie='googtrans='+v+';path=/;domain=.'+location.hostname;
+}
+
+/* ============================================================
+   MAP
+============================================================ */
+function initMap(){
+  map=L.map('map',{zoomControl:false}).setView([-1.5,113.5],6);
+  const streetMap=L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{attribution:'&copy; OpenStreetMap, &copy; CARTO'});
+  const satelliteMap=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{attribution:'Tiles &copy; Esri'});
+  streetMap.addTo(map);
+  L.control.zoom({position:'bottomright'}).addTo(map);
+  hazardLayers=L.layerGroup().addTo(map);
+  L.control.layers({"Street View":streetMap,"Satellite View":satelliteMap},{"Hotspots & Smoke Zones":hazardLayers},{position:'bottomleft'}).addTo(map);
+  map.on('click',e=>{
+    if(isPickingMap){
+      document.getElementById('s-lat').value=e.latlng.lat.toFixed(6);
+      document.getElementById('s-lon').value=e.latlng.lng.toFixed(6);
+      cancelMapPick();
+    }
+  });
+}
+function startMapPick(){isPickingMap=true;document.getElementById('modal-add-site').classList.add('hidden');const t=document.getElementById('map-picker-instruction');t.classList.remove('hidden');t.classList.add('flex');document.getElementById('map').classList.add('picking-mode');if(window.innerWidth<768)mobileView('map');}
+function cancelMapPick(){isPickingMap=false;const t=document.getElementById('map-picker-instruction');t.classList.add('hidden');t.classList.remove('flex');document.getElementById('map').classList.remove('picking-mode');document.getElementById('modal-add-site').classList.remove('hidden');}
+function openModal(id){document.getElementById(id).classList.remove('hidden');}
+function closeModal(id){document.getElementById(id).classList.add('hidden');}
+function showLoader(t){document.getElementById('loader-text').innerText=t;document.getElementById('loader').style.display='flex';}
+function hideLoader(){document.getElementById('loader').style.display='none';}
+
+/* ============================================================
+   MOBILE / TABS
+============================================================ */
+function mobileView(v){
+  const dash=document.getElementById('dash-panel'),mapc=document.getElementById('map-container');
+  const mt=document.getElementById('mtab-map'),md=document.getElementById('mtab-dash');
+  if(window.innerWidth>=768)return;
+  if(v==='map'){mapc.classList.remove('hidden');dash.classList.add('hidden');mt.classList.add('mtab-active');md.classList.remove('mtab-active');setTimeout(()=>map.invalidateSize(),200);}
+  else{dash.classList.remove('hidden');mapc.classList.add('hidden');md.classList.add('mtab-active');mt.classList.remove('mtab-active');}
+}
+function switchTab(t){
+  document.querySelectorAll('.tabpane').forEach(p=>p.classList.add('hidden'));
+  const el=document.getElementById('tab-'+t);el.classList.remove('hidden');el.classList.add('fade-in');
+  document.querySelectorAll('.dtab').forEach(b=>{b.classList.remove('tab-active');b.classList.add('text-slate-500','border-transparent');});
+  const btn=document.querySelector(`.dtab[data-tab="${t}"]`);btn.classList.add('tab-active');btn.classList.remove('text-slate-500','border-transparent');
+}
+
+/* ============================================================
+   ONBOARDING + SETTINGS
+============================================================ */
+async function pasteFromClipboard(){
+  try{ const t=await navigator.clipboard.readText(); document.getElementById('onb-firms').value=t.trim();
+       msg('onb-msg','Pasted from clipboard.','text-emerald-600'); }
+  catch(e){ msg('onb-msg','Clipboard blocked by browser — paste manually (Ctrl+V).','text-amber-600'); }
+}
+function msg(id,txt,cls){const e=document.getElementById(id);e.className='text-[10px] mt-1.5 h-3 '+cls;e.innerText=txt;}
+
+async function saveOnboardKey(){
+  const k=document.getElementById('onb-firms').value.trim();
+  if(!k){ msg('onb-msg','Please paste a key, or press "Skip for now".','text-rose-600'); return; }
+  if(k.length<20){ msg('onb-msg','That looks too short for a MAP_KEY — please re-check.','text-rose-600'); return; }
+  settings.firms=k; settings.onboarded=true;
+  await localforage.setItem('haze_settings',settings);
+  document.getElementById('set-firms').value=k;
+  renderKeyStatus();
+  closeModal('modal-onboard');
+}
+async function skipOnboard(){
+  settings.onboarded=true;
+  await localforage.setItem('haze_settings',settings);
+  renderKeyStatus();
+  closeModal('modal-onboard');
+}
+async function saveSettings(){
+  settings.firms=document.getElementById('set-firms').value.trim();
+  settings.sat=document.getElementById('set-sat').value;
+  settings.radius=document.getElementById('set-radius').value;
+  settings.onboarded=true;
+  await localforage.setItem('haze_settings',settings);
+  renderKeyStatus();
+  closeModal('modal-settings');
+  if(currentSiteId) processSiteData(currentSiteId);
+}
+async function loadSettings(){
+  let s=await localforage.getItem('haze_settings');
+  if(s) settings={...settings,...s};
+  document.getElementById('set-firms').value=settings.firms||'';
+  document.getElementById('set-sat').value=settings.sat||'VIIRS_SNPP_NRT';
+  document.getElementById('set-radius').value=settings.radius||'1.0';
+  if(settings.lang && settings.lang!=='en') document.getElementById('lang-current').innerText=settings.lang.toUpperCase().slice(0,2);
+  renderKeyStatus();
+  if(!settings.onboarded) setTimeout(()=>openModal('modal-onboard'),700);
+}
+function renderKeyStatus(){
+  const b=document.getElementById('key-status');
+  if(settings.firms){
+    b.className='rounded-lg p-3 text-[11px] border flex items-start gap-2 bg-emerald-50 border-emerald-200 text-emerald-800';
+    b.innerHTML='<i class="fa-solid fa-circle-check mt-0.5"></i><span><b>NASA FIRMS connected.</b> Fire hotspot detection is active. Key ending in <code class="bg-white px-1 rounded">…'+settings.firms.slice(-6)+'</code></span>';
+  }else{
+    b.className='rounded-lg p-3 text-[11px] border flex items-start gap-2 bg-rose-50 border-rose-200 text-rose-800';
+    b.innerHTML='<i class="fa-solid fa-triangle-exclamation mt-0.5"></i><span><b>No FIRMS key — hotspot detection disabled.</b> PM2.5 and weather still work, but you cannot see where the fires are.</span>';
+  }
+}
+
+/* ============================================================
+   SAMPLE DATA
+============================================================ */
+function loadSampleData(){
+  const genHistory=()=>{
+    const h=[],now=new Date();
+    const hz=['Dense smoke plume','Extreme PM2.5','Hotspot cluster upwind','Prolonged dry spell','Peat fire smouldering','Low visibility haze'];
+    for(let i=0;i<24;i++){
+      const d=new Date(now.getTime()-((Math.floor(Math.random()*730)+1)*864e5));
+      const hi=Math.random()>0.55;
+      h.push({date:d.toLocaleDateString('en-CA'),time:d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}),
+        riskScore:hi?Math.floor(Math.random()*26)+75:Math.floor(Math.random()*35)+40,
+        riskLevel:hi?'HIGH':'MEDIUM',hazard:hz[Math.floor(Math.random()*hz.length)],
+        pm25:hi?Math.floor(Math.random()*200)+120:Math.floor(Math.random()*60)+40});
+    }
+    return h.sort((a,b)=>new Date(b.date)-new Date(a.date));
+  };
+  db.sites=[
+    {id:"S_1",name:"Palangka Raya – City Centre",type:"Village",groups:["Infants","Children","Elderly","Asthma"],pop:12000,lat:-2.2088,lon:113.9213,capN95:false,capPurifier:false,capCleanroom:false,capClinic:true,capMeds:false,capAlert:true,hasData:false,history:genHistory()},
+    {id:"S_2",name:"Banjarbaru – SDN 5 Elementary",type:"School",groups:["Children"],pop:420,lat:-3.4572,lon:114.8110,capN95:true,capPurifier:false,capCleanroom:true,capClinic:true,capMeds:false,capAlert:true,hasData:false,history:genHistory()},
+    {id:"S_3",name:"Pontianak – Puskesmas Sungai Raya",type:"Health Facility",groups:["Infants","Elderly","COPD","Heart"],pop:800,lat:-0.0850,lon:109.3450,capN95:true,capPurifier:true,capCleanroom:true,capClinic:true,capMeds:true,capAlert:true,hasData:false,history:genHistory()},
+    {id:"S_4",name:"Sampit – Peatland Farming Village",type:"Village",groups:["Outdoor","Infants","Pregnant","Elderly"],pop:2300,lat:-2.5350,lon:112.9500,capN95:false,capPurifier:false,capCleanroom:false,capClinic:false,capMeds:false,capAlert:false,hasData:false,history:genHistory()}
+  ];
+  saveDb(); renderMapMarkers();
+  alert("Sample Kalimantan data loaded (including 2 years of haze event history).");
+  closeModal('modal-settings');
+  if(window.innerWidth<768) mobileView('map');
+}
+
+async function saveDb(){ await localforage.setItem('haze_db',db); }
+async function loadDb(){ let d=await localforage.getItem('haze_db'); if(d){db=d;renderMapMarkers();} }
+
+/* ============================================================
+   MARKERS
+============================================================ */
+function renderMapMarkers(){
+  for(let id in markers) map.removeLayer(markers[id]); markers={};
+  if(db.sites.length===0) return;
+  let bounds=L.latLngBounds();
+  db.sites.forEach(s=>{
+    const color=!s.hasData?'#94a3b8':(s.riskScore>=75?'#e11d48':(s.riskScore>=40?'#f59e0b':'#10b981'));
+    const icon=L.divIcon({html:`<div style="width:18px;height:18px;background:${color};border-radius:50%;border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4)"></div>`,className:'',iconSize:[18,18],iconAnchor:[9,9]});
+    const m=L.marker([s.lat,s.lon],{icon}).addTo(map);
+    m.bindTooltip(`<b>${s.name}</b><br><span style="font-size:10px">${s.type}${s.hasData?' · ARI risk '+s.riskScore+'% · PM2.5 '+s.apiPM25:''}</span>`,{direction:'top'});
+    m.bindPopup(`<div class="text-center min-w-[150px] py-1">
+      <h4 class="font-bold text-slate-800 text-sm mb-0.5">${s.name}</h4>
+      <div class="text-[10px] text-slate-500 mb-2">${s.type}</div>
+      <button onclick="mobileView('dash')" class="md:hidden w-full bg-orange-600 hover:bg-orange-700 text-white px-3 py-2 rounded-lg text-xs font-bold shadow-sm flex items-center justify-center gap-1">See Analysis <i class="fa-solid fa-arrow-right"></i></button>
+      <div class="hidden md:block text-[9px] text-slate-400 border-t pt-1 mt-1">Data shown on the right panel.</div></div>`,{closeButton:false,offset:[0,-5]});
+    m.on('click',()=>{
+      currentSiteId=s.id;
+      map.flyTo([s.lat,s.lon],10,{duration:1.4});
+      if(s.hasData) renderDashboard(s); else processSiteData(s.id);
+    });
+    markers[s.id]=m; bounds.extend([s.lat,s.lon]);
+  });
+  try{map.fitBounds(bounds,{padding:[40,40],maxZoom:11});}catch(e){}
+}
+
+function saveSite(e){
+  e.preventDefault();
+  const g=Array.from(document.querySelectorAll('.grp-chk:checked')).map(c=>c.value);
+  if(g.length===0) g.push("Healthy");
+  const s={id:"S_"+Date.now(),name:document.getElementById('s-name').value,
+    lat:parseFloat(document.getElementById('s-lat').value),lon:parseFloat(document.getElementById('s-lon').value),
+    type:document.getElementById('s-type').value,groups:g,pop:parseInt(document.getElementById('s-pop').value)||0,
+    capN95:false,capPurifier:false,capCleanroom:false,capClinic:false,capMeds:false,capAlert:false,hasData:false,history:[]};
+  db.sites.push(s);saveDb();closeModal('modal-add-site');document.getElementById('form-site').reset();
+  renderMapMarkers();currentSiteId=s.id;
+  if(window.innerWidth<768) mobileView('dash');
+  processSiteData(s.id);
+}
+function saveCapacity(e){
+  e.preventDefault();const s=db.sites.find(x=>x.id===currentSiteId);if(!s)return;
+  s.capN95=document.getElementById('cap-n95').checked;
+  s.capPurifier=document.getElementById('cap-purifier').checked;
+  s.capCleanroom=document.getElementById('cap-cleanroom').checked;
+  s.capClinic=document.getElementById('cap-clinic').checked;
+  s.capMeds=document.getElementById('cap-meds').checked;
+  s.capAlert=document.getElementById('cap-alert').checked;
+  saveDb();closeModal('modal-capacity');processSiteData(currentSiteId);
+}
+function populateCapacityForm(s){
+  document.getElementById('cap-n95').checked=!!s.capN95;
+  document.getElementById('cap-purifier').checked=!!s.capPurifier;
+  document.getElementById('cap-cleanroom').checked=!!s.capCleanroom;
+  document.getElementById('cap-clinic').checked=!!s.capClinic;
+  document.getElementById('cap-meds').checked=!!s.capMeds;
+  document.getElementById('cap-alert').checked=!!s.capAlert;
+}
+
+/* ============================================================
+   API ORCHESTRATION
+============================================================ */
+async function processSiteData(id){
+  const s=db.sites.find(x=>x.id===id);if(!s)return;
+  showLoader("Querying NASA FIRMS · CAMS Air Quality · Open-Meteo…");
+  try{
+    const urlAQ=`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${s.lat}&longitude=${s.lon}`
+      +`&current=pm2_5,pm10,carbon_monoxide,nitrogen_dioxide,sulphur_dioxide,ozone,aerosol_optical_depth,dust,uv_index,european_aqi,us_aqi`
+      +`&hourly=pm2_5,pm10,carbon_monoxide,us_aqi,aerosol_optical_depth&forecast_days=3&timezone=auto`;
+    const urlW=`https://api.open-meteo.com/v1/forecast?latitude=${s.lat}&longitude=${s.lon}`
+      +`&current=temperature_2m,relative_humidity_2m,precipitation,weather_code,wind_speed_10m,wind_direction_10m,surface_pressure`
+      +`&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_hours,wind_speed_10m_max,wind_direction_10m_dominant,weather_code,relative_humidity_2m_min`
+      +`&timezone=auto&forecast_days=5&past_days=14`;
+
+    const [rAQ,rW]=await Promise.all([
+      fetch(urlAQ),
+      fetch(urlW)
+    ]);
+    const dAQ=await rAQ.json(), dW=await rW.json();
+
+    s.fireData=[]; s.firePoints=0; s.fireError=null;
+    if(settings.firms){ await fetchFirms(s); } else { s.fireError='NO_KEY'; }
+
+    calculateRisk(s,dAQ,dW);
+    s.hasData=true; s.lastUpdate=new Date().toISOString();
+    saveDb(); hideLoader(); renderMapMarkers(); renderDashboard(s);
+    fetchNasaPower(s);
+  }catch(err){
+    console.error(err); hideLoader();
+    alert("Failed to reach the air-quality APIs. Check your internet connection and try Refresh again.");
+  }
+}
+
+async function fetchFirms(s){
+  const r=parseFloat(settings.radius||1.0);
+  const bbox=`${(s.lon-r).toFixed(3)},${(s.lat-r).toFixed(3)},${(s.lon+r).toFixed(3)},${(s.lat+r).toFixed(3)}`;
+  const url=`https://firms.modaps.eosdis.nasa.gov/api/area/csv/${settings.firms}/${settings.sat}/${bbox}/2`;
+  try{
+    const res=await fetch(url);
+    const txt=await res.text();
+    if(txt.toLowerCase().includes('invalid') || txt.toLowerCase().includes('error')){ s.fireError='BAD_KEY'; return; }
+    const lines=txt.trim().split('\n');
+    if(lines.length<2){ s.firePoints=0; s.fireData=[]; return; }
+    const head=lines[0].split(',').map(h=>h.trim().toLowerCase());
+    const iLat=head.indexOf('latitude'),iLon=head.indexOf('longitude');
+    const iFrp=head.indexOf('frp'),iConf=head.indexOf('confidence'),iDay=head.indexOf('acq_date'),iTime=head.indexOf('acq_time');
+    const arr=[];
+    for(let i=1;i<lines.length;i++){
+      const c=lines[i].split(',');
+      if(c.length<3) continue;
+      const la=parseFloat(c[iLat]),lo=parseFloat(c[iLon]);
+      if(isNaN(la)||isNaN(lo)) continue;
+      arr.push({lat:la,lon:lo,frp:parseFloat(c[iFrp])||0,conf:c[iConf]||'-',date:c[iDay]||'',time:c[iTime]||'',
+                dist:haversine(s.lat,s.lon,la,lo)});
+    }
+    arr.sort((a,b)=>a.dist-b.dist);
+    s.fireData=arr; s.firePoints=arr.length;
+    s.nearestFire=arr.length?arr[0].dist:null;
+    s.totalFRP=arr.reduce((a,b)=>a+(b.frp||0),0);
+  }catch(e){ console.log('FIRMS error',e); s.fireError='FETCH'; }
+}
+
+function haversine(la1,lo1,la2,lo2){
+  const R=6371,dLa=(la2-la1)*Math.PI/180,dLo=(lo2-lo1)*Math.PI/180;
+  const a=Math.sin(dLa/2)**2+Math.cos(la1*Math.PI/180)*Math.cos(la2*Math.PI/180)*Math.sin(dLo/2)**2;
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+function bearing(la1,lo1,la2,lo2){
+  const φ1=la1*Math.PI/180,φ2=la2*Math.PI/180,Δλ=(lo2-lo1)*Math.PI/180;
+  const y=Math.sin(Δλ)*Math.cos(φ2), x=Math.cos(φ1)*Math.sin(φ2)-Math.sin(φ1)*Math.cos(φ2)*Math.cos(Δλ);
+  return (Math.atan2(y,x)*180/Math.PI+360)%360;
+}
+
+async function fetchNasaPower(s){
+  const el=document.getElementById('nasa-power');
+  try{
+    let end=new Date();end.setDate(end.getDate()-3);
+    let start=new Date();start.setDate(start.getDate()-33);
+    const f=d=>d.toISOString().split('T')[0].replace(/-/g,'');
+    const url=`https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR,T2M_MAX,RH2M&community=AG&longitude=${s.lon}&latitude=${s.lat}&start=${f(start)}&end=${f(end)}&format=JSON`;
+    const d=await (await fetch(url)).json();
+    const p=d.properties.parameter;
+    const rain=Object.values(p.PRECTOTCORR).filter(v=>v>-100);
+    const total=rain.reduce((a,b)=>a+b,0);
+    let dry=0; for(let i=rain.length-1;i>=0;i--){ if(rain[i]<1) dry++; else break; }
+    const tmax=Object.values(p.T2M_MAX).filter(v=>v>-100);
+    const avgT=(tmax.reduce((a,b)=>a+b,0)/tmax.length).toFixed(1);
+    s.dryStreak=dry;
+    let verdict, cls;
+    if(dry>=14||total<40){verdict='<b class="text-rose-700">CRITICAL peat dryness.</b> Peat soil is likely dry enough to ignite and smoulder underground. Fires started now will be extremely hard to extinguish and will produce heavy smoke for weeks.';}
+    else if(dry>=7||total<90){verdict='<b class="text-amber-700">ELEVATED dryness.</b> Surface vegetation is drying out. Land-clearing fires can escape control quickly.';}
+    else {verdict='<b class="text-emerald-700">Peat moisture adequate.</b> Recent rainfall is suppressing fire ignition and spread potential.';}
+    el.innerHTML=`Last 30 days: <b>${total.toFixed(0)} mm</b> total rainfall · <b>${dry} consecutive dry days</b> (&lt;1mm) · avg max temp <b>${avgT}°C</b>.<br><span class="block mt-1.5">${verdict}</span>`;
+  }catch(e){ el.innerHTML='NASA POWER peat-dryness context unavailable right now.'; }
+}
+
+/* ============================================================
+   RISK ENGINE
+============================================================ */
+function calculateRisk(s,aq,w){
+  const a=aq.current||{}, c=w.current||{};
+  s.apiPM25=Math.round(a.pm2_5||0);
+  s.apiPM10=Math.round(a.pm10||0);
+  s.apiCO=Math.round(a.carbon_monoxide||0);
+  s.apiNO2=Math.round(a.nitrogen_dioxide||0);
+  s.apiSO2=Math.round(a.sulphur_dioxide||0);
+  s.apiO3=Math.round(a.ozone||0);
+  s.apiAOD=(a.aerosol_optical_depth!=null)?Number(a.aerosol_optical_depth).toFixed(2):null;
+  s.apiDust=Math.round(a.dust||0);
+  s.apiUSAQI=Math.round(a.us_aqi||0);
+  s.apiEUAQI=Math.round(a.european_aqi||0);
+
+  s.apiTemp=c.temperature_2m; s.apiRH=c.relative_humidity_2m;
+  s.apiWind=c.wind_speed_10m??0; s.apiWindDir=c.wind_direction_10m??0; s.apiRain=c.precipitation??0;
+
+  // hourly
+  const h=aq.hourly||{};
+  s.hTime=h.time||[]; s.hPM25=h.pm2_5||[]; s.hAQI=h.us_aqi||[]; s.hPM10=h.pm10||[];
+  const nextPM = s.hPM25.slice(0,72).filter(v=>v!=null);
+  s.peakPM25 = nextPM.length?Math.round(Math.max(...nextPM)):s.apiPM25;
+  s.avgPM25_24 = nextPM.length?Math.round(nextPM.slice(0,24).reduce((x,y)=>x+y,0)/Math.min(24,nextPM.length)):s.apiPM25;
+
+  // daily weather
+  const dd=w.daily||{};
+  s.dDates=(dd.time||[]).slice(-5);
+  const nAll=(dd.time||[]).length, o=Math.max(nAll-5,0);
+  s.dTmax=(dd.temperature_2m_max||[]).slice(o);
+  s.dTmin=(dd.temperature_2m_min||[]).slice(o);
+  s.dRain=(dd.precipitation_sum||[]).slice(o);
+  s.dWind=(dd.wind_speed_10m_max||[]).slice(o);
+  s.dCode=(dd.weather_code||[]).slice(o);
+  s.dRHmin=(dd.relative_humidity_2m_min||[]).slice(o);
+  const past=(dd.precipitation_sum||[]).slice(0,o);
+  let dry14=0; for(let i=past.length-1;i>=0;i--){ if((past[i]||0)<1) dry14++; else break; }
+  s.recentDry=dry14;
+
+  // visibility estimate (Koschmieder-ish)
+  s.visKm = s.apiPM25>0 ? Math.max(0.15, Math.min(30, 2500/(s.apiPM25*8+30))).toFixed(1) : '30+';
+
+  // smoke transport
+  s.upwindFires=0; s.transportNote='No hotspot data';
+  if(s.fireData && s.fireData.length){
+    const windFrom=s.apiWindDir; // meteorological: direction wind comes FROM
+    let up=0;
+    s.fireData.forEach(f=>{
+      const b=bearing(s.lat,s.lon,f.lat,f.lon);
+      let diff=Math.abs(((b-windFrom+540)%360)-180);
+      if(diff<45 && f.dist<160) up++;
+    });
+    s.upwindFires=up;
+    s.transportNote = up>0 ? `${up} hotspot(s) directly upwind` : 'Fires not currently upwind';
+  } else if(s.fireError==='NO_KEY'){ s.transportNote='FIRMS key missing'; }
+
+  /* ---------- HAZARD (0–14) ---------- */
+  let H=0; const hz=[];
+  const P=s.apiPM25;
+  if(P>=250){H+=6;hz.push(['Hazardous PM2.5','crit',P+' µg/m³ — >16× WHO 24h guideline']);}
+  else if(P>=150){H+=5;hz.push(['Very unhealthy PM2.5','crit',P+' µg/m³ — emergency territory']);}
+  else if(P>=55){H+=4;hz.push(['Unhealthy PM2.5','crit',P+' µg/m³ — ARI cases rise sharply']);}
+  else if(P>=35){H+=2;hz.push(['Unhealthy for sensitive groups','warn',P+' µg/m³']);}
+  else if(P>=15){H+=1;hz.push(['Moderate particulate','warn',P+' µg/m³ — above WHO guideline']);}
+  else hz.push(['PM2.5 within WHO guideline','ok',P+' µg/m³']);
+
+  if(s.peakPM25>P*1.5 && s.peakPM25>=55){H+=2;hz.push(['Worsening trend forecast','crit','Peak '+s.peakPM25+' µg/m³ expected within 72h']);}
+
+  if(s.firePoints>=50){H+=3;hz.push(['Massive hotspot cluster','crit',s.firePoints+' detections in radius']);}
+  else if(s.firePoints>=10){H+=2;hz.push(['Active fire cluster','crit',s.firePoints+' detections']);}
+  else if(s.firePoints>0){H+=1;hz.push(['Fire hotspots detected','warn',s.firePoints+' detection(s), nearest '+(s.nearestFire?s.nearestFire.toFixed(0):'?')+' km']);}
+  else if(s.fireError==='NO_KEY'){hz.push(['Hotspot detection OFF','warn','Add NASA FIRMS key in Settings']);}
+  else hz.push(['No hotspots detected','ok','Clear within search radius']);
+
+  if(s.upwindFires>0){H+=2;hz.push(['Smoke blowing toward site','crit',s.upwindFires+' upwind fire(s) — direct plume path']);}
+  if(s.apiCO>4000){H+=1;hz.push(['Elevated carbon monoxide','warn',s.apiCO+' µg/m³ — combustion signature']);}
+  if(s.apiAOD && parseFloat(s.apiAOD)>0.8){H+=1;hz.push(['High aerosol optical depth','warn','AOD '+s.apiAOD+' — thick smoke column']);}
+  if(s.apiWind<5 && P>35){H+=1;hz.push(['Stagnant air','warn','Wind '+s.apiWind+' km/h — smoke will not disperse']);}
+  if(s.recentDry>=10){H+=1;hz.push(['Prolonged dry spell','warn',s.recentDry+' days without rain — peat ignition risk']);}
+  if(s.dRain.slice(0,3).reduce((a,b)=>a+(b||0),0)<2){hz.push(['No rain relief in 3 days','warn','Haze likely to persist']);}
+  else hz.push(['Rain forecast','ok','Rainfall may wash out particulates']);
+
+  s.hazardList=hz; s.hazardScore=Math.min(H,14);
+
+  /* ---------- VULNERABILITY (1–6) ---------- */
+  let V=1; const vu=[];
+  const g=Array.isArray(s.groups)?s.groups:['Healthy'];
+  const wmap={Infants:6,COPD:6,Asthma:5,Elderly:5,Pregnant:5,Heart:5,Children:4,Outdoor:4,Healthy:1};
+  g.forEach(x=>{V=Math.max(V,wmap[x]||2);});
+  const labels={Infants:'Infants &lt;5 yrs — airways still developing, breathe 2× faster per kg body weight',
+    Children:'School-age children — outdoor play increases inhaled dose',
+    Elderly:'Elderly 65+ — reduced lung reserve and immune response',
+    Pregnant:'Pregnant women — PM2.5 linked to low birth weight &amp; preterm birth',
+    Asthma:'Asthma — smoke is a direct bronchoconstriction trigger',
+    COPD:'COPD — highest hospitalisation risk during haze episodes',
+    Heart:'Heart disease — PM2.5 raises heart attack &amp; stroke risk within hours',
+    Outdoor:'Outdoor workers — prolonged unavoidable exposure',
+    Healthy:'Healthy adults — lower but non-zero risk'};
+  g.forEach(x=>vu.push([x,(wmap[x]>=5?'crit':wmap[x]>=4?'warn':'ok'),labels[x]||'']));
+  if(s.type==='School'&&P>=55){vu.push(['School in session','warn','Children congregated in one exposed location']);}
+  if(s.type==='Health Facility'){vu.push(['Health facility','warn','Already-sick patients concentrated here']);}
+  if(s.pop>=1000){vu.push(['Large exposed population','warn','~'+s.pop.toLocaleString()+' people']);}
+  s.vulnList=vu; s.vulnScore=Math.min(V,6);
+
+  /* ---------- CAPACITY (1–7) ---------- */
+  let C=1; const cp=[];
+  const add=(f,l,note)=>{if(f){C++;cp.push([l,'ok',note]);}else{cp.push([l,'miss','Not available — this raises risk']);}};
+  add(s.capN95,'N95/KN95 respirators','Filters ~95% of PM2.5');
+  add(s.capPurifier,'HEPA air purifier','Can cut indoor PM2.5 by 50–90%');
+  add(s.capCleanroom,'Sealed clean-air room','Safe refuge during peak smoke');
+  add(s.capClinic,'Clinic within 30 min','Rapid treatment for ARI cases');
+  add(s.capMeds,'Inhalers / oxygen stocked','Prevents asthma escalation');
+  add(s.capAlert,'Alert system & SOP','Enables timely community response');
+  s.capScoreRaw=C;
+  let eff=C;
+  if(s.type==='Workplace'||g.includes('Outdoor')) eff=C*0.7; // outdoor exposure can't be sheltered
+  s.capList=cp; s.capScore=Math.max(eff,0.7);
+
+  /* ---------- FINAL ---------- */
+  const raw=(s.hazardScore*s.vulnScore)/s.capScore;
+  s.riskScore=Math.round(Math.min((raw/28)*100,100));
+  s.riskLevel=s.riskScore>=75?'HIGH':s.riskScore>=40?'MEDIUM':'LOW';
+
+  computeIndicators(s);
+  generateActions(s);
+  logHistory(s);
+}
+
+/* ============================================================
+   INDICATORS
+============================================================ */
+function statusClass(l){return l==='crit'?'bg-rose-100 text-rose-700':l==='warn'?'bg-amber-100 text-amber-700':l==='ok'?'bg-emerald-100 text-emerald-700':'bg-slate-100 text-slate-500';}
+function dotClass(l){return l==='crit'?'text-rose-500':l==='warn'?'text-amber-500':l==='ok'?'text-emerald-500':'text-slate-400';}
+function ic(icon,name,val,lvl,note){return{icon,name,val,lvl,note};}
+
+function pmCat(p){
+  if(p>=250)return{t:'Hazardous',l:'crit'};
+  if(p>=150)return{t:'Very Unhealthy',l:'crit'};
+  if(p>=55)return{t:'Unhealthy',l:'crit'};
+  if(p>=35)return{t:'Sensitive Groups',l:'warn'};
+  if(p>=15)return{t:'Moderate',l:'warn'};
+  return{t:'Good',l:'ok'};
+}
+
+function computeIndicators(s){
+  const ind=[]; const P=s.apiPM25;
+  const cat=pmCat(P);
+  ind.push(ic('fa-smog','PM2.5 (fine smoke)',P+' µg/m³',cat.l,cat.t+' · WHO 24h guideline is 15'));
+  ind.push(ic('fa-cloud','PM10 (coarse)',s.apiPM10+' µg/m³',s.apiPM10>150?'crit':s.apiPM10>50?'warn':'ok','Ash and larger particles'));
+  ind.push(ic('fa-gauge-high','US AQI',s.apiUSAQI||'—',s.apiUSAQI>200?'crit':s.apiUSAQI>100?'warn':'ok','EPA composite index'));
+  ind.push(ic('fa-fire','Fire hotspots (48h)',
+    s.fireError==='NO_KEY'?'Key needed':s.firePoints,
+    s.fireError==='NO_KEY'?'warn':(s.firePoints>=10?'crit':s.firePoints>0?'warn':'ok'),
+    s.fireError==='NO_KEY'?'Add NASA FIRMS key in Settings':(s.nearestFire!=null?'Nearest '+s.nearestFire.toFixed(0)+' km · total FRP '+(s.totalFRP||0).toFixed(0)+' MW':'None in radius')));
+  ind.push(ic('fa-wind','Smoke transport',s.upwindFires>0?s.upwindFires+' upwind':'Not upwind',s.upwindFires>0?'crit':'ok',
+    'Wind from '+compass(s.apiWindDir)+' at '+s.apiWind+' km/h'));
+  ind.push(ic('fa-eye','Visibility (est.) ⚠',s.visKm+' km',parseFloat(s.visKm)<1?'crit':parseFloat(s.visKm)<5?'warn':'ok','Derived from PM2.5 extinction'));
+  ind.push(ic('fa-fire-flame-simple','Carbon monoxide',s.apiCO+' µg/m³',s.apiCO>6000?'crit':s.apiCO>3000?'warn':'ok','Incomplete combustion marker'));
+  ind.push(ic('fa-layer-group','Aerosol optical depth',s.apiAOD??'—',s.apiAOD>1?'crit':s.apiAOD>0.5?'warn':'ok','Smoke thickness in the air column'));
+  ind.push(ic('fa-lungs','ARI/ISPA pressure',ariPressure(P).t,ariPressure(P).l,ariPressure(P).n));
+  ind.push(ic('fa-child','Child safe outdoor time',childTime(P),P>=150?'crit':P>=55?'warn':'ok','Recommended max outdoor exposure'));
+  ind.push(ic('fa-droplet','Humidity / Temp',s.apiRH+'% / '+s.apiTemp+'°C',s.apiRH<40?'warn':'ok','Low RH worsens airway irritation'));
+  ind.push(ic('fa-sun-plant-wilt','Days without rain',s.recentDry,s.recentDry>=14?'crit':s.recentDry>=7?'warn':'ok','Peat ignition potential'));
+  s.indicators=ind;
+}
+function compass(d){const n=['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];return n[Math.round(((d||0)%360)/22.5)%16];}
+function ariPressure(p){
+  if(p>=150)return{t:'Severe',l:'crit',n:'Expect a surge in clinic ARI visits within 24–48h'};
+  if(p>=55)return{t:'High',l:'crit',n:'ARI/ISPA cases typically climb at this level'};
+  if(p>=35)return{t:'Elevated',l:'warn',n:'Sensitive people will start symptoms'};
+  if(p>=15)return{t:'Low-Moderate',l:'warn',n:'Mild irritation possible for some'};
+  return{t:'Minimal',l:'ok',n:'Background respiratory risk'};
+}
+function childTime(p){
+  if(p>=250)return'0 min';
+  if(p>=150)return'~15 min';
+  if(p>=55)return'~1 hour';
+  if(p>=35)return'~3 hours';
+  return'Normal';
+}
+
+/* ============================================================
+   ACTIONS
+============================================================ */
+function generateActions(s){
+  const acts=[]; const P=s.apiPM25;
+  const g=Array.isArray(s.groups)?s.groups:['Healthy'];
+  const has=x=>g.includes(x);
+
+  /* --- EMERGENCY LEVEL --- */
+  if(P>=250){
+    acts.push(['fa-triangle-exclamation','high',`<b>HAZARDOUS AIR — PUBLIC HEALTH EMERGENCY:</b><br>
+    • PM2.5 is at <b>${P} µg/m³</b>, more than 16 times the WHO safe daily limit. At this concentration, even healthy adults will develop coughing, chest tightness and eye irritation within an hour outdoors.<br>
+    • <b>Everyone must remain indoors.</b> Cancel all outdoor work, sports, ceremonies and market activity. There is no safe duration of outdoor exposure at this level.<br>
+    • Close and seal every window and door. Use wet cloth, duct tape or foam strips to block gaps around door frames, window edges, ventilation bricks and floor drains. Smoke enters through gaps you cannot see.<br>
+    • Designate ONE room as the clean-air refuge — ideally the smallest room with the fewest windows. Everyone, especially vulnerable people, should spend most of the day there.<br>
+    • Do not burn anything indoors: no cooking with wood or kerosene, no mosquito coils, no candles, no smoking. Indoor combustion adds directly to the PM2.5 you are already breathing.<br>
+    • If anyone develops breathing difficulty, bluish lips, chest pain or confusion, this is a medical emergency — go to a health facility immediately, do not wait for the haze to clear.`]);
+  }
+  else if(P>=150){
+    acts.push(['fa-house-lock','high',`<b>VERY UNHEALTHY AIR — SHELTER INDOORS NOW:</b><br>
+    • PM2.5 has reached <b>${P} µg/m³</b>. Particles this fine bypass the nose and throat entirely and lodge deep in the alveoli, then cross into the bloodstream.<br>
+    • Move all activity indoors and keep it there. Postpone anything non-essential that requires going outside.<br>
+    • Seal the house: close all windows and doors, and stuff wet towels along the bottom gap of external doors. Re-wet the towels every few hours as they dry out.<br>
+    • Keep children in a single sealed room and give them quiet indoor activities. Physical play increases breathing rate by 3–5×, which multiplies the dose of smoke inhaled.<br>
+    • Drink water frequently. Hydration keeps the mucus lining of the airways thin enough to trap and clear particles effectively.<br>
+    • Check on elderly neighbours living alone at least twice today — they are the group most likely to deteriorate silently without calling for help.`]);
+  }
+  else if(P>=55){
+    acts.push(['fa-mask-face','high',`<b>UNHEALTHY AIR — LIMIT EXPOSURE AND MASK UP:</b><br>
+    • At <b>${P} µg/m³</b>, ARI/ISPA cases in the community typically begin rising within 24–48 hours.<br>
+    • Reduce outdoor time to what is strictly necessary. If you must go out, keep trips short and avoid physical exertion — walking slowly instead of quickly can halve the volume of smoke you inhale.<br>
+    • Keep windows closed during the day, particularly during morning hours (05:00–09:00) when smoke settles low to the ground under a temperature inversion.<br>
+    • If you need to ventilate, do it briefly in the mid-afternoon when the air has mixed and PM2.5 is usually at its lowest.<br>
+    • Watch for the earliest symptoms: dry cough, scratchy throat, burning eyes, headache. These are warnings to reduce exposure further, not things to push through.`]);
+  }
+  else if(P>=35){
+    acts.push(['fa-person-circle-exclamation','med',`<b>SENSITIVE GROUPS SHOULD TAKE CARE:</b><br>
+    • PM2.5 is <b>${P} µg/m³</b> — above the WHO guideline. Healthy adults will likely feel fine, but children, elderly, pregnant women, and anyone with asthma, COPD or heart disease should reduce outdoor activity today.<br>
+    • Keep asthma reliever inhalers physically on the person, not in a drawer at home. Symptoms at this level can escalate faster than usual.<br>
+    • Move exercise, sport and heavy work indoors or reschedule to a cleaner day.<br>
+    • Monitor the trend rather than the single number — if PM2.5 keeps climbing over the next 12 hours, move to full indoor sheltering before it reaches unhealthy levels.`]);
+  }
+
+  /* --- MASK GUIDANCE --- */
+  if(P>=55){
+    if(s.capN95){
+      acts.push(['fa-head-side-mask','high',`<b>HOW TO USE YOUR N95 RESPIRATORS CORRECTLY:</b><br>
+      • You have N95/KN95 stock — use it now for anyone who must go outdoors. A properly fitted N95 filters about 95% of PM2.5 particles; a cloth or surgical mask filters almost none of it because smoke particles are far smaller than the weave.<br>
+      • Fit is everything. Place the mask over nose and chin, then press the metal nose strip firmly along the bridge of the nose with two fingers on each side — not pinched with one hand, which creates a channel for leaks.<br>
+      • Both straps must go around the head (one above the ears, one below the neck), not looped over the ears. Ear loops on a KN95 leak significantly.<br>
+      • Test the seal: cover the mask with both hands and exhale hard. If air escapes around the edges or your glasses fog, refit it.<br>
+      • Facial hair breaks the seal completely. Men with beards get little protection from an N95 and should minimise outdoor exposure instead.<br>
+      • Replace the mask when it becomes damp, visibly dirty, or breathing through it becomes noticeably harder — typically after 8 hours of use in heavy smoke.<br>
+      • <b>Do not put N95 masks on infants under 2 years old</b> — they cannot be fitted safely and can restrict breathing. Keep infants in a clean-air room instead.`]);
+    } else {
+      acts.push(['fa-triangle-exclamation','high',`<b>NO N95 STOCK — URGENT PROCUREMENT NEEDED:</b><br>
+      • You have no N95/KN95 respirators recorded. This is the single biggest protection gap at your current smoke level.<br>
+      • Contact the local Puskesmas, BPBD (disaster agency) or village office today — during haze emergencies these agencies usually distribute N95 masks free of charge, but only to those who ask.<br>
+      • As an interim measure only: a surgical mask worn under a tightly-fitted cloth mask gives partial improvement over nothing, by improving seal. Understand clearly this is <b>far weaker than an N95</b> and does not make outdoor exposure safe.<br>
+      • Prioritise whatever protection you obtain for: infants' caregivers, pregnant women, asthma and COPD patients, and anyone who cannot avoid going outdoors.<br>
+      • In the meantime, the most effective protection available to you at zero cost is <b>staying indoors in a sealed room</b>. Physical avoidance beats an inadequate mask every time.`]);
+    }
+  }
+
+  /* --- CLEAN AIR ROOM --- */
+  if(P>=55){
+    if(s.capPurifier){
+      acts.push(['fa-fan','high',`<b>RUN YOUR AIR PURIFIER FOR MAXIMUM EFFECT:</b><br>
+      • Turn the HEPA purifier on at the highest fan setting and leave it running continuously — cycling it on and off allows PM2.5 to rebuild between runs.<br>
+      • Place it in the room where people spend the most time (usually the sleeping room at night), positioned in an open area away from walls and furniture so air can circulate freely into it.<br>
+      • Close that room's door and windows. A purifier in an unsealed room is fighting a losing battle against continuous smoke infiltration.<br>
+      • Check the filter now. A filter clogged with soot loses most of its effectiveness. If it looks grey or black, replace it — during haze season, filters can saturate in weeks rather than months.<br>
+      • Do not rely on "ionisers" or "ozone generators" — ozone is itself a lung irritant and makes respiratory symptoms worse. Only HEPA mechanical filtration is appropriate.`]);
+    } else {
+      acts.push(['fa-screwdriver-wrench','med',`<b>BUILD A DIY AIR CLEANER TODAY (Corsi-Rosenthal box):</b><br>
+      • You have no purifier. You can build an effective one in under 30 minutes for a fraction of the cost, and studies show it performs comparably to commercial units.<br>
+      • Materials needed: one standard box fan, four MERV-13 furnace filters (or the highest grade available locally), duct tape, and a piece of cardboard.<br>
+      • Assembly: arrange the four filters into a cube (they form the four walls), tape the corners together, seal the bottom with cardboard, and place the box fan on top blowing <b>upward and outward</b>. Ensure the airflow arrows on the filters all point inward toward the fan.<br>
+      • Tape every seam thoroughly. Any gap lets unfiltered air bypass the filters and dramatically reduces performance.<br>
+      • Run it continuously in the room where the vulnerable people sleep.<br>
+      • If MERV-13 filters are unavailable, even stacking two lower-grade filters gives partial benefit — imperfect filtration is far better than none during a haze emergency.`]);
+    }
+
+    if(!s.capCleanroom){
+      acts.push(['fa-door-closed','high',`<b>HOW TO CREATE A CLEAN-AIR REFUGE ROOM:</b><br>
+      • Choose the smallest interior room with the fewest windows and doors to the outside — a bedroom is usually ideal. Small volume means the air can actually be cleaned and kept clean.<br>
+      • Seal every gap: window frames, the gap under the door, air vents, ventilation bricks, and any wall cracks. Use wet towels, plastic sheeting and tape. Smoke will find any opening you leave.<br>
+      • Put the air purifier (or DIY box) inside and run it continuously.<br>
+      • Move sleeping arrangements into this room for vulnerable people — infants, elderly, asthma and COPD patients. Overnight is when exposure duration is longest and when symptoms most often escalate.<br>
+      • Keep the door closed at all times; enter and exit quickly.<br>
+      • Do not cook in this room, and do not bring in charcoal, mosquito coils or candles.<br>
+      • Once sealed and filtered, indoor PM2.5 in a clean room can be reduced to under a third of outdoor levels — this is often the most effective single intervention available to a household.`]);
+    }
+  }
+
+  /* --- VULNERABLE GROUP SPECIFIC --- */
+  if(has('Infants') && P>=35){
+    acts.push(['fa-baby','high',`<b>PROTECTING INFANTS AND TODDLERS (highest risk group):</b><br>
+    • Infants breathe roughly twice as much air per kilogram of body weight as adults, and their lungs are still forming — smoke exposure now can affect lung development permanently.<br>
+    • Keep infants inside the sealed clean-air room for as much of the day as possible. Do not take babies outdoors for errands, visits or market trips while PM2.5 is elevated.<br>
+    • Do <b>not</b> put an N95 mask on a child under 2 years old. It cannot seal properly and creates a suffocation and CO₂ rebreathing risk. Environmental control is the only safe option for this age group.<br>
+    • Continue breastfeeding — it supports the immune system and reduces the severity of respiratory infections.<br>
+    • Watch closely for danger signs and seek care immediately if you see: rapid breathing (over 50 breaths/min under 1 year, over 40 over 1 year), the skin between or below the ribs sucking inward with each breath, grunting sounds, refusal to feed, or unusual drowsiness.<br>
+    • Do not use any smoke, herbal fumes or steam treatments in the room — these add particulates and worsen the situation.`]);
+  }
+
+  if((has('Asthma')||has('COPD')) && P>=35){
+    acts.push(['fa-lungs-virus','high',`<b>ASTHMA &amp; COPD ACTION PLAN DURING HAZE:</b><br>
+    • Smoke is a direct bronchoconstriction trigger — airways narrow within minutes of exposure. Attacks during haze episodes escalate faster than usual attacks.<br>
+    • Carry your reliever inhaler (salbutamol/ventolin) on your person at all times, including at home and overnight. Do not leave it in another room.<br>
+    • If you have been prescribed a preventer (steroid) inhaler, take it exactly on schedule and do not skip doses because you "feel fine" — the preventer is what stops the attack from happening.<br>
+    • ${s.capMeds?'You have medication stock recorded — verify today that you have at least 2 weeks of supply and that inhalers are not expired or empty. Shake the canister; if it feels light, get a refill now before pharmacies run short.':'<b>You have no medication stock recorded — get a refill immediately.</b> During haze emergencies pharmacies and clinics run out of inhalers quickly. Do not wait until you are down to your last doses.'}<br>
+    • Know the escalation rule: if your reliever inhaler is not working after 2 doses, or you need it more often than every 4 hours, or you cannot complete a full sentence in one breath — <b>go to a health facility immediately</b>.<br>
+    • Avoid all additional airway irritants: cigarette smoke, cooking smoke, mosquito coils, strong cleaning chemicals, and perfume sprays.`]);
+  }
+
+  if(has('Pregnant') && P>=35){
+    acts.push(['fa-person-pregnant','med',`<b>GUIDANCE FOR PREGNANT WOMEN:</b><br>
+    • PM2.5 exposure during pregnancy is associated with low birth weight, preterm birth and restricted fetal growth. Fine particles enter the bloodstream and can affect placental function.<br>
+    • Stay indoors in the cleanest available room. Treat this as a priority, not an inconvenience — the exposure window that matters most is happening now.<br>
+    • Avoid all cooking with wood, charcoal or kerosene. If you must cook, use gas or electric, cook near a window fan exhausting outward, and keep the cooking time short.<br>
+    • Attend all scheduled antenatal check-ups. Mention the haze exposure to your midwife or doctor so fetal growth can be monitored appropriately.<br>
+    • Report immediately any reduction in fetal movement, unusual shortness of breath at rest, or chest pain.<br>
+    • Stay well hydrated and rest — the physiological demand of pregnancy already reduces respiratory reserve.`]);
+  }
+
+  if(has('Elderly') && P>=55){
+    acts.push(['fa-person-cane','high',`<b>PROTECTING ELDERLY RESIDENTS:</b><br>
+    • Adults over 65 have reduced lung capacity and weaker mucociliary clearance, so smoke particles stay in the airways longer. They also have the highest rate of haze-related hospitalisation.<br>
+    • PM2.5 raises the risk of heart attack and stroke within hours of exposure, not just days — this is a cardiovascular emergency risk, not only a lung problem.<br>
+    • Ensure elderly household members stay in the clean-air room and that someone checks on them at least twice daily, especially those living alone.<br>
+    • Verify their regular heart and blood-pressure medications are being taken correctly and are not running low.<br>
+    • Watch for: increased confusion, unusual fatigue, ankle swelling, chest discomfort, or breathlessness when doing normally easy tasks. Any of these warrant medical review.<br>
+    • Discourage them from going out to markets or gatherings — arrange for someone else to run errands.`]);
+  }
+
+  if(has('Outdoor') && P>=55){
+    acts.push(['fa-helmet-safety','high',`<b>OUTDOOR WORKERS — EXPOSURE CONTROL:</b><br>
+    • Outdoor workers receive the highest total smoke dose of anyone in the community because exposure is prolonged and combined with physical exertion, which multiplies the volume of air inhaled.<br>
+    • Where possible, suspend or reschedule heavy outdoor work until PM2.5 falls below 55 µg/m³. Employers have a duty of care here.<br>
+    • If work cannot stop: shift to the least-polluted hours (usually mid-afternoon, avoiding the 05:00–09:00 inversion period), rotate workers so no individual is outdoors all day, and enforce a 15-minute break indoors every hour.<br>
+    • N95 respirators are mandatory, not optional, for this group. Note that breathing through an N95 during heavy labour is harder — schedule extra rest breaks accordingly.<br>
+    • Provide a sheltered, filtered rest area on site. Even a sealed cabin with a DIY filter box dramatically reduces cumulative daily dose.<br>
+    • Any worker reporting chest tightness, persistent cough or dizziness must be removed from outdoor duty and assessed.`]);
+  }
+
+  /* --- SCHOOL --- */
+  if(s.type==='School'&&P>=55){
+    acts.push(['fa-school','high',`<b>SCHOOL CLOSURE / OPERATIONS DECISION:</b><br>
+    • At PM2.5 above 55 µg/m³, standard practice is to <b>cancel all outdoor activities</b> — sports, assemblies, recess outdoors, and field trips — with no exceptions.<br>
+    • ${P>=150?'<b>At the current level ('+P+' µg/m³), full school closure and a switch to home learning is strongly recommended.</b> Transporting children to and from school itself creates significant exposure.':'If PM2.5 exceeds 150 µg/m³, escalate to full closure and home learning.'}<br>
+    • If school remains open: keep all children in the classrooms with windows and doors closed, place available air purifiers or DIY filter boxes in the classrooms with the youngest children first, and move recess to an indoor hall.<br>
+    • Identify and list every student with asthma. Confirm their inhalers are at school, accessible, and not expired. Brief teachers on recognising an asthma attack.<br>
+    • Notify parents by whatever channel reaches them fastest (WhatsApp group, SMS, announcement) about the air quality level and what the school is doing.<br>
+    • Keep a daily log of students reporting cough, sore throat or breathing difficulty. A rising count is your early signal to close.`]);
+  }
+
+  /* --- HEALTH FACILITY --- */
+  if(s.type==='Health Facility'&&P>=55){
+    acts.push(['fa-hospital','high',`<b>HEALTH FACILITY SURGE PREPARATION:</b><br>
+    • Expect ARI/ISPA presentations to rise sharply within 24–72 hours of sustained PM2.5 above 55 µg/m³. Prepare now rather than reacting later.<br>
+    • Check and increase stock of: salbutamol inhalers and nebuliser solution, spacer devices, oxygen cylinders and masks, and N95 respirators for staff.<br>
+    • Ensure the nebuliser room and any waiting area have filtered air — patients arriving with respiratory distress must not be waiting in smoky air.<br>
+    • Set up a fast-track triage for respiratory cases. Prioritise by: oxygen saturation below 94%, respiratory rate elevated for age, inability to speak full sentences, or cyanosis.<br>
+    • Brief all staff on the difference between smoke-induced bronchospasm and infection — many haze presentations do not need antibiotics, and over-prescribing wastes stock you will need.<br>
+    • Maintain a daily case count of ARI presentations broken down by age group and report to the district health office. This data drives the wider emergency response.<br>
+    • Prepare a referral pathway to the nearest hospital with ventilation capacity for severe cases.`]);
+  }
+
+  /* --- FIRE SOURCE --- */
+  if(s.firePoints>0){
+    acts.push(['fa-fire-flame-curved','high',`<b>ACTIVE FIRE HOTSPOTS DETECTED — SOURCE RESPONSE:</b><br>
+    • NASA satellites detected <b>${s.firePoints} thermal hotspot(s)</b> within your search radius in the last 48 hours${s.nearestFire!=null?', the nearest approximately <b>'+s.nearestFire.toFixed(0)+' km</b> away':''}.${s.upwindFires>0?' <b>'+s.upwindFires+' of these are directly upwind</b>, meaning their smoke is being carried straight toward this location.':''}<br>
+    • Report the fire immediately if it is not already known: contact BPBD (disaster agency), Manggala Agni (forest fire brigade), or the local police/village head. Early reporting is the single most effective way to stop a small fire becoming a regional haze event.<br>
+    • Note the fire's approximate location and direction before reporting — satellite coordinates are visible on the map in this app.<br>
+    • <b>Never attempt to fight a peat fire yourself.</b> Peat burns underground and the surface may look solid while a burnt-out void lies beneath — people have died falling into these. Water applied to the surface also does not reach the smouldering layer.<br>
+    • If the fire is on or near your land, clear a firebreak by removing dry vegetation in a wide strip, and wet the perimeter if a water source is available.<br>
+    • Prepare an evacuation plan now: identify the route, the destination (a location with clean air, ideally upwind and away from peat), and what you will take. Do not wait until flames are visible.<br>
+    • Keep important documents, medication and phone chargers in one bag ready to move.`]);
+  }
+  else if(s.fireError==='NO_KEY'){
+    acts.push(['fa-key','med',`<b>ENABLE FIRE HOTSPOT DETECTION (2-minute setup):</b><br>
+    • This app cannot currently see where the fires are, because no NASA FIRMS key has been entered. You are seeing air quality but not the smoke source.<br>
+    • Knowing hotspot locations matters because it tells you whether smoke will get worse (fires upwind and approaching) or clear (fires downwind or extinguished).<br>
+    • Getting a key is free and requires only an email address — no account approval, no payment, no waiting period.<br>
+    • Open <b>Settings (gear icon) → Get a free key</b>, or click the button below, submit your email on NASA's page, copy the MAP_KEY they show you, and paste it back here.<br>
+    • Once saved, hotspot detection activates immediately for every location you monitor.`]);
+  }
+
+  /* --- STAGNANT AIR --- */
+  if(s.apiWind<5&&P>=55){
+    acts.push(['fa-cloud','med',`<b>STAGNANT AIR — SMOKE WILL NOT CLEAR TODAY:</b><br>
+    • Wind speed is only ${s.apiWind} km/h. With this little air movement, smoke accumulates rather than disperses, and concentrations typically keep building through the night.<br>
+    • Expect the worst air quality between roughly 04:00 and 09:00, when cool air near the ground traps smoke in a shallow layer (temperature inversion). Avoid morning outdoor activity entirely — including morning exercise, school runs on foot, and early market trips.<br>
+    • Plan any unavoidable outdoor tasks for mid-afternoon, when surface heating mixes the air and PM2.5 usually dips to its daily minimum.<br>
+    • Keep the clean-air room sealed continuously overnight; do not open windows for "fresh air" at night, as night air will be the most polluted of the day.<br>
+    • Do not expect relief until either the wind picks up or rain arrives.`]);
+  }
+
+  /* --- RAIN RELIEF --- */
+  const rain3=s.dRain.slice(0,3).reduce((a,b)=>a+(b||0),0);
+  if(rain3>=10&&P>=55){
+    acts.push(['fa-cloud-rain','low',`<b>RAINFALL FORECAST — PARTIAL RELIEF EXPECTED:</b><br>
+    • Approximately <b>${rain3.toFixed(0)} mm</b> of rain is forecast over the next 3 days. Rain scavenges particulates from the air and will bring measurable improvement in PM2.5.<br>
+    • Important caveat: rain suppresses <b>surface</b> fire and washes the air, but it does <b>not</b> extinguish deep peat fires, which smoulder metres below the surface. Smoke often returns within a day or two once the surface dries.<br>
+    • Use the cleaner-air window productively: ventilate and flush the house thoroughly, wash smoke residue off floors and surfaces with a damp cloth (do not sweep dry, which re-suspends particles), replace or clean air purifier filters, and restock masks and medication.<br>
+    • Take vulnerable people outside for a short period of genuinely fresh air and daylight — sustained indoor confinement has its own health costs.<br>
+    • Do not assume the haze season is over. Re-check this dashboard daily.`]);
+  }
+
+  /* --- DRY SPELL PREVENTION --- */
+  if(s.recentDry>=10&&P<55){
+    acts.push(['fa-sun-plant-wilt','med',`<b>PROLONGED DRY SPELL — FIRE PREVENTION WINDOW:</b><br>
+    • There have been <b>${s.recentDry} consecutive days with almost no rain</b>. Peat soil and surface vegetation are drying out and becoming highly ignitable, even though the air is currently still reasonably clear.<br>
+    • This is the time to act — preventing ignition is vastly cheaper and easier than fighting a peat fire or managing a haze health emergency later.<br>
+    • Enforce a total ban on land clearing by burning. A single small clearing fire on dry peat can become an uncontrollable regional smoke source within days.<br>
+    • Do not burn household or agricultural waste. Do not discard cigarette butts on dry ground.<br>
+    • Check that canal blocking / peat rewetting structures (if present in your area) are functioning and holding water. Rewetted peat does not ignite.<br>
+    • Organise or join community fire patrols (MPA / Masyarakat Peduli Api) to watch high-risk areas, particularly near roads and plantation edges where ignition usually starts.<br>
+    • Stock up now on N95 masks and medication while supplies are available and prices are normal. Waiting until the haze arrives means shortages.`]);
+  }
+
+  /* --- NO ALERT SYSTEM --- */
+  if(!s.capAlert&&P>=35){
+    acts.push(['fa-bullhorn','med',`<b>SET UP A COMMUNITY ALERT SYSTEM:</b><br>
+    • You have no alert system or SOP recorded. Without one, protective actions happen too late and unevenly across the community.<br>
+    • Create a WhatsApp group (or use the mosque/village loudspeaker) dedicated to daily air quality updates. Assign one person to post the PM2.5 reading and the recommended action level every morning and afternoon.<br>
+    • Agree on simple, unambiguous trigger levels in advance so no one has to make a judgement call in the moment. For example: <b>Green</b> (&lt;35) normal activity; <b>Yellow</b> (35–55) sensitive groups indoors; <b>Orange</b> (55–150) everyone limits outdoor time, masks required; <b>Red</b> (&gt;150) full indoor sheltering, schools closed.<br>
+    • Make a list of vulnerable households — those with infants, elderly living alone, asthma or COPD patients — and assign a specific volunteer to check on each one during Orange and Red days.<br>
+    • Identify and prepare a community clean-air shelter (a sealed hall with filters) for households who cannot seal their own homes.<br>
+    • Practise the plan once before the peak of the dry season, so everyone knows their role.`]);
+  }
+
+  /* --- ALL CLEAR --- */
+  if(acts.length===0){
+    acts.push(['fa-circle-check','ok',`<b>AIR QUALITY ACCEPTABLE — PREPAREDNESS CHECKLIST:</b><br>
+    • PM2.5 is currently ${P} µg/m³, within acceptable range. Normal outdoor activity is safe. Use this clear-air period to prepare rather than to relax completely.<br>
+    • <i>Stock check:</i> Confirm you have N95/KN95 masks for every household member, especially the vulnerable ones. Buy them now while they are available and normally priced — during a haze emergency they sell out within days.<br>
+    • <i>Medication:</i> Verify asthma inhalers are in date and at least 2 weeks of supply is on hand. Refill anything running low.<br>
+    • <i>Clean room:</i> Identify which room will be your clean-air refuge and pre-position tape, plastic sheeting and towels for sealing it.<br>
+    • <i>Air filter:</i> If you have a purifier, check or replace the filter now. If you do not, consider building a DIY box-fan filter before you need it.<br>
+    • <i>Community:</i> Confirm the alert group is active and that the vulnerable-household list is up to date.<br>
+    • <i>Prevention:</i> Do not burn waste or clear land by fire, and report anyone who does. Most haze events start with a small, avoidable fire.<br>
+    • Re-check this dashboard daily during the dry season — conditions can deteriorate within 24 hours.`]);
+  }
+
+  s.actions=acts;
+}
+
+/* ============================================================
+   HISTORY
+============================================================ */
+function logHistory(s){
+  if(!s.history) s.history=[];
+  const now=new Date(), today=now.toLocaleDateString('en-CA');
+  if(s.riskLevel==='HIGH'||s.riskLevel==='MEDIUM'){
+    const entry={date:today,time:now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}),
+      riskScore:s.riskScore,riskLevel:s.riskLevel,pm25:s.apiPM25,
+      hazard:s.hazardList.length?s.hazardList[0][0]:'Elevated smoke'};
+    const i=s.history.findIndex(h=>h.date===today);
+    if(i>=0){ if(s.riskScore>s.history[i].riskScore) s.history[i]=entry; }
+    else s.history.unshift(entry);
+    if(s.history.length>1825) s.history.pop();
+  }
+}
+
+/* ============================================================
+   MAP HAZARD OVERLAY
+============================================================ */
+function drawHazardsOnMap(s){
+  if(!hazardLayers) return;
+  hazardLayers.clearLayers();
+  const col=s.riskLevel==='HIGH'?'#e11d48':s.riskLevel==='MEDIUM'?'#f59e0b':'#10b981';
+  L.circle([s.lat,s.lon],{color:col,weight:2,fillColor:col,fillOpacity:.08,radius:10000})
+    .bindTooltip(`<b>${s.name}</b><br>PM2.5 ${s.apiPM25} µg/m³ · ARI risk ${s.riskScore}%`).addTo(hazardLayers);
+
+  if(s.fireData && s.fireData.length){
+    s.fireData.forEach(f=>{
+      const r=Math.max(4,Math.min(12,3+(f.frp||0)/6));
+      L.circleMarker([f.lat,f.lon],{radius:r,color:'#7f1d1d',weight:1,fillColor:'#f97316',fillOpacity:.85,className:'pulse-fire'})
+        .bindTooltip(`<b>🔥 Fire Hotspot</b><br>FRP ${(f.frp||0).toFixed(1)} MW · conf ${f.conf}<br>${f.dist.toFixed(0)} km away<br>${f.date} ${f.time}`)
+        .addTo(hazardLayers);
+    });
+  }
+
+  // smoke plume direction arrow
+  if(s.apiWind>1){
+    const toDir=((s.apiWindDir||0)+180)%360;
+    const dist=Math.min(0.9,0.15+s.apiWind/60);
+    const rad=toDir*Math.PI/180;
+    const endLat=s.lat+dist*Math.cos(rad), endLon=s.lon+dist*Math.sin(rad)/Math.cos(s.lat*Math.PI/180);
+    L.polyline([[s.lat,s.lon],[endLat,endLon]],{color:'#0ea5e9',weight:3,opacity:.65,dashArray:'8,6'})
+      .bindTooltip(`Wind from ${compass(s.apiWindDir)} at ${s.apiWind} km/h — smoke drifts this way`).addTo(hazardLayers);
+  }
+}
+
+/* ============================================================
+   RENDER
+============================================================ */
+function renderDashboard(s){
+  document.getElementById('welcome-state').classList.add('hidden');
+  document.getElementById('dashboard-content').classList.remove('hidden');
+  document.getElementById('d-name').innerText=s.name;
+  document.getElementById('d-type').innerText=s.type;
+  const gd=(Array.isArray(s.groups)?s.groups:[s.groups]).join(', ');
+  document.getElementById('d-groups').innerText=gd.length>40?gd.slice(0,37)+'…':gd;
+  document.getElementById('d-coord').innerText=s.lat.toFixed(3)+', '+s.lon.toFixed(3);
+  populateCapacityForm(s);
+
+  const col=s.riskLevel==='HIGH'?'#e11d48':s.riskLevel==='MEDIUM'?'#f59e0b':'#10b981';
+  document.getElementById('risk-gauge').style.background=`conic-gradient(${col} ${(s.riskScore/100)*360}deg,#e2e8f0 ${(s.riskScore/100)*360}deg)`;
+  document.getElementById('risk-score').innerText=s.riskScore+'%';
+  document.getElementById('risk-score').style.color=col;
+  const rb=document.getElementById('risk-badge');
+  rb.innerText=s.riskLevel+' RISK';
+  rb.className='text-[10px] font-bold px-2 py-0.5 rounded-full mt-1 border '+(s.riskLevel==='HIGH'?'bg-rose-50 border-rose-300 text-rose-700':s.riskLevel==='MEDIUM'?'bg-amber-50 border-amber-300 text-amber-700':'bg-emerald-50 border-emerald-300 text-emerald-700');
+
+  document.getElementById('ov-pm25').innerText=s.apiPM25;
+  const cat=pmCat(s.apiPM25), pb=document.getElementById('ov-pm25-badge');
+  pb.innerText=cat.t;
+  pb.className='text-[9px] px-1.5 py-0.5 rounded inline-block mt-0.5 '+(cat.l==='crit'?'bg-rose-100 text-rose-700':cat.l==='warn'?'bg-amber-100 text-amber-700':'bg-emerald-100 text-emerald-700');
+  document.getElementById('ov-fire').innerText=(s.fireError==='NO_KEY')?'—':s.firePoints;
+  document.getElementById('ov-fire-sub').innerText=(s.fireError==='NO_KEY')?'Add FIRMS key to enable':(s.nearestFire!=null?'Nearest '+s.nearestFire.toFixed(0)+' km':'NASA FIRMS');
+  document.getElementById('ov-vis').innerText=s.visKm+' km';
+  document.getElementById('ov-wind').innerText=s.upwindFires>0?'TOWARD SITE':'Not upwind';
+  document.getElementById('ov-wind-sub').innerText='From '+compass(s.apiWindDir)+' · '+s.apiWind+' km/h';
+
+  renderAlert(s);
+
+  // indicators
+  const ig=document.getElementById('indicator-grid'); ig.innerHTML='';
+  s.indicators.forEach(i=>{
+    ig.innerHTML+=`<div class="bg-white p-3 rounded-lg border border-slate-100 shadow-sm flex items-start gap-3">
+      <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${statusClass(i.lvl)}"><i class="fa-solid ${i.icon}"></i></div>
+      <div class="min-w-0"><span class="text-[11px] font-bold text-slate-700">${i.name}</span>
+      <div class="text-lg font-extrabold text-slate-800 leading-none mt-0.5">${i.val}</div>
+      <p class="text-[10px] text-slate-400 mt-1 leading-tight">${i.note}</p></div></div>`;
+  });
+
+  // vulnerable breakdown
+  const vb=document.getElementById('vuln-breakdown'); vb.innerHTML='';
+  s.vulnList.forEach(([t,l,n])=>{
+    vb.innerHTML+=`<div class="flex items-start gap-2 p-2 rounded-lg ${l==='crit'?'bg-rose-50':l==='warn'?'bg-amber-50':'bg-slate-50'}">
+      <i class="fa-solid fa-user-shield ${dotClass(l)} mt-0.5"></i>
+      <div><span class="font-bold text-slate-700">${t}</span><p class="text-[10px] text-slate-500 leading-snug mt-0.5">${n}</p></div></div>`;
+  });
+
+  renderDestana(s);
+  renderHistory(s);
+  renderForecast(s);
+  renderDose(s);
+
+  const al=document.getElementById('actions-list'); al.innerHTML='';
+  s.actions.forEach(a=>{
+    const pri=a[1];
+    const pc=pri==='high'?'border-rose-200 bg-rose-50':pri==='med'?'border-amber-200 bg-amber-50':pri==='ok'?'border-emerald-200 bg-emerald-50':'border-slate-200 bg-white';
+    const ic2=pri==='high'?'text-rose-600':pri==='med'?'text-amber-600':pri==='ok'?'text-emerald-600':'text-slate-600';
+    const tag=pri==='high'?'<span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-rose-600 text-white">URGENT</span>':pri==='med'?'<span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-500 text-white">RECOMMENDED</span>':pri==='ok'?'<span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-600 text-white">ROUTINE</span>':'';
+    al.innerHTML+=`<div class="rounded-xl border ${pc} p-3.5 flex gap-3 items-start shadow-sm"><i class="fa-solid ${a[0]} ${ic2} text-lg mt-0.5 w-5 text-center"></i><div class="flex-1"><div class="mb-1">${tag}</div><p class="text-xs text-slate-700 leading-relaxed">${a[2]}</p></div></div>`;
+  });
+
+  switchTab('overview');
+  renderChart(s);
+  drawHazardsOnMap(s);
+}
+
+function renderAlert(s){
+  const box=document.getElementById('ibf-alert'); const P=s.apiPM25;
+  const grp=(Array.isArray(s.groups)?s.groups:[s.groups]).join(', ');
+  if(s.riskLevel==='HIGH'){
+    box.className="mb-5 rounded-xl border border-rose-200 bg-rose-50 p-4 shadow-sm flex gap-3 items-start";
+    box.innerHTML=`<div class="bg-rose-100 text-rose-600 rounded-full p-2 shrink-0"><i class="fa-solid fa-triangle-exclamation text-lg"></i></div>
+      <div><h3 class="font-bold text-rose-800 text-sm mb-0.5">CRITICAL SMOKE ALERT — Act Immediately</h3>
+      <p class="text-xs text-rose-700 leading-relaxed">PM2.5 is <b>${P} µg/m³</b> (${pmCat(P).t}) and the calculated ARI/ISPA risk for this location is <b>${s.riskScore}%</b>. The people here — <b>${grp}</b> — are in the group most likely to be hospitalised during a haze episode. At this exposure level, respiratory symptoms can begin within hours and acute attacks can escalate rapidly. <b>Move everyone indoors into a sealed room now</b>, and work through the <b>Actions</b> tab from the top, starting with the items marked URGENT.</p></div>`;
+  } else if(s.riskLevel==='MEDIUM'||s.actions.some(a=>a[1]==='high')){
+    box.className="mb-5 rounded-xl border border-amber-200 bg-amber-50 p-4 shadow-sm flex gap-3 items-start";
+    box.innerHTML=`<div class="bg-amber-100 text-amber-600 rounded-full p-2 shrink-0"><i class="fa-solid fa-circle-exclamation text-lg"></i></div>
+      <div><h3 class="font-bold text-amber-800 text-sm mb-0.5">ELEVATED SMOKE RISK — Take Precautions Today</h3>
+      <p class="text-xs text-amber-700 leading-relaxed">PM2.5 is <b>${P} µg/m³</b> (${pmCat(P).t}), which is above the WHO safe guideline of 15 µg/m³. Conditions are not yet an emergency, but <b>${grp}</b> at this location will begin experiencing symptoms if exposure continues. This is the stage where preventive action is cheap and highly effective — sealing rooms, limiting outdoor time and preparing masks now avoids a crisis in 48 hours. Open the <b>Actions</b> tab for the specific steps.</p></div>`;
+  } else {
+    box.className="mb-5 rounded-xl border border-emerald-200 bg-emerald-50 p-4 shadow-sm flex gap-3 items-start";
+    box.innerHTML=`<div class="bg-emerald-100 text-emerald-600 rounded-full p-2 shrink-0"><i class="fa-solid fa-check-double text-lg"></i></div>
+      <div><h3 class="font-bold text-emerald-800 text-sm mb-0.5">AIR QUALITY ACCEPTABLE</h3>
+      <p class="text-xs text-emerald-700 leading-relaxed">PM2.5 is <b>${P} µg/m³</b> (${pmCat(P).t}) and no significant smoke hazard is currently affecting this location. Normal outdoor activity is safe for <b>${grp}</b>. This is the right time to prepare rather than relax — stock N95 masks, check inhaler supplies, and identify your clean-air room before the next haze episode. See the <b>Actions</b> tab for the preparedness checklist.</p></div>`;
+  }
+}
+
+function renderDose(s){
+  const P=s.apiPM25;
+  const box=document.getElementById('dose-box');
+  const cigEquiv=(P/22).toFixed(1); // rough Berkeley Earth equivalence
+  const pop=s.pop||0;
+  let expected='—';
+  if(pop>0){
+    let rate = P>=250?0.09 : P>=150?0.06 : P>=55?0.035 : P>=35?0.015 : 0.005;
+    expected=Math.round(pop*rate);
+  }
+  box.innerHTML=`
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+    <div class="p-3 rounded-lg bg-slate-50 border border-slate-100">
+      <div class="text-[10px] font-bold text-slate-400 uppercase mb-1">Cigarette equivalent ⚠</div>
+      <div class="text-xl font-black text-slate-800">${cigEquiv}</div>
+      <p class="text-[10px] text-slate-500 mt-1 leading-snug">Breathing this air for 24 hours delivers roughly the same PM2.5 dose as smoking this many cigarettes (Berkeley Earth approximation).</p>
+    </div>
+    <div class="p-3 rounded-lg bg-slate-50 border border-slate-100">
+      <div class="text-[10px] font-bold text-slate-400 uppercase mb-1">24h avg forecast</div>
+      <div class="text-xl font-black text-slate-800">${s.avgPM25_24} <span class="text-xs font-semibold text-slate-400">µg/m³</span></div>
+      <p class="text-[10px] text-slate-500 mt-1 leading-snug">Peak of <b>${s.peakPM25} µg/m³</b> expected within 72 hours. WHO 24-hour guideline is 15 µg/m³.</p>
+    </div>
+    <div class="p-3 rounded-lg bg-slate-50 border border-slate-100">
+      <div class="text-[10px] font-bold text-slate-400 uppercase mb-1">Est. ARI cases ⚠</div>
+      <div class="text-xl font-black text-slate-800">${expected}</div>
+      <p class="text-[10px] text-slate-500 mt-1 leading-snug">${pop>0?'Rough projection of new respiratory complaints among the ~'+pop.toLocaleString()+' exposed people if this level persists for a week.':'Enter a population figure when registering the area to enable this estimate.'}</p>
+    </div>
+  </div>
+  <p class="text-[10px] text-slate-400 mt-3 leading-snug"><i class="fa-solid fa-circle-info mr-1"></i>These are indicative planning estimates derived from published exposure-response relationships, not clinical predictions. They are intended to help you size a response, not to diagnose individuals.</p>`;
+}
+
+function renderDestana(s){
+  const fill=(id,list)=>{const el=document.getElementById(id);el.innerHTML='';
+    list.forEach(([t,l,n])=>{el.innerHTML+=`<li class="flex items-start gap-2"><i class="fa-solid fa-circle text-[6px] mt-1.5 ${dotClass(l)}"></i><div><span class="font-semibold text-slate-700">${t}</span><br><span class="text-[10px] text-slate-400">${n}</span></div></li>`;});};
+  fill('hz-list',s.hazardList); fill('vu-list',s.vulnList); fill('cp-list',s.capList);
+  document.getElementById('hz-score').innerText=s.hazardScore+'/14';
+  document.getElementById('vu-score').innerText=s.vulnScore+'/6';
+  document.getElementById('cp-score').innerText=s.capScoreRaw+'/7';
+  document.getElementById('destana-eq').innerHTML=`<div class="text-[10px] uppercase tracking-wider text-slate-400 mb-1">Risk Equation</div>
+    <div class="text-sm font-semibold">Risk = (Smoke Hazard ${s.hazardScore} × Vulnerability ${s.vulnScore}) ÷ Capacity ${s.capScore.toFixed(1)} → <span class="${s.riskLevel==='HIGH'?'text-rose-400':s.riskLevel==='MEDIUM'?'text-amber-400':'text-emerald-400'}">${s.riskScore}% ${s.riskLevel}</span></div>`;
+}
+
+function renderHistory(s){
+  const hl=document.getElementById('history-list'); hl.innerHTML='';
+  if(!s.history||s.history.length===0){
+    hl.innerHTML='<div class="text-center p-6 bg-slate-50 border border-dashed border-slate-200 rounded-lg text-slate-400 text-xs">No moderate or high smoke exposure days recorded yet for this location.</div>';
+    return;
+  }
+  s.history.slice(0,120).forEach(h=>{
+    const badge=h.riskLevel==='HIGH'?'bg-rose-100 text-rose-700 border-rose-200':'bg-amber-100 text-amber-700 border-amber-200';
+    hl.innerHTML+=`<div class="bg-white rounded-lg border border-slate-200 p-3 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 shadow-sm">
+      <div><div class="text-[10px] text-slate-400 font-bold mb-0.5"><i class="fa-regular fa-calendar mr-1"></i> ${h.date} · ${h.time}</div>
+      <div class="text-xs font-semibold text-slate-700">${h.hazard}</div>
+      ${h.pm25!=null?`<div class="text-[10px] text-slate-400 mt-0.5">PM2.5 ${h.pm25} µg/m³</div>`:''}</div>
+      <div class="px-2.5 py-1 rounded border text-[10px] font-bold shrink-0 ${badge}">${h.riskScore}% ${h.riskLevel}</div></div>`;
+  });
+}
+
+function renderForecast(s){
+  const fc=document.getElementById('forecast-days'); fc.innerHTML='';
+  const wIcon=c=>c<=3?'<i class="fa-solid fa-sun text-amber-500"></i>':(c>=45&&c<=48)?'<i class="fa-solid fa-smog text-slate-400"></i>':(c>=51&&c<=67)?'<i class="fa-solid fa-cloud-rain text-sky-400"></i>':(c>=71&&c<=82)?'<i class="fa-solid fa-cloud-showers-heavy text-sky-600"></i>':c>=95?'<i class="fa-solid fa-cloud-bolt text-indigo-600"></i>':'<i class="fa-solid fa-cloud text-slate-400"></i>';
+  for(let i=0;i<s.dDates.length;i++){
+    const d=new Date(s.dDates[i]);
+    const rain=s.dRain[i]||0;
+    const fireDanger = rain<1 && (s.dTmax[i]||0)>32 && (s.dRHmin[i]||100)<50;
+    fc.innerHTML+=`<div class="flex flex-col items-center bg-slate-50 border ${fireDanger?'border-rose-200 bg-rose-50':'border-slate-100'} rounded-lg p-2 min-w-[76px] shrink-0">
+      <span class="text-[10px] text-slate-500 uppercase font-bold">${d.toLocaleDateString('en-US',{weekday:'short'})}</span>
+      <div class="text-lg my-1">${wIcon(s.dCode[i])}</div>
+      <div class="text-[9px] text-slate-700 font-bold">${Math.round(s.dTmax[i])}°/${Math.round(s.dTmin[i])}°</div>
+      <div class="text-[9px] text-cyan-600 mt-0.5">${rain.toFixed(0)}mm</div>
+      <div class="text-[9px] text-teal-600 mt-0.5">${Math.round(s.dWind[i]||0)}km/h</div>
+      ${fireDanger?'<div class="text-[8px] font-bold text-rose-600 mt-1"><i class="fa-solid fa-fire"></i> FIRE</div>':''}
+    </div>`;
+  }
+  const ctx=document.getElementById('floodChart').getContext('2d');
+  if(floodChart) floodChart.destroy();
+  const lbls=s.dDates.map(d=>new Date(d).toLocaleDateString('en-US',{day:'numeric',month:'short'}));
+  floodChart=new Chart(ctx,{data:{labels:lbls,datasets:[
+    {type:'bar',label:'Rainfall (mm)',data:s.dRain,backgroundColor:'rgba(14,165,233,.55)',yAxisID:'y',order:3},
+    {type:'line',label:'Max Temp (°C)',data:s.dTmax,borderColor:'#f43f5e',borderWidth:2,tension:.4,yAxisID:'y1',order:1},
+    {type:'line',label:'Max Wind (km/h)',data:s.dWind,borderColor:'#14b8a6',borderWidth:2,borderDash:[5,4],tension:.4,yAxisID:'y1',order:2}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{boxWidth:12,font:{size:10}}}},
+    scales:{y:{position:'left',title:{display:true,text:'mm',font:{size:9}}},y1:{position:'right',grid:{drawOnChartArea:false},title:{display:true,text:'°C / km/h',font:{size:9}}}}}});
+}
+
+function renderChart(s){
+  const ctx=document.getElementById('envChart').getContext('2d');
+  if(envChart) envChart.destroy();
+  const n=Math.min(72,s.hTime.length);
+  const lbls=s.hTime.slice(0,n).map(t=>{const d=new Date(t);return d.getHours()===0?d.toLocaleDateString('en-US',{day:'numeric',month:'short'}):(d.getHours()%6===0?d.getHours()+':00':'');});
+  const pm=s.hPM25.slice(0,n), aqi=s.hAQI.slice(0,n);
+  envChart=new Chart(ctx,{data:{labels:lbls,datasets:[
+    {type:'line',label:'PM2.5 (µg/m³)',data:pm,borderColor:'#ea580c',backgroundColor:'rgba(234,88,12,.12)',borderWidth:2,fill:true,tension:.35,pointRadius:0,yAxisID:'y'},
+    {type:'line',label:'US AQI',data:aqi,borderColor:'#6366f1',borderWidth:1.5,borderDash:[5,4],tension:.35,pointRadius:0,yAxisID:'y1'}
+  ]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+    plugins:{legend:{position:'top',labels:{boxWidth:12,font:{size:10}}},
+      tooltip:{callbacks:{afterBody:(items)=>{const v=items[0].parsed.y;return '  → '+pmCat(v).t;}}}},
+    scales:{x:{ticks:{maxRotation:0,autoSkip:false,font:{size:8}}},
+      y:{position:'left',beginAtZero:true,title:{display:true,text:'PM2.5 µg/m³',font:{size:9}}},
+      y1:{position:'right',beginAtZero:true,grid:{drawOnChartArea:false},title:{display:true,text:'AQI',font:{size:9}}}}}});
+}
+
+/* ============================================================
+   DATA MGMT
+============================================================ */
+function exportData(){
+  const blob=new Blob([JSON.stringify({db,settings},null,2)],{type:"application/json"});
+  const url=URL.createObjectURL(blob),a=document.createElement("a");
+  a.href=url;a.download="HazeGuard_Backup.json";a.click();URL.revokeObjectURL(url);
+}
+function importData(e){
+  const f=e.target.files[0]; if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    try{
+      const p=JSON.parse(ev.target.result);
+      if(p.db&&p.db.sites){
+        db=p.db; saveDb();
+        if(p.settings){settings={...settings,...p.settings};localforage.setItem('haze_settings',settings);loadSettings();}
+        renderMapMarkers(); closeModal('modal-settings');
+        document.getElementById('welcome-state').classList.remove('hidden');
+        document.getElementById('dashboard-content').classList.add('hidden');
+        if(window.innerWidth<768) mobileView('map');
+        alert("Data successfully loaded.");
+      } else alert("Invalid JSON format.");
+    }catch(err){alert("Error reading JSON file.");}
+  };
+  r.readAsText(f); e.target.value='';
+}
+function clearData(){
+  if(confirm("Delete ALL monitoring areas and settings? This cannot be undone.")){
+    db.sites=[];saveDb();
+    settings={firms:'',sat:'VIIRS_SNPP_NRT',radius:'1.0',onboarded:true,lang:'en'};
+    localforage.setItem('haze_settings',settings);loadSettings();
+    renderMapMarkers();closeModal('modal-settings');
+    document.getElementById('welcome-state').classList.remove('hidden');
+    document.getElementById('dashboard-content').classList.add('hidden');
+    if(window.innerWidth<768) mobileView('map');
+    alert("All data cleared.");
+  }
+}
+
+/* ============================================================
+   OFFLINE
+============================================================ */
+const banner=(()=>{ const b=document.createElement('div');
+  b.className='fixed bottom-16 md:bottom-4 left-1/2 -translate-x-1/2 bg-amber-600 text-white px-4 py-2 rounded-full text-[11px] font-bold shadow-lg z-[9999] flex items-center gap-2 transition-all duration-500 translate-y-20 opacity-0';
+  b.innerHTML='<i class="fa-solid fa-wifi"></i> Offline';
+  document.body.appendChild(b); return b; })();
+window.addEventListener('offline',()=>{banner.innerHTML='<i class="fa-solid fa-plane-up"></i> Offline Mode: showing cached data';banner.classList.remove('bg-emerald-600','translate-y-20','opacity-0');banner.classList.add('bg-amber-600');});
+window.addEventListener('online',()=>{banner.innerHTML='<i class="fa-solid fa-wifi"></i> Connection restored — refreshing…';banner.classList.remove('bg-amber-600');banner.classList.add('bg-emerald-600');setTimeout(()=>banner.classList.add('translate-y-20','opacity-0'),3000);if(currentSiteId)processSiteData(currentSiteId);});
+if(!navigator.onLine) window.dispatchEvent(new Event('offline'));
+
+window.addEventListener('resize',()=>{
+  if(window.innerWidth>=768){document.getElementById('dash-panel').classList.remove('hidden');document.getElementById('map-container').classList.remove('hidden');}
+  else mobileView(document.getElementById('mtab-dash').classList.contains('mtab-active')?'dash':'map');
+});
+
+document.addEventListener('DOMContentLoaded',()=>{initMap();loadSettings();loadDb();});
+</script>
+</body>
+</html>
