@@ -3,9 +3,18 @@ import csv
 import json
 import sys
 import time
+import socket
 import requests
+from urllib3.util import connection
 from io import StringIO
 from datetime import datetime
+
+# PAKSA PYTHON MENGGUNAKAN IPV4 
+# Mengatasi error [Errno 101] Network is unreachable di GitHub Actions
+def allowed_gai_family():
+    return socket.AF_INET
+
+connection.allowed_gai_family = allowed_gai_family
 
 # Ambil MAP_KEY dari Environment Github Actions
 MAP_KEY = os.environ.get("FIRMS_MAP_KEY")
@@ -15,18 +24,17 @@ if not MAP_KEY:
 
 SOURCE = "VIIRS_SNPP_NRT"
 DAY_RANGE = 1
-BBOX = "90,-11,141,10" # Asia Tenggara & Indonesia
+BBOX = "90,-11,141,10" # Bounding Box Asia Tenggara & Indonesia
 
 URL = f"https://firms.modaps.eosdis.nasa.gov/api/area/csv/{MAP_KEY}/{SOURCE}/{BBOX}/{DAY_RANGE}"
 
 def fetch_and_process():
-    print(f"[{datetime.now()}] Mengambil data dari NASA FIRMS...")
+    print(f"[{datetime.now()}] Mengambil data dari NASA FIRMS (Forced IPv4)...")
     
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
     }
 
-    # Mekanisme Retry (Coba ulang hingga 5x jika NASA memutus koneksi)
     max_retries = 5
     response = None
     
@@ -43,7 +51,6 @@ def fetch_and_process():
         
         time.sleep(5)
 
-    # Jika semua percobaan gagal, hentikan script dengan Error
     if not response or response.status_code != 200:
         print("Error Fatal: Gagal mengambil data dari NASA FIRMS setelah 5 kali percobaan.")
         sys.exit(1)
