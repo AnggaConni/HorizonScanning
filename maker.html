@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Article JSON Manager & Viewer</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* Custom styling for the generated content */
+    .prose p { margin-bottom: 1.5em; line-height: 1.8; color: #334155; }
+    .prose h3 { font-size: 1.5rem; font-weight: bold; margin-top: 2em; margin-bottom: 1em; color: #0f172a; }
+    .prose h4 { font-size: 1.25rem; font-weight: bold; margin-top: 1.5em; margin-bottom: 1em; color: #0f172a; }
+    .prose blockquote { border-left: 4px solid #38bdf8; padding-left: 1rem; font-style: italic; color: #475569; }
+    .hidden-section { display: none !important; }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen pb-20">
+
+  <!-- Navigation -->
+  <nav class="bg-slate-900 text-white sticky top-0 z-50 shadow-lg">
+    <div class="max-w-5xl mx-auto px-4 flex flex-wrap items-center justify-between py-4">
+      <div class="font-extrabold text-xl tracking-wide text-sky-400">
+        <i class="fa-solid fa-code border-2 border-sky-400 p-1 rounded-md mr-2"></i> JSON CMS
+      </div>
+      <div class="flex gap-2 md:gap-4 mt-3 md:mt-0 overflow-x-auto">
+        <button onclick="switchTab('home')" class="hover:text-sky-400 font-semibold px-2 py-1 transition-colors"><i class="fa-solid fa-house"></i> Articles</button>
+        <button onclick="openEditor()" class="hover:text-emerald-400 font-semibold px-2 py-1 transition-colors"><i class="fa-solid fa-pen-to-square"></i> Write</button>
+        <button onclick="switchTab('json-manager')" class="hover:text-amber-400 font-semibold px-2 py-1 transition-colors"><i class="fa-solid fa-database"></i> JSON Data</button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="max-w-5xl mx-auto px-4 mt-8">
+    
+    <!-- SECTION: ARTICLE LIST (HOME) -->
+    <section id="home" class="view-section">
+      <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-extrabold text-slate-900">Your Articles</h1>
+        <button onclick="openEditor()" class="bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded-lg font-bold shadow-lg transition-all"><i class="fa-solid fa-plus mr-2"></i>New Article</button>
+      </div>
+      <div id="article-list" class="grid md:grid-cols-2 gap-6">
+        <!-- List will be rendered here -->
+        <div class="text-slate-500 italic col-span-2 text-center py-10">No articles loaded. Please go to "JSON Data" tab to load your JSON.</div>
+      </div>
+    </section>
+
+    <!-- SECTION: ARTICLE VIEWER -->
+    <section id="viewer" class="view-section hidden-section bg-white p-6 md:p-12 rounded-2xl shadow-xl">
+      <button onclick="switchTab('home')" class="text-slate-500 hover:text-sky-600 font-bold mb-6 transition-colors"><i class="fa-solid fa-arrow-left mr-2"></i>Back to list</button>
+      <div class="mb-8 border-b pb-8">
+        <span id="view-category" class="text-sky-600 font-bold text-sm tracking-widest uppercase">Category</span>
+        <h1 id="view-title" class="text-4xl font-extrabold text-slate-900 mt-2 mb-4 leading-tight">Article Title</h1>
+        <div class="flex items-center text-slate-500 text-sm gap-4">
+          <span><i class="fa-solid fa-user mr-1"></i> <span id="view-author">Author</span></span>
+          <span><i class="fa-solid fa-calendar mr-1"></i> <span id="view-date">Date</span></span>
+        </div>
+      </div>
+      <!-- Content Container -->
+      <div id="view-content" class="prose max-w-none"></div>
+    </section>
+
+    <!-- SECTION: EDITOR -->
+    <section id="editor" class="view-section hidden-section">
+      <h1 class="text-3xl font-extrabold text-slate-900 mb-8" id="editor-title">Create / Edit Article</h1>
+      <div class="bg-white p-6 md:p-8 rounded-2xl shadow-xl space-y-6">
+        <input type="hidden" id="edit-id">
+        
+        <div class="grid md:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-sm font-bold text-slate-700 mb-1">Title</label>
+            <input type="text" id="edit-title" class="w-full border border-slate-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-sky-500" placeholder="Article Title">
+          </div>
+          <div>
+            <label class="block text-sm font-bold text-slate-700 mb-1">Category</label>
+            <input type="text" id="edit-category" class="w-full border border-slate-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-sky-500" placeholder="e.g. Psychology">
+          </div>
+          <div>
+            <label class="block text-sm font-bold text-slate-700 mb-1">Author</label>
+            <input type="text" id="edit-author" class="w-full border border-slate-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-sky-500" placeholder="Author Name">
+          </div>
+          <div>
+            <label class="block text-sm font-bold text-slate-700 mb-1">Date</label>
+            <input type="text" id="edit-date" class="w-full border border-slate-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-sky-500" placeholder="e.g. August 25, 2026">
+          </div>
+          <div class="md:col-span-2">
+            <label class="block text-sm font-bold text-slate-700 mb-1">Thumbnail/Image URL</label>
+            <input type="text" id="edit-image" class="w-full border border-slate-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-sky-500" placeholder="e.g. thum/image.png">
+          </div>
+          <div class="md:col-span-2">
+            <label class="block text-sm font-bold text-slate-700 mb-1">Excerpt (Short Summary)</label>
+            <textarea id="edit-excerpt" rows="3" class="w-full border border-slate-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-sky-500" placeholder="Short description..."></textarea>
+          </div>
+        </div>
+
+        <!-- CONTENT EDITOR TOOLBAR -->
+        <div class="md:col-span-2 mt-6">
+          <label class="block text-sm font-bold text-slate-700 mb-2">Article Content (HTML)</label>
+          <div class="flex flex-wrap gap-2 mb-2 p-2 bg-slate-100 rounded-t-lg border border-b-0 border-slate-300">
+            <button onclick="insertHTML('p')" class="bg-white hover:bg-slate-200 text-slate-700 px-3 py-1.5 text-sm font-bold border rounded shadow-sm"><i class="fa-solid fa-paragraph text-sky-600 mr-1"></i> Paragraph</button>
+            <button onclick="insertHTML('h3')" class="bg-white hover:bg-slate-200 text-slate-700 px-3 py-1.5 text-sm font-bold border rounded shadow-sm"><i class="fa-solid fa-heading text-sky-600 mr-1"></i> Subtitle (H3)</button>
+            <button onclick="insertHTML('img')" class="bg-white hover:bg-slate-200 text-slate-700 px-3 py-1.5 text-sm font-bold border rounded shadow-sm"><i class="fa-solid fa-image text-emerald-600 mr-1"></i> Add Image</button>
+            <button onclick="insertHTML('mp3')" class="bg-white hover:bg-slate-200 text-slate-700 px-3 py-1.5 text-sm font-bold border rounded shadow-sm"><i class="fa-solid fa-music text-amber-600 mr-1"></i> Add MP3 Player</button>
+            <button onclick="insertHTML('quote')" class="bg-white hover:bg-slate-200 text-slate-700 px-3 py-1.5 text-sm font-bold border rounded shadow-sm"><i class="fa-solid fa-quote-left text-violet-600 mr-1"></i> Quote Box</button>
+          </div>
+          <textarea id="edit-content" rows="15" class="w-full font-mono text-sm border border-slate-300 rounded-b-lg p-4 focus:outline-none focus:ring-2 focus:ring-sky-500" placeholder="Type or inject HTML here..."></textarea>
+        </div>
+
+        <div class="flex gap-4 pt-4 border-t">
+          <button onclick="saveArticle()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg font-bold shadow-lg transition-all">Save Article</button>
+          <button onclick="switchTab('home')" class="bg-slate-300 hover:bg-slate-400 text-slate-800 px-6 py-3 rounded-lg font-bold transition-all">Cancel</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION: JSON MANAGER -->
+    <section id="json-manager" class="view-section hidden-section">
+      <h1 class="text-3xl font-extrabold text-slate-900 mb-8">Data Manager</h1>
+      
+      <div class="grid md:grid-cols-2 gap-8">
+        <!-- Load JSON -->
+        <div class="bg-white p-6 rounded-2xl shadow-xl">
+          <h2 class="text-xl font-bold text-slate-800 mb-2"><i class="fa-solid fa-file-import text-amber-500 mr-2"></i>1. Import JSON</h2>
+          <p class="text-sm text-slate-500 mb-4">Paste your existing data.json code here to load the articles.</p>
+          <textarea id="import-json" rows="10" class="w-full font-mono text-xs border border-slate-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-amber-500 mb-4" placeholder="[ { ... } ]"></textarea>
+          <button onclick="loadJSON()" class="w-full bg-amber-500 hover:bg-amber-600 text-white py-3 rounded-lg font-bold shadow-md transition-all">Load Data to Website</button>
+        </div>
+
+        <!-- Export JSON -->
+        <div class="bg-white p-6 rounded-2xl shadow-xl border-2 border-emerald-400">
+          <h2 class="text-xl font-bold text-slate-800 mb-2"><i class="fa-solid fa-file-export text-emerald-500 mr-2"></i>2. Export Updated JSON</h2>
+          <p class="text-sm text-slate-500 mb-4">After adding/editing articles, copy this updated JSON to save to your file.</p>
+          <textarea id="export-json" rows="10" class="w-full font-mono text-xs border border-slate-300 bg-slate-50 rounded-lg p-3 focus:outline-none mb-4" readonly placeholder="Your updated JSON will appear here..."></textarea>
+          <button onclick="copyJSON()" id="btn-copy" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-3 rounded-lg font-bold shadow-md transition-all">Copy to Clipboard</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // State
+    let articlesData = [];
+
+    // --- NAVIGATION ---
+    function switchTab(tabId) {
+      document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden-section'));
+      document.getElementById(tabId).classList.remove('hidden-section');
+      
+      // Stop any playing audio when switching tabs
+      document.querySelectorAll('audio').forEach(audio => {
+        audio.pause();
+      });
+
+      if(tabId === 'home') renderList();
+      if(tabId === 'json-manager') updateExportJSON();
+    }
+
+    // --- JSON MANAGEMENT ---
+    function loadJSON() {
+      try {
+        const input = document.getElementById('import-json').value;
+        const parsed = JSON.parse(input);
+        if (Array.isArray(parsed)) {
+          articlesData = parsed;
+          alert(`Successfully loaded ${articlesData.length} articles!`);
+          updateExportJSON();
+          switchTab('home');
+        } else {
+          alert("Invalid JSON format. It should be an array of objects [ { ... } ].");
+        }
+      } catch (e) {
+        alert("Error parsing JSON. Please check your syntax.");
+        console.error(e);
+      }
+    }
+
+    function updateExportJSON() {
+      const exportBox = document.getElementById('export-json');
+      // Format with 2 spaces for readability
+      exportBox.value = JSON.stringify(articlesData, null, 2);
+    }
+
+    function copyJSON() {
+      const exportBox = document.getElementById('export-json');
+      exportBox.select();
+      document.execCommand('copy');
+      const btn = document.getElementById('btn-copy');
+      btn.innerHTML = '<i class="fa-solid fa-check mr-2"></i>Copied!';
+      setTimeout(() => btn.innerHTML = 'Copy to Clipboard', 2000);
+    }
+
+    // --- VIEWER / RENDERING ---
+    function renderList() {
+      const container = document.getElementById('article-list');
+      container.innerHTML = '';
+
+      if (articlesData.length === 0) {
+        container.innerHTML = '<div class="text-slate-500 italic col-span-2 text-center py-10">No articles loaded.</div>';
+        return;
+      }
+
+      articlesData.forEach(article => {
+        const card = document.createElement('div');
+        card.className = "bg-white p-6 rounded-2xl shadow-lg border border-slate-100 hover:shadow-xl transition-shadow flex flex-col justify-between";
+        card.innerHTML = `
+          <div>
+            <div class="text-xs font-bold text-sky-500 uppercase tracking-wider mb-2">${article.category || 'Uncategorized'}</div>
+            <h2 class="text-xl font-extrabold text-slate-800 mb-3 leading-snug cursor-pointer hover:text-sky-600" onclick="viewArticle('${article.id}')">${article.title}</h2>
+            <p class="text-slate-600 text-sm mb-4 line-clamp-3">${article.excerpt}</p>
+          </div>
+          <div class="flex items-center justify-between mt-4 pt-4 border-t border-slate-100">
+            <div class="text-xs text-slate-400 font-semibold"><i class="fa-solid fa-calendar mr-1"></i>${article.date || ''}</div>
+            <div class="flex gap-2">
+              <button onclick="editArticle('${article.id}')" class="text-slate-400 hover:text-amber-500 transition-colors" title="Edit Article"><i class="fa-solid fa-pen"></i></button>
+              <button onclick="viewArticle('${article.id}')" class="text-sky-600 font-bold text-sm hover:underline">Read More <i class="fa-solid fa-arrow-right ml-1"></i></button>
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function viewArticle(id) {
+      const article = articlesData.find(a => a.id === id);
+      if(!article) return;
+
+      document.getElementById('view-category').textContent = article.category;
+      document.getElementById('view-title').textContent = article.title;
+      document.getElementById('view-author').textContent = article.author;
+      document.getElementById('view-date').textContent = article.date;
+      
+      const contentContainer = document.getElementById('view-content');
+      contentContainer.innerHTML = ''; // Clear old content
+
+      // To execute embedded <script> tags inside the JSON HTML string, we use createContextualFragment
+      const range = document.createRange();
+      range.selectNode(document.body);
+      const documentFragment = range.createContextualFragment(article.content);
+      contentContainer.appendChild(documentFragment);
+
+      switchTab('viewer');
+    }
+
+    // --- EDITOR LOGIC ---
+    function openEditor(id = null) {
+      if (id) {
+        document.getElementById('editor-title').textContent = "Edit Article";
+        const article = articlesData.find(a => a.id === id);
+        document.getElementById('edit-id').value = article.id;
+        document.getElementById('edit-title').value = article.title || '';
+        document.getElementById('edit-category').value = article.category || '';
+        document.getElementById('edit-author').value = article.author || '';
+        document.getElementById('edit-date').value = article.date || '';
+        document.getElementById('edit-image').value = article.imageUrl || '';
+        document.getElementById('edit-excerpt').value = article.excerpt || '';
+        document.getElementById('edit-content').value = article.content || '';
+      } else {
+        document.getElementById('editor-title').textContent = "Create New Article";
+        document.getElementById('edit-id').value = Date.now().toString(); // Generate unique ID
+        document.getElementById('edit-title').value = '';
+        document.getElementById('edit-category').value = '';
+        document.getElementById('edit-author').value = '';
+        
+        // Auto-fill today's date
+        const options = { month: 'long', day: 'numeric', year: 'numeric' };
+        document.getElementById('edit-date').value = new Date().toLocaleDateString('en-US', options);
+        
+        document.getElementById('edit-image').value = '';
+        document.getElementById('edit-excerpt').value = '';
+        document.getElementById('edit-content').value = '';
+      }
+      switchTab('editor');
+    }
+
+    function editArticle(id) {
+      openEditor(id);
+    }
+
+    function saveArticle() {
+      const id = document.getElementById('edit-id').value;
+      const newArticle = {
+        id: id,
+        title: document.getElementById('edit-title').value,
+        excerpt: document.getElementById('edit-excerpt').value,
+        content: document.getElementById('edit-content').value,
+        category: document.getElementById('edit-category').value,
+        author: document.getElementById('edit-author').value,
+        date: document.getElementById('edit-date').value,
+        imageUrl: document.getElementById('edit-image').value
+      };
+
+      const existingIndex = articlesData.findIndex(a => a.id === id);
+      if (existingIndex > -1) {
+        articlesData[existingIndex] = newArticle;
+      } else {
+        articlesData.unshift(newArticle); // Put new article at the top
+      }
+
+      alert("Article saved! Don't forget to go to 'JSON Data' to copy your new JSON.");
+      switchTab('home');
+    }
+
+    // --- HTML INJECTION TOOLBAR ---
+    function insertAtCursor(textarea, textToInsert) {
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const text = textarea.value;
+      textarea.value = text.substring(0, start) + textToInsert + text.substring(end);
+      textarea.selectionStart = textarea.selectionEnd = start + textToInsert.length;
+      textarea.focus();
+    }
+
+    function insertHTML(type) {
+      const textarea = document.getElementById('edit-content');
+      let html = '';
+
+      if (type === 'p') {
+        html = `\n<p class='lead text-lg text-slate-600 leading-relaxed mb-6'>Ketik paragraf Anda di sini...</p>\n`;
+      } 
+      else if (type === 'h3') {
+        html = `\n<h3 class='text-2xl font-extrabold text-slate-900 mt-12 mb-6'>Judul Sub-Bab</h3>\n`;
+      } 
+      else if (type === 'quote') {
+        html = `\n<div class='callout bg-sky-50 border-l-4 border-sky-500 p-6 rounded-r-2xl my-10'>\n  <h4 class='font-extrabold text-sky-900 flex items-center gap-2 mb-3'><i class='fa-solid fa-lightbulb'></i> Judul Quote/Catatan</h4>\n  <p class='text-sky-800 text-sm leading-relaxed m-0'>Isi catatan khusus Anda di sini...</p>\n</div>\n`;
+      }
+      else if (type === 'img') {
+        const url = prompt("Masukkan Link URL Gambar:");
+        if (url) {
+          html = `\n<div class='not-prose my-10'>\n  <img src='${url}' alt='Image Description' class='w-full rounded-2xl shadow-lg border border-slate-200'>\n</div>\n`;
+        }
+      } 
+      else if (type === 'mp3') {
+        const url = prompt("Masukkan Link URL MP3/Audio:");
+        const title = prompt("Masukkan Judul Lagu:", "Ambient Soundtrack");
+        if (url) {
+          // Buat ID unik agar jika ada 2 player di halaman yg sama scriptnya tidak tabrakan
+          const uniqueId = Math.floor(Math.random() * 10000);
+          html = `\n<div id='mp3-player-${uniqueId}' class='not-prose sticky top-4 z-40 mb-10 mx-auto max-w-2xl'>
+  <style>
+    #mp3-player-${uniqueId} .disc-${uniqueId}{animation:spin-${uniqueId} 3.2s linear infinite;animation-play-state:paused;}
+    #mp3-player-${uniqueId} .disc-${uniqueId}.spinning{animation-play-state:running;}
+    @keyframes spin-${uniqueId}{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+    #mp3-player-${uniqueId} input[type=range]{accent-color:#38bdf8;}
+  </style>
+  <div class='flex items-center gap-4 px-5 py-3 bg-gradient-to-r from-slate-950 via-sky-950 to-indigo-950 rounded-full shadow-2xl border border-sky-400/30'>
+    <button id='mp3-toggle-${uniqueId}' class='shrink-0 w-12 h-12 rounded-full bg-slate-900 border-2 border-sky-400 flex items-center justify-center text-sky-300 shadow-lg relative overflow-hidden'>
+      <span id='mp3-disc-${uniqueId}' class='disc-${uniqueId} absolute inset-0 rounded-full' style='background:conic-gradient(#38bdf8 0deg,#0f172a 40deg,#0f172a 320deg,#38bdf8 360deg);'></span>
+      <i id='mp3-icon-${uniqueId}' class='fa-solid fa-play relative z-10 text-xs'></i>
+    </button>
+    <div class='flex-1 min-w-0'>
+      <div class='text-white font-bold text-sm truncate'>${title}</div>
+      <div id='mp3-status-${uniqueId}' class='text-sky-300 text-xs'>Tap play to begin</div>
+    </div>
+    <div class='flex items-center gap-2 shrink-0 pr-1'>
+      <i class='fa-solid fa-headphones text-sky-300 text-xs'></i>
+      <input id='mp3-vol-${uniqueId}' type='range' min='0' max='100' value='40' class='w-16 md:w-24 cursor-pointer'>
+    </div>
+  </div>
+  <audio id='mp3-audio-${uniqueId}' loop preload='none' src='${url}'></audio>
+</div>
+<script>
+(function(){
+  var container = document.getElementById('mp3-player-${uniqueId}');
+  var audio = document.getElementById('mp3-audio-${uniqueId}');
+  var btn = document.getElementById('mp3-toggle-${uniqueId}');
+  var icon = document.getElementById('mp3-icon-${uniqueId}');
+  var status = document.getElementById('mp3-status-${uniqueId}');
+  var disc = document.getElementById('mp3-disc-${uniqueId}');
+  var vol = document.getElementById('mp3-vol-${uniqueId}');
+  if(!audio || !btn || !container) return;
+
+  audio.volume = 0.40;
+
+  function setIcon(playing){
+    icon.className = 'fa-solid ' + (playing ? 'fa-pause' : 'fa-play') + ' relative z-10 text-xs';
+    if(disc){ disc.classList.toggle('spinning', playing); }
+  }
+
+  function tryPlay(){
+    audio.play().then(function(){
+      setIcon(true);
+      status.textContent = 'Now playing — adjust volume anytime';
+    }).catch(function(){
+      status.textContent = 'Tap play to start audio';
+    });
+  }
+
+  btn.addEventListener('click', function(e){
+    e.stopPropagation();
+    if(audio.paused) { tryPlay(); } else { audio.pause(); setIcon(false); status.textContent = 'Paused'; }
+  });
+
+  vol.addEventListener('input', function(){
+    audio.volume = Number(vol.value) / 100;
+    if(audio.volume === 0){ status.textContent = 'Muted'; }
+  });
+
+  audio.addEventListener('ended', function(){ setIcon(false); });
+})();
+<\/script>\n`;
+        }
+      }
+
+      if (html) {
+        insertAtCursor(textarea, html);
+      }
+    }
+  </script>
+</body>
+</html>
