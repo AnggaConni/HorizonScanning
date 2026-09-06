@@ -456,6 +456,16 @@
           </select>
         </div>
 
+        <!-- Register Monitoring Area -->
+        <div><label class="block font-semibold text-slate-700 mb-1">Primary Hazard Source</label>
+          <select id="s-hazard" class="w-full border rounded-lg p-2 outline-none">
+            <option value="wildfire">🔥 Wildfire Smoke / Karhutla</option>
+            <option value="volcanic">🌋 Volcanic Ash</option>
+            <option value="pollution">🏭 Urban / Industrial Pollution</option>
+          </select>
+          <p class="text-[10px] text-slate-400 mt-1">Determines which health-action guidance is shown.</p>
+        </div>
+
         <div>
           <label class="block font-semibold text-slate-700 mb-1">Vulnerable Groups Present <span class="text-[10px] font-normal text-slate-400">(Check all that apply)</span></label>
           <div class="grid grid-cols-1 gap-2 p-3 bg-slate-50 border border-slate-200 rounded-lg max-h-44 overflow-y-auto">
@@ -775,19 +785,24 @@ function loadSampleData(){
     }
     return h.sort((a,b)=>new Date(b.date)-new Date(a.date));
   };
-  
+
   db.sites=[
-    {id:"S_1",name:"Palangka Raya – City Centre",type:"Village",groups:["Infants","Children","Elderly","Asthma"],pop:12000,lat:-2.2088,lon:113.9213,capN95:false,capPurifier:false,capCleanroom:false,capClinic:true,capMeds:false,capAlert:true,hasData:false,history:genHistory()},
-    {id:"S_2",name:"Banjarbaru – SDN 5 Elementary",type:"School",groups:["Children"],pop:420,lat:-3.4572,lon:114.8110,capN95:true,capPurifier:false,capCleanroom:true,capClinic:true,capMeds:false,capAlert:true,hasData:false,history:genHistory()},
-    {id:"S_3",name:"Pontianak – Puskesmas Sungai Raya",type:"Health Facility",groups:["Infants","Elderly","COPD","Heart"],pop:800,lat:-0.0850,lon:109.3450,capN95:true,capPurifier:true,capCleanroom:true,capClinic:true,capMeds:true,capAlert:true,hasData:false,history:genHistory()},
-    {id:"S_4",name:"Sampit – Peatland Farming",type:"Village",groups:["Outdoor","Infants","Pregnant","Elderly"],pop:2300,lat:-2.5350,lon:112.9500,capN95:false,capPurifier:false,capCleanroom:false,capClinic:false,capMeds:false,capAlert:false,hasData:false,history:genHistory()},
-    
-    // --- TAMBAHAN DATA CILEGON ---
-    {id:"S_5",name:"Cilegon – Industrial & Port Zone",type:"Workplace",groups:["Outdoor","Asthma","Healthy"],pop:15000,lat:-6.0174,lon:106.0227,capN95:true,capPurifier:false,capCleanroom:true,capClinic:true,capMeds:true,capAlert:true,hasData:false,history:genHistory()}
+    // --- KALIMANTAN: WILDFIRE / KARHUTLA PEATLAND ---
+    {id:"S_1",name:"Palangka Raya – City Centre",type:"Village",hazardType:"wildfire",groups:["Infants","Children","Elderly","Asthma"],pop:12000,lat:-2.2088,lon:113.9213,capN95:false,capPurifier:false,capCleanroom:false,capClinic:true,capMeds:false,capAlert:true,hasData:false,history:genHistory()},
+    {id:"S_2",name:"Banjarbaru – SDN 5 Elementary",type:"School",hazardType:"wildfire",groups:["Children"],pop:420,lat:-3.4572,lon:114.8110,capN95:true,capPurifier:false,capCleanroom:true,capClinic:true,capMeds:false,capAlert:true,hasData:false,history:genHistory()},
+    {id:"S_3",name:"Pontianak – Puskesmas Sungai Raya",type:"Health Facility",hazardType:"wildfire",groups:["Infants","Elderly","COPD","Heart"],pop:800,lat:-0.0850,lon:109.3450,capN95:true,capPurifier:true,capCleanroom:true,capClinic:true,capMeds:true,capAlert:true,hasData:false,history:genHistory()},
+    {id:"S_4",name:"Sampit – Peatland Farming",type:"Village",hazardType:"wildfire",groups:["Outdoor","Infants","Pregnant","Elderly"],pop:2300,lat:-2.5350,lon:112.9500,capN95:false,capPurifier:false,capCleanroom:false,capClinic:false,capMeds:false,capAlert:false,hasData:false,history:genHistory()},
+
+    // --- CILEGON: VOLCANIC ASH (dekat Selat Sunda / Anak Krakatau) ---
+    {id:"S_5",name:"Cilegon – Industrial & Port Zone",type:"Workplace",hazardType:"volcanic",groups:["Outdoor","Asthma","Healthy"],pop:15000,lat:-6.0174,lon:106.0227,capN95:true,capPurifier:false,capCleanroom:true,capClinic:true,capMeds:true,capAlert:true,hasData:false,history:genHistory()},
+
+    // --- JAKARTA & BANDUNG: URBAN / INDUSTRIAL POLLUTION ---
+    {id:"S_6",name:"Jakarta – Kebon Jeruk Residential",type:"Village",hazardType:"pollution",groups:["Infants","Elderly","Asthma","Outdoor"],pop:9500,lat:-6.1937,lon:106.7659,capN95:false,capPurifier:true,capCleanroom:false,capClinic:true,capMeds:false,capAlert:false,hasData:false,history:genHistory()},
+    {id:"S_7",name:"Bandung – Cicaheum Traffic Corridor",type:"Household",hazardType:"pollution",groups:["Children","COPD","Outdoor"],pop:600,lat:-6.9034,lon:107.6547,capN95:false,capPurifier:false,capCleanroom:false,capClinic:true,capMeds:false,capAlert:false,hasData:false,history:genHistory()}
   ];
-  
+
   saveDb(); renderMapMarkers();
-  alert("Sample data (Kalimantan & Cilegon) loaded successfully.");
+  alert("Sample data loaded: Kalimantan (wildfire), Cilegon (volcanic ash), Jakarta & Bandung (urban pollution).");
   closeModal('modal-settings');
   if(window.innerWidth<768) mobileView('map');
 }
@@ -826,10 +841,14 @@ function saveSite(e){
   e.preventDefault();
   const g=Array.from(document.querySelectorAll('.grp-chk:checked')).map(c=>c.value);
   if(g.length===0) g.push("Healthy");
+
   const s={id:"S_"+Date.now(),name:document.getElementById('s-name').value,
     lat:parseFloat(document.getElementById('s-lat').value),lon:parseFloat(document.getElementById('s-lon').value),
-    type:document.getElementById('s-type').value,groups:g,pop:parseInt(document.getElementById('s-pop').value)||0,
+    type:document.getElementById('s-type').value,
+    hazardType:document.getElementById('s-hazard').value||'wildfire',
+    groups:g,pop:parseInt(document.getElementById('s-pop').value)||0,
     capN95:false,capPurifier:false,capCleanroom:false,capClinic:false,capMeds:false,capAlert:false,hasData:false,history:[]};
+
   db.sites.push(s);saveDb();closeModal('modal-add-site');document.getElementById('form-site').reset();
   renderMapMarkers();currentSiteId=s.id;
   if(window.innerWidth<768) mobileView('dash');
@@ -1020,11 +1039,17 @@ function calculateRisk(s,aq,w){
 
   if(s.peakPM25>P*1.5 && s.peakPM25>=55){H+=2;hz.push(['Worsening trend forecast','crit','Peak '+s.peakPM25+' µg/m³ expected within 72h']);}
 
-  if(s.firePoints>=50){H+=3;hz.push(['Massive hotspot cluster','crit',s.firePoints+' detections in radius']);}
-  else if(s.firePoints>=10){H+=2;hz.push(['Active fire cluster','crit',s.firePoints+' detections']);}
-  else if(s.firePoints>0){H+=1;hz.push(['Fire hotspots detected','warn',s.firePoints+' detection(s), nearest '+(s.nearestFire?s.nearestFire.toFixed(0):'?')+' km']);}
-  else if(s.fireError==='NO_KEY'){hz.push(['Hotspot detection OFF','warn','Add NASA FIRMS key in Settings']);}
-  else hz.push(['No hotspots detected','ok','Clear within search radius']);
+  const hazTypeH = s.hazardType || 'wildfire';
+  if(hazTypeH!=='pollution'){
+    const tLabel = hazTypeH==='volcanic' ? 'thermal/vent anomaly' : 'hotspot';
+    if(s.firePoints>=50){H+=3;hz.push(['Massive '+tLabel+' cluster','crit',s.firePoints+' detections in radius']);}
+    else if(s.firePoints>=10){H+=2;hz.push(['Active '+tLabel+' cluster','crit',s.firePoints+' detections']);}
+    else if(s.firePoints>0){H+=1;hz.push([tLabel.charAt(0).toUpperCase()+tLabel.slice(1)+'(s) detected','warn',s.firePoints+' detection(s), nearest '+(s.nearestFire?s.nearestFire.toFixed(0):'?')+' km']);}
+    else if(s.fireError==='NO_KEY'){hz.push(['Detection OFF','warn','Add NASA FIRMS key in Settings']);}
+    else hz.push(['No '+tLabel+'s detected','ok','Clear within search radius']);
+  } else if(s.apiNO2>100 || s.apiSO2>100){
+    hz.push(['Elevated industrial/traffic gas markers','warn','NO₂ '+s.apiNO2+' µg/m³ · SO₂ '+s.apiSO2+' µg/m³']);
+  }
 
   if(s.upwindFires>0){H+=2;hz.push(['Smoke blowing toward site','crit',s.upwindFires+' upwind fire(s) — direct plume path']);}
   if(s.apiCO>4000){H+=1;hz.push(['Elevated carbon monoxide','warn',s.apiCO+' µg/m³ — combustion signature']);}
@@ -1102,11 +1127,17 @@ function computeIndicators(s){
   ind.push(ic('fa-smog','PM2.5 (fine smoke)',P+' µg/m³',cat.l,cat.t+' · WHO 24h guideline is 15'));
   ind.push(ic('fa-cloud','PM10 (coarse)',s.apiPM10+' µg/m³',s.apiPM10>150?'crit':s.apiPM10>50?'warn':'ok','Ash and larger particles'));
   ind.push(ic('fa-gauge-high','US AQI',s.apiUSAQI||'—',s.apiUSAQI>200?'crit':s.apiUSAQI>100?'warn':'ok','EPA composite index'));
-  ind.push(ic('fa-fire','Fire hotspots (48h)',
-    s.fireError==='NO_KEY'?'Key needed':s.firePoints,
-    s.fireError==='NO_KEY'?'warn':(s.firePoints>=10?'crit':s.firePoints>0?'warn':'ok'),
-    s.fireError==='NO_KEY'?'Add NASA FIRMS key in Settings':(s.nearestFire!=null?'Nearest '+s.nearestFire.toFixed(0)+' km · total FRP '+(s.totalFRP||0).toFixed(0)+' MW':'None in radius')));
-  ind.push(ic('fa-wind','Smoke transport',s.upwindFires>0?s.upwindFires+' upwind':'Not upwind',s.upwindFires>0?'crit':'ok',
+
+  const hazTypeI = s.hazardType || 'wildfire';
+  const thLabel = hazTypeI==='volcanic' ? 'Thermal/lava anomalies (48h)' : 'Fire hotspots (48h)';
+  if(hazTypeI!=='pollution'){
+    ind.push(ic('fa-fire',thLabel,
+      s.fireError==='NO_KEY'?'Key needed':s.firePoints,
+      s.fireError==='NO_KEY'?'warn':(s.firePoints>=10?'crit':s.firePoints>0?'warn':'ok'),
+      s.fireError==='NO_KEY'?'Add NASA FIRMS key in Settings':(s.nearestFire!=null?'Nearest '+s.nearestFire.toFixed(0)+' km · total FRP '+(s.totalFRP||0).toFixed(0)+' MW':'None in radius')));
+  }
+  
+    ind.push(ic('fa-wind','Smoke transport',s.upwindFires>0?s.upwindFires+' upwind':'Not upwind',s.upwindFires>0?'crit':'ok',
     'Wind from '+compass(s.apiWindDir)+' at '+s.apiWind+' km/h'));
   ind.push(ic('fa-eye','Visibility (est.) ⚠',s.visKm+' km',parseFloat(s.visKm)<1?'crit':parseFloat(s.visKm)<5?'warn':'ok','Derived from PM2.5 extinction'));
   ind.push(ic('fa-fire-flame-simple','Carbon monoxide',s.apiCO+' µg/m³',s.apiCO>6000?'crit':s.apiCO>3000?'warn':'ok','Incomplete combustion marker'));
@@ -1140,6 +1171,7 @@ function generateActions(s){
   const acts=[]; const P=s.apiPM25;
   const g=Array.isArray(s.groups)?s.groups:['Healthy'];
   const has=x=>g.includes(x);
+  const hazType = s.hazardType || 'wildfire';
 
   /* --- EMERGENCY LEVEL --- */
   if(P>=250){
@@ -1303,8 +1335,8 @@ function generateActions(s){
   }
 
   /* --- FIRE SOURCE --- */
-  if(s.firePoints>0){
-    acts.push(['fa-fire-flame-curved','high',`<b>ACTIVE FIRE HOTSPOTS DETECTED — SOURCE RESPONSE:</b><br>
+  if(hazType==='wildfire' && s.firePoints>0){
+  acts.push(['fa-fire-flame-curved','high',`<b>ACTIVE FIRE HOTSPOTS DETECTED — SOURCE RESPONSE:</b><br>
     • NASA satellites detected <b>${s.firePoints} thermal hotspot(s)</b> within your search radius in the last 48 hours${s.nearestFire!=null?', the nearest approximately <b>'+s.nearestFire.toFixed(0)+' km</b> away':''}.${s.upwindFires>0?' <b>'+s.upwindFires+' of these are directly upwind</b>, meaning their smoke is being carried straight toward this location.':''}<br>
     • Report the fire immediately if it is not already known: contact BPBD (disaster agency), Manggala Agni (forest fire brigade), or the local police/village head. Early reporting is the single most effective way to stop a small fire becoming a regional haze event.<br>
     • Note the fire's approximate location and direction before reporting — satellite coordinates are visible on the map in this app.<br>
@@ -1313,13 +1345,53 @@ function generateActions(s){
     • Prepare an evacuation plan now: identify the route, the destination (a location with clean air, ideally upwind and away from peat), and what you will take. Do not wait until flames are visible.<br>
     • Keep important documents, medication and phone chargers in one bag ready to move.`]);
   }
-  else if(s.fireError==='NO_KEY'){
-    acts.push(['fa-key','med',`<b>ENABLE FIRE HOTSPOT DETECTION (2-minute setup):</b><br>
+  else if(hazType==='wildfire' && s.fireError==='NO_KEY'){
+  acts.push(['fa-key','med',`<b>ENABLE FIRE HOTSPOT DETECTION (2-minute setup):</b><br>
     • This app cannot currently see where the fires are, because no NASA FIRMS key has been entered. You are seeing air quality but not the smoke source.<br>
     • Knowing hotspot locations matters because it tells you whether smoke will get worse (fires upwind and approaching) or clear (fires downwind or extinguished).<br>
     • Getting a key is free and requires only an email address — no account approval, no payment, no waiting period.<br>
     • Open <b>Settings (gear icon) → Get a free key</b>, or click the button below, submit your email on NASA's page, copy the MAP_KEY they show you, and paste it back here.<br>
     • Once saved, hotspot detection activates immediately for every location you monitor.`]);
+  }
+
+  /* --- VOLCANIC ASH SOURCE-SPECIFIC --- */
+  if(hazType==='volcanic'){
+    if(P>=35){
+      acts.push(['fa-mountain','high',`<b>VOLCANIC ASHFALL — PROPERTY &amp; INFRASTRUCTURE ACTIONS:</b><br>
+      • Ash is abrasive glass-and-mineral dust, not organic smoke — it damages lungs, eyes, machinery and roofing differently from wildfire smoke.<br>
+      • <b>Clear roofs regularly using a broom, not water at first</b> if ash is thick and dry — wet ash can double in weight and has collapsed roofs. Once loose ash is removed, light water spraying prevents it re-suspending into the air.<br>
+      • <b>Never dry-sweep indoor ash</b> — this re-suspends fine particles you'll then breathe. Dampen surfaces first, then wipe or mop.<br>
+      • Cover open water sources (wells, tanks, ponds) — ash contaminates drinking water and can raise its fluoride/sulphate content to unsafe levels. If ash has already fallen in, let it settle and draw water from above the sediment, or switch to bottled/sealed sources.<br>
+      • Protect vehicle and generator air intakes — silica-rich ash is highly abrasive to engines and can destroy an unfiltered engine within hours. Avoid driving unless necessary; if you must, drive slowly, use headlights, and change air filters more frequently than usual.<br>
+      • Check on livestock and crops — ash coating on pasture and water troughs is a common source of animal illness after eruptions; provide covered feed and water where possible.`]);
+    }
+    if(P>=15){
+      acts.push(['fa-eye','med',`<b>EYE &amp; SKIN PROTECTION DURING ASHFALL:</b><br>
+      • Volcanic ash particles are sharp-edged at a microscopic level and cause corneal abrasion far more than smoke does. <b>Avoid wearing contact lenses</b> during active ashfall — switch to glasses, ideally goggles that seal at the sides.<br>
+      • Rinse eyes with clean water (not rubbing) if they feel gritty. Do not rub — this scratches the cornea.<br>
+      • Cover exposed skin outdoors; ash can cause irritation on contact, especially for people with sensitive skin or eczema.<br>
+      • Combine an N95/KN95 respirator with eye protection — a mask alone leaves the eyes fully exposed to ash, which is a bigger irritant here than in wildfire smoke.`]);
+    }
+    acts.push(['fa-tower-observation','med',`<b>MONITOR OFFICIAL VOLCANO STATUS:</b><br>
+    • This dashboard tracks air quality, not eruption status. Always cross-check the current alert level (Normal / Waspada / Siaga / Awas) from <b>PVMBG (Pusat Vulkanologi dan Mitigasi Bencana Geologi)</b> or the nearest official monitoring post — PM2.5 readings alone don't tell you whether an evacuation order is active.<br>
+    • If the volcano is raised to Siaga or Awas, follow the official evacuation radius immediately regardless of what the air quality numbers show locally — pyroclastic and lahar hazards operate on a completely different timescale than ashfall exposure.<br>
+    • Keep a battery or hand-crank radio — ashfall often disrupts mobile networks and power, cutting off app-based alerts exactly when they matter most.`]);
+  }
+
+  /* --- URBAN / INDUSTRIAL POLLUTION SOURCE-SPECIFIC --- */
+  if(hazType==='pollution'){
+    if(s.apiNO2>100 || s.apiCO>4000 || s.apiSO2>100){
+      acts.push(['fa-industry','high',`<b>INDUSTRIAL / TRAFFIC POLLUTION MARKERS ELEVATED:</b><br>
+      • NO₂ ${s.apiNO2} µg/m³, SO₂ ${s.apiSO2} µg/m³, CO ${s.apiCO} µg/m³ — these gases point to combustion sources (vehicles, factories, power plants) rather than open burning.<br>
+      • If levels are unusually high compared to normal days, this may indicate a nearby industrial malfunction or illegal emission. Consider reporting it to your local <b>Dinas Lingkungan Hidup (DLH)</b> or the national environmental complaint line so the source can be inspected.<br>
+      • Keep windows facing busy roads or industrial areas closed during peak traffic/production hours; ventilate from the side of the building furthest from the source instead.<br>
+      • NO₂ and SO₂ irritate airways at lower concentrations than PM2.5 alone — people with asthma may react before the PM2.5 number looks alarming.`]);
+    }
+    acts.push(['fa-car','med',`<b>REDUCE EXPOSURE FROM TRAFFIC &amp; GROUND-LEVEL OZONE:</b><br>
+    • Urban pollution typically peaks during morning/evening rush hour (traffic-driven) and again in the early-to-mid afternoon (ozone forms from sunlight reacting with traffic exhaust). Avoid outdoor exercise in both windows if PM2.5 or AQI is elevated.<br>
+    • If commuting, keep car windows closed and air conditioning on recirculate mode near heavy traffic — cabin filters block a meaningful share of PM2.5 that would otherwise enter with fresh-air intake.<br>
+    • Choose routes away from major arterial roads and idling traffic where possible; pollutant concentration drops sharply even 50–100m away from a busy road.<br>
+    • Unlike wildfire haze, urban pollution rarely clears with a single rain event — it is a chronic, daily exposure. Long-term reduction (mask on commute, indoor purifier at home) matters more here than short emergency measures.`]);
   }
 
   /* --- STAGNANT AIR --- */
@@ -1337,14 +1409,14 @@ function generateActions(s){
   if(rain3>=10&&P>=55){
     acts.push(['fa-cloud-rain','low',`<b>RAINFALL FORECAST — PARTIAL RELIEF EXPECTED:</b><br>
     • Approximately <b>${rain3.toFixed(0)} mm</b> of rain is forecast over the next 3 days. Rain scavenges particulates from the air and will bring measurable improvement in PM2.5.<br>
-    • Important caveat: rain suppresses <b>surface</b> fire and washes the air, but it does <b>not</b> extinguish deep peat fires, which smoulder metres below the surface. Smoke often returns within a day or two once the surface dries.<br>
+    ${hazType==='wildfire' ? '• Important caveat: rain suppresses <b>surface</b> fire and washes the air, but it does <b>not</b> extinguish deep peat fires, which smoulder metres below the surface. Smoke often returns within a day or two once the surface dries.' : hazType==='volcanic' ? '• Important caveat: rain washes ash out of the air but turns loose ash on the ground into heavy, cement-like sludge (lahar risk on slopes) — do not assume rain makes conditions safer outdoors.' : '• Note: unlike wildfire haze, urban pollution regenerates daily from traffic and industry — expect levels to rise again once rain stops and roads dry.'}<br>
     • Use the cleaner-air window productively: ventilate and flush the house thoroughly, wash smoke residue off floors and surfaces with a damp cloth (do not sweep dry, which re-suspends particles), replace or clean air purifier filters, and restock masks and medication.<br>
     • Take vulnerable people outside for a short period of genuinely fresh air and daylight — sustained indoor confinement has its own health costs.<br>
     • Do not assume the haze season is over. Re-check this dashboard daily.`]);
   }
 
   /* --- DRY SPELL PREVENTION --- */
-  if(s.recentDry>=10&&P<55){
+  if(hazType==='wildfire' && s.recentDry>=10 && P<55){
     acts.push(['fa-sun-plant-wilt','med',`<b>PROLONGED DRY SPELL — FIRE PREVENTION WINDOW:</b><br>
     • There have been <b>${s.recentDry} consecutive days with almost no rain</b>. Peat soil and surface vegetation are drying out and becoming highly ignitable, even though the air is currently still reasonably clear.<br>
     • This is the time to act — preventing ignition is vastly cheaper and easier than fighting a peat fire or managing a haze health emergency later.<br>
