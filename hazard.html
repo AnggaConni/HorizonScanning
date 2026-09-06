@@ -54,6 +54,14 @@
   .pulse-fire{animation:pf 1.6s ease-in-out infinite;}
   @keyframes pf{0%,100%{opacity:.85}50%{opacity:.35}}
 
+  .wind-plume {
+    animation: fade-pulse 2s infinite alternate ease-in-out;
+  }
+  @keyframes fade-pulse {
+    0% { fill-opacity: 0.15; }
+    100% { fill-opacity: 0.45; }
+  }
+
   /* Hide Google Translate chrome */
   .goog-te-banner-frame{display:none!important;}
   body{top:0!important;}
@@ -125,7 +133,12 @@
   <div id="map-container" class="w-full md:w-[38%] lg:w-1/3 flex flex-col border-r border-slate-200 bg-white shrink-0 relative h-full">
     <div class="p-3 bg-slate-50 border-b flex justify-between items-center z-20 shrink-0">
       <h2 class="font-bold text-sm text-slate-700"><i class="fa-solid fa-fire-flame-curved mr-1 text-orange-600"></i> Hotspot &amp; Haze Map</h2>
-      <button onclick="openModal('modal-add-site')" class="text-xs bg-slate-800 text-white px-2.5 py-1.5 rounded-lg hover:bg-slate-700 shadow flex items-center gap-1"><i class="fa-solid fa-plus"></i> Add Area</button>
+      <div class="flex gap-2">
+        <button onclick="toggleFullScreen()" id="btn-fullscreen" class="text-xs bg-white text-slate-600 border border-slate-300 px-2.5 py-1.5 rounded-lg hover:bg-slate-100 shadow-sm flex items-center transition" title="Full Screen Map">
+          <i class="fa-solid fa-expand"></i>
+        </button>
+        <button onclick="openModal('modal-add-site')" class="text-xs bg-slate-800 text-white px-2.5 py-1.5 rounded-lg hover:bg-slate-700 shadow flex items-center gap-1"><i class="fa-solid fa-plus"></i> Add Area</button>
+      </div>
     </div>
     <div id="map-wrapper" class="flex-1 relative p-2">
       <div id="map" class="shadow-inner border border-slate-200 w-full h-full rounded-lg relative z-10"></div>
@@ -599,12 +612,48 @@ function setGTCookie(v){
 ============================================================ */
 function initMap(){
   map=L.map('map',{zoomControl:false}).setView([-1.5,113.5],6);
-  const streetMap=L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{attribution:'&copy; OpenStreetMap, &copy; CARTO'});
-  const satelliteMap=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{attribution:'Tiles &copy; Esri'});
-  streetMap.addTo(map);
+  
+  // 1. Basemap Esri
+  const esriStreet = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+    attribution: 'Tiles &copy; Esri'
+  });
+  const esriSatellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    attribution: 'Tiles &copy; Esri'
+  });
+  
+  // 2. SET TANGGAL (Pilih salah satu)
+  // Mode A: Untuk melihat contoh asap pekat saat Karhutla parah di Kalimantan/Sumatera
+  // const dateStr = '2023-10-02'; 
+  
+  // Mode B: Hapus tanda "//" di bawah ini jika ingin data REAL-TIME (kemarin)
+  const date = new Date(); date.setDate(date.getDate() - 1);
+  const dateStr = date.toISOString().split('T')[0];
+
+  // 3. Layer Sebaran Asap (NASA OMPS Aerosol Index) - Sangat pekat & akurat
+  const smokeLayer = L.tileLayer(`https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/OMPS_Aerosol_Index/default/${dateStr}/GoogleMapsCompatible_Level6/{z}/{y}/{x}.png`, {
+    attribution: '&copy; NASA GIBS',
+    opacity: 0.65,        
+    maxNativeZoom: 6,     
+    maxZoom: 18           
+  });
+  
+  esriStreet.addTo(map);
   L.control.zoom({position:'bottomright'}).addTo(map);
   hazardLayers=L.layerGroup().addTo(map);
-  L.control.layers({"Street View":streetMap,"Satellite View":satelliteMap},{"Hotspots & Smoke Zones":hazardLayers},{position:'bottomleft'}).addTo(map);
+  
+  // 4. Daftarkan layer
+  L.control.layers(
+    {
+      "Esri Street": esriStreet, 
+      "Esri Satellite": esriSatellite
+    },
+    {
+      "🔥 Hotspots & Wind Plume": hazardLayers,
+      "🌫️ Sebaran Asap (NASA)": smokeLayer  
+    },
+    {position:'bottomleft'}
+  ).addTo(map);
+
   map.on('click',e=>{
     if(isPickingMap){
       document.getElementById('s-lat').value=e.latlng.lat.toFixed(6);
@@ -613,6 +662,8 @@ function initMap(){
     }
   });
 }
+
+
 function startMapPick(){isPickingMap=true;document.getElementById('modal-add-site').classList.add('hidden');const t=document.getElementById('map-picker-instruction');t.classList.remove('hidden');t.classList.add('flex');document.getElementById('map').classList.add('picking-mode');if(window.innerWidth<768)mobileView('map');}
 function cancelMapPick(){isPickingMap=false;const t=document.getElementById('map-picker-instruction');t.classList.add('hidden');t.classList.remove('flex');document.getElementById('map').classList.remove('picking-mode');document.getElementById('modal-add-site').classList.remove('hidden');}
 function openModal(id){document.getElementById(id).classList.remove('hidden');}
@@ -711,14 +762,19 @@ function loadSampleData(){
     }
     return h.sort((a,b)=>new Date(b.date)-new Date(a.date));
   };
+  
   db.sites=[
     {id:"S_1",name:"Palangka Raya – City Centre",type:"Village",groups:["Infants","Children","Elderly","Asthma"],pop:12000,lat:-2.2088,lon:113.9213,capN95:false,capPurifier:false,capCleanroom:false,capClinic:true,capMeds:false,capAlert:true,hasData:false,history:genHistory()},
     {id:"S_2",name:"Banjarbaru – SDN 5 Elementary",type:"School",groups:["Children"],pop:420,lat:-3.4572,lon:114.8110,capN95:true,capPurifier:false,capCleanroom:true,capClinic:true,capMeds:false,capAlert:true,hasData:false,history:genHistory()},
     {id:"S_3",name:"Pontianak – Puskesmas Sungai Raya",type:"Health Facility",groups:["Infants","Elderly","COPD","Heart"],pop:800,lat:-0.0850,lon:109.3450,capN95:true,capPurifier:true,capCleanroom:true,capClinic:true,capMeds:true,capAlert:true,hasData:false,history:genHistory()},
-    {id:"S_4",name:"Sampit – Peatland Farming Village",type:"Village",groups:["Outdoor","Infants","Pregnant","Elderly"],pop:2300,lat:-2.5350,lon:112.9500,capN95:false,capPurifier:false,capCleanroom:false,capClinic:false,capMeds:false,capAlert:false,hasData:false,history:genHistory()}
+    {id:"S_4",name:"Sampit – Peatland Farming",type:"Village",groups:["Outdoor","Infants","Pregnant","Elderly"],pop:2300,lat:-2.5350,lon:112.9500,capN95:false,capPurifier:false,capCleanroom:false,capClinic:false,capMeds:false,capAlert:false,hasData:false,history:genHistory()},
+    
+    // --- TAMBAHAN DATA CILEGON ---
+    {id:"S_5",name:"Cilegon – Industrial & Port Zone",type:"Workplace",groups:["Outdoor","Asthma","Healthy"],pop:15000,lat:-6.0174,lon:106.0227,capN95:true,capPurifier:false,capCleanroom:true,capClinic:true,capMeds:true,capAlert:true,hasData:false,history:genHistory()}
   ];
+  
   saveDb(); renderMapMarkers();
-  alert("Sample Kalimantan data loaded (including 2 years of haze event history).");
+  alert("Sample data (Kalimantan & Cilegon) loaded successfully.");
   closeModal('modal-settings');
   if(window.innerWidth<768) mobileView('map');
 }
@@ -1349,14 +1405,54 @@ function drawHazardsOnMap(s){
     });
   }
 
-  // smoke plume direction arrow
+  // Visualisasi Area Sebaran Abu Vulkanik / Asap
   if(s.apiWind>1){
-    const toDir=((s.apiWindDir||0)+180)%360;
-    const dist=Math.min(0.9,0.15+s.apiWind/60);
-    const rad=toDir*Math.PI/180;
-    const endLat=s.lat+dist*Math.cos(rad), endLon=s.lon+dist*Math.sin(rad)/Math.cos(s.lat*Math.PI/180);
-    L.polyline([[s.lat,s.lon],[endLat,endLon]],{color:'#0ea5e9',weight:3,opacity:.65,dashArray:'8,6'})
-      .bindTooltip(`Wind from ${compass(s.apiWindDir)} at ${s.apiWind} km/h — smoke drifts this way`).addTo(hazardLayers);
+    const toDir = ((s.apiWindDir||0)+180)%360; // Arah pergerakan angin (menuju ke)
+    const dist = Math.min(1.5, 0.2 + s.apiWind/40); // Jangkauan area memanjang sesuai kecepatan angin
+    
+    // Hitung radius penyebaran (lebar kipas/cone)
+    const spreadAngle = 25; // Asap/abu melebar 25 derajat ke kiri dan kanan
+    const radCenter = toDir * Math.PI/180;
+    const radLeft = (toDir - spreadAngle) * Math.PI/180;
+    const radRight = (toDir + spreadAngle) * Math.PI/180;
+    
+    // Koreksi untuk bentuk bumi (Spherical)
+    const latRatio = Math.cos(s.lat * Math.PI/180);
+    
+    // Titik pusat, ujung kiri, tengah, dan ujung kanan dari area sebaran
+    const pCenter = [s.lat + dist * Math.cos(radCenter), s.lon + dist * Math.sin(radCenter)/latRatio];
+    const pLeft = [s.lat + dist * Math.cos(radLeft), s.lon + dist * Math.sin(radLeft)/latRatio];
+    const pRight = [s.lat + dist * Math.cos(radRight), s.lon + dist * Math.sin(radRight)/latRatio];
+
+    // 1. Gambar Area Kipas (Wedge Polygon) berwarna abu-abu
+    L.polygon([
+      [s.lat, s.lon],
+      pLeft, pCenter, pRight // Membentuk lekukan di ujung
+    ], {
+      color: '#64748b',   // Border abu-abu batu
+      weight: 1,
+      fillColor: '#94a3b8', 
+      className: 'wind-plume' // Memanggil animasi CSS
+    }).bindTooltip(`<b>Zona Paparan Abu / Asap</b><br>Angin bergerak ke arah ${compass(toDir)}<br>Kecepatan: ${s.apiWind} km/h`)
+      .addTo(hazardLayers);
+
+    // 2. Gambar Ikon Panah penunjuk arah di tengah area
+    const arrowHtml = `<div style="transform: rotate(${toDir}deg); font-size:18px; color:#f8fafc; filter:drop-shadow(0px 1px 3px rgba(0,0,0,0.8)); text-align:center;">
+                         <i class="fa-solid fa-arrow-up"></i>
+                       </div>`;
+    
+    const arrowIcon = L.divIcon({
+      html: arrowHtml,
+      className: '',
+      iconSize: [20, 20],
+      iconAnchor: [10, 10]
+    });
+    
+    // Tempatkan panah sekitar sepertiga jalan dari titik asal
+    const arrowLat = s.lat + (dist * 0.4) * Math.cos(radCenter);
+    const arrowLon = s.lon + (dist * 0.4) * Math.sin(radCenter)/latRatio;
+    
+    L.marker([arrowLat, arrowLon], {icon: arrowIcon, interactive:false}).addTo(hazardLayers);
   }
 }
 
@@ -1603,6 +1699,47 @@ const banner=(()=>{ const b=document.createElement('div');
 window.addEventListener('offline',()=>{banner.innerHTML='<i class="fa-solid fa-plane-up"></i> Offline Mode: showing cached data';banner.classList.remove('bg-emerald-600','translate-y-20','opacity-0');banner.classList.add('bg-amber-600');});
 window.addEventListener('online',()=>{banner.innerHTML='<i class="fa-solid fa-wifi"></i> Connection restored — refreshing…';banner.classList.remove('bg-amber-600');banner.classList.add('bg-emerald-600');setTimeout(()=>banner.classList.add('translate-y-20','opacity-0'),3000);if(currentSiteId)processSiteData(currentSiteId);});
 if(!navigator.onLine) window.dispatchEvent(new Event('offline'));
+
+/* ============================================================
+   FULL SCREEN MAP
+============================================================ */
+function toggleFullScreen() {
+  const mapCont = document.getElementById('map-container');
+  
+  if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+    // Masuk Full Screen
+    if (mapCont.requestFullscreen) {
+      mapCont.requestFullscreen();
+    } else if (mapCont.webkitRequestFullscreen) { /* Safari */
+      mapCont.webkitRequestFullscreen();
+    }
+  } else {
+    // Keluar Full Screen
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if (document.webkitExitFullscreen) { /* Safari */
+      document.webkitExitFullscreen();
+    }
+  }
+}
+
+// Event listener untuk mengubah ikon saat masuk/keluar full screen
+function handleFSChange() {
+  const btnIcon = document.querySelector('#btn-fullscreen i');
+  if (document.fullscreenElement || document.webkitFullscreenElement) {
+    btnIcon.className = 'fa-solid fa-compress'; // Ganti ke ikon Exit Fullscreen
+  } else {
+    btnIcon.className = 'fa-solid fa-expand';   // Kembali ke ikon Fullscreen
+  }
+  
+  // Beri tahu Leaflet bahwa ukuran container berubah agar peta me-render ulang ujung layarnya
+  setTimeout(() => { 
+    if(map) map.invalidateSize(); 
+  }, 200);
+}
+
+document.addEventListener('fullscreenchange', handleFSChange);
+document.addEventListener('webkitfullscreenchange', handleFSChange);
 
 window.addEventListener('resize',()=>{
   if(window.innerWidth>=768){document.getElementById('dash-panel').classList.remove('hidden');document.getElementById('map-container').classList.remove('hidden');}
