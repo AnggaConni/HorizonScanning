@@ -83,6 +83,13 @@
 
   html, body { height:100vh; height:100dvh; }
   @supports (-webkit-touch-callout: none){ body{height:-webkit-fill-available;} }
+  
+  /* FIX UNTUK iOS IPHONE BLANK MAP */
+  #map-wrapper { display: flex; flex-direction: column; flex: 1 1 auto; }
+  #map { flex: 1 1 auto; height: 100% !important; min-height: 65vh; width: 100%; }
+  @media (min-width: 768px) { #map { min-height: 0; } }
+
+
 </style>
 </head>
 
@@ -661,6 +668,12 @@ function initMap(){
       cancelMapPick();
     }
   });
+
+  // --- TAMBAHKAN KODE INI DI SINI ---
+  // Pancing Leaflet untuk me-render ulang ukurannya di iPhone
+  setTimeout(() => { 
+    if(map) map.invalidateSize(); 
+  }, 500);
 }
 
 
