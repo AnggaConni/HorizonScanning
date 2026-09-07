@@ -457,13 +457,13 @@
         </div>
 
         <!-- Register Monitoring Area -->
-        <div><label class="block font-semibold text-slate-700 mb-1">Primary Hazard Source</label>
-          <select id="s-hazard" class="w-full border rounded-lg p-2 outline-none">
-            <option value="wildfire">🔥 Wildfire Smoke / Karhutla</option>
-            <option value="volcanic">🌋 Volcanic Ash</option>
-            <option value="pollution">🏭 Urban / Industrial Pollution</option>
-          </select>
-          <p class="text-[10px] text-slate-400 mt-1">Determines which health-action guidance is shown.</p>
+        <div><label class="block font-semibold text-slate-700 mb-1">Ancaman yang Dipantau <span class="text-[10px] font-normal text-slate-400">(Bisa pilih >1)</span></label>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 p-3 bg-slate-50 border border-slate-200 rounded-lg">
+            <label class="flex items-center gap-2 text-xs cursor-pointer hover:bg-slate-100 p-1 rounded"><input type="checkbox" value="wildfire" class="hz-chk w-3.5 h-3.5 text-orange-600" checked> 🔥 Karhutla</label>
+            <label class="flex items-center gap-2 text-xs cursor-pointer hover:bg-slate-100 p-1 rounded"><input type="checkbox" value="volcanic" class="hz-chk w-3.5 h-3.5 text-orange-600"> 🌋 Abu Vulkanik</label>
+            <label class="flex items-center gap-2 text-xs cursor-pointer hover:bg-slate-100 p-1 rounded"><input type="checkbox" value="pollution" class="hz-chk w-3.5 h-3.5 text-orange-600"> 🏭 Polusi Industri</label>
+            <label class="flex items-center gap-2 text-xs cursor-pointer hover:bg-slate-100 p-1 rounded"><input type="checkbox" value="tsunami" class="hz-chk w-3.5 h-3.5 text-orange-600"> 🌊 Tsunami & Gempa</label>
+          </div>
         </div>
 
         <div>
@@ -574,6 +574,7 @@ let db = { sites: [] };
 let map=null, markers={}, currentSiteId=null, envChart=null, floodChart=null, isPickingMap=false;
 let settings = { firms:'', sat:'VIIRS_SNPP_NRT', radius:'1.0', onboarded:false, lang:'en' };
 let hazardLayers = null;
+let quakeLayers = null;
 
 /* ============================================================
    GOOGLE TRANSLATE
@@ -657,16 +658,18 @@ function initMap(){
   esriStreet.addTo(map);
   L.control.zoom({position:'bottomright'}).addTo(map);
   hazardLayers=L.layerGroup().addTo(map);
+  quakeLayers=L.layerGroup().addTo(map);
   
   // 4. Daftarkan layer
-  L.control.layers(
+L.control.layers(
     {
       "Esri Street": esriStreet, 
       "Esri Satellite": esriSatellite
     },
     {
       "🔥 Hotspots & Wind Plume": hazardLayers,
-      "🌫️ Sebaran Asap (NASA)": smokeLayer  
+      "🌫️ Haze/smoke Dispersion (NASA)": smokeLayer,
+      "💥 Earthquake Epicenter (USGS)": quakeLayers // INI CEKLIS BARUNYA
     },
     {position:'bottomleft'}
   ).addTo(map);
@@ -845,7 +848,7 @@ function saveSite(e){
   const s={id:"S_"+Date.now(),name:document.getElementById('s-name').value,
     lat:parseFloat(document.getElementById('s-lat').value),lon:parseFloat(document.getElementById('s-lon').value),
     type:document.getElementById('s-type').value,
-    hazardType:document.getElementById('s-hazard').value||'wildfire',
+    hazardTypes: Array.from(document.querySelectorAll('.hz-chk:checked')).map(c=>c.value).length ? Array.from(document.querySelectorAll('.hz-chk:checked')).map(c=>c.value) : ['wildfire'],
     groups:g,pop:parseInt(document.getElementById('s-pop').value)||0,
     capN95:false,capPurifier:false,capCleanroom:false,capClinic:false,capMeds:false,capAlert:false,hasData:false,history:[]};
 
@@ -896,6 +899,39 @@ async function processSiteData(id){
 
     s.fireData=[]; s.firePoints=0; s.fireError=null;
     if(settings.firms){ await fetchFirms(s); } else { s.fireError='NO_KEY'; }
+
+// --- CEK GEMPA GLOBAL UNTUK SEMUA LOKASI ---
+    const urlQuake = `https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&minmagnitude=5.5&limit=10`;
+    try {
+      const rQuake = await fetch(urlQuake);
+      const dQuake = await rQuake.json();
+      s.quakeData = dQuake.features || [];
+      
+      // LOGIKA NOTIFIKASI UNIVERSAL (Selalu cek walau hazard tsunami tidak dipilih)
+      s.quakeData.forEach(q => {
+        const qLat = q.geometry.coordinates[1];
+        const qLon = q.geometry.coordinates[0];
+        const dist = haversine(s.lat, s.lon, qLat, qLon);
+        
+        // Jika ada gempa M5.5+ jarak < 300km DARI LOKASI APAPUN
+        if (dist < 300) {
+          // 1. Paksa UI untuk memunculkan warning Tsunami/Gempa di Dashboard
+          if(!s.hazardTypes) s.hazardTypes = [];
+          if(!s.hazardTypes.includes('tsunami')) s.hazardTypes.push('tsunami'); 
+          
+          // 2. Kirim Push Notification ke HP / PC User
+          if (Notification.permission === 'granted') {
+             new Notification("🚨 AWAS GEMPA / TSUNAMI!", {
+               body: `Gempa Magnitudo ${q.properties.mag} terdeteksi berjarak ${dist.toFixed(0)} km dari ${s.name}. Segera jauhi pantai!`,
+               icon: "https://cdn-icons-png.flaticon.com/512/1684/1684409.png", // Icon air/warning
+               vibrate: [200, 100, 200, 100, 200]
+             });
+          }
+        }
+      });
+    } catch(e) {
+      s.quakeData = [];
+    }
 
     calculateRisk(s,dAQ,dW);
     s.hasData=true; s.lastUpdate=new Date().toISOString();
@@ -1051,6 +1087,36 @@ function calculateRisk(s,aq,w){
     hz.push(['Elevated industrial/traffic gas markers','warn','NO₂ '+s.apiNO2+' µg/m³ · SO₂ '+s.apiSO2+' µg/m³']);
   }
 
+  // --- LOGIKA BAHAYA TSUNAMI ---
+  s.tsunamiActive = false;
+  if (hazTypeH === 'tsunami') {
+    let nearestQuake = null;
+    let minQuakeDist = Infinity;
+
+    s.quakeData.forEach(q => {
+      const qLat = q.geometry.coordinates[1];
+      const qLon = q.geometry.coordinates[0];
+      const dist = haversine(s.lat, s.lon, qLat, qLon);
+      if (dist < minQuakeDist) { minQuakeDist = dist; nearestQuake = q; }
+      
+      // Jika gempa berpotensi tsunami (USGS tsunami flag == 1) & jarak < 1000km
+      if (q.properties.tsunami === 1 && dist < 1000) {
+        s.tsunamiActive = true;
+        H += 10; // Skor maksimal karena ini ancaman jiwa langsung
+        hz.push(['⚠️ POTENSI TSUNAMI AKTIF', 'crit', `Gempa M${q.properties.mag} terdeteksi berjarak ${dist.toFixed(0)} km. Ada peringatan Tsunami dari USGS/NOAA.`]);
+      }
+    });
+
+    if (!s.tsunamiActive) {
+      if (nearestQuake) {
+        hz.push(['Tidak ada ancaman Tsunami', 'ok', `Gempa M${nearestQuake.properties.mag} terbaru berjarak ${minQuakeDist.toFixed(0)} km (Aman).`]);
+      } else {
+        hz.push(['Status Pantai Aman', 'ok', 'Tidak ada gempa M5.5+ terdeteksi saat ini.']);
+      }
+    }
+  }
+  // -----------------------------
+
   if(s.upwindFires>0){H+=2;hz.push(['Smoke blowing toward site','crit',s.upwindFires+' upwind fire(s) — direct plume path']);}
   if(s.apiCO>4000){H+=1;hz.push(['Elevated carbon monoxide','warn',s.apiCO+' µg/m³ — combustion signature']);}
   if(s.apiAOD && parseFloat(s.apiAOD)>0.8){H+=1;hz.push(['High aerosol optical depth','warn','AOD '+s.apiAOD+' — thick smoke column']);}
@@ -1130,7 +1196,15 @@ function computeIndicators(s){
 
   const hazTypeI = s.hazardType || 'wildfire';
   const thLabel = hazTypeI==='volcanic' ? 'Thermal/lava anomalies (48h)' : 'Fire hotspots (48h)';
-  if(hazTypeI!=='pollution'){
+  
+  if (hazTypeI === 'tsunami') {
+    // Jika tipe hazard adalah tsunami, tampilkan indikator Gelombang Air
+    ind.push(ic('fa-water', 'Peringatan Tsunami', 
+      s.tsunamiActive ? 'AWAS TSUNAMI' : 'Normal', 
+      s.tsunamiActive ? 'crit' : 'ok', 
+      s.tsunamiActive ? 'Segera jauhi pantai' : 'Tidak ada peringatan aktif'));
+  } else if (hazTypeI !== 'pollution') {
+    // Jika bukan tsunami dan bukan polusi (berarti Wildfire/Volcanic), tampilkan indikator Titik Api
     ind.push(ic('fa-fire',thLabel,
       s.fireError==='NO_KEY'?'Key needed':s.firePoints,
       s.fireError==='NO_KEY'?'warn':(s.firePoints>=10?'crit':s.firePoints>0?'warn':'ok'),
@@ -1378,6 +1452,22 @@ function generateActions(s){
     • Keep a battery or hand-crank radio — ashfall often disrupts mobile networks and power, cutting off app-based alerts exactly when they matter most.`]);
   }
 
+  /* --- TSUNAMI SPECIFIC ACTIONS --- */
+  if(hazType === 'tsunami'){
+    if(s.tsunamiActive){
+      acts.push(['fa-person-running', 'high', `<b>🚨 PERINGATAN TSUNAMI AKTIF — EVAKUASI SEKARANG:</b><br>
+      • USGS/NOAA telah mendeteksi gempa besar yang berpotensi membangkitkan gelombang Tsunami yang mengarah ke wilayah pesisir.<br>
+      • <b>JAUHI PANTAI DAN MUARA SUNGAI SEKARANG JUGA.</b> Jangan menunggu sirine atau melihat air surut. Pergi ke tempat tinggi (bukit, gunung, atau gedung evakuasi vertikal minimal lantai 3).<br>
+      • Tinggalkan kendaraan jika jalanan macet total, berlarilah menuju titik kumpul evakuasi (TES/TEA).<br>
+      • Jangan kembali ke pantai sampai ada pernyataan aman (ALL CLEAR) resmi dari BMKG atau BPBD setempat.`]);
+    } else {
+      acts.push(['fa-tower-broadcast', 'med', `<b>SIAGA KEBENCANAAN PESISIR (TSUNAMI EWS AKTIF):</b><br>
+      • Saat ini tidak ada peringatan tsunami aktif. Namun lokasi ini berada di zona rawan.<br>
+      • Kenali jalur evakuasi (Rute Evakuasi Tsunami) di lingkungan Anda. Pastikan Anda tahu cara mencapai area dengan ketinggian >10 mdpl dalam waktu kurang dari 20 menit.<br>
+      • Jika Anda merasakan gempa kuat yang membuat Anda sulit berdiri, <b>jangan tunggu peringatan alat ini</b>, segera lari ke tempat tinggi (rumus 20-20-20: Gempa 20 detik, waktu evakuasi 20 menit, lari ke ketinggian 20 meter).`]);
+    }
+  }
+
   /* --- URBAN / INDUSTRIAL POLLUTION SOURCE-SPECIFIC --- */
   if(hazType==='pollution'){
     if(s.apiNO2>100 || s.apiCO>4000 || s.apiSO2>100){
@@ -1474,19 +1564,40 @@ function logHistory(s){
 /* ============================================================
    MAP HAZARD OVERLAY
 ============================================================ */
-/* ============================================================
-   MAP HAZARD OVERLAY
-============================================================ */
 function drawHazardsOnMap(s){
   if(!hazardLayers) return;
-  hazardLayers.clearLayers();
   
-  // Lingkaran radius bahaya utama
+  // 1. Bersihkan layer lama
+  hazardLayers.clearLayers();
+  if(quakeLayers) quakeLayers.clearLayers(); // Tambahan membersihkan layer gempa
+  
+  // 2. Lingkaran radius bahaya utama di lokasi user
   const col=s.riskLevel==='HIGH'?'#e11d48':s.riskLevel==='MEDIUM'?'#f59e0b':'#10b981';
   L.circle([s.lat,s.lon],{color:col,weight:2,fillColor:col,fillOpacity:.08,radius:10000})
     .bindTooltip(`<b>${s.name}</b><br>PM2.5 ${s.apiPM25} µg/m³ · ARI risk ${s.riskScore}%`).addTo(hazardLayers);
 
-  // Gambar titik api
+  // 3. GAMBAR EPISENTER GEMPA (Menggunakan quakeLayers agar bisa diceklis)
+  if(s.quakeData && s.quakeData.length > 0) {
+    s.quakeData.forEach(q => {
+      const qLat = q.geometry.coordinates[1];
+      const qLon = q.geometry.coordinates[0];
+      const isTsunami = q.properties.tsunami === 1;
+      
+      const qColor = isTsunami ? '#dc2626' : '#2563eb'; // Merah jika tsunami, Biru jika aman
+      
+      L.circleMarker([qLat, qLon], {
+        radius: Math.max(6, q.properties.mag * 2),
+        color: qColor, 
+        weight: 2, 
+        fillColor: qColor, 
+        fillOpacity: 0.6,
+        className: isTsunami ? 'pulse-fire' : ''
+      }).bindTooltip(`<b>💥 Pusat Gempa</b><br>Magnitudo: ${q.properties.mag}<br>Lokasi: ${q.properties.place}<br>Potensi Tsunami: ${isTsunami ? '<b>YA</b>' : 'TIDAK'}`)
+        .addTo(quakeLayers); 
+    });
+  }
+
+  // 4. Gambar titik api (Hotspots Karhutla)
   if(s.fireData && s.fireData.length){
     s.fireData.forEach(f=>{
       const r=Math.max(4,Math.min(12,3+(f.frp||0)/6));
@@ -1496,14 +1607,13 @@ function drawHazardsOnMap(s){
     });
   }
 
-  // Visualisasi Area Sebaran Abu Vulkanik / Asap & Wind Field
+  // 5. Visualisasi Area Sebaran Abu Vulkanik / Asap & Wind Field
   if(s.apiWind>1){
     const toDir = ((s.apiWindDir||0)+180)%360; // Kroscek: Arah angin menuju ke mana
     
-    // --- 1. WIND FIELD (PANAH ANGIN REGIONAL) ---
+    // --- WIND FIELD (PANAH ANGIN REGIONAL) ---
     // Density panah otomatis menyesuaikan level zoom
     const zoom = map.getZoom();
-
     let step;
 
     if (zoom >= 10) {
@@ -1565,7 +1675,7 @@ function drawHazardsOnMap(s){
       }
     }
 
-    // --- 2. ZONA CONE PAPARAN (Wedge Polygon) ---
+    // --- ZONA CONE PAPARAN (Wedge Polygon) ---
     const dist = Math.min(1.5, 0.2 + s.apiWind/40); // Jangkauan area memanjang
     const spreadAngle = 25; // Lebar sebaran asap
     const radCenter = toDir * Math.PI/180;
@@ -1584,7 +1694,7 @@ function drawHazardsOnMap(s){
       className: 'wind-plume' 
     }).bindTooltip(`<b>Zona Paparan Abu / Asap</b><br>Angin bergerak ke arah ${compass(toDir)}<br>Kecepatan: ${s.apiWind} km/h`).addTo(hazardLayers);
 
-    // --- 3. PANAH INDIKATOR DI DALAM CONE ---
+    // --- PANAH INDIKATOR DI DALAM CONE ---
     const arrowHtml = `<div style="transform: rotate(${toDir}deg); font-size:18px; color:#f8fafc; filter:drop-shadow(0px 1px 3px rgba(0,0,0,0.8)); text-align:center;">
                          <i class="fa-solid fa-arrow-up"></i>
                        </div>`;
@@ -1883,6 +1993,14 @@ document.addEventListener('webkitfullscreenchange', handleFSChange);
 window.addEventListener('resize',()=>{
   if(window.innerWidth>=768){document.getElementById('dash-panel').classList.remove('hidden');document.getElementById('map-container').classList.remove('hidden');}
   else mobileView(document.getElementById('mtab-dash').classList.contains('mtab-active')?'dash':'map');
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  initMap(); loadSettings(); loadDb();
+  // Minta izin notifikasi saat web dibuka
+  if (Notification.permission !== 'granted' && Notification.permission !== 'denied') {
+    Notification.requestPermission();
+  }
 });
 
 document.addEventListener('DOMContentLoaded',()=>{initMap();loadSettings();loadDb();});
