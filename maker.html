@@ -13,13 +13,18 @@
     .prose h4 { font-size: 1.25rem; font-weight: bold; margin-top: 1.5em; margin-bottom: 1em; color: #0f172a; }
     .prose blockquote { border-left: 4px solid #38bdf8; padding-left: 1rem; font-style: italic; color: #475569; }
     .hidden-section { display: none !important; }
+    /* Scrollbar styling for a cleaner look in the 2-column layout */
+    .custom-scroll::-webkit-scrollbar { width: 6px; }
+    .custom-scroll::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    .custom-scroll::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
   </style>
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen pb-20">
 
   <!-- Navigation -->
   <nav class="bg-slate-900 text-white sticky top-0 z-50 shadow-lg">
-    <div class="max-w-5xl mx-auto px-4 flex flex-wrap items-center justify-between py-4">
+    <div class="max-w-7xl mx-auto px-4 flex flex-wrap items-center justify-between py-4">
       <div class="font-extrabold text-xl tracking-wide text-sky-400">
         <i class="fa-solid fa-code border-2 border-sky-400 p-1 rounded-md mr-2"></i> JSON CMS
       </div>
@@ -31,10 +36,11 @@
     </div>
   </nav>
 
-  <main class="max-w-5xl mx-auto px-4 mt-8">
+  <!-- Expanded max-width for the 2-column layout -->
+  <main class="max-w-7xl mx-auto px-4 mt-8">
     
     <!-- SECTION: ARTICLE LIST (HOME) -->
-    <section id="home" class="view-section">
+    <section id="home" class="view-section max-w-5xl mx-auto">
       <div class="flex justify-between items-center mb-8">
         <h1 class="text-3xl font-extrabold text-slate-900">Your Articles</h1>
         <button onclick="openEditor()" class="bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded-lg font-bold shadow-lg transition-all"><i class="fa-solid fa-plus mr-2"></i>New Article</button>
@@ -46,7 +52,7 @@
     </section>
 
     <!-- SECTION: ARTICLE VIEWER -->
-    <section id="viewer" class="view-section hidden-section bg-white p-6 md:p-12 rounded-2xl shadow-xl">
+    <section id="viewer" class="view-section hidden-section bg-white p-6 md:p-12 rounded-2xl shadow-xl max-w-4xl mx-auto">
       <button onclick="switchTab('home')" class="text-slate-500 hover:text-sky-600 font-bold mb-6 transition-colors"><i class="fa-solid fa-arrow-left mr-2"></i>Back to list</button>
       <div class="mb-8 border-b pb-8">
         <span id="view-category" class="text-sky-600 font-bold text-sm tracking-widest uppercase">Category</span>
@@ -60,61 +66,129 @@
       <div id="view-content" class="prose max-w-none"></div>
     </section>
 
-    <!-- SECTION: EDITOR -->
+    <!-- SECTION: EDITOR (2-COLUMN LAYOUT) -->
     <section id="editor" class="view-section hidden-section">
-      <h1 class="text-3xl font-extrabold text-slate-900 mb-8" id="editor-title">Create / Edit Article</h1>
-      <div class="bg-white p-6 md:p-8 rounded-2xl shadow-xl space-y-6">
-        <input type="hidden" id="edit-id">
+      <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-extrabold text-slate-900" id="editor-title">Create / Edit Article</h1>
+        <div class="flex gap-2">
+          <button onclick="switchTab('home')" class="bg-slate-300 hover:bg-slate-400 text-slate-800 px-4 py-2 rounded-lg font-bold transition-all">Cancel</button>
+          <button onclick="saveArticle()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-lg font-bold shadow-lg transition-all"><i class="fa-solid fa-floppy-disk mr-2"></i>Save Article</button>
+        </div>
+      </div>
+
+      <!-- 2 Columns Grid -->
+      <div class="grid lg:grid-cols-2 gap-6 lg:h-[80vh]">
         
-        <div class="grid md:grid-cols-2 gap-6">
-          <div>
-            <label class="block text-sm font-bold text-slate-700 mb-1">Title</label>
-            <input type="text" id="edit-title" class="w-full border border-slate-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-sky-500" placeholder="Article Title">
-          </div>
-          <div>
-            <label class="block text-sm font-bold text-slate-700 mb-1">Category</label>
-            <input type="text" id="edit-category" class="w-full border border-slate-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-sky-500" placeholder="e.g. Psychology">
-          </div>
-          <div>
-            <label class="block text-sm font-bold text-slate-700 mb-1">Author</label>
-            <input type="text" id="edit-author" class="w-full border border-slate-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-sky-500" placeholder="Author Name">
-          </div>
-          <div>
-            <label class="block text-sm font-bold text-slate-700 mb-1">Date</label>
-            <input type="text" id="edit-date" class="w-full border border-slate-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-sky-500" placeholder="e.g. August 25, 2026">
-          </div>
-          <div class="md:col-span-2">
-            <label class="block text-sm font-bold text-slate-700 mb-1">Thumbnail/Image URL</label>
-            <input type="text" id="edit-image" class="w-full border border-slate-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-sky-500" placeholder="e.g. thum/image.png">
-          </div>
-          <div class="md:col-span-2">
-            <label class="block text-sm font-bold text-slate-700 mb-1">Excerpt (Short Summary)</label>
-            <textarea id="edit-excerpt" rows="3" class="w-full border border-slate-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-sky-500" placeholder="Short description..."></textarea>
+        <!-- COLUMN 1: THE FORM (LEFT) -->
+        <div class="bg-white p-6 rounded-2xl shadow-xl flex flex-col h-full">
+          <h2 class="text-lg font-bold text-slate-800 mb-4 border-b pb-2"><i class="fa-solid fa-pen mr-2 text-sky-500"></i>Editor</h2>
+          <div class="overflow-y-auto custom-scroll pr-2 space-y-5 flex-1 flex flex-col">
+            <input type="hidden" id="edit-id">
+            
+            <div class="grid grid-cols-2 gap-4">
+              <div class="col-span-2 md:col-span-1">
+                <label class="block text-xs font-bold text-slate-700 mb-1">Title</label>
+                <input type="text" id="edit-title" class="w-full border border-slate-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-sky-500" placeholder="Article Title">
+              </div>
+              <div class="col-span-2 md:col-span-1">
+                <label class="block text-xs font-bold text-slate-700 mb-1">Category</label>
+                <input type="text" id="edit-category" class="w-full border border-slate-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-sky-500" placeholder="e.g. Psychology">
+              </div>
+              <div class="col-span-2 md:col-span-1">
+                <label class="block text-xs font-bold text-slate-700 mb-1">Author</label>
+                <input type="text" id="edit-author" class="w-full border border-slate-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-sky-500" placeholder="Author Name">
+              </div>
+              <div class="col-span-2 md:col-span-1">
+                <label class="block text-xs font-bold text-slate-700 mb-1">Date</label>
+                <input type="text" id="edit-date" class="w-full border border-slate-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-sky-500" placeholder="e.g. August 25, 2026">
+              </div>
+              <div class="col-span-2">
+                <label class="block text-xs font-bold text-slate-700 mb-1">Thumbnail/Image URL</label>
+                <input type="text" id="edit-image" class="w-full border border-slate-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-sky-500" placeholder="e.g. thum/image.png">
+              </div>
+              <div class="col-span-2">
+                <label class="block text-xs font-bold text-slate-700 mb-1">Excerpt (Short Summary)</label>
+                <textarea id="edit-excerpt" rows="2" class="w-full border border-slate-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-sky-500 text-sm" placeholder="Short description..."></textarea>
+              </div>
+            </div>
+
+            <!-- CONTENT EDITOR TOOLBAR -->
+            <div class="mt-4 flex flex-col flex-1 min-h-[500px]">
+                <div class="flex justify-between items-end mb-2">
+                <label class="block text-xs font-bold text-slate-700">Article Content (HTML)</label>
+                <!-- Fitur Find and Replace -->
+                <div class="flex gap-1 items-center">
+                    <input type="text" id="find-text" placeholder="Cari kata..." class="text-[10px] border border-slate-300 rounded px-2 py-1 w-20 md:w-24 focus:outline-none focus:border-sky-500">
+                    <input type="text" id="replace-text" placeholder="Ganti dgn..." class="text-[10px] border border-slate-300 rounded px-2 py-1 w-20 md:w-24 focus:outline-none focus:border-sky-500">
+                    <button onclick="findAndReplace()" class="bg-slate-700 hover:bg-slate-800 text-white text-[10px] px-2 py-1 rounded font-bold transition-all">Replace All</button>
+                </div>
+                </div>
+                <div class="flex flex-wrap items-center gap-2 mb-2 p-2 bg-slate-100 rounded-t-lg border border-b-0 border-slate-300">
+                <!-- Fitur Rich Text Format -->
+                <button type="button" onmousedown="event.preventDefault()" onclick="wrapText('b')" title="Bold (Blok teks dulu)" class="bg-white hover:bg-slate-200 text-slate-800 px-2.5 py-1 text-xs font-bold border rounded shadow-sm"><i class="fa-solid fa-bold"></i></button>
+                <button type="button" onmousedown="event.preventDefault()" onclick="wrapText('i')" title="Italic (Blok teks dulu)" class="bg-white hover:bg-slate-200 text-slate-800 px-2.5 py-1 text-xs font-bold border rounded shadow-sm"><i class="fa-solid fa-italic"></i></button>
+                <button type="button" onmousedown="event.preventDefault()" onclick="wrapText('u')" title="Underline (Blok teks dulu)" class="bg-white hover:bg-slate-200 text-slate-800 px-2.5 py-1 text-xs font-bold border rounded shadow-sm"><i class="fa-solid fa-underline"></i></button>
+                <button type="button" onmousedown="event.preventDefault()" onclick="wrapText('link')" title="Link ke website lain (Blok teks dulu)" class="bg-white hover:bg-slate-200 text-slate-800 px-2.5 py-1 text-xs font-bold border rounded shadow-sm"><i class="fa-solid fa-link"></i></button>
+                <div title="Ubah Warna Teks (Blok teks lalu pilih warna)" class="flex items-center bg-white border rounded shadow-sm px-1 h-[26px]">
+                    <label for="color-picker" class="text-xs cursor-pointer px-1"><i class="fa-solid fa-palette text-rose-500"></i></label>
+                    <input type="color" id="color-picker" onchange="wrapText('color')" class="w-5 h-5 p-0 border-0 cursor-pointer bg-transparent">
+                </div>
+
+                <select id="fontsize-picker" onmousedown="event.stopPropagation()" onchange="wrapText('fontsize')" title="Ukuran Font (Blok teks dulu)" class="bg-white hover:bg-slate-200 text-slate-700 text-xs font-bold border rounded shadow-sm py-1 pl-1 pr-0.5">
+                  <option value="">Ukuran</option>
+                  <option value="12px">12px</option>
+                  <option value="14px">14px</option>
+                  <option value="16px">16px</option>
+                  <option value="18px">18px</option>
+                  <option value="20px">20px</option>
+                  <option value="24px">24px</option>
+                  <option value="28px">28px</option>
+                  <option value="32px">32px</option>
+                  <option value="40px">40px</option>
+                </select>
+
+                <select id="fontfamily-picker" onmousedown="event.stopPropagation()" onchange="wrapText('fontfamily')" title="Jenis Font (Blok teks dulu)" class="bg-white hover:bg-slate-200 text-slate-700 text-xs font-bold border rounded shadow-sm py-1 pl-1 pr-0.5">
+                  <option value="">Font</option>
+                  <option value="Arial, sans-serif">Arial</option>
+                  <option value="Georgia, serif">Georgia</option>
+                  <option value="'Courier New', monospace">Courier New</option>
+                  <option value="'Times New Roman', serif">Times New Roman</option>
+                  <option value="Verdana, sans-serif">Verdana</option>
+                  <option value="'Comic Sans MS', cursive">Comic Sans</option>
+                </select>
+
+                <div class="w-px h-5 bg-slate-300 mx-1"></div> <!-- Garis Pemisah -->
+
+                <button type="button" onmousedown="event.preventDefault()" onclick="insertHTML('p')" class="bg-white hover:bg-slate-200 text-slate-700 px-2 py-1 text-xs font-bold border rounded shadow-sm"><i class="fa-solid fa-paragraph text-sky-600 mr-1"></i> Paragraf</button>
+                <button type="button" onmousedown="event.preventDefault()" onclick="insertHTML('h3')" class="bg-white hover:bg-slate-200 text-slate-700 px-2 py-1 text-xs font-bold border rounded shadow-sm"><i class="fa-solid fa-heading text-sky-600 mr-1"></i> Subtitle H3</button>
+                <button type="button" onmousedown="event.preventDefault()" onclick="insertHTML('img')" class="bg-white hover:bg-slate-200 text-slate-700 px-2 py-1 text-xs font-bold border rounded shadow-sm"><i class="fa-solid fa-image text-emerald-600 mr-1"></i> Image</button>
+                <button type="button" onmousedown="event.preventDefault()" onclick="insertHTML('mp3')" class="bg-white hover:bg-slate-200 text-slate-700 px-2 py-1 text-xs font-bold border rounded shadow-sm"><i class="fa-solid fa-music text-amber-600 mr-1"></i> MP3</button>
+                <button type="button" onmousedown="event.preventDefault()" onclick="insertHTML('quote')" class="bg-white hover:bg-slate-200 text-slate-700 px-2 py-1 text-xs font-bold border rounded shadow-sm"><i class="fa-solid fa-quote-left text-violet-600 mr-1"></i> Quote</button>
+                <button type="button" onmousedown="event.preventDefault()" onclick="insertHTML('button')" class="bg-white hover:bg-slate-200 text-slate-700 px-2 py-1 text-xs font-bold border rounded shadow-sm"><i class="fa-solid fa-arrow-up-right-from-square text-rose-600 mr-1"></i> Button</button>
+              </div>
+              <!-- Textarea with input listener for live preview -->
+              <textarea id="edit-content" class="w-full flex-1 font-mono text-sm border border-slate-300 rounded-b-lg p-3 focus:outline-none focus:ring-2 focus:ring-sky-500 custom-scroll resize-none" placeholder="Type or inject HTML here..." oninput="updatePreview()"></textarea>
+            </div>
           </div>
         </div>
 
-        <!-- CONTENT EDITOR TOOLBAR -->
-        <div class="md:col-span-2 mt-6">
-          <label class="block text-sm font-bold text-slate-700 mb-2">Article Content (HTML)</label>
-          <div class="flex flex-wrap gap-2 mb-2 p-2 bg-slate-100 rounded-t-lg border border-b-0 border-slate-300">
-            <button onclick="insertHTML('p')" class="bg-white hover:bg-slate-200 text-slate-700 px-3 py-1.5 text-sm font-bold border rounded shadow-sm"><i class="fa-solid fa-paragraph text-sky-600 mr-1"></i> Paragraph</button>
-            <button onclick="insertHTML('h3')" class="bg-white hover:bg-slate-200 text-slate-700 px-3 py-1.5 text-sm font-bold border rounded shadow-sm"><i class="fa-solid fa-heading text-sky-600 mr-1"></i> Subtitle (H3)</button>
-            <button onclick="insertHTML('img')" class="bg-white hover:bg-slate-200 text-slate-700 px-3 py-1.5 text-sm font-bold border rounded shadow-sm"><i class="fa-solid fa-image text-emerald-600 mr-1"></i> Add Image</button>
-            <button onclick="insertHTML('mp3')" class="bg-white hover:bg-slate-200 text-slate-700 px-3 py-1.5 text-sm font-bold border rounded shadow-sm"><i class="fa-solid fa-music text-amber-600 mr-1"></i> Add MP3 Player</button>
-            <button onclick="insertHTML('quote')" class="bg-white hover:bg-slate-200 text-slate-700 px-3 py-1.5 text-sm font-bold border rounded shadow-sm"><i class="fa-solid fa-quote-left text-violet-600 mr-1"></i> Quote Box</button>
+        <!-- COLUMN 2: LIVE PREVIEW (RIGHT) -->
+        <div class="bg-white p-6 rounded-2xl shadow-xl flex flex-col h-full border-2 border-slate-200">
+          <div class="flex justify-between items-center border-b pb-2 mb-4">
+            <h2 class="text-lg font-bold text-slate-800"><i class="fa-solid fa-eye mr-2 text-emerald-500"></i>Live Preview</h2>
+            <span class="text-xs font-semibold text-slate-400 bg-slate-100 px-2 py-1 rounded">Updates as you type</span>
           </div>
-          <textarea id="edit-content" rows="15" class="w-full font-mono text-sm border border-slate-300 rounded-b-lg p-4 focus:outline-none focus:ring-2 focus:ring-sky-500" placeholder="Type or inject HTML here..."></textarea>
+          <div class="overflow-y-auto custom-scroll pr-4 flex-1 prose max-w-none" id="preview-content">
+            <!-- Live preview will be injected here -->
+            <div class="text-slate-400 italic text-center mt-20">Preview konten akan muncul di sini...</div>
+          </div>
         </div>
 
-        <div class="flex gap-4 pt-4 border-t">
-          <button onclick="saveArticle()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg font-bold shadow-lg transition-all">Save Article</button>
-          <button onclick="switchTab('home')" class="bg-slate-300 hover:bg-slate-400 text-slate-800 px-6 py-3 rounded-lg font-bold transition-all">Cancel</button>
-        </div>
       </div>
     </section>
 
     <!-- SECTION: JSON MANAGER -->
-    <section id="json-manager" class="view-section hidden-section">
+    <section id="json-manager" class="view-section hidden-section max-w-5xl mx-auto">
       <h1 class="text-3xl font-extrabold text-slate-900 mb-8">Data Manager</h1>
       
       <div class="grid md:grid-cols-2 gap-8">
@@ -122,7 +196,7 @@
         <div class="bg-white p-6 rounded-2xl shadow-xl">
           <h2 class="text-xl font-bold text-slate-800 mb-2"><i class="fa-solid fa-file-import text-amber-500 mr-2"></i>1. Import JSON</h2>
           <p class="text-sm text-slate-500 mb-4">Paste your existing data.json code here to load the articles.</p>
-          <textarea id="import-json" rows="10" class="w-full font-mono text-xs border border-slate-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-amber-500 mb-4" placeholder="[ { ... } ]"></textarea>
+          <textarea id="import-json" rows="10" class="w-full font-mono text-xs border border-slate-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-amber-500 mb-4 custom-scroll" placeholder="[ { ... } ]"></textarea>
           <button onclick="loadJSON()" class="w-full bg-amber-500 hover:bg-amber-600 text-white py-3 rounded-lg font-bold shadow-md transition-all">Load Data to Website</button>
         </div>
 
@@ -130,7 +204,7 @@
         <div class="bg-white p-6 rounded-2xl shadow-xl border-2 border-emerald-400">
           <h2 class="text-xl font-bold text-slate-800 mb-2"><i class="fa-solid fa-file-export text-emerald-500 mr-2"></i>2. Export Updated JSON</h2>
           <p class="text-sm text-slate-500 mb-4">After adding/editing articles, copy this updated JSON to save to your file.</p>
-          <textarea id="export-json" rows="10" class="w-full font-mono text-xs border border-slate-300 bg-slate-50 rounded-lg p-3 focus:outline-none mb-4" readonly placeholder="Your updated JSON will appear here..."></textarea>
+          <textarea id="export-json" rows="10" class="w-full font-mono text-xs border border-slate-300 bg-slate-50 rounded-lg p-3 focus:outline-none mb-4 custom-scroll" readonly placeholder="Your updated JSON will appear here..."></textarea>
           <button onclick="copyJSON()" id="btn-copy" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-3 rounded-lg font-bold shadow-md transition-all">Copy to Clipboard</button>
         </div>
       </div>
@@ -270,6 +344,8 @@
         document.getElementById('edit-excerpt').value = '';
         document.getElementById('edit-content').value = '';
       }
+      
+      updatePreview(); // Trigger initial preview render
       switchTab('editor');
     }
 
@@ -301,14 +377,55 @@
       switchTab('home');
     }
 
+    // --- LIVE PREVIEW ---
+    function updatePreview() {
+      const content = document.getElementById('edit-content').value;
+      const previewBox = document.getElementById('preview-content');
+      
+      if (content.trim() === '') {
+        previewBox.innerHTML = '<div class="text-slate-400 italic text-center mt-20">Preview konten akan muncul di sini...</div>';
+      } else {
+        // Render raw HTML. Note: <script> tags won't execute in live preview to prevent browser crashes during typing.
+        // They will execute perfectly once Saved & read in the main "Articles" tab.
+        previewBox.innerHTML = content;
+      }
+    }
+
+    // --- SELECTION TRACKING (fixes: toolbar buttons stealing focus/selection) ---
+    // Klik tombol toolbar bisa bikin textarea kehilangan fokus, dan di beberapa
+    // browser (terutama HP) itu bikin posisi seleksi teks ikut hilang/reset ke 0
+    // sebelum sempat dibaca. Jadi kita simpan posisi seleksi terakhir tiap kali
+    // user pilih/klik/ketik di textarea, dan pakai nilai tersimpan itu, bukan
+    // nilai live yang bisa sudah basi saat tombol diklik.
+    let savedSelection = { start: 0, end: 0 };
+
+    function trackSelection() {
+      const ta = document.getElementById('edit-content');
+      if (!ta) return;
+      savedSelection.start = ta.selectionStart;
+      savedSelection.end = ta.selectionEnd;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const ta = document.getElementById('edit-content');
+      if (ta) {
+        ['select', 'keyup', 'mouseup', 'click', 'input'].forEach(evt => {
+          ta.addEventListener(evt, trackSelection);
+        });
+      }
+    });
+
     // --- HTML INJECTION TOOLBAR ---
     function insertAtCursor(textarea, textToInsert) {
-      const start = textarea.selectionStart;
-      const end = textarea.selectionEnd;
+      const start = savedSelection.start;
+      const end = savedSelection.end;
       const text = textarea.value;
       textarea.value = text.substring(0, start) + textToInsert + text.substring(end);
-      textarea.selectionStart = textarea.selectionEnd = start + textToInsert.length;
+      const newPos = start + textToInsert.length;
+      textarea.selectionStart = textarea.selectionEnd = newPos;
+      savedSelection.start = savedSelection.end = newPos;
       textarea.focus();
+      updatePreview(); // Trigger preview update after injection
     }
 
     function insertHTML(type) {
@@ -334,7 +451,6 @@
         const url = prompt("Masukkan Link URL MP3/Audio:");
         const title = prompt("Masukkan Judul Lagu:", "Ambient Soundtrack");
         if (url) {
-          // Buat ID unik agar jika ada 2 player di halaman yg sama scriptnya tidak tabrakan
           const uniqueId = Math.floor(Math.random() * 10000);
           html = `\n<div id='mp3-player-${uniqueId}' class='not-prose sticky top-4 z-40 mb-10 mx-auto max-w-2xl'>
   <style>
@@ -402,10 +518,101 @@
         }
       }
 
+      else if (type === 'button') {
+        const url = prompt("Masukkan Link URL tombol (contoh: https://website-lain.com):");
+        if (url) {
+          const label = prompt("Masukkan Teks Tombol:", "Kunjungi Website") || "Kunjungi Website";
+          html = `\n<div class='not-prose text-center my-10'>\n  <a href='${url}' target='_blank' rel='noopener' class='inline-block bg-sky-600 hover:bg-sky-700 text-white font-bold px-6 py-3 rounded-xl shadow-lg transition-all'>${label} <i class='fa-solid fa-arrow-up-right-from-square ml-2 text-sm'></i></a>\n</div>\n`;
+        }
+      }
+
       if (html) {
         insertAtCursor(textarea, html);
       }
     }
+
+    // --- FITUR FIND AND REPLACE ---
+    function findAndReplace() {
+      const findStr = document.getElementById('find-text').value;
+      const replaceStr = document.getElementById('replace-text').value;
+      const textarea = document.getElementById('edit-content');
+      
+      if (!findStr) {
+        alert("Masukkan kata yang ingin dicari terlebih dahulu!");
+        return;
+      }
+
+      // Menggunakan split.join untuk mereplace semua kata yang cocok (Replace All)
+      const originalText = textarea.value;
+      const newText = originalText.split(findStr).join(replaceStr);
+      
+      if (originalText === newText) {
+        alert(`Kata "${findStr}" tidak ditemukan di dalam artikel.`);
+      } else {
+        textarea.value = newText;
+        updatePreview(); // Update layar kanan
+        alert(`Berhasil mengganti semua kata "${findStr}" menjadi "${replaceStr}"!`);
+      }
+    }
+
+    // --- FITUR RICH TEXT (BOLD, ITALIC, WARNA) ---
+    function wrapText(type) {
+      const textarea = document.getElementById('edit-content');
+      const start = savedSelection.start;
+      const end = savedSelection.end;
+      const selectedText = textarea.value.substring(start, end);
+      
+      if (start === end) {
+        alert("Blok (highlight) teks yang ingin diubah terlebih dahulu!");
+        return;
+      }
+
+      let wrappedText = "";
+      if (type === 'b') {
+        wrappedText = `<strong>${selectedText}</strong>`;
+      } else if (type === 'i') {
+        wrappedText = `<em>${selectedText}</em>`;
+      } else if (type === 'u') {
+        wrappedText = `<u>${selectedText}</u>`;
+      } else if (type === 'color') {
+        const color = document.getElementById('color-picker').value;
+        wrappedText = `<span style="color: ${color};">${selectedText}</span>`;
+      } else if (type === 'link') {
+        const url = prompt("Masukkan Link URL (contoh: https://website-lain.com):");
+        if (!url) return;
+        wrappedText = `<a href="${url}" target="_blank" rel="noopener" class="text-sky-600 underline hover:text-sky-800">${selectedText}</a>`;
+      } else if (type === 'fontsize') {
+        const size = document.getElementById('fontsize-picker').value;
+        const picker = document.getElementById('fontsize-picker');
+        if (!size) return;
+        wrappedText = `<span style="font-size: ${size};">${selectedText}</span>`;
+        picker.value = ""; // reset supaya bisa dipilih ulang
+      } else if (type === 'fontfamily') {
+        const family = document.getElementById('fontfamily-picker').value;
+        const picker = document.getElementById('fontfamily-picker');
+        if (!family) return;
+        wrappedText = `<span style="font-family: ${family};">${selectedText}</span>`;
+        picker.value = ""; // reset supaya bisa dipilih ulang
+      }
+
+      if (!wrappedText) return;
+
+      // Menyelipkan tag HTML ke teks yang diblok
+      textarea.value = textarea.value.substring(0, start) + wrappedText + textarea.value.substring(end);
+      
+      // Mengembalikan fokus/kursor ke teks yang baru diedit
+      const newStart = start;
+      const newEnd = start + wrappedText.length;
+      textarea.focus();
+      textarea.selectionStart = newStart;
+      textarea.selectionEnd = newEnd;
+      savedSelection.start = newStart;
+      savedSelection.end = newEnd;
+      
+      updatePreview(); // Update layar kanan
+    }
+
+
   </script>
 </body>
 </html>
