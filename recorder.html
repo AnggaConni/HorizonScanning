@@ -157,9 +157,8 @@ tailwind.config = {
         <div class="flex items-center gap-2">
           <span class="lbl" data-i18n="rec.mode">Engine</span>
           <select id="recog-mode" class="inp !w-auto !py-1.5 text-xs">
-            <option value="auto" data-i18n="rec.modeAuto">Auto detect (EN + ID)</option>
-            <option value="en-US" data-i18n="rec.modeEn">English only</option>
             <option value="id-ID" data-i18n="rec.modeId">Indonesian only</option>
+            <option value="en-US" data-i18n="rec.modeEn">English only</option>
           </select>
         </div>
       </div>
@@ -561,7 +560,7 @@ const LS = {
 const DEFAULT_SETTINGS = {
   apiKey:'', model:'gemini-2.0-flash', autoIntervalMs:180000, chunkWords:220,
   silenceSec:10, autoProcess:true, saveAudio:true, wakeLock:true,
-  momStyle:'concise', momLang:'auto', recogMode:'auto'
+  momStyle:'concise', momLang:'auto', recogMode:'id-ID'
 };
 
 const state = {
@@ -670,12 +669,7 @@ function registerLangVote(text){
   state.dominantLang = idN > enN ? 'id' : 'en';
   $('detected-lang').textContent = langLabel(d.lang) + (state.langVotes.length>2 ? ' · ' + langLabel(state.dominantLang) : '');
 
-  // auto switch recogniser when the room clearly changed language
-  if(state.settings.recogMode === 'auto' && state.isRecording){
-    const need = 3;
-    if(idN >= need && baseOf(state.recogLang) !== 'id') switchRecogLang('id-ID','vote');
-    else if(enN >= need && baseOf(state.recogLang) !== 'en') switchRecogLang('en-US','vote');
-  }
+  // (Fungsi switch otomatis dimatikan agar mesin terkunci pada bahasa pilihan)
   return d.lang;
 }
 
@@ -917,13 +911,8 @@ setInterval(function(){
     logEngine('watchdog restart after ' + Math.round(silence/1000) + 's silence');
     try{ state.recognition.stop(); }catch(e){ safeStart(); }
   }
-  // 2) auto language probe: audio present but engine returns nothing
-  else if(state.settings.recogMode === 'auto' && state.resultsSinceLangSet === 0
-          && state.audioSeenSinceLangSet && (now - state.langSetAt) > 15000){
-    switchRecogLang(baseOf(state.recogLang) === 'id' ? 'en-US' : 'id-ID', 'probe');
-  }
-
-  // 3) time-based chunking for the AI queue
+ 
+  // 2) time-based chunking for the AI queue
   const iv = state.settings.autoIntervalMs;
   if(iv > 0 && words(state.buffer) >= 20 && (now - state.lastChunkAt) >= iv) flushBuffer('interval');
 }, 2000);
@@ -1450,8 +1439,7 @@ async function startRecording(){
     state.lastResultAt = Date.now(); state.lastChunkAt = Date.now(); state.langSetAt = Date.now();
     state.resultsSinceLangSet = 0; state.audioSeenSinceLangSet = false;
 
-    if(state.settings.recogMode !== 'auto') state.recogLang = state.settings.recogMode;
-    else if(!state.recogLang) state.recogLang = state.ui === 'id' ? 'id-ID' : 'en-US';
+    state.recogLang = state.settings.recogMode || 'id-ID';
 
     setupAudio(stream);
     await startMediaRecorder(stream);
@@ -1832,8 +1820,7 @@ function hydrateInputs(){
     const d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
     state.meta.date = d.toISOString().slice(0,16); $('meet-date').value = state.meta.date; save.meta();
   }
-  state.recogLang = state.settings.recogMode === 'auto'
-    ? (state.ui === 'id' ? 'id-ID' : 'en-US') : state.settings.recogMode;
+  state.recogLang = state.settings.recogMode || 'id-ID';
 
   // rebuild language votes from restored transcript
   state.segments.slice(-7).forEach(function(s){ if(s.lang) state.langVotes.push(s.lang); });
