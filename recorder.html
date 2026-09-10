@@ -1,0 +1,1852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart MoM Studio — Offline Recorder + AI Minutes</title>
+
+<script src="https://cdn.tailwindcss.com?plugins=typography,forms"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      fontFamily: { sans: ['Inter','sans-serif'] },
+      colors: {
+        brand: { 50:'#eff6ff',100:'#dbeafe',200:'#bfdbfe',300:'#93c5fd',400:'#60a5fa',500:'#3b82f6',600:'#2563eb',700:'#1d4ed8' },
+        mint:  { 50:'#ecfdf5',100:'#d1fae5',500:'#10b981',600:'#059669' },
+        sun:   { 50:'#fffbeb',100:'#fef3c7',500:'#f59e0b',600:'#d97706' }
+      }
+    }
+  }
+}
+</script>
+
+<style>
+  :root { color-scheme: light; }
+  body{
+    background:
+      radial-gradient(1200px 600px at 10% -10%, #e0f2fe 0%, transparent 55%),
+      radial-gradient(1000px 500px at 100% 0%, #ede9fe 0%, transparent 50%),
+      #f7fafc;
+    color:#334155;
+  }
+  .panel{ background:#fff; border:1px solid #e6ecf3; border-radius:1rem;
+    box-shadow:0 1px 2px rgba(16,24,40,.04), 0 8px 24px -12px rgba(16,24,40,.12); }
+  .chip{ display:inline-flex; align-items:center; gap:.35rem; font-size:.7rem; font-weight:600;
+    padding:.15rem .5rem; border-radius:9999px; }
+  .btn{ display:inline-flex; align-items:center; gap:.4rem; font-size:.78rem; font-weight:600;
+    padding:.45rem .7rem; border-radius:.6rem; border:1px solid #e2e8f0; background:#fff; color:#475569;
+    transition:.15s; white-space:nowrap; }
+  .btn:hover{ background:#f8fafc; border-color:#cbd5e1; }
+  .btn:disabled{ opacity:.45; cursor:not-allowed; }
+  .btn-primary{ background:#2563eb; border-color:#2563eb; color:#fff; }
+  .btn-primary:hover{ background:#1d4ed8; border-color:#1d4ed8; }
+  .btn-mint{ background:#10b981; border-color:#10b981; color:#fff; }
+  .btn-mint:hover{ background:#059669; border-color:#059669; }
+  .btn-danger{ background:#fff1f2; border-color:#fecdd3; color:#e11d48; }
+  .btn-danger:hover{ background:#ffe4e6; }
+  .inp{ width:100%; font-size:.82rem; padding:.5rem .65rem; border-radius:.6rem; border:1px solid #e2e8f0;
+    background:#fbfdff; outline:none; transition:.15s; }
+  .inp:focus{ border-color:#93c5fd; box-shadow:0 0 0 3px #dbeafe; background:#fff; }
+  .lbl{ font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:#94a3b8; }
+  ::-webkit-scrollbar{ width:8px; height:8px; }
+  ::-webkit-scrollbar-thumb{ background:#cbd5e1; border-radius:8px; }
+  ::-webkit-scrollbar-thumb:hover{ background:#94a3b8; }
+  canvas#viz{ width:100%; height:96px; display:block; border-radius:.75rem; background:#f8fbff; }
+  .pulse-rec{ animation:pr 1.8s infinite; }
+  @keyframes pr{ 0%{box-shadow:0 0 0 0 rgba(239,68,68,.45)} 70%{box-shadow:0 0 0 16px rgba(239,68,68,0)} 100%{box-shadow:0 0 0 0 rgba(239,68,68,0)} }
+  .fade-in{ animation:fi .25s ease-out; }
+  @keyframes fi{ from{opacity:0; transform:translateY(4px)} to{opacity:1; transform:none} }
+  mark{ background:#fef08a; padding:0 .1rem; border-radius:.2rem; }
+  .seg:hover .seg-tools{ opacity:1; }
+  .seg-tools{ opacity:0; transition:.15s; }
+  .modal{ position:fixed; inset:0; z-index:60; display:none; }
+  .modal.open{ display:block; }
+  .modal-bg{ position:absolute; inset:0; background:rgba(15,23,42,.35); backdrop-filter:blur(2px); }
+  .modal-card{ position:relative; margin:4vh auto; max-width:720px; width:92%; max-height:90vh; overflow:auto; }
+  .spin{ animation:sp 1s linear infinite; } @keyframes sp{ to{ transform:rotate(360deg) } }
+  @media print{ body{background:#fff} .no-print{display:none !important} .panel{box-shadow:none;border:0} }
+</style>
+</head>
+
+<body class="min-h-screen flex flex-col font-sans">
+
+<!-- ============================ HEADER ============================ -->
+<header class="no-print sticky top-0 z-40 bg-white/85 backdrop-blur border-b border-slate-200">
+  <div class="max-w-[1600px] mx-auto px-4 py-3 flex items-center gap-3 flex-wrap">
+    <div class="flex items-center gap-3">
+      <div class="bg-gradient-to-br from-brand-500 to-brand-700 p-2.5 rounded-xl text-white shadow-md shadow-brand-200">
+        <i class="fa-solid fa-microphone-lines text-lg"></i>
+      </div>
+      <div>
+        <h1 class="text-[1.05rem] font-extrabold text-slate-800 leading-tight" data-i18n="app.title">Smart MoM Studio</h1>
+        <p class="text-[.7rem] text-slate-500 font-medium" data-i18n="app.subtitle">Resilient recorder · Auto EN/ID detect · Offline queue · AI minutes</p>
+      </div>
+    </div>
+
+    <div class="ml-auto flex items-center gap-2 flex-wrap">
+      <span id="pill-online" class="chip bg-mint-50 text-mint-600 border border-mint-100">
+        <i class="fa-solid fa-wifi"></i><span data-i18n="hdr.online">Online</span>
+      </span>
+      <span id="pill-queue" class="chip bg-sun-50 text-sun-600 border border-sun-100" title="pending">
+        <i class="fa-solid fa-layer-group"></i><span id="queue-count">0</span>&nbsp;<span data-i18n="hdr.pending">pending</span>
+      </span>
+      <span id="pill-key" class="chip bg-slate-100 text-slate-500 border border-slate-200">
+        <i class="fa-solid fa-key"></i><span data-i18n="hdr.noKey">No API key</span>
+      </span>
+
+      <div class="flex rounded-lg overflow-hidden border border-slate-200 text-xs font-bold">
+        <button id="ui-en" class="px-2.5 py-1.5 bg-brand-500 text-white">EN</button>
+        <button id="ui-id" class="px-2.5 py-1.5 bg-white text-slate-500">ID</button>
+      </div>
+
+      <button class="btn" data-act="open-help"><i class="fa-solid fa-circle-question"></i><span data-i18n="hdr.help">Help</span></button>
+      <button class="btn btn-primary" data-act="open-settings"><i class="fa-solid fa-sliders"></i><span data-i18n="hdr.settings">Settings</span></button>
+    </div>
+  </div>
+</header>
+
+<!-- ============================ MAIN ============================ -->
+<main class="flex-grow max-w-[1600px] mx-auto w-full px-4 py-5 grid grid-cols-1 xl:grid-cols-12 gap-5">
+
+  <!-- Meeting metadata -->
+  <section class="panel p-4 xl:col-span-12">
+    <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
+      <h2 class="font-bold text-slate-800 flex items-center gap-2 text-sm">
+        <i class="fa-solid fa-clipboard-list text-brand-500"></i><span data-i18n="meet.title">Meeting information</span>
+      </h2>
+      <span class="text-[.7rem] text-slate-400 flex items-center gap-1">
+        <i class="fa-solid fa-floppy-disk"></i><span data-i18n="meet.autosave">Auto-saved locally</span>
+      </span>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+      <div><div class="lbl mb-1" data-i18n="meet.name">Title</div>
+        <input id="meet-title" class="inp" data-i18n-ph="meet.namePh" placeholder="Weekly Product Sync"></div>
+      <div><div class="lbl mb-1" data-i18n="meet.date">Date &amp; time</div>
+        <input id="meet-date" type="datetime-local" class="inp"></div>
+      <div><div class="lbl mb-1" data-i18n="meet.location">Location</div>
+        <input id="meet-location" class="inp" data-i18n-ph="meet.locationPh" placeholder="Zoom / Room 3A"></div>
+      <div><div class="lbl mb-1" data-i18n="meet.participants">Participants</div>
+        <input id="meet-participants" class="inp" data-i18n-ph="meet.participantsPh" placeholder="Ana, Budi, Chris"></div>
+      <div class="md:col-span-4"><div class="lbl mb-1" data-i18n="meet.agenda">Agenda / context</div>
+        <textarea id="meet-agenda" rows="2" class="inp" data-i18n-ph="meet.agendaPh" placeholder="Sprint review, blockers, next release scope"></textarea></div>
+    </div>
+  </section>
+
+  <!-- ==================== LEFT COLUMN ==================== -->
+  <div class="xl:col-span-7 flex flex-col gap-5">
+
+    <!-- Recorder -->
+    <section class="panel p-5">
+      <div class="flex items-center justify-between gap-2 flex-wrap mb-3">
+        <div class="flex items-center gap-2 flex-wrap">
+          <span id="status-pill" class="chip bg-slate-100 text-slate-600 border border-slate-200">
+            <i class="fa-solid fa-circle text-[.5rem]"></i><span id="status-text" data-i18n="rec.ready">Ready to record</span>
+          </span>
+          <span id="detected-pill" class="chip bg-brand-50 text-brand-600 border border-brand-100">
+            <i class="fa-solid fa-language"></i><span data-i18n="rec.detected">Detected</span>:&nbsp;<b id="detected-lang">—</b>
+          </span>
+          <span id="keepalive-pill" class="chip bg-mint-50 text-mint-600 border border-mint-100">
+            <i class="fa-solid fa-shield-halved"></i><span data-i18n="rec.keepalive">Keep-alive ON</span>
+          </span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="lbl" data-i18n="rec.mode">Engine</span>
+          <select id="recog-mode" class="inp !w-auto !py-1.5 text-xs">
+            <option value="auto" data-i18n="rec.modeAuto">Auto detect (EN + ID)</option>
+            <option value="en-US" data-i18n="rec.modeEn">English only</option>
+            <option value="id-ID" data-i18n="rec.modeId">Indonesian only</option>
+          </select>
+        </div>
+      </div>
+
+      <canvas id="viz"></canvas>
+
+      <div class="mt-3 flex items-center gap-3">
+        <i class="fa-solid fa-volume-low text-slate-400 text-xs"></i>
+        <div class="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
+          <div id="level-bar" class="h-full bg-gradient-to-r from-brand-400 to-mint-500 w-0 transition-all duration-100"></div>
+        </div>
+        <span id="timer" class="font-bold text-slate-700 tabular-nums text-sm">00:00</span>
+      </div>
+
+      <div class="flex items-center justify-center gap-5 mt-5">
+        <button id="btn-record" class="btn-primary w-16 h-16 rounded-full flex items-center justify-center text-2xl shadow-lg shadow-brand-200 transition">
+          <i class="fa-solid fa-microphone"></i>
+        </button>
+        <button id="btn-pause" class="w-12 h-12 rounded-full flex items-center justify-center text-lg bg-sun-50 text-sun-600 border border-sun-100 hover:bg-sun-100 transition disabled:opacity-40" disabled>
+          <i class="fa-solid fa-pause"></i>
+        </button>
+        <button id="btn-stop" class="w-12 h-12 rounded-full flex items-center justify-center text-lg bg-slate-100 text-slate-500 border border-slate-200 hover:bg-rose-500 hover:text-white hover:border-rose-500 transition disabled:opacity-40" disabled>
+          <i class="fa-solid fa-stop"></i>
+        </button>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 mt-5">
+        <div class="bg-slate-50 rounded-xl p-2.5 text-center border border-slate-100">
+          <div class="text-lg font-extrabold text-slate-800" id="stat-words">0</div>
+          <div class="lbl" data-i18n="rec.words">Words</div></div>
+        <div class="bg-slate-50 rounded-xl p-2.5 text-center border border-slate-100">
+          <div class="text-lg font-extrabold text-slate-800" id="stat-segments">0</div>
+          <div class="lbl" data-i18n="rec.segments">Segments</div></div>
+        <div class="bg-slate-50 rounded-xl p-2.5 text-center border border-slate-100">
+          <div class="text-lg font-extrabold text-slate-800" id="stat-chunks">0</div>
+          <div class="lbl" data-i18n="rec.chunks">AI chunks</div></div>
+        <div class="bg-slate-50 rounded-xl p-2.5 text-center border border-slate-100">
+          <div class="text-lg font-extrabold text-slate-800" id="stat-restarts">0</div>
+          <div class="lbl" data-i18n="rec.restarts">Auto-restarts</div></div>
+        <div class="bg-slate-50 rounded-xl p-2.5 text-center border border-slate-100">
+          <div class="text-lg font-extrabold text-slate-800" id="stat-buffer">0</div>
+          <div class="lbl" data-i18n="rec.buffer">Buffer words</div></div>
+      </div>
+
+      <details class="mt-3">
+        <summary class="text-[.72rem] text-slate-500 cursor-pointer hover:text-brand-600 font-semibold">
+          <i class="fa-solid fa-heart-pulse"></i> <span data-i18n="rec.engineLog">Engine / keep-alive log</span>
+        </summary>
+        <div id="engine-log" class="mt-2 max-h-32 overflow-y-auto text-[.7rem] text-slate-500 font-mono space-y-1 bg-slate-50 rounded-lg p-2 border border-slate-100"></div>
+      </details>
+    </section>
+
+    <!-- Transcript -->
+    <section class="panel flex flex-col" style="min-height:460px">
+      <div class="p-4 border-b border-slate-100 flex items-center justify-between gap-2 flex-wrap">
+        <h2 class="font-bold text-slate-800 flex items-center gap-2 text-sm">
+          <i class="fa-solid fa-closed-captioning text-brand-500"></i><span data-i18n="tr.title">Live transcript</span>
+          <span class="chip bg-brand-50 text-brand-600" id="tr-count">0</span>
+        </h2>
+        <div class="flex gap-2 flex-wrap no-print">
+          <button class="btn" data-act="copy-transcript"><i class="fa-regular fa-copy"></i><span data-i18n="tr.copy">Copy</span></button>
+          <button class="btn" data-act="export-json"><i class="fa-solid fa-download"></i>JSON</button>
+          <button class="btn" data-act="export-txt"><i class="fa-solid fa-file-lines"></i>TXT</button>
+          <button class="btn btn-danger" data-act="clear-transcript"><i class="fa-solid fa-trash-can"></i><span data-i18n="tr.clear">Clear</span></button>
+        </div>
+      </div>
+
+      <div class="px-4 py-3 border-b border-slate-100 flex gap-2 flex-wrap items-center no-print">
+        <div class="relative flex-1 min-w-[180px]">
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-300 text-xs"></i>
+          <input id="tr-search" class="inp !pl-8" data-i18n-ph="tr.searchPh" placeholder="Search transcript…">
+        </div>
+        <select id="speaker-select" class="inp !w-auto text-xs">
+          <option value="">— <span data-i18n="tr.noSpeaker">No speaker</span> —</option>
+          <option>Speaker 1</option><option>Speaker 2</option><option>Speaker 3</option>
+          <option>Speaker 4</option><option>Host</option><option>Me</option>
+        </select>
+        <button class="btn" data-act="add-note"><i class="fa-solid fa-plus"></i><span data-i18n="tr.note">Note</span></button>
+      </div>
+
+      <div id="transcript" class="p-4 flex-grow overflow-y-auto space-y-2 max-h-[520px]"></div>
+      <div id="interim" class="px-4 pb-4 text-slate-400 italic text-sm min-h-[1.2rem]"></div>
+    </section>
+  </div>
+
+  <!-- ==================== RIGHT COLUMN ==================== -->
+  <div class="xl:col-span-5 flex flex-col gap-5">
+
+    <!-- MoM -->
+    <section class="panel flex flex-col" style="min-height:520px">
+      <div class="p-4 border-b border-slate-100">
+        <div class="flex items-center justify-between gap-2 flex-wrap">
+          <h2 class="font-bold text-slate-800 flex items-center gap-2 text-sm">
+            <i class="fa-solid fa-file-signature text-mint-500"></i><span data-i18n="mom.title">Minutes of Meeting</span>
+            <span class="chip bg-mint-50 text-mint-600" id="mom-count">0</span>
+          </h2>
+          <div class="flex gap-2 flex-wrap no-print">
+            <button class="btn" data-act="copy-mom"><i class="fa-regular fa-copy"></i></button>
+            <button class="btn" data-act="export-md"><i class="fa-brands fa-markdown"></i>MD</button>
+            <button class="btn" data-act="export-word"><i class="fa-solid fa-file-word text-brand-600"></i>Word</button>
+            <button class="btn" data-act="export-pdf"><i class="fa-solid fa-file-pdf text-rose-600"></i>PDF</button>
+            <button class="btn" data-act="export-csv"><i class="fa-solid fa-table-list"></i>CSV</button>
+          </div>
+        </div>
+        <div class="flex gap-2 flex-wrap mt-3 no-print">
+          <select id="mom-style" class="inp !w-auto text-xs">
+            <option value="concise" data-i18n="mom.styleConcise">Concise</option>
+            <option value="detailed" data-i18n="mom.styleDetailed">Detailed</option>
+            <option value="action" data-i18n="mom.styleAction">Action-focused</option>
+          </select>
+          <select id="mom-lang" class="inp !w-auto text-xs">
+            <option value="auto" data-i18n="mom.langAuto">Output: Auto</option>
+            <option value="en">Output: English</option>
+            <option value="id">Output: Indonesia</option>
+          </select>
+          <button class="btn btn-mint" data-act="process-now"><i class="fa-solid fa-wand-magic-sparkles"></i><span data-i18n="mom.processNow">Process now</span></button>
+          <button class="btn" data-act="offline-draft"><i class="fa-solid fa-plug-circle-xmark"></i><span data-i18n="mom.offlineDraft">Offline draft</span></button>
+          <button class="btn" data-act="final-mom"><i class="fa-solid fa-layer-group"></i><span data-i18n="mom.final">Consolidate</span></button>
+        </div>
+      </div>
+      <div id="mom-list" class="p-4 flex-grow overflow-y-auto max-h-[640px]"></div>
+    </section>
+
+    <!-- Offline AI queue -->
+    <section class="panel">
+      <div class="p-4 border-b border-slate-100 flex items-center justify-between gap-2 flex-wrap">
+        <h2 class="font-bold text-slate-800 flex items-center gap-2 text-sm">
+          <i class="fa-solid fa-cloud-arrow-up text-sun-500"></i><span data-i18n="q.title">Offline AI queue</span>
+        </h2>
+        <div class="flex gap-2 no-print">
+          <button class="btn" data-act="process-queue"><i class="fa-solid fa-bolt"></i><span data-i18n="q.process">Process</span></button>
+          <button class="btn btn-danger" data-act="clear-queue"><i class="fa-solid fa-broom"></i></button>
+        </div>
+      </div>
+      <div id="queue-list" class="p-4 space-y-2 max-h-64 overflow-y-auto"></div>
+    </section>
+
+    <!-- Local audio archive -->
+    <section class="panel">
+      <div class="p-4 border-b border-slate-100 flex items-center justify-between gap-2 flex-wrap">
+        <h2 class="font-bold text-slate-800 flex items-center gap-2 text-sm">
+          <i class="fa-solid fa-hard-drive text-brand-500"></i><span data-i18n="au.title">Local audio archive</span>
+        </h2>
+        <button class="btn no-print" data-act="refresh-audio"><i class="fa-solid fa-rotate"></i></button>
+      </div>
+      <div id="audio-list" class="p-4 space-y-2 max-h-72 overflow-y-auto"></div>
+      <audio id="player" controls class="w-full px-4 pb-4 hidden"></audio>
+    </section>
+  </div>
+</main>
+
+<footer class="no-print max-w-[1600px] mx-auto w-full px-4 py-4 text-[.7rem] text-slate-400 flex flex-wrap gap-4 justify-between">
+  <span><i class="fa-solid fa-lock"></i> <span data-i18n="foot.privacy">Everything stays in your browser until you call the AI.</span></span>
+  <span id="storage-info"></span>
+</footer>
+
+<!-- ============================ SETTINGS MODAL ============================ -->
+<div class="modal" id="modal-settings">
+  <div class="modal-bg" data-act="close-modal"></div>
+  <div class="modal-card panel p-5">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="font-extrabold text-slate-800 text-base"><i class="fa-solid fa-sliders text-brand-500"></i> <span data-i18n="set.title">Settings</span></h3>
+      <button class="btn" data-act="close-modal"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <div class="space-y-4">
+      <div>
+        <div class="lbl mb-1" data-i18n="set.apiKey">Gemini API key</div>
+        <div class="flex gap-2">
+          <input id="api-key" type="password" class="inp" placeholder="AIza…">
+          <button class="btn" data-act="toggle-key"><i class="fa-regular fa-eye"></i></button>
+        </div>
+        <p class="text-[.7rem] text-slate-400 mt-1" data-i18n="set.apiKeyHint">Stored only in this browser (localStorage). Without a key everything still records and queues locally.</p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <div class="lbl mb-1" data-i18n="set.model">Model</div>
+          <select id="model-select" class="inp">
+            <option value="gemini-2.0-flash">gemini-2.0-flash</option>
+            <option value="gemini-2.5-flash">gemini-2.5-flash</option>
+            <option value="gemini-2.0-flash-lite">gemini-2.0-flash-lite</option>
+            <option value="gemini-1.5-flash">gemini-1.5-flash</option>
+            <option value="gemini-1.5-pro">gemini-1.5-pro</option>
+          </select>
+        </div>
+        <div>
+          <div class="lbl mb-1" data-i18n="set.autoInterval">Auto chunk interval</div>
+          <select id="auto-interval" class="inp">
+            <option value="0" data-i18n="set.manual">Manual only</option>
+            <option value="60000">1 min</option>
+            <option value="180000">3 min</option>
+            <option value="300000">5 min</option>
+            <option value="600000">10 min</option>
+          </select>
+        </div>
+        <div>
+          <div class="lbl mb-1" data-i18n="set.chunkWords">Chunk when words ≥</div>
+          <input id="chunk-words" type="number" min="30" step="10" class="inp">
+        </div>
+        <div>
+          <div class="lbl mb-1" data-i18n="set.silence">Silence restart (sec)</div>
+          <input id="silence-sec" type="number" min="3" step="1" class="inp">
+        </div>
+      </div>
+
+      <div class="space-y-2">
+        <label class="flex items-center gap-2 text-sm"><input id="opt-autoprocess" type="checkbox" class="rounded text-brand-600">
+          <span data-i18n="set.autoProcess">Auto-process queue when online + key exists</span></label>
+        <label class="flex items-center gap-2 text-sm"><input id="opt-save-audio" type="checkbox" class="rounded text-brand-600">
+          <span data-i18n="set.saveAudio">Save raw audio locally (IndexedDB) for later AI transcription</span></label>
+        <label class="flex items-center gap-2 text-sm"><input id="opt-wake" type="checkbox" class="rounded text-brand-600">
+          <span data-i18n="set.wakeLock">Keep screen awake while recording</span></label>
+      </div>
+
+      <div class="border-t border-slate-100 pt-4">
+        <div class="lbl mb-2" data-i18n="set.backup">Backup</div>
+        <div class="flex gap-2 flex-wrap">
+          <button class="btn" data-act="export-backup"><i class="fa-solid fa-file-export"></i><span data-i18n="set.export">Export backup</span></button>
+          <label class="btn cursor-pointer"><i class="fa-solid fa-file-import"></i><span data-i18n="set.import">Import backup</span>
+            <input id="import-file" type="file" accept="application/json" class="hidden"></label>
+          <button class="btn btn-danger" data-act="wipe-all"><i class="fa-solid fa-radiation"></i><span data-i18n="set.clearAll">Erase everything</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================ HELP MODAL ============================ -->
+<div class="modal" id="modal-help">
+  <div class="modal-bg" data-act="close-modal"></div>
+  <div class="modal-card panel p-5 prose prose-sm max-w-none">
+    <div class="flex items-center justify-between mb-2 not-prose">
+      <h3 class="font-extrabold text-slate-800 text-base"><i class="fa-solid fa-circle-question text-brand-500"></i> <span data-i18n="help.title">How it works</span></h3>
+      <button class="btn" data-act="close-modal"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div id="help-body"></div>
+  </div>
+</div>
+
+<div id="toasts" class="fixed bottom-5 right-5 z-[70] space-y-2 no-print"></div>
+
+<!-- ============================ APP ============================ -->
+<script>
+/* =======================================================================
+   0. i18n dictionary (EN default)
+   ======================================================================= */
+const I18N = {
+  en: {
+    'app.title':'Smart MoM Studio',
+    'app.subtitle':'Resilient recorder · Auto EN/ID detect · Offline queue · AI minutes',
+    'hdr.online':'Online','hdr.offline':'Offline','hdr.pending':'pending',
+    'hdr.help':'Help','hdr.settings':'Settings','hdr.noKey':'No API key','hdr.key':'API key set',
+    'meet.title':'Meeting information','meet.autosave':'Auto-saved locally',
+    'meet.name':'Title','meet.namePh':'Weekly Product Sync','meet.date':'Date & time',
+    'meet.location':'Location','meet.locationPh':'Zoom / Room 3A',
+    'meet.participants':'Participants','meet.participantsPh':'Ana, Budi, Chris',
+    'meet.agenda':'Agenda / context','meet.agendaPh':'Sprint review, blockers, next release scope',
+    'rec.ready':'Ready to record','rec.recording':'Recording…','rec.paused':'Paused',
+    'rec.stopped':'Recording stopped','rec.detected':'Detected','rec.keepalive':'Keep-alive ON',
+    'rec.mode':'Engine','rec.modeAuto':'Auto detect (EN + ID)','rec.modeEn':'English only','rec.modeId':'Indonesian only',
+    'rec.words':'Words','rec.segments':'Segments','rec.chunks':'AI chunks','rec.restarts':'Auto-restarts',
+    'rec.buffer':'Buffer words','rec.engineLog':'Engine / keep-alive log',
+    'rec.start':'Start recording','rec.pause':'Pause','rec.resume':'Resume','rec.stop':'Stop',
+    'tr.title':'Live transcript','tr.searchPh':'Search transcript…','tr.copy':'Copy','tr.clear':'Clear',
+    'tr.note':'Note','tr.noSpeaker':'No speaker',
+    'tr.placeholder':'Your words will appear here. Long pauses are fine — the engine restarts itself and keeps saving locally.',
+    'tr.notePrompt':'Manual note:','tr.edit':'Edit','tr.del':'Delete','tr.save':'Save','tr.cancel':'Cancel',
+    'mom.title':'Minutes of Meeting','mom.styleConcise':'Concise','mom.styleDetailed':'Detailed',
+    'mom.styleAction':'Action-focused','mom.langAuto':'Output: Auto',
+    'mom.processNow':'Process now','mom.offlineDraft':'Offline draft','mom.final':'Consolidate',
+    'mom.placeholder':'No minutes yet. Record something, then hit “Process now” (AI) or “Offline draft” (no internet needed).',
+    'mom.summary':'Executive summary','mom.keyPoints':'Key points','mom.discussion':'Discussion',
+    'mom.decisions':'Decisions','mom.actions':'Action items','mom.risks':'Risks / blockers',
+    'mom.questions':'Open questions','mom.next':'Next steps','mom.tags':'Tags','mom.sentiment':'Tone',
+    'mom.task':'Task','mom.owner':'Owner','mom.due':'Due','mom.prio':'Priority',
+    'mom.badgeAi':'AI','mom.badgeOffline':'Offline draft','mom.badgeFinal':'Consolidated','mom.badgeAudio':'From audio',
+    'q.title':'Offline AI queue','q.process':'Process','q.empty':'Queue empty — chunks land here when AI is unavailable.',
+    'q.pending':'Pending','q.processing':'Processing','q.done':'Done','q.error':'Failed',
+    'q.retry':'Retry','q.remove':'Remove','q.words':'words',
+    'au.title':'Local audio archive','au.empty':'No local recordings yet.',
+    'au.play':'Play','au.dl':'Download','au.del':'Delete','au.transcribe':'AI transcribe','au.recovered':'recovered',
+    'set.title':'Settings','set.apiKey':'Gemini API key',
+    'set.apiKeyHint':'Stored only in this browser (localStorage). Without a key everything still records and queues locally.',
+    'set.model':'Model','set.autoInterval':'Auto chunk interval','set.manual':'Manual only',
+    'set.chunkWords':'Chunk when words ≥','set.silence':'Silence restart (sec)',
+    'set.autoProcess':'Auto-process queue when online + key exists',
+    'set.saveAudio':'Save raw audio locally (IndexedDB) for later AI transcription',
+    'set.wakeLock':'Keep screen awake while recording',
+    'set.backup':'Backup','set.export':'Export backup','set.import':'Import backup','set.clearAll':'Erase everything',
+    'foot.privacy':'Everything stays in your browser until you call the AI.',
+    'help.title':'How it works',
+    't.copied':'Copied to clipboard','t.noData':'Nothing to export yet','t.cleared':'Data cleared',
+    't.queued':'Saved locally & queued for AI','t.offlineQueued':'Offline — chunk stored locally, will auto-process when online',
+    't.noKeyQueued':'No API key — chunk stored locally',
+    't.momReady':'Minutes generated','t.aiError':'AI error: {msg}','t.micError':'Microphone error: {msg}',
+    't.noSupport':'This browser has no Web Speech API. Use desktop Chrome or Edge.',
+    't.restored':'Previous session restored from local storage',
+    't.langSwitch':'Language switched to {lang}','t.saved':'Saved','t.deleted':'Deleted',
+    't.processing':'Processing {n} chunk(s)…','t.queueDone':'Queue processed','t.wiped':'All local data erased',
+    't.needTranscript':'Record or type something first','t.tooBig':'Audio too large for inline AI ({mb} MB). Download it instead.',
+    't.transcribing':'Transcribing audio with AI…','t.imported':'Backup imported'
+  },
+  id: {
+    'app.title':'Smart MoM Studio',
+    'app.subtitle':'Perekam anti-putus · Deteksi EN/ID otomatis · Antrean offline · Notulen AI',
+    'hdr.online':'Online','hdr.offline':'Offline','hdr.pending':'menunggu',
+    'hdr.help':'Bantuan','hdr.settings':'Pengaturan','hdr.noKey':'Tanpa API key','hdr.key':'API key aktif',
+    'meet.title':'Informasi rapat','meet.autosave':'Tersimpan otomatis di lokal',
+    'meet.name':'Judul','meet.namePh':'Rapat Mingguan Produk','meet.date':'Tanggal & waktu',
+    'meet.location':'Lokasi','meet.locationPh':'Zoom / Ruang 3A',
+    'meet.participants':'Peserta','meet.participantsPh':'Ana, Budi, Chris',
+    'meet.agenda':'Agenda / konteks','meet.agendaPh':'Review sprint, kendala, lingkup rilis berikutnya',
+    'rec.ready':'Siap merekam','rec.recording':'Sedang merekam…','rec.paused':'Dijeda',
+    'rec.stopped':'Rekaman dihentikan','rec.detected':'Terdeteksi','rec.keepalive':'Anti-putus AKTIF',
+    'rec.mode':'Mesin','rec.modeAuto':'Deteksi otomatis (EN + ID)','rec.modeEn':'Hanya Inggris','rec.modeId':'Hanya Indonesia',
+    'rec.words':'Kata','rec.segments':'Segmen','rec.chunks':'Bagian AI','rec.restarts':'Restart otomatis',
+    'rec.buffer':'Kata di buffer','rec.engineLog':'Log mesin / anti-putus',
+    'rec.start':'Mulai merekam','rec.pause':'Jeda','rec.resume':'Lanjut','rec.stop':'Stop',
+    'tr.title':'Transkrip langsung','tr.searchPh':'Cari transkrip…','tr.copy':'Salin','tr.clear':'Hapus',
+    'tr.note':'Catatan','tr.noSpeaker':'Tanpa pembicara',
+    'tr.placeholder':'Ucapan Anda akan muncul di sini. Hening lama tidak masalah — mesin menyalakan ulang sendiri dan terus menyimpan ke lokal.',
+    'tr.notePrompt':'Catatan manual:','tr.edit':'Ubah','tr.del':'Hapus','tr.save':'Simpan','tr.cancel':'Batal',
+    'mom.title':'Notulen Rapat','mom.styleConcise':'Ringkas','mom.styleDetailed':'Rinci',
+    'mom.styleAction':'Fokus tindak lanjut','mom.langAuto':'Keluaran: Otomatis',
+    'mom.processNow':'Proses sekarang','mom.offlineDraft':'Draf offline','mom.final':'Gabungkan',
+    'mom.placeholder':'Belum ada notulen. Rekam dulu, lalu tekan “Proses sekarang” (AI) atau “Draf offline” (tanpa internet).',
+    'mom.summary':'Ringkasan eksekutif','mom.keyPoints':'Poin utama','mom.discussion':'Pembahasan',
+    'mom.decisions':'Keputusan','mom.actions':'Tindak lanjut','mom.risks':'Risiko / kendala',
+    'mom.questions':'Pertanyaan terbuka','mom.next':'Langkah berikutnya','mom.tags':'Tagar','mom.sentiment':'Nuansa',
+    'mom.task':'Tugas','mom.owner':'PIC','mom.due':'Tenggat','mom.prio':'Prioritas',
+    'mom.badgeAi':'AI','mom.badgeOffline':'Draf offline','mom.badgeFinal':'Gabungan','mom.badgeAudio':'Dari audio',
+    'q.title':'Antrean AI offline','q.process':'Proses','q.empty':'Antrean kosong — bagian transkrip masuk sini saat AI tak tersedia.',
+    'q.pending':'Menunggu','q.processing':'Diproses','q.done':'Selesai','q.error':'Gagal',
+    'q.retry':'Ulangi','q.remove':'Buang','q.words':'kata',
+    'au.title':'Arsip audio lokal','au.empty':'Belum ada rekaman lokal.',
+    'au.play':'Putar','au.dl':'Unduh','au.del':'Hapus','au.transcribe':'Transkrip AI','au.recovered':'terselamatkan',
+    'set.title':'Pengaturan','set.apiKey':'Gemini API key',
+    'set.apiKeyHint':'Hanya disimpan di browser ini (localStorage). Tanpa key pun semua tetap terekam & masuk antrean lokal.',
+    'set.model':'Model','set.autoInterval':'Interval potong otomatis','set.manual':'Manual saja',
+    'set.chunkWords':'Potong bila kata ≥','set.silence':'Restart saat hening (detik)',
+    'set.autoProcess':'Proses antrean otomatis saat online + ada key',
+    'set.saveAudio':'Simpan audio mentah di lokal (IndexedDB) untuk transkrip AI nanti',
+    'set.wakeLock':'Jaga layar tetap menyala saat merekam',
+    'set.backup':'Cadangan','set.export':'Ekspor cadangan','set.import':'Impor cadangan','set.clearAll':'Hapus semuanya',
+    'foot.privacy':'Semua data tetap di browser Anda sampai AI dipanggil.',
+    'help.title':'Cara kerja',
+    't.copied':'Tersalin ke papan klip','t.noData':'Belum ada data untuk diekspor','t.cleared':'Data dihapus',
+    't.queued':'Disimpan lokal & masuk antrean AI','t.offlineQueued':'Offline — bagian disimpan lokal, otomatis diproses saat online',
+    't.noKeyQueued':'Tanpa API key — bagian disimpan lokal',
+    't.momReady':'Notulen dibuat','t.aiError':'Kesalahan AI: {msg}','t.micError':'Kesalahan mikrofon: {msg}',
+    't.noSupport':'Browser ini tidak mendukung Web Speech API. Gunakan Chrome/Edge desktop.',
+    't.restored':'Sesi sebelumnya dipulihkan dari penyimpanan lokal',
+    't.langSwitch':'Bahasa dialihkan ke {lang}','t.saved':'Tersimpan','t.deleted':'Terhapus',
+    't.processing':'Memproses {n} bagian…','t.queueDone':'Antrean selesai','t.wiped':'Semua data lokal dihapus',
+    't.needTranscript':'Rekam atau tulis sesuatu dulu','t.tooBig':'Audio terlalu besar untuk AI inline ({mb} MB). Unduh saja.',
+    't.transcribing':'Mentranskrip audio dengan AI…','t.imported':'Cadangan diimpor'
+  }
+};
+
+const HELP = {
+  en: '<h4>1. Recording that refuses to die</h4><ul>'
+    + '<li>The record button owns a single flag. Whenever the browser engine ends a session (silence, timeout, hiccup), <code>onend</code> restarts it automatically.</li>'
+    + '<li>A watchdog checks every 2&nbsp;s: if nothing was recognised for your “silence restart” window, it performs a hard restart. Long pauses therefore never stop the session.</li>'
+    + '<li>Every finalised phrase is written to <code>localStorage</code> instantly, and raw audio is streamed into IndexedDB in chunks — a crash or refresh only loses the last few seconds.</li></ul>'
+    + '<h4>2. Automatic EN / ID detection</h4><ul>'
+    + '<li>Each phrase is scored against English and Indonesian markers (stopwords + Indonesian affixes such as <code>-nya, -kan, me-, di-</code>).</li>'
+    + '<li>A rolling vote switches the recogniser language when the room changes language. If audio is loud but nothing is recognised, the engine probes the other language.</li></ul>'
+    + '<h4>3. Offline → AI later</h4><ul>'
+    + '<li>Transcript is cut into chunks by time and/or word count. Chunks are queued locally.</li>'
+    + '<li>Offline or no API key → they stay <em>pending</em>. As soon as you are online with a key, they are processed automatically (also triggered by the browser <code>online</code> event).</li>'
+    + '<li>No internet at all? Use <b>Offline draft</b> — a local extractive summariser. Saved audio can also be transcribed by AI later.</li></ul>'
+    + '<h4>4. Shortcuts</h4><ul><li><b>Ctrl/Cmd + Shift + R</b> start / stop</li><li><b>Ctrl/Cmd + Shift + P</b> pause / resume</li>'
+    + '<li><b>Ctrl/Cmd + Shift + G</b> process now</li><li><b>Ctrl/Cmd + Shift + F</b> search transcript</li></ul>',
+  id: '<h4>1. Rekaman yang tak mau mati</h4><ul>'
+    + '<li>Tombol rekam memegang satu penanda. Setiap kali mesin browser berhenti (hening, timeout, gangguan), <code>onend</code> menyalakannya kembali otomatis.</li>'
+    + '<li>Pengawas berjalan tiap 2&nbsp;detik: bila tak ada hasil selama ambang “restart saat hening”, dilakukan restart paksa. Jadi jeda panjang tidak pernah menghentikan sesi.</li>'
+    + '<li>Setiap kalimat final langsung ditulis ke <code>localStorage</code>, audio mentah dialirkan ke IndexedDB per potongan — crash atau refresh hanya kehilangan beberapa detik terakhir.</li></ul>'
+    + '<h4>2. Deteksi EN / ID otomatis</h4><ul>'
+    + '<li>Setiap kalimat dinilai terhadap penanda Inggris & Indonesia (kata henti + afiks seperti <code>-nya, -kan, me-, di-</code>).</li>'
+    + '<li>Voting bergulir mengalihkan bahasa pengenal saat ruangan berganti bahasa. Bila suara nyaring tetapi tak ada hasil, mesin mencoba bahasa lainnya.</li></ul>'
+    + '<h4>3. Offline → AI menyusul</h4><ul>'
+    + '<li>Transkrip dipotong per waktu dan/atau jumlah kata, lalu masuk antrean lokal.</li>'
+    + '<li>Offline atau tanpa API key → tetap <em>menunggu</em>. Begitu online dan ada key, otomatis diproses (juga dipicu peristiwa <code>online</code> browser).</li>'
+    + '<li>Sama sekali tanpa internet? Pakai <b>Draf offline</b> — perangkum ekstraktif lokal. Audio tersimpan juga bisa ditranskrip AI nanti.</li></ul>'
+    + '<h4>4. Pintasan</h4><ul><li><b>Ctrl/Cmd + Shift + R</b> mulai / stop</li><li><b>Ctrl/Cmd + Shift + P</b> jeda / lanjut</li>'
+    + '<li><b>Ctrl/Cmd + Shift + G</b> proses sekarang</li><li><b>Ctrl/Cmd + Shift + F</b> cari transkrip</li></ul>'
+};
+
+/* =======================================================================
+   1. State + persistence
+   ======================================================================= */
+const LS = {
+  ui:'smartmom.ui', settings:'smartmom.settings', meta:'smartmom.meta',
+  segments:'smartmom.segments', buffer:'smartmom.buffer',
+  queue:'smartmom.queue', moms:'smartmom.moms', stats:'smartmom.stats'
+};
+
+const DEFAULT_SETTINGS = {
+  apiKey:'', model:'gemini-2.0-flash', autoIntervalMs:180000, chunkWords:220,
+  silenceSec:10, autoProcess:true, saveAudio:true, wakeLock:true,
+  momStyle:'concise', momLang:'auto', recogMode:'auto'
+};
+
+const state = {
+  ui: localStorage.getItem(LS.ui) || 'en',
+  settings: Object.assign({}, DEFAULT_SETTINGS, safeJson(localStorage.getItem(LS.settings), {})),
+  meta: safeJson(localStorage.getItem(LS.meta), { title:'', date:'', location:'', participants:'', agenda:'' }),
+  segments: safeJson(localStorage.getItem(LS.segments), []),
+  buffer: localStorage.getItem(LS.buffer) || '',
+  queue: safeJson(localStorage.getItem(LS.queue), []),
+  moms: safeJson(localStorage.getItem(LS.moms), []),
+  stats: safeJson(localStorage.getItem(LS.stats), { restarts:0, elapsedMs:0 }),
+
+  isRecording:false, isPaused:false, recognition:null, recogLang:'en-US',
+  langVotes:[], dominantLang:'en',
+  lastResultAt:0, lastChunkAt:0, langSetAt:0, resultsSinceLangSet:0,
+  audioSeenSinceLangSet:false, level:0,
+  startedAt:0, sessionElapsed:0,
+  audioCtx:null, analyser:null, micSource:null, mediaStream:null, rafId:null,
+  mediaRecorder:null, audioSessionId:null, audioChunkIdx:0, audioBytes:0,
+  wakeLock:null, processing:false, search:''
+};
+
+function safeJson(s, fb){ try{ return s ? JSON.parse(s) : fb; }catch(e){ return fb; } }
+function t(k, vars){
+  const d = I18N[state.ui] || I18N.en;
+  let s = (d[k] !== undefined ? d[k] : (I18N.en[k] !== undefined ? I18N.en[k] : k));
+  if(vars) Object.keys(vars).forEach(function(x){ s = s.split('{'+x+'}').join(vars[x]); });
+  return s;
+}
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, function(c){
+  return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]; }); }
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+function nowTime(){ return new Date().toLocaleTimeString(); }
+function words(s){ return (s||'').trim() ? s.trim().split(/\s+/).length : 0; }
+
+const save = {
+  settings(){ localStorage.setItem(LS.settings, JSON.stringify(state.settings)); },
+  meta(){ localStorage.setItem(LS.meta, JSON.stringify(state.meta)); },
+  segments(){ try{ localStorage.setItem(LS.segments, JSON.stringify(state.segments)); }catch(e){ toast('Storage full', 'warn'); } },
+  buffer(){ localStorage.setItem(LS.buffer, state.buffer); },
+  queue(){ localStorage.setItem(LS.queue, JSON.stringify(state.queue)); },
+  moms(){ try{ localStorage.setItem(LS.moms, JSON.stringify(state.moms)); }catch(e){} },
+  stats(){ localStorage.setItem(LS.stats, JSON.stringify(state.stats)); }
+};
+
+/* =======================================================================
+   2. DOM shortcuts + toasts
+   ======================================================================= */
+const $ = function(id){ return document.getElementById(id); };
+function toast(msg, kind){
+  const map = { ok:'bg-mint-50 text-mint-600 border-mint-200', warn:'bg-sun-50 text-sun-600 border-sun-200',
+                err:'bg-rose-50 text-rose-600 border-rose-200', info:'bg-brand-50 text-brand-600 border-brand-200' };
+  const el = document.createElement('div');
+  el.className = 'fade-in border rounded-xl px-4 py-2.5 text-xs font-semibold shadow-lg max-w-xs ' + (map[kind||'info']);
+  el.innerHTML = esc(msg);
+  $('toasts').appendChild(el);
+  setTimeout(function(){ el.style.opacity='0'; el.style.transform='translateY(6px)'; el.style.transition='.3s';
+    setTimeout(function(){ el.remove(); }, 320); }, 3600);
+}
+function logEngine(msg){
+  const box = $('engine-log');
+  const line = document.createElement('div');
+  line.textContent = '[' + nowTime() + '] ' + msg;
+  box.insertBefore(line, box.firstChild);
+  while(box.childElementCount > 60) box.removeChild(box.lastChild);
+}
+
+/* =======================================================================
+   3. Language detection (EN vs ID)
+   ======================================================================= */
+const ID_MARKERS = ('yang dan dengan untuk tidak kita saya kami adalah akan ini itu dari ke pada sudah belum bisa harus jadi kalau saja juga atau karena apa bagaimana '
+ + 'terima kasih baik oke ya nanti besok kemarin sekarang tolong mohon pak bu mas mbak bagian rapat notulen keputusan tindak lanjut siapa berapa kenapa dimana '
+ + 'jangan boleh mungkin sangat lebih kurang banyak sedikit semua setiap masing bikin buat pakai punya dalam tentang seperti supaya agar tapi tetapi namun sehingga').split(/\s+/);
+const EN_MARKERS = ('the and is are to of we you they that this for with will have has not but about should would can could okay thanks please meeting minutes decision '
+ + 'action item next week yesterday today tomorrow what how why where who when there here from into over under just very more less all every make made use using '
+ + 'need needs let us going gonna been being does did done because although however therefore').split(/\s+/);
+const ID_SET = new Set(ID_MARKERS), EN_SET = new Set(EN_MARKERS);
+
+function detectLanguage(text){
+  const toks = (text||'').toLowerCase().replace(/[^a-z\u00c0-\u024f\s'-]/g,' ').split(/\s+/).filter(Boolean);
+  if(!toks.length) return { lang:null, conf:0 };
+  let id=0, en=0;
+  toks.forEach(function(w){
+    if(ID_SET.has(w)) id += 2;
+    if(EN_SET.has(w)) en += 2;
+    if(/(nya|kan|lah|kah)$/.test(w) && w.length>4) id += 1;
+    if(/^(me|di|ter|ber|pe|se|ke)[a-z]{3,}/.test(w)) id += 0.6;
+    if(/(ing|tion|ment|ness|ed|ly)$/.test(w) && w.length>4) en += 0.8;
+  });
+  const total = id + en;
+  if(total < 2) return { lang:null, conf:0 };
+  const lang = id >= en ? 'id' : 'en';
+  return { lang: lang, conf: Math.min(1, Math.abs(id-en)/total + 0.15) };
+}
+function langLabel(code){ return code === 'id' ? 'Bahasa Indonesia' : (code === 'en' ? 'English' : '—'); }
+function toBcp(code){ return code === 'id' ? 'id-ID' : 'en-US'; }
+function baseOf(bcp){ return String(bcp||'').slice(0,2); }
+
+function registerLangVote(text){
+  const d = detectLanguage(text);
+  if(!d.lang) return null;
+  state.langVotes.push(d.lang);
+  if(state.langVotes.length > 7) state.langVotes.shift();
+  const idN = state.langVotes.filter(function(x){ return x==='id'; }).length;
+  const enN = state.langVotes.length - idN;
+  state.dominantLang = idN > enN ? 'id' : 'en';
+  $('detected-lang').textContent = langLabel(d.lang) + (state.langVotes.length>2 ? ' · ' + langLabel(state.dominantLang) : '');
+
+  // auto switch recogniser when the room clearly changed language
+  if(state.settings.recogMode === 'auto' && state.isRecording){
+    const need = 3;
+    if(idN >= need && baseOf(state.recogLang) !== 'id') switchRecogLang('id-ID','vote');
+    else if(enN >= need && baseOf(state.recogLang) !== 'en') switchRecogLang('en-US','vote');
+  }
+  return d.lang;
+}
+
+/* =======================================================================
+   4. Audio visualiser + MediaRecorder (local audio archive)
+   ======================================================================= */
+function setupAudio(stream){
+  const Ctx = window.AudioContext || window.webkitAudioContext;
+  state.audioCtx = new Ctx();
+  state.analyser = state.audioCtx.createAnalyser();
+  state.analyser.fftSize = 512;
+  state.micSource = state.audioCtx.createMediaStreamSource(stream);
+  state.micSource.connect(state.analyser);
+
+  const canvas = $('viz'), ctx = canvas.getContext('2d');
+  function resize(){ canvas.width = canvas.clientWidth * (window.devicePixelRatio||1);
+                     canvas.height = 96 * (window.devicePixelRatio||1); }
+  resize(); window.addEventListener('resize', resize);
+
+  const bins = state.analyser.frequencyBinCount;
+  const data = new Uint8Array(bins);
+
+  function draw(){
+    if(!state.isRecording){ ctx.clearRect(0,0,canvas.width,canvas.height); return; }
+    state.rafId = requestAnimationFrame(draw);
+    state.analyser.getByteFrequencyData(data);
+
+    let sum = 0; for(let i=0;i<bins;i++) sum += data[i];
+    state.level = sum / bins;
+    if(state.level > 12) state.audioSeenSinceLangSet = true;
+    $('level-bar').style.width = Math.min(100, state.level*1.8) + '%';
+
+    const W = canvas.width, H = canvas.height;
+    ctx.clearRect(0,0,W,H);
+    const bars = 64, bw = W/bars;
+    for(let i=0;i<bars;i++){
+      const v = data[Math.floor(i*bins/bars)] / 255;
+      const h = Math.max(2, v*H*0.92);
+      const g = ctx.createLinearGradient(0,H-h,0,H);
+      if(state.isPaused){ g.addColorStop(0,'#fcd34d'); g.addColorStop(1,'#fef3c7'); }
+      else { g.addColorStop(0,'#2563eb'); g.addColorStop(1,'#7dd3fc'); }
+      ctx.fillStyle = g;
+      const r = Math.min(4, bw/2);
+      const x = i*bw+1, y = H-h, w = bw-2;
+      ctx.beginPath();
+      ctx.moveTo(x, y+r); ctx.arcTo(x, y, x+r, y, r);
+      ctx.lineTo(x+w-r, y); ctx.arcTo(x+w, y, x+w, y+r, r);
+      ctx.lineTo(x+w, H); ctx.lineTo(x, H); ctx.closePath(); ctx.fill();
+    }
+    ctx.fillStyle = 'rgba(148,163,184,.35)'; ctx.fillRect(0,H-1,W,1);
+  }
+  draw();
+}
+
+function pickMime(){
+  const c = ['audio/webm;codecs=opus','audio/webm','audio/mp4','audio/ogg;codecs=opus'];
+  for(let i=0;i<c.length;i++){ if(window.MediaRecorder && MediaRecorder.isTypeSupported(c[i])) return c[i]; }
+  return '';
+}
+async function startMediaRecorder(stream){
+  if(!state.settings.saveAudio || !window.MediaRecorder) return;
+  const mime = pickMime();
+  try{
+    state.mediaRecorder = mime ? new MediaRecorder(stream,{ mimeType:mime }) : new MediaRecorder(stream);
+  }catch(e){ logEngine('MediaRecorder unavailable: ' + e.message); return; }
+
+  state.audioSessionId = uid();
+  state.audioChunkIdx = 0; state.audioBytes = 0;
+  await idbPut('sessions', { id:state.audioSessionId, startedAt:Date.now(), endedAt:null,
+    mime: state.mediaRecorder.mimeType || mime || 'audio/webm', bytes:0,
+    title: state.meta.title || '', lang: state.dominantLang });
+
+  state.mediaRecorder.ondataavailable = async function(e){
+    if(!e.data || !e.data.size) return;
+    state.audioBytes += e.data.size;
+    await idbPut('chunks', { sessionId: state.audioSessionId, idx: state.audioChunkIdx++, blob: e.data, size: e.data.size });
+    const s = await idbGet('sessions', state.audioSessionId);
+    if(s){ s.bytes = state.audioBytes; await idbPut('sessions', s); }
+    renderAudioList();
+  };
+  state.mediaRecorder.start(15000); // flush to IndexedDB every 15 s → crash-safe
+  logEngine('Local audio capture started (' + (state.mediaRecorder.mimeType||'default') + ')');
+}
+async function stopMediaRecorder(){
+  if(!state.mediaRecorder) return;
+  try{ if(state.mediaRecorder.state !== 'inactive') state.mediaRecorder.stop(); }catch(e){}
+  const id = state.audioSessionId;
+  state.mediaRecorder = null;
+  setTimeout(async function(){
+    const s = await idbGet('sessions', id);
+    if(s){ s.endedAt = Date.now(); s.bytes = state.audioBytes; await idbPut('sessions', s); renderAudioList(); }
+  }, 600);
+}
+
+/* =======================================================================
+   5. IndexedDB helpers
+   ======================================================================= */
+const DB_NAME='smartmom-db', DB_VER=1;
+function openDb(){
+  return new Promise(function(res, rej){
+    const r = indexedDB.open(DB_NAME, DB_VER);
+    r.onupgradeneeded = function(){
+      const db = r.result;
+      if(!db.objectStoreNames.contains('sessions')) db.createObjectStore('sessions',{ keyPath:'id' });
+      if(!db.objectStoreNames.contains('chunks')){
+        const st = db.createObjectStore('chunks',{ keyPath:'key', autoIncrement:true });
+        st.createIndex('bySession','sessionId');
+      }
+    };
+    r.onsuccess = function(){ res(r.result); };
+    r.onerror = function(){ rej(r.error); };
+  });
+}
+async function idbPut(store, val){ const db = await openDb(); return new Promise(function(res,rej){
+  const tx = db.transaction(store,'readwrite'); tx.objectStore(store).put(val);
+  tx.oncomplete = function(){ res(true); }; tx.onerror = function(){ rej(tx.error); }; }); }
+async function idbGet(store, key){ const db = await openDb(); return new Promise(function(res,rej){
+  const rq = db.transaction(store,'readonly').objectStore(store).get(key);
+  rq.onsuccess = function(){ res(rq.result); }; rq.onerror = function(){ rej(rq.error); }; }); }
+async function idbAll(store){ const db = await openDb(); return new Promise(function(res,rej){
+  const rq = db.transaction(store,'readonly').objectStore(store).getAll();
+  rq.onsuccess = function(){ res(rq.result||[]); }; rq.onerror = function(){ rej(rq.error); }; }); }
+async function idbBySession(sessionId){ const db = await openDb(); return new Promise(function(res,rej){
+  const rq = db.transaction('chunks','readonly').objectStore('chunks').index('bySession').getAll(sessionId);
+  rq.onsuccess = function(){ res((rq.result||[]).sort(function(a,b){ return a.idx-b.idx; })); };
+  rq.onerror = function(){ rej(rq.error); }; }); }
+async function idbDeleteSession(sessionId){
+  const db = await openDb();
+  const chunks = await idbBySession(sessionId);
+  return new Promise(function(res){
+    const tx = db.transaction(['sessions','chunks'],'readwrite');
+    tx.objectStore('sessions').delete(sessionId);
+    const cs = tx.objectStore('chunks');
+    chunks.forEach(function(c){ cs.delete(c.key); });
+    tx.oncomplete = function(){ res(true); };
+  });
+}
+async function idbWipe(){ const db = await openDb(); return new Promise(function(res){
+  const tx = db.transaction(['sessions','chunks'],'readwrite');
+  tx.objectStore('sessions').clear(); tx.objectStore('chunks').clear();
+  tx.oncomplete = function(){ res(true); }; }); }
+
+/* =======================================================================
+   6. Speech recognition — resilient core
+   ======================================================================= */
+function initRecognition(){
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SR){ toast(t('t.noSupport'),'err'); return false; }
+  const r = new SR();
+  r.continuous = true;
+  r.interimResults = true;
+  r.maxAlternatives = 1;
+  r.lang = state.recogLang;
+
+  r.onstart = function(){
+    state.lastResultAt = Date.now();
+    logEngine('recognition.start (' + r.lang + ')');
+  };
+
+  r.onresult = function(ev){
+    state.lastResultAt = Date.now();
+    let interim = '', final = '';
+    for(let i = ev.resultIndex; i < ev.results.length; i++){
+      const txt = ev.results[i][0].transcript;
+      if(ev.results[i].isFinal) final += txt; else interim += txt;
+    }
+    if(interim) $('interim').textContent = interim;
+    if(final && final.trim()){
+      $('interim').textContent = '';
+      state.resultsSinceLangSet++;
+      addSegment(final.trim(), null, ev.results[ev.resultIndex] ? ev.results[ev.resultIndex][0].confidence : null);
+    }
+  };
+
+  r.onerror = function(ev){
+    logEngine('error: ' + ev.error);
+    if(ev.error === 'not-allowed' || ev.error === 'service-not-allowed'){
+      toast(t('t.micError',{ msg: ev.error }),'err');
+      hardStop();
+    }
+    // network / no-speech / aborted / audio-capture → onend will restart
+  };
+
+  // ---- the anti-stop heart: always restart while the button says "recording"
+  r.onend = function(){
+    if(state.isRecording && !state.isPaused){
+      state.stats.restarts++; save.stats(); renderStats();
+      logEngine('onend → auto restart');
+      setTimeout(function(){ safeStart(); }, 350);
+    } else {
+      logEngine('onend (idle)');
+    }
+  };
+
+  state.recognition = r;
+  return true;
+}
+
+function safeStart(){
+  if(!state.recognition) return;
+  try{ state.recognition.lang = state.recogLang; state.recognition.start(); }
+  catch(e){
+    if(String(e.message||'').indexOf('already started') === -1){
+      setTimeout(function(){ try{ state.recognition.start(); }catch(e2){} }, 700);
+    }
+  }
+}
+
+function switchRecogLang(bcp, reason){
+  if(state.recogLang === bcp) return;
+  state.recogLang = bcp;
+  state.langSetAt = Date.now();
+  state.resultsSinceLangSet = 0;
+  state.audioSeenSinceLangSet = false;
+  logEngine('lang → ' + bcp + ' (' + reason + ')');
+  toast(t('t.langSwitch',{ lang: langLabel(baseOf(bcp)) }),'info');
+  if(state.isRecording && state.recognition){
+    try{ state.recognition.stop(); }catch(e){}   // onend restarts with new lang
+  }
+}
+
+/* ---- watchdog: silence, chunking, probing ---- */
+setInterval(function(){
+  // timer + storage
+  if(state.isRecording && !state.isPaused){
+    state.sessionElapsed = Date.now() - state.startedAt;
+    $('timer').textContent = fmtDur(state.stats.elapsedMs + state.sessionElapsed);
+  }
+  if(!state.isRecording || state.isPaused) return;
+
+  const now = Date.now();
+  const silence = now - (state.lastResultAt || now);
+  const silenceLimit = Math.max(3, state.settings.silenceSec) * 1000;
+
+  // 1) hard restart after a long pause — recording must never die
+  if(silence > silenceLimit){
+    state.lastResultAt = now;
+    state.stats.restarts++; save.stats(); renderStats();
+    logEngine('watchdog restart after ' + Math.round(silence/1000) + 's silence');
+    try{ state.recognition.stop(); }catch(e){ safeStart(); }
+  }
+  // 2) auto language probe: audio present but engine returns nothing
+  else if(state.settings.recogMode === 'auto' && state.resultsSinceLangSet === 0
+          && state.audioSeenSinceLangSet && (now - state.langSetAt) > 15000){
+    switchRecogLang(baseOf(state.recogLang) === 'id' ? 'en-US' : 'id-ID', 'probe');
+  }
+
+  // 3) time-based chunking for the AI queue
+  const iv = state.settings.autoIntervalMs;
+  if(iv > 0 && words(state.buffer) >= 20 && (now - state.lastChunkAt) >= iv) flushBuffer('interval');
+}, 2000);
+
+/* =======================================================================
+   7. Segments
+   ======================================================================= */
+function addSegment(text, kind, confidence){
+  const lang = registerLangVote(text) || state.dominantLang;
+  const seg = { id:uid(), ts:Date.now(), time:nowTime(), text:text, lang:lang,
+                speaker: $('speaker-select').value || '', kind: kind || 'speech',
+                conf: confidence ? Math.round(confidence*100) : null };
+  state.segments.push(seg);
+  state.buffer += ' ' + text;
+  save.segments(); save.buffer();
+  renderSegment(seg, true);
+  renderStats();
+
+  if(words(state.buffer) >= state.settings.chunkWords) flushBuffer('words');
+}
+
+function renderTranscript(){
+  const box = $('transcript');
+  box.innerHTML = '';
+  const q = state.search.trim().toLowerCase();
+  const list = state.segments.filter(function(s){
+    return !q || s.text.toLowerCase().indexOf(q) !== -1 || (s.speaker||'').toLowerCase().indexOf(q) !== -1;
+  });
+  if(!list.length){
+    box.innerHTML = '<p class="text-slate-400 italic text-sm text-center mt-10 px-6">' + esc(t('tr.placeholder')) + '</p>';
+  } else {
+    list.forEach(function(s){ renderSegment(s, false); });
+  }
+  $('tr-count').textContent = state.segments.length;
+  box.scrollTop = box.scrollHeight;
+}
+
+function renderSegment(s, append){
+  const box = $('transcript');
+  if(append && box.querySelector('p.italic')) box.innerHTML = '';
+  const q = state.search.trim();
+  let body = esc(s.text);
+  if(q){
+    const re = new RegExp('(' + q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + ')','gi');
+    body = body.replace(re, '<mark>$1</mark>');
+  }
+  const langChip = '<span class="chip ' + (s.lang==='id' ? 'bg-rose-50 text-rose-500' : 'bg-brand-50 text-brand-600') + '">'
+    + (s.lang==='id' ? '🇮🇩 ID' : '🇺🇸 EN') + '</span>';
+  const noteChip = s.kind === 'note' ? '<span class="chip bg-sun-50 text-sun-600"><i class="fa-solid fa-pen"></i>note</span>' : '';
+  const spk = s.speaker ? '<span class="chip bg-violet-50 text-violet-600"><i class="fa-solid fa-user"></i>' + esc(s.speaker) + '</span>' : '';
+  const conf = s.conf ? '<span class="chip bg-slate-100 text-slate-400">' + s.conf + '%</span>' : '';
+
+  const el = document.createElement('div');
+  el.className = 'seg fade-in bg-slate-50/70 hover:bg-white border border-slate-100 rounded-xl p-3';
+  el.dataset.id = s.id;
+  el.innerHTML =
+      '<div class="flex items-center gap-1.5 flex-wrap mb-1.5">'
+    +   '<span class="text-[.68rem] font-bold text-slate-400 tabular-nums">' + esc(s.time) + '</span>'
+    +   langChip + spk + noteChip + conf
+    +   '<span class="seg-tools ml-auto flex gap-1">'
+    +     '<button class="text-slate-400 hover:text-brand-600 text-xs px-1" data-act="cycle-speaker" data-id="' + s.id + '" title="speaker"><i class="fa-solid fa-user-pen"></i></button>'
+    +     '<button class="text-slate-400 hover:text-brand-600 text-xs px-1" data-act="edit-seg" data-id="' + s.id + '" title="' + esc(t('tr.edit')) + '"><i class="fa-solid fa-pen-to-square"></i></button>'
+    +     '<button class="text-slate-400 hover:text-rose-600 text-xs px-1" data-act="del-seg" data-id="' + s.id + '" title="' + esc(t('tr.del')) + '"><i class="fa-solid fa-trash"></i></button>'
+    +   '</span>'
+    + '</div>'
+    + '<div class="text-sm leading-relaxed text-slate-700" data-role="text">' + body + '</div>';
+  box.appendChild(el);
+  if(append) box.scrollTop = box.scrollHeight;
+}
+
+function editSegment(id){
+  const seg = state.segments.filter(function(s){ return s.id===id; })[0];
+  if(!seg) return;
+  const el = document.querySelector('[data-id="' + id + '"] [data-role="text"]');
+  if(!el) return;
+  el.innerHTML = '<textarea class="inp" rows="3">' + esc(seg.text) + '</textarea>'
+    + '<div class="flex gap-2 mt-2"><button class="btn btn-primary" data-act="save-seg" data-id="' + id + '">'
+    + esc(t('tr.save')) + '</button><button class="btn" data-act="cancel-seg" data-id="' + id + '">' + esc(t('tr.cancel')) + '</button></div>';
+  el.querySelector('textarea').focus();
+}
+function saveSegment(id){
+  const el = document.querySelector('[data-id="' + id + '"] textarea');
+  const seg = state.segments.filter(function(s){ return s.id===id; })[0];
+  if(!el || !seg) return;
+  seg.text = el.value.trim();
+  seg.lang = detectLanguage(seg.text).lang || seg.lang;
+  save.segments(); renderTranscript(); renderStats(); toast(t('t.saved'),'ok');
+}
+
+/* =======================================================================
+   8. Chunk buffer → offline AI queue
+   ======================================================================= */
+function flushBuffer(reason){
+  const text = state.buffer.trim();
+  if(words(text) < 5) return null;
+  const item = { id:uid(), createdAt:Date.now(), text:text, words:words(text),
+                 lang: state.dominantLang, status:'pending', reason:reason||'manual', error:'' };
+  state.queue.push(item);
+  state.buffer = '';
+  state.lastChunkAt = Date.now();
+  save.queue(); save.buffer();
+  renderQueue(); renderStats();
+  logEngine('chunk queued (' + item.words + ' words, ' + item.reason + ')');
+
+  if(!navigator.onLine) toast(t('t.offlineQueued'),'warn');
+  else if(!state.settings.apiKey) toast(t('t.noKeyQueued'),'warn');
+  else toast(t('t.queued'),'ok');
+
+  if(state.settings.autoProcess) processQueue(false);
+  return item;
+}
+
+function renderQueue(){
+  const box = $('queue-list');
+  const pending = state.queue.filter(function(i){ return i.status==='pending' || i.status==='processing'; }).length;
+  $('queue-count').textContent = pending;
+  $('pill-queue').className = 'chip border ' + (pending ? 'bg-sun-50 text-sun-600 border-sun-200' : 'bg-slate-100 text-slate-400 border-slate-200');
+
+  if(!state.queue.length){ box.innerHTML = '<p class="text-xs text-slate-400 italic">' + esc(t('q.empty')) + '</p>'; return; }
+  const map = { pending:['bg-sun-50 text-sun-600','fa-hourglass-half', t('q.pending')],
+                processing:['bg-brand-50 text-brand-600','fa-spinner spin', t('q.processing')],
+                done:['bg-mint-50 text-mint-600','fa-check', t('q.done')],
+                error:['bg-rose-50 text-rose-600','fa-triangle-exclamation', t('q.error')] };
+  const parts = [];
+  state.queue.slice().reverse().forEach(function(i){
+    const m = map[i.status] || map.pending;
+    parts.push('<div class="border border-slate-100 rounded-xl p-2.5 flex items-start gap-2">'
+      + '<span class="chip ' + m[0] + '"><i class="fa-solid ' + m[1] + '"></i>' + esc(m[2]) + '</span>'
+      + '<div class="flex-1 min-w-0">'
+      +   '<div class="text-[.7rem] text-slate-400">' + new Date(i.createdAt).toLocaleTimeString()
+      +     ' · ' + i.words + ' ' + esc(t('q.words')) + ' · ' + (i.lang==='id'?'🇮🇩':'🇺🇸') + ' · ' + esc(i.reason) + '</div>'
+      +   '<div class="text-xs text-slate-600 truncate">' + esc(i.text.slice(0,140)) + '</div>'
+      +   (i.error ? '<div class="text-[.7rem] text-rose-500 mt-1">' + esc(i.error) + '</div>' : '')
+      + '</div>'
+      + '<div class="flex gap-1">'
+      +   (i.status!=='done' ? '<button class="btn !px-2 !py-1" data-act="retry-q" data-id="' + i.id + '" title="' + esc(t('q.retry')) + '"><i class="fa-solid fa-rotate-right"></i></button>' : '')
+      +   '<button class="btn !px-2 !py-1" data-act="rm-q" data-id="' + i.id + '" title="' + esc(t('q.remove')) + '"><i class="fa-solid fa-xmark"></i></button>'
+      + '</div></div>');
+  });
+  box.innerHTML = parts.join('');
+}
+
+async function processQueue(force){
+  if(state.processing) return;
+  const pend = state.queue.filter(function(i){ return i.status==='pending' || i.status==='error'; });
+  if(!pend.length) return;
+  if(!navigator.onLine){ if(force) toast(t('t.offlineQueued'),'warn'); return; }
+  if(!state.settings.apiKey){ if(force) toast(t('t.noKeyQueued'),'warn'); return; }
+  if(!force && !state.settings.autoProcess) return;
+
+  state.processing = true;
+  toast(t('t.processing',{ n: pend.length }),'info');
+  for(let k=0;k<pend.length;k++){
+    const item = pend[k];
+    item.status = 'processing'; item.error=''; save.queue(); renderQueue();
+    try{
+      const data = await askGeminiMom(item.text, item.lang);
+      addMom({ type:'ai', data:data, model:state.settings.model, lang:data.language || item.lang, sourceWords:item.words });
+      item.status = 'done'; save.queue(); renderQueue();
+    }catch(e){
+      item.status = 'error'; item.error = String(e.message || e); save.queue(); renderQueue();
+      toast(t('t.aiError',{ msg: item.error }),'err');
+      if(!navigator.onLine) break;
+    }
+  }
+  state.processing = false;
+  renderStats();
+  toast(t('t.queueDone'),'ok');
+}
+
+/* =======================================================================
+   9. Gemini
+   ======================================================================= */
+async function callGemini(parts, wantJson){
+  const key = (state.settings.apiKey||'').trim();
+  if(!key) throw new Error('missing API key');
+  const url = 'https://generativelanguage.googleapis.com/v1beta/models/'
+    + encodeURIComponent(state.settings.model) + ':generateContent?key=' + encodeURIComponent(key);
+  const body = {
+    contents: [{ role:'user', parts: parts }],
+    generationConfig: { temperature: 0.25, topP: 0.9, maxOutputTokens: 8192,
+      responseMimeType: wantJson ? 'application/json' : 'text/plain' }
+  };
+  const res = await fetch(url, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(body) });
+  const json = await res.json();
+  if(json.error) throw new Error(json.error.message || 'API error');
+  const cand = json.candidates && json.candidates[0];
+  if(!cand || !cand.content) throw new Error('empty response');
+  return (cand.content.parts || []).map(function(p){ return p.text || ''; }).join('');
+}
+
+function momOutLang(fallback){
+  const sel = state.settings.momLang;
+  if(sel === 'en' || sel === 'id') return sel;
+  return fallback || state.dominantLang || 'en';
+}
+
+function momPrompt(transcript, outLang, styleKey, isFinal){
+  const styles = {
+    concise:'Keep it tight and skimmable. Short bullets, no filler.',
+    detailed:'Be thorough: capture nuance, arguments, numbers and context per topic.',
+    action:'Prioritise execution: emphasise owners, deadlines, dependencies and blockers.'
+  };
+  const langName = outLang === 'id' ? 'Bahasa Indonesia' : 'English';
+  const meta = state.meta;
+  return [
+    'You are an expert meeting secretary. Produce Minutes of Meeting from a raw, possibly noisy speech-to-text transcript.',
+    'Write ALL output text in ' + langName + '. Style: ' + (styles[styleKey] || styles.concise),
+    'Fix obvious transcription errors, ignore filler words, never invent facts. If something is unclear, put it in openQuestions.',
+    isFinal ? 'This is the FULL transcript of the whole meeting: consolidate and de-duplicate.' : 'This is one part of an ongoing meeting: summarise only this part.',
+    'Meeting metadata — title: ' + (meta.title || 'n/a')
+      + ' | date: ' + (meta.date || 'n/a')
+      + ' | location: ' + (meta.location || 'n/a')
+      + ' | participants: ' + (meta.participants || 'n/a')
+      + ' | agenda: ' + (meta.agenda || 'n/a'),
+    'Return ONLY valid JSON with exactly this shape:',
+    '{"meetingTitle":"string","language":"en|id","executiveSummary":"string","keyPoints":["string"],'
+      + '"discussion":[{"topic":"string","points":["string"]}],"decisions":["string"],'
+      + '"actionItems":[{"task":"string","owner":"string","due":"string","priority":"High|Medium|Low"}],'
+      + '"risks":["string"],"openQuestions":["string"],"nextSteps":["string"],"sentiment":"string","tags":["string"]}',
+    'Use empty arrays when a section has no content.',
+    'TRANSCRIPT:', transcript
+  ].join('\n\n');
+}
+
+function parseLooseJson(txt){
+  let s = String(txt||'').replace(/```json/gi,'').replace(/```/g,'').trim();
+  const a = s.indexOf('{'), b = s.lastIndexOf('}');
+  if(a !== -1 && b !== -1) s = s.slice(a, b+1);
+  return JSON.parse(s);
+}
+function normalizeMom(d, fallbackLang){
+  d = d || {};
+  const arr = function(v){ return Array.isArray(v) ? v : (v ? [v] : []); };
+  return {
+    meetingTitle: d.meetingTitle || state.meta.title || '',
+    language: d.language || fallbackLang || 'en',
+    executiveSummary: d.executiveSummary || d.summary || '',
+    keyPoints: arr(d.keyPoints),
+    discussion: arr(d.discussion).map(function(x){
+      return typeof x === 'string' ? { topic:x, points:[] }
+        : { topic: x.topic || '', points: arr(x.points) }; }),
+    decisions: arr(d.decisions),
+    actionItems: arr(d.actionItems).map(function(x){
+      return typeof x === 'string' ? { task:x, owner:'', due:'', priority:'' }
+        : { task:x.task||'', owner:x.owner||'', due:x.due||'', priority:x.priority||'' }; }),
+    risks: arr(d.risks), openQuestions: arr(d.openQuestions), nextSteps: arr(d.nextSteps),
+    sentiment: d.sentiment || '', tags: arr(d.tags)
+  };
+}
+async function askGeminiMom(transcript, langHint, isFinal){
+  const outLang = momOutLang(langHint);
+  const raw = await callGemini([{ text: momPrompt(transcript, outLang, state.settings.momStyle, !!isFinal) }], true);
+  return normalizeMom(parseLooseJson(raw), outLang);
+}
+
+/* =======================================================================
+   10. Offline extractive summariser (zero internet)
+   ======================================================================= */
+const STOP = new Set(ID_MARKERS.concat(EN_MARKERS).concat(['a','an','in','on','at','it','be','as','so','or','if','by','my','me','ok']));
+function offlineDraft(text, lang){
+  const clean = text.replace(/\s+/g,' ').trim();
+  const sentences = clean.split(/(?<=[.!?])\s+|\s*[;•]\s*/).filter(function(s){ return words(s) >= 4; });
+  const freq = {};
+  clean.toLowerCase().replace(/[^a-z\u00c0-\u024f\s]/g,' ').split(/\s+/).forEach(function(w){
+    if(w.length < 4 || STOP.has(w)) return; freq[w] = (freq[w]||0)+1;
+  });
+  const score = function(s){
+    const ws = s.toLowerCase().replace(/[^a-z\u00c0-\u024f\s]/g,' ').split(/\s+/);
+    let sc = 0; ws.forEach(function(w){ sc += (freq[w]||0); });
+    return sc / Math.sqrt(ws.length || 1);
+  };
+  const ranked = sentences.slice().sort(function(a,b){ return score(b) - score(a); });
+  const top = ranked.slice(0, 6);
+  const actionRe = /(action|follow ?up|to ?do|deadline|assign|owner|pic|due|next step|harus|akan|tolong|mohon|pastikan|tindak lanjut|tenggat|deadline)/i;
+  const decisionRe = /(decide|decided|agree|agreed|approve|approved|conclusion|final|sepakat|setuju|diputuskan|keputusan|disetujui)/i;
+  const riskRe = /(risk|block|blocker|issue|problem|delay|concern|risiko|kendala|masalah|terlambat|hambatan)/i;
+  const qRe = /\?|(unclear|tbd|belum jelas|belum pasti|nanti dicek)/i;
+  const topics = Object.keys(freq).sort(function(a,b){ return freq[b]-freq[a]; }).slice(0,10);
+
+  return normalizeMom({
+    meetingTitle: state.meta.title || '',
+    language: lang || state.dominantLang || 'en',
+    executiveSummary: top.slice(0,2).join(' ') || clean.slice(0,300),
+    keyPoints: top,
+    discussion: topics.slice(0,4).map(function(tp){
+      return { topic: tp, points: sentences.filter(function(s){ return s.toLowerCase().indexOf(tp) !== -1; }).slice(0,3) };
+    }),
+    decisions: sentences.filter(function(s){ return decisionRe.test(s); }).slice(0,6),
+    actionItems: sentences.filter(function(s){ return actionRe.test(s); }).slice(0,8).map(function(s){
+      const owner = (s.match(/\b(?:pic|owner|by)\s*:?\s*([A-Z][a-z]+)/) || [])[1] || '';
+      const due = (s.match(/\b(today|tomorrow|monday|tuesday|wednesday|thursday|friday|next week|besok|minggu depan|hari ini|senin|selasa|rabu|kamis|jumat|\d{1,2}\/\d{1,2})\b/i) || [])[1] || '';
+      return { task:s, owner:owner, due:due, priority:'' };
+    }),
+    risks: sentences.filter(function(s){ return riskRe.test(s); }).slice(0,6),
+    openQuestions: sentences.filter(function(s){ return qRe.test(s); }).slice(0,6),
+    nextSteps: ranked.slice(6,10),
+    sentiment: '', tags: topics.slice(0,6)
+  }, lang);
+}
+
+/* =======================================================================
+   11. MoM rendering + exports
+   ======================================================================= */
+function addMom(entry){
+  entry.id = uid(); entry.createdAt = Date.now();
+  state.moms.unshift(entry);
+  save.moms(); renderMoms();
+  toast(t('t.momReady'),'ok');
+}
+
+function listBlock(title, icon, items){
+  if(!items || !items.length) return '';
+  return '<div class="mt-3"><h4 class="text-[.72rem] font-extrabold uppercase tracking-wide text-slate-400 mb-1">'
+    + '<i class="fa-solid ' + icon + ' mr-1"></i>' + esc(title) + '</h4>'
+    + '<ul class="list-disc pl-5 space-y-1 text-[.83rem] text-slate-700">'
+    + items.map(function(x){ return '<li>' + esc(x) + '</li>'; }).join('') + '</ul></div>';
+}
+function actionsBlock(items){
+  if(!items || !items.length) return '';
+  const prioClass = function(p){
+    const s = String(p||'').toLowerCase();
+    if(s.indexOf('high')===0 || s.indexOf('ting')===0) return 'bg-rose-50 text-rose-600';
+    if(s.indexOf('med')===0 || s.indexOf('sed')===0) return 'bg-sun-50 text-sun-600';
+    if(s) return 'bg-mint-50 text-mint-600';
+    return 'bg-slate-100 text-slate-400';
+  };
+  const rows = items.map(function(a){
+    return '<tr class="border-t border-slate-100">'
+      + '<td class="py-1.5 pr-2 align-top">' + esc(a.task) + '</td>'
+      + '<td class="py-1.5 pr-2 align-top whitespace-nowrap font-semibold text-slate-600">' + (esc(a.owner)||'—') + '</td>'
+      + '<td class="py-1.5 pr-2 align-top whitespace-nowrap">' + (esc(a.due)||'—') + '</td>'
+      + '<td class="py-1.5 align-top"><span class="chip ' + prioClass(a.priority) + '">' + (esc(a.priority)||'—') + '</span></td></tr>';
+  }).join('');
+  return '<div class="mt-3"><h4 class="text-[.72rem] font-extrabold uppercase tracking-wide text-slate-400 mb-1">'
+    + '<i class="fa-solid fa-list-check mr-1"></i>' + esc(t('mom.actions')) + '</h4>'
+    + '<div class="overflow-x-auto"><table class="w-full text-[.8rem]"><thead><tr class="text-left text-slate-400 text-[.68rem] uppercase">'
+    + '<th class="pb-1">' + esc(t('mom.task')) + '</th><th class="pb-1">' + esc(t('mom.owner')) + '</th>'
+    + '<th class="pb-1">' + esc(t('mom.due')) + '</th><th class="pb-1">' + esc(t('mom.prio')) + '</th>'
+    + '</tr></thead><tbody>' + rows + '</tbody></table></div></div>';
+}
+function discussionBlock(items){
+  if(!items || !items.length) return '';
+  const body = items.map(function(d){
+    return '<div class="mb-2"><div class="font-bold text-slate-700 text-[.85rem]">' + esc(d.topic) + '</div>'
+      + (d.points && d.points.length
+        ? '<ul class="list-disc pl-5 text-[.83rem] text-slate-600 space-y-0.5 mt-0.5">'
+          + d.points.map(function(p){ return '<li>' + esc(p) + '</li>'; }).join('') + '</ul>'
+        : '') + '</div>';
+  }).join('');
+  return '<div class="mt-3"><h4 class="text-[.72rem] font-extrabold uppercase tracking-wide text-slate-400 mb-1">'
+    + '<i class="fa-solid fa-comments mr-1"></i>' + esc(t('mom.discussion')) + '</h4>' + body + '</div>';
+}
+
+function momCardHtml(m){
+  const d = m.data;
+  const badgeMap = { ai:['bg-mint-50 text-mint-600','fa-wand-magic-sparkles', t('mom.badgeAi')],
+                     offline:['bg-sun-50 text-sun-600','fa-plug-circle-xmark', t('mom.badgeOffline')],
+                     final:['bg-brand-50 text-brand-600','fa-layer-group', t('mom.badgeFinal')],
+                     audio:['bg-violet-50 text-violet-600','fa-file-audio', t('mom.badgeAudio')] };
+  const b = badgeMap[m.type] || badgeMap.ai;
+  const out = [];
+  out.push('<article class="mom-card fade-in border border-slate-100 rounded-2xl p-4 mb-4 bg-white">');
+  out.push('<div class="flex items-center gap-1.5 flex-wrap mb-2">'
+    + '<span class="chip ' + b[0] + '"><i class="fa-solid ' + b[1] + '"></i>' + esc(b[2]) + '</span>'
+    + '<span class="chip bg-slate-100 text-slate-500">' + esc(new Date(m.createdAt).toLocaleString()) + '</span>'
+    + (m.model ? '<span class="chip bg-slate-100 text-slate-400">' + esc(m.model) + '</span>' : '')
+    + '<span class="chip bg-slate-100 text-slate-400">' + (d.language==='id'?'🇮🇩 ID':'🇺🇸 EN') + '</span>'
+    + (m.sourceWords ? '<span class="chip bg-slate-100 text-slate-400">' + m.sourceWords + 'w</span>' : '')
+    + '<span class="ml-auto flex gap-1 no-print">'
+    +   '<button class="btn !px-2 !py-1" data-act="copy-one-mom" data-id="' + m.id + '"><i class="fa-regular fa-copy"></i></button>'
+    +   '<button class="btn !px-2 !py-1 btn-danger" data-act="del-mom" data-id="' + m.id + '"><i class="fa-solid fa-trash"></i></button>'
+    + '</span></div>');
+  if(d.meetingTitle) out.push('<h3 class="font-extrabold text-slate-800 text-[.95rem]">' + esc(d.meetingTitle) + '</h3>');
+  if(d.executiveSummary) out.push('<p class="text-[.85rem] text-slate-600 mt-1 leading-relaxed bg-slate-50 border border-slate-100 rounded-xl p-3">'
+    + '<b class="text-slate-500">' + esc(t('mom.summary')) + ':</b> ' + esc(d.executiveSummary) + '</p>');
+  out.push(listBlock(t('mom.keyPoints'),'fa-star', d.keyPoints));
+  out.push(discussionBlock(d.discussion));
+  out.push(listBlock(t('mom.decisions'),'fa-gavel', d.decisions));
+  out.push(actionsBlock(d.actionItems));
+  out.push(listBlock(t('mom.risks'),'fa-triangle-exclamation', d.risks));
+  out.push(listBlock(t('mom.questions'),'fa-circle-question', d.openQuestions));
+  out.push(listBlock(t('mom.next'),'fa-forward', d.nextSteps));
+  if(d.sentiment) out.push('<p class="text-[.75rem] text-slate-500 mt-3"><b>' + esc(t('mom.sentiment')) + ':</b> ' + esc(d.sentiment) + '</p>');
+  if(d.tags && d.tags.length) out.push('<div class="mt-2 flex flex-wrap gap-1">'
+    + d.tags.map(function(x){ return '<span class="chip bg-brand-50 text-brand-600">#' + esc(x) + '</span>'; }).join('') + '</div>');
+  out.push('</article>');
+  return out.join('');
+}
+
+function renderMoms(){
+  const box = $('mom-list');
+  $('mom-count').textContent = state.moms.length;
+  if(!state.moms.length){
+    box.innerHTML = '<div class="text-center text-slate-400 mt-16 px-6">'
+      + '<i class="fa-solid fa-robot text-4xl mb-3 text-slate-200"></i>'
+      + '<p class="text-sm max-w-xs mx-auto">' + esc(t('mom.placeholder')) + '</p></div>';
+    return;
+  }
+  box.innerHTML = state.moms.map(momCardHtml).join('');
+}
+
+function momToText(m){
+  const d = m.data, L = [];
+  L.push('# ' + (d.meetingTitle || 'Minutes of Meeting'));
+  L.push('_' + new Date(m.createdAt).toLocaleString() + ' · ' + (m.type||'ai') + (m.model ? ' · ' + m.model : '') + '_');
+  if(d.executiveSummary){ L.push('\n## ' + t('mom.summary')); L.push(d.executiveSummary); }
+  const bl = function(title, arr){ if(arr && arr.length){ L.push('\n## ' + title); arr.forEach(function(x){ L.push('- ' + x); }); } };
+  bl(t('mom.keyPoints'), d.keyPoints);
+  if(d.discussion && d.discussion.length){
+    L.push('\n## ' + t('mom.discussion'));
+    d.discussion.forEach(function(x){ L.push('### ' + x.topic); (x.points||[]).forEach(function(p){ L.push('- ' + p); }); });
+  }
+  bl(t('mom.decisions'), d.decisions);
+  if(d.actionItems && d.actionItems.length){
+    L.push('\n## ' + t('mom.actions'));
+    L.push('| ' + t('mom.task') + ' | ' + t('mom.owner') + ' | ' + t('mom.due') + ' | ' + t('mom.prio') + ' |');
+    L.push('|---|---|---|---|');
+    d.actionItems.forEach(function(a){ L.push('| ' + a.task + ' | ' + (a.owner||'-') + ' | ' + (a.due||'-') + ' | ' + (a.priority||'-') + ' |'); });
+  }
+  bl(t('mom.risks'), d.risks); bl(t('mom.questions'), d.openQuestions); bl(t('mom.next'), d.nextSteps);
+  if(d.tags && d.tags.length) L.push('\n' + d.tags.map(function(x){ return '#' + x; }).join(' '));
+  return L.join('\n');
+}
+function metaHeaderHtml(){
+  const m = state.meta;
+  return '<div style="font-family:Inter,Arial,sans-serif;margin-bottom:18px">'
+    + '<h1 style="margin:0 0 6px 0;font-size:20px">' + esc(m.title || t('mom.title')) + '</h1>'
+    + '<table style="font-size:12px;color:#475569">'
+    + '<tr><td><b>' + esc(t('meet.date')) + '</b></td><td style="padding-left:8px">' + esc(m.date || '—') + '</td></tr>'
+    + '<tr><td><b>' + esc(t('meet.location')) + '</b></td><td style="padding-left:8px">' + esc(m.location || '—') + '</td></tr>'
+    + '<tr><td><b>' + esc(t('meet.participants')) + '</b></td><td style="padding-left:8px">' + esc(m.participants || '—') + '</td></tr>'
+    + '<tr><td><b>' + esc(t('meet.agenda')) + '</b></td><td style="padding-left:8px">' + esc(m.agenda || '—') + '</td></tr>'
+    + '</table><hr style="border:none;border-top:1px solid #e2e8f0;margin:14px 0"></div>';
+}
+function download(filename, content, mime){
+  const blob = content instanceof Blob ? content : new Blob([content], { type: mime || 'text/plain;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); }, 4000);
+}
+
+/* =======================================================================
+   12. Audio archive UI
+   ======================================================================= */
+function fmtBytes(b){ if(!b) return '0 KB'; const u=['B','KB','MB','GB']; let i=0,n=b;
+  while(n>=1024 && i<u.length-1){ n/=1024; i++; } return n.toFixed(n<10?1:0)+' '+u[i]; }
+function fmtDur(ms){
+  const s = Math.floor(ms/1000), h = Math.floor(s/3600), m = Math.floor((s%3600)/60), ss = s%60;
+  const p = function(x){ return String(x).padStart(2,'0'); };
+  return (h ? p(h)+':' : '') + p(m) + ':' + p(ss);
+}
+async function renderAudioList(){
+  const box = $('audio-list');
+  let sessions = [];
+  try{ sessions = await idbAll('sessions'); }catch(e){}
+  sessions.sort(function(a,b){ return b.startedAt - a.startedAt; });
+  if(!sessions.length){ box.innerHTML = '<p class="text-xs text-slate-400 italic">' + esc(t('au.empty')) + '</p>'; return; }
+  box.innerHTML = sessions.map(function(s){
+    const live = state.audioSessionId === s.id && state.isRecording;
+    const rec = !s.endedAt && !live;
+    return '<div class="border border-slate-100 rounded-xl p-2.5 flex items-center gap-2 flex-wrap">'
+      + '<span class="chip ' + (live ? 'bg-rose-50 text-rose-600' : 'bg-brand-50 text-brand-600') + '">'
+      +   '<i class="fa-solid ' + (live ? 'fa-circle-dot' : 'fa-file-audio') + '"></i>' + fmtBytes(s.bytes||0) + '</span>'
+      + '<div class="flex-1 min-w-0"><div class="text-xs font-semibold text-slate-600 truncate">'
+      +   esc(s.title || new Date(s.startedAt).toLocaleString()) + (rec ? ' · <span class="text-sun-600">' + esc(t('au.recovered')) + '</span>' : '') + '</div>'
+      +   '<div class="text-[.68rem] text-slate-400">' + new Date(s.startedAt).toLocaleString() + ' · ' + esc(s.mime||'') + '</div></div>'
+      + '<div class="flex gap-1 no-print">'
+      +   '<button class="btn !px-2 !py-1" data-act="play-audio" data-id="' + s.id + '" title="' + esc(t('au.play')) + '"><i class="fa-solid fa-play"></i></button>'
+      +   '<button class="btn !px-2 !py-1" data-act="dl-audio" data-id="' + s.id + '" title="' + esc(t('au.dl')) + '"><i class="fa-solid fa-download"></i></button>'
+      +   '<button class="btn !px-2 !py-1" data-act="ai-audio" data-id="' + s.id + '" title="' + esc(t('au.transcribe')) + '"><i class="fa-solid fa-wand-sparkles"></i></button>'
+      +   '<button class="btn !px-2 !py-1 btn-danger" data-act="del-audio" data-id="' + s.id + '"><i class="fa-solid fa-trash"></i></button>'
+      + '</div></div>';
+  }).join('');
+}
+async function sessionBlob(id){
+  const s = await idbGet('sessions', id);
+  const chunks = await idbBySession(id);
+  return new Blob(chunks.map(function(c){ return c.blob; }), { type: (s && s.mime) || 'audio/webm' });
+}
+function blobToBase64(blob){
+  return new Promise(function(res, rej){
+    const fr = new FileReader();
+    fr.onload = function(){ res(String(fr.result).split(',')[1]); };
+    fr.onerror = rej; fr.readAsDataURL(blob);
+  });
+}
+async function transcribeAudioWithAI(id){
+  if(!state.settings.apiKey){ toast(t('t.noKeyQueued'),'warn'); return; }
+  if(!navigator.onLine){ toast(t('t.offlineQueued'),'warn'); return; }
+  const blob = await sessionBlob(id);
+  const mb = blob.size/1048576;
+  if(mb > 18){ toast(t('t.tooBig',{ mb: mb.toFixed(1) }),'warn'); return; }
+  toast(t('t.transcribing'),'info');
+  try{
+    const b64 = await blobToBase64(blob);
+    const mime = (blob.type || 'audio/webm').split(';')[0];
+    const raw = await callGemini([
+      { text: 'Transcribe this meeting audio verbatim. Detect whether the speech is English or Indonesian (or mixed) and keep the original language. '
+            + 'Prefix each paragraph with an approximate [mm:ss] timestamp and a speaker guess like "S1:". Return plain text only.' },
+      { inlineData: { mimeType: mime, data: b64 } }
+    ], false);
+    const text = String(raw||'').trim();
+    if(!text) throw new Error('empty transcription');
+    addSegment('[AUDIO→AI] ' + text.slice(0, 4000), 'note', null);
+    const data = await askGeminiMom(text, detectLanguage(text).lang || state.dominantLang, true);
+    addMom({ type:'audio', data:data, model:state.settings.model, lang:data.language, sourceWords:words(text) });
+  }catch(e){ toast(t('t.aiError',{ msg: e.message }),'err'); }
+}
+
+/* =======================================================================
+   13. Recording control
+   ======================================================================= */
+async function startRecording(){
+  if(state.isRecording) return;
+  if(!state.recognition && !initRecognition()) return;
+  try{
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: { echoCancellation:true, noiseSuppression:true, autoGainControl:true } });
+    state.mediaStream = stream;
+    state.isRecording = true; state.isPaused = false;
+    state.startedAt = Date.now(); state.sessionElapsed = 0;
+    state.lastResultAt = Date.now(); state.lastChunkAt = Date.now(); state.langSetAt = Date.now();
+    state.resultsSinceLangSet = 0; state.audioSeenSinceLangSet = false;
+
+    if(state.settings.recogMode !== 'auto') state.recogLang = state.settings.recogMode;
+    else if(!state.recogLang) state.recogLang = state.ui === 'id' ? 'id-ID' : 'en-US';
+
+    setupAudio(stream);
+    await startMediaRecorder(stream);
+    safeStart();
+    if(state.settings.wakeLock) requestWake();
+
+    setStatus('recording');
+    $('btn-record').innerHTML = '<i class="fa-solid fa-microphone"></i>';
+    $('btn-record').classList.add('pulse-rec');
+    $('btn-record').style.background = '#ef4444';
+    $('btn-record').style.borderColor = '#ef4444';
+    $('btn-pause').disabled = false; $('btn-stop').disabled = false;
+    logEngine('session started (' + state.recogLang + ')');
+  }catch(e){ toast(t('t.micError',{ msg:e.message }),'err'); }
+}
+function pauseResume(){
+  if(!state.isRecording) return;
+  state.isPaused = !state.isPaused;
+  if(state.isPaused){
+    try{ state.recognition.stop(); }catch(e){}
+    try{ if(state.mediaRecorder && state.mediaRecorder.state==='recording') state.mediaRecorder.pause(); }catch(e){}
+    state.stats.elapsedMs += Date.now() - state.startedAt; save.stats();
+    setStatus('paused');
+    $('btn-pause').innerHTML = '<i class="fa-solid fa-play"></i>';
+    logEngine('paused by user');
+  } else {
+    state.startedAt = Date.now(); state.lastResultAt = Date.now();
+    try{ if(state.mediaRecorder && state.mediaRecorder.state==='paused') state.mediaRecorder.resume(); }catch(e){}
+    safeStart();
+    setStatus('recording');
+    $('btn-pause').innerHTML = '<i class="fa-solid fa-pause"></i>';
+    logEngine('resumed by user');
+  }
+}
+async function hardStop(){
+  if(!state.isRecording) return;
+  state.isRecording = false; state.isPaused = false;
+  try{ state.recognition.stop(); }catch(e){}
+  await stopMediaRecorder();
+  if(state.mediaStream) state.mediaStream.getTracks().forEach(function(tr){ tr.stop(); });
+  if(state.audioCtx && state.audioCtx.state !== 'closed'){ try{ state.audioCtx.close(); }catch(e){} }
+  if(state.rafId) cancelAnimationFrame(state.rafId);
+  state.stats.elapsedMs += Math.max(0, Date.now() - state.startedAt); save.stats();
+  releaseWake();
+
+  $('level-bar').style.width = '0%';
+  $('interim').textContent = '';
+  $('btn-record').classList.remove('pulse-rec');
+  $('btn-record').style.background = ''; $('btn-record').style.borderColor = '';
+  $('btn-pause').disabled = true; $('btn-stop').disabled = true;
+  $('btn-pause').innerHTML = '<i class="fa-solid fa-pause"></i>';
+  setStatus('stopped');
+  logEngine('session stopped');
+
+  flushBuffer('stop');           // nothing is ever lost
+  renderAudioList();
+}
+function setStatus(kind){
+  const map = { ready:['bg-slate-100 text-slate-600 border-slate-200', t('rec.ready')],
+                recording:['bg-rose-50 text-rose-600 border-rose-200', t('rec.recording')],
+                paused:['bg-sun-50 text-sun-600 border-sun-200', t('rec.paused')],
+                stopped:['bg-slate-100 text-slate-600 border-slate-200', t('rec.stopped')] };
+  const m = map[kind] || map.ready;
+  $('status-pill').className = 'chip border ' + m[0];
+  $('status-text').textContent = m[1];
+  $('status-text').dataset.i18n = 'rec.' + (kind==='recording'?'recording':kind==='paused'?'paused':kind==='stopped'?'stopped':'ready');
+}
+async function requestWake(){
+  try{ if('wakeLock' in navigator){ state.wakeLock = await navigator.wakeLock.request('screen'); logEngine('wake lock acquired'); } }catch(e){}
+}
+function releaseWake(){ try{ if(state.wakeLock){ state.wakeLock.release(); state.wakeLock=null; } }catch(e){} }
+
+/* =======================================================================
+   14. Stats / status pills / i18n apply
+   ======================================================================= */
+function renderStats(){
+  const totalWords = state.segments.reduce(function(a,s){ return a + words(s.text); }, 0);
+  $('stat-words').textContent = totalWords;
+  $('stat-segments').textContent = state.segments.length;
+  $('stat-chunks').textContent = state.queue.length;
+  $('stat-restarts').textContent = state.stats.restarts;
+  $('stat-buffer').textContent = words(state.buffer);
+  $('tr-count').textContent = state.segments.length;
+  $('timer').textContent = fmtDur(state.stats.elapsedMs + (state.isRecording && !state.isPaused ? state.sessionElapsed : 0));
+  $('detected-lang').textContent = state.langVotes.length ? langLabel(state.dominantLang) : '—';
+  renderStorageInfo();
+}
+function renderConnPills(){
+  const on = navigator.onLine;
+  $('pill-online').className = 'chip border ' + (on ? 'bg-mint-50 text-mint-600 border-mint-200' : 'bg-rose-50 text-rose-600 border-rose-200');
+  $('pill-online').innerHTML = '<i class="fa-solid ' + (on ? 'fa-wifi' : 'fa-plug-circle-xmark') + '"></i>' + esc(on ? t('hdr.online') : t('hdr.offline'));
+  const hasKey = !!(state.settings.apiKey||'').trim();
+  $('pill-key').className = 'chip border ' + (hasKey ? 'bg-brand-50 text-brand-600 border-brand-200' : 'bg-slate-100 text-slate-400 border-slate-200');
+  $('pill-key').innerHTML = '<i class="fa-solid fa-key"></i>' + esc(hasKey ? t('hdr.key') : t('hdr.noKey'));
+}
+async function renderStorageInfo(){
+  let txt = 'localStorage ≈ ' + fmtBytes(new Blob([JSON.stringify(localStorage)]).size);
+  try{
+    if(navigator.storage && navigator.storage.estimate){
+      const e = await navigator.storage.estimate();
+      txt += ' · IndexedDB+ ' + fmtBytes(e.usage||0) + ' / ' + fmtBytes(e.quota||0);
+    }
+  }catch(e){}
+  $('storage-info').textContent = txt + ' · v2.0';
+}
+function applyI18n(){
+  document.documentElement.lang = state.ui;
+  document.querySelectorAll('[data-i18n]').forEach(function(el){ el.textContent = t(el.dataset.i18n); });
+  document.querySelectorAll('[data-i18n-ph]').forEach(function(el){ el.placeholder = t(el.dataset.i18nPh); });
+  $('ui-en').className = 'px-2.5 py-1.5 ' + (state.ui==='en' ? 'bg-brand-500 text-white' : 'bg-white text-slate-500');
+  $('ui-id').className = 'px-2.5 py-1.5 ' + (state.ui==='id' ? 'bg-brand-500 text-white' : 'bg-white text-slate-500');
+  $('help-body').innerHTML = HELP[state.ui] || HELP.en;
+  renderConnPills(); renderQueue(); renderMoms(); renderTranscript(); renderStats(); renderAudioList();
+  setStatus(state.isRecording ? (state.isPaused?'paused':'recording') : 'ready');
+}
+
+/* =======================================================================
+   15. Events
+   ======================================================================= */
+$('btn-record').addEventListener('click', function(){ state.isRecording ? hardStop() : startRecording(); });
+$('btn-pause').addEventListener('click', pauseResume);
+$('btn-stop').addEventListener('click', hardStop);
+
+$('ui-en').addEventListener('click', function(){ state.ui='en'; localStorage.setItem(LS.ui,'en'); applyI18n(); });
+$('ui-id').addEventListener('click', function(){ state.ui='id'; localStorage.setItem(LS.ui,'id'); applyI18n(); });
+
+$('recog-mode').addEventListener('change', function(){
+  state.settings.recogMode = this.value; save.settings();
+  if(this.value !== 'auto') switchRecogLang(this.value, 'manual');
+  else logEngine('auto detect enabled');
+});
+$('mom-style').addEventListener('change', function(){ state.settings.momStyle = this.value; save.settings(); });
+$('mom-lang').addEventListener('change', function(){ state.settings.momLang = this.value; save.settings(); });
+$('tr-search').addEventListener('input', function(){ state.search = this.value; renderTranscript(); });
+
+['title','date','location','participants','agenda'].forEach(function(k){
+  const el = $('meet-' + k);
+  el.addEventListener('input', function(){ state.meta[k] = el.value; save.meta(); });
+});
+
+// settings inputs
+$('api-key').addEventListener('input', function(){ state.settings.apiKey = this.value; save.settings(); renderConnPills();
+  if(this.value.trim() && state.settings.autoProcess) processQueue(false); });
+$('model-select').addEventListener('change', function(){ state.settings.model = this.value; save.settings(); });
+$('auto-interval').addEventListener('change', function(){ state.settings.autoIntervalMs = parseInt(this.value,10)||0; save.settings(); });
+$('chunk-words').addEventListener('change', function(){ state.settings.chunkWords = Math.max(30, parseInt(this.value,10)||220); save.settings(); });
+$('silence-sec').addEventListener('change', function(){ state.settings.silenceSec = Math.max(3, parseInt(this.value,10)||10); save.settings(); });
+$('opt-autoprocess').addEventListener('change', function(){ state.settings.autoProcess = this.checked; save.settings(); if(this.checked) processQueue(false); });
+$('opt-save-audio').addEventListener('change', function(){ state.settings.saveAudio = this.checked; save.settings(); });
+$('opt-wake').addEventListener('change', function(){ state.settings.wakeLock = this.checked; save.settings();
+  if(this.checked && state.isRecording) requestWake(); else releaseWake(); });
+$('import-file').addEventListener('change', function(e){
+  const f = e.target.files[0]; if(!f) return;
+  const fr = new FileReader();
+  fr.onload = function(){
+    try{
+      const d = JSON.parse(fr.result);
+      if(d.segments) state.segments = d.segments;
+      if(d.moms) state.moms = d.moms;
+      if(d.queue) state.queue = d.queue;
+      if(d.meta) state.meta = d.meta;
+      if(typeof d.buffer === 'string') state.buffer = d.buffer;
+      if(d.settings) state.settings = Object.assign(state.settings, d.settings, { apiKey: state.settings.apiKey });
+      save.segments(); save.moms(); save.queue(); save.meta(); save.buffer(); save.settings();
+      hydrateInputs(); applyI18n(); toast(t('t.imported'),'ok');
+    }catch(err){ toast('Invalid backup','err'); }
+  };
+  fr.readAsText(f);
+});
+
+// global delegated actions
+document.addEventListener('click', async function(e){
+  const el = e.target.closest('[data-act]');
+  if(!el) return;
+  const act = el.dataset.act, id = el.dataset.id;
+
+  if(act==='open-settings'){ $('modal-settings').classList.add('open'); }
+  if(act==='open-help'){ $('modal-help').classList.add('open'); }
+  if(act==='close-modal'){ document.querySelectorAll('.modal').forEach(function(m){ m.classList.remove('open'); }); }
+  if(act==='toggle-key'){ const i=$('api-key'); i.type = i.type==='password' ? 'text' : 'password'; }
+
+  if(act==='add-note'){
+    const txt = prompt(t('tr.notePrompt'));
+    if(txt && txt.trim()) addSegment(txt.trim(), 'note', null);
+  }
+  if(act==='edit-seg') editSegment(id);
+  if(act==='save-seg') saveSegment(id);
+  if(act==='cancel-seg') renderTranscript();
+  if(act==='del-seg'){
+    state.segments = state.segments.filter(function(s){ return s.id!==id; });
+    save.segments(); renderTranscript(); renderStats(); toast(t('t.deleted'),'ok');
+  }
+  if(act==='cycle-speaker'){
+    const opts = ['','Speaker 1','Speaker 2','Speaker 3','Host','Me'];
+    const s = state.segments.filter(function(x){ return x.id===id; })[0];
+    if(s){ s.speaker = opts[(opts.indexOf(s.speaker)+1) % opts.length]; save.segments(); renderTranscript(); }
+  }
+  if(act==='clear-transcript'){
+    if(confirm(state.ui==='id' ? 'Hapus semua transkrip & buffer?' : 'Clear all transcript & buffer?')){
+      state.segments=[]; state.buffer=''; state.langVotes=[];
+      save.segments(); save.buffer(); renderTranscript(); renderStats(); toast(t('t.cleared'),'ok');
+    }
+  }
+  if(act==='copy-transcript'){
+    const txt = state.segments.map(function(s){
+      return '[' + s.time + ']' + (s.speaker ? ' ' + s.speaker + ':' : '') + ' ' + s.text; }).join('\n');
+    if(!txt) return toast(t('t.noData'),'warn');
+    navigator.clipboard.writeText(txt); toast(t('t.copied'),'ok');
+  }
+  if(act==='export-json'){
+    if(!state.segments.length) return toast(t('t.noData'),'warn');
+    download('transcript_' + Date.now() + '.json',
+      JSON.stringify({ meta:state.meta, dominantLang:state.dominantLang, segments:state.segments }, null, 2),
+      'application/json');
+  }
+  if(act==='export-txt'){
+    if(!state.segments.length) return toast(t('t.noData'),'warn');
+    const head = (state.meta.title||'Meeting') + '\n' + (state.meta.date||'') + '\n\n';
+    download('transcript_' + Date.now() + '.txt', head + state.segments.map(function(s){
+      return '[' + s.time + '][' + s.lang.toUpperCase() + ']' + (s.speaker ? ' ' + s.speaker + ':' : '') + ' ' + s.text; }).join('\n'));
+  }
+
+  if(act==='process-now'){ flushBuffer('manual'); processQueue(true); }
+  if(act==='process-queue'){ processQueue(true); }
+  if(act==='clear-queue'){ state.queue=[]; save.queue(); renderQueue(); renderStats(); }
+  if(act==='retry-q'){
+    const it = state.queue.filter(function(x){ return x.id===id; })[0];
+    if(it){ it.status='pending'; it.error=''; save.queue(); renderQueue(); processQueue(true); }
+  }
+  if(act==='rm-q'){ state.queue = state.queue.filter(function(x){ return x.id!==id; }); save.queue(); renderQueue(); renderStats(); }
+
+  if(act==='offline-draft'){
+    const txt = (state.buffer + ' ' + state.segments.map(function(s){ return s.text; }).join(' ')).trim();
+    if(words(txt) < 12) return toast(t('t.needTranscript'),'warn');
+    addMom({ type:'offline', data: offlineDraft(txt, momOutLang(state.dominantLang)), model:'', lang: momOutLang(state.dominantLang), sourceWords: words(txt) });
+    state.buffer=''; save.buffer(); renderStats();
+  }
+  if(act==='final-mom'){
+    const txt = state.segments.map(function(s){
+      return (s.speaker ? s.speaker + ': ' : '') + s.text; }).join('\n');
+    if(words(txt) < 12) return toast(t('t.needTranscript'),'warn');
+    if(!navigator.onLine || !state.settings.apiKey){
+      addMom({ type:'offline', data: offlineDraft(txt, momOutLang()), lang: momOutLang(), sourceWords: words(txt) });
+      return;
+    }
+    el.innerHTML = '<i class="fa-solid fa-spinner spin"></i>';
+    try{
+      const data = await askGeminiMom(txt, state.dominantLang, true);
+      addMom({ type:'final', data:data, model:state.settings.model, lang:data.language, sourceWords: words(txt) });
+    }catch(err){ toast(t('t.aiError',{ msg: err.message }),'err'); }
+    el.innerHTML = '<i class="fa-solid fa-layer-group"></i><span>' + esc(t('mom.final')) + '</span>';
+  }
+
+  if(act==='copy-mom'){
+    if(!state.moms.length) return toast(t('t.noData'),'warn');
+    navigator.clipboard.writeText(state.moms.map(momToText).join('\n\n---\n\n')); toast(t('t.copied'),'ok');
+  }
+  if(act==='copy-one-mom'){
+    const m = state.moms.filter(function(x){ return x.id===id; })[0];
+    if(m){ navigator.clipboard.writeText(momToText(m)); toast(t('t.copied'),'ok'); }
+  }
+  if(act==='del-mom'){ state.moms = state.moms.filter(function(x){ return x.id!==id; }); save.moms(); renderMoms(); }
+  if(act==='export-md'){
+    if(!state.moms.length) return toast(t('t.noData'),'warn');
+    download('MoM_' + Date.now() + '.md', state.moms.map(momToText).join('\n\n---\n\n'), 'text/markdown;charset=utf-8');
+  }
+  if(act==='export-word'){
+    if(!state.moms.length) return toast(t('t.noData'),'warn');
+    const html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" '
+      + 'xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>Minutes of Meeting</title>'
+      + '<style>body{font-family:Inter,Arial,sans-serif;font-size:12px;color:#1f2937}h1,h2,h3,h4{color:#1e3a8a}'
+      + 'table{border-collapse:collapse;width:100%}td,th{border:1px solid #cbd5e1;padding:5px;font-size:11px;text-align:left}'
+      + '.chip{font-size:10px;color:#475569}</style></head><body>'
+      + metaHeaderHtml() + $('mom-list').innerHTML + '</body></html>';
+    download('MoM_' + Date.now() + '.doc', html, 'application/vnd.ms-word;charset=utf-8');
+  }
+  if(act==='export-pdf'){
+    if(!state.moms.length) return toast(t('t.noData'),'warn');
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'padding:24px;background:#fff;width:780px;font-family:Inter,Arial,sans-serif';
+    wrap.innerHTML = metaHeaderHtml() + $('mom-list').innerHTML;
+    wrap.querySelectorAll('.no-print').forEach(function(n){ n.remove(); });
+    document.body.appendChild(wrap);
+    html2pdf().set({ margin:10, filename:'MoM_' + Date.now() + '.pdf',
+      image:{type:'jpeg',quality:.98}, html2canvas:{scale:2,useCORS:true},
+      jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}, pagebreak:{mode:['css','legacy']} })
+      .from(wrap).save().then(function(){ wrap.remove(); });
+  }
+  if(act==='export-csv'){
+    const rows = [[t('mom.task'), t('mom.owner'), t('mom.due'), t('mom.prio'), 'source', 'generated']];
+    state.moms.forEach(function(m){
+      (m.data.actionItems||[]).forEach(function(a){
+        rows.push([a.task, a.owner, a.due, a.priority, m.type, new Date(m.createdAt).toLocaleString()]);
+      });
+    });
+    if(rows.length === 1) return toast(t('t.noData'),'warn');
+    const csv = rows.map(function(r){ return r.map(function(c){
+      return '"' + String(c==null?'':c).replace(/"/g,'""') + '"'; }).join(','); }).join('\r\n');
+    download('action_items_' + Date.now() + '.csv', '\uFEFF' + csv, 'text/csv;charset=utf-8');
+  }
+
+  if(act==='refresh-audio') renderAudioList();
+  if(act==='play-audio'){
+    const b = await sessionBlob(id);
+    const p = $('player'); p.src = URL.createObjectURL(b); p.classList.remove('hidden'); p.play();
+  }
+  if(act==='dl-audio'){
+    const b = await sessionBlob(id);
+    const ext = (b.type.indexOf('mp4')!==-1) ? 'm4a' : 'webm';
+    download('recording_' + id + '.' + ext, b);
+  }
+  if(act==='del-audio'){ await idbDeleteSession(id); renderAudioList(); toast(t('t.deleted'),'ok'); }
+  if(act==='ai-audio') transcribeAudioWithAI(id);
+
+  if(act==='export-backup'){
+    download('smartmom_backup_' + Date.now() + '.json', JSON.stringify({
+      version:2, exportedAt:new Date().toISOString(), meta:state.meta, segments:state.segments,
+      buffer:state.buffer, queue:state.queue, moms:state.moms,
+      settings: Object.assign({}, state.settings, { apiKey:'' })
+    }, null, 2), 'application/json');
+  }
+  if(act==='wipe-all'){
+    if(!confirm(state.ui==='id' ? 'Hapus SEMUA data lokal (transkrip, notulen, antrean, audio)?' : 'Erase ALL local data (transcript, minutes, queue, audio)?')) return;
+    Object.keys(LS).forEach(function(k){ if(k!=='ui') localStorage.removeItem(LS[k]); });
+    await idbWipe();
+    state.segments=[]; state.buffer=''; state.queue=[]; state.moms=[]; state.stats={restarts:0,elapsedMs:0};
+    state.settings = Object.assign({}, DEFAULT_SETTINGS);
+    hydrateInputs(); applyI18n(); toast(t('t.wiped'),'ok');
+  }
+});
+
+// connectivity → the offline queue drains itself
+window.addEventListener('online', function(){
+  renderConnPills(); logEngine('back online');
+  if(state.settings.autoProcess) processQueue(false);
+});
+window.addEventListener('offline', function(){ renderConnPills(); logEngine('went offline'); });
+
+// keep recording across tab switches; nudge the engine when returning
+document.addEventListener('visibilitychange', function(){
+  if(!document.hidden && state.isRecording && !state.isPaused){
+    logEngine('tab visible → engine nudge'); safeStart();
+  }
+});
+window.addEventListener('beforeunload', function(e){
+  if(state.isRecording){ e.preventDefault(); e.returnValue = ''; return ''; }
+});
+document.addEventListener('keydown', function(e){
+  if(!(e.ctrlKey || e.metaKey) || !e.shiftKey) return;
+  const k = e.key.toLowerCase();
+  if(k==='r'){ e.preventDefault(); state.isRecording ? hardStop() : startRecording(); }
+  if(k==='p'){ e.preventDefault(); pauseResume(); }
+  if(k==='g'){ e.preventDefault(); flushBuffer('manual'); processQueue(true); }
+  if(k==='f'){ e.preventDefault(); $('tr-search').focus(); }
+});
+
+/* =======================================================================
+   16. Boot
+   ======================================================================= */
+function hydrateInputs(){
+  $('api-key').value = state.settings.apiKey || '';
+  $('model-select').value = state.settings.model;
+  $('auto-interval').value = String(state.settings.autoIntervalMs);
+  $('chunk-words').value = state.settings.chunkWords;
+  $('silence-sec').value = state.settings.silenceSec;
+  $('opt-autoprocess').checked = !!state.settings.autoProcess;
+  $('opt-save-audio').checked = !!state.settings.saveAudio;
+  $('opt-wake').checked = !!state.settings.wakeLock;
+  $('recog-mode').value = state.settings.recogMode;
+  $('mom-style').value = state.settings.momStyle;
+  $('mom-lang').value = state.settings.momLang;
+  ['title','date','location','participants','agenda'].forEach(function(k){ $('meet-' + k).value = state.meta[k] || ''; });
+}
+
+(function boot(){
+  hydrateInputs();
+  if(!state.meta.date){
+    const d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+    state.meta.date = d.toISOString().slice(0,16); $('meet-date').value = state.meta.date; save.meta();
+  }
+  state.recogLang = state.settings.recogMode === 'auto'
+    ? (state.ui === 'id' ? 'id-ID' : 'en-US') : state.settings.recogMode;
+
+  // rebuild language votes from restored transcript
+  state.segments.slice(-7).forEach(function(s){ if(s.lang) state.langVotes.push(s.lang); });
+  if(state.langVotes.length){
+    const idN = state.langVotes.filter(function(x){ return x==='id'; }).length;
+    state.dominantLang = idN > state.langVotes.length - idN ? 'id' : 'en';
+  }
+
+  applyI18n();
+  logEngine('app ready · ui=' + state.ui + ' · engine=' + state.recogLang);
+  if(state.segments.length || state.queue.length) toast(t('t.restored'),'info');
+  if(state.settings.autoProcess) setTimeout(function(){ processQueue(false); }, 1500);
+})();
+</script>
+</body>
+</html>
