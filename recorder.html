@@ -230,7 +230,34 @@ tailwind.config = {
             <i class="fa-solid fa-shield-halved"></i><span data-i18n="rec.keepalive">Keep-alive ON</span>
           </span>
         </div>
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2 flex-wrap">
+          
+          <!-- Tombol Toggle Multi-Mic -->
+          <label class="relative group flex items-center gap-1.5 text-xs font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-2 py-1.5 rounded-lg cursor-pointer hover:bg-slate-100 transition">
+            <input type="checkbox" id="opt-multi-mic" class="rounded text-brand-600">
+            <i class="fa-solid fa-microphones text-slate-400"></i>
+            <span data-i18n="rec.multiMic">Multi-Mic</span>
+            <!-- Tooltip -->
+            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-56 p-2 bg-slate-800 text-white text-[0.65rem] rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 text-center shadow-lg leading-snug font-normal">
+              <span data-i18n="rec.multiMicTip">Combine all connected hardware mics.</span>
+              <div class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-800"></div>
+            </div>
+          </label>
+
+          <!-- Tombol Toggle Suara Komputer -->
+          <label class="relative group flex items-center gap-1.5 text-xs font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-2 py-1.5 rounded-lg cursor-pointer hover:bg-slate-100 transition">
+            <input type="checkbox" id="opt-system-audio" class="rounded text-brand-600">
+            <i class="fa-solid fa-desktop text-slate-400"></i>
+            <span data-i18n="rec.sysAudio">System Audio</span>
+            <!-- Tooltip -->
+            <div class="absolute bottom-full right-0 sm:left-1/2 sm:-translate-x-1/2 mb-2 w-56 p-2 bg-slate-800 text-white text-[0.65rem] rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 text-center shadow-lg leading-snug font-normal">
+              <span data-i18n="rec.sysAudioTip">Turn ON to record Zoom/Meet.</span>
+              <div class="absolute top-full right-4 sm:left-1/2 sm:-translate-x-1/2 sm:right-auto border-4 border-transparent border-t-slate-800"></div>
+            </div>
+          </label>
+
+          <div class="w-px h-5 bg-slate-200 mx-1 hidden sm:block"></div> <!-- Garis Pemisah -->
+
           <div class="relative group flex items-center gap-1 cursor-help">
             <span class="lbl" data-i18n="rec.mode">Engine</span>
             <i class="fa-solid fa-circle-question text-brand-500 animate-pulse text-[0.7rem]"></i>
@@ -480,6 +507,22 @@ tailwind.config = {
   </div>
 </div>
 
+<!-- ============================ MIC SELECTOR MODAL ============================ -->
+<div class="modal" id="modal-mics">
+  <div class="modal-bg" data-act="cancel-mics"></div>
+  <div class="modal-card panel p-5 max-w-md">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="font-extrabold text-slate-800 text-base"><i class="fa-solid fa-microphones text-brand-500"></i> <span data-i18n="mic.title">Select Microphones</span></h3>
+      <button class="btn" data-act="cancel-mics"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div id="mic-list" class="space-y-2 max-h-60 overflow-y-auto mb-4"></div>
+    <div class="flex justify-end gap-2">
+      <button class="btn" data-act="cancel-mics" data-i18n="mic.cancel">Cancel</button>
+      <button class="btn btn-primary" data-act="save-mics" data-i18n="mic.save">Save Selection</button>
+    </div>
+  </div>
+</div>
+
 <!-- ============================ HELP MODAL ============================ -->
 <div class="modal" id="modal-help">
   <div class="modal-bg" data-act="close-modal"></div>
@@ -514,6 +557,11 @@ const I18N = {
     'rec.stopped':'Recording stopped','rec.detected':'Detected','rec.keepalive':'Keep-alive ON',
     'rec.mode':'Engine','rec.modeAuto':'Auto detect (EN + ID)','rec.modeEn':'English only','rec.modeId':'Indonesian only',
     'rec.engineTip':'Are the discussions mainly in EN or ID? Select to lock the primary language.',
+    'rec.sysAudio':'System Audio',
+    'rec.sysAudioTip':'Turn ON to record Zoom/Meet. (Live transcript may pause, but audio is saved for AI post-processing later)',
+    'rec.multiMic':'Multi-Mic',
+    'rec.multiMicTip':'Select and combine specific hardware mics. (Windows users: if transcript stops working, turn this OFF)',
+    'mic.title':'Select Microphones','mic.save':'Save Selection','mic.cancel':'Cancel','mic.empty':'No microphones found.',
     'rec.words':'Words','rec.segments':'Segments','rec.chunks':'AI chunks','rec.restarts':'Auto-restarts',
     'rec.buffer':'Buffer words','rec.engineLog':'Engine / keep-alive log',
     'rec.start':'Start recording','rec.pause':'Pause','rec.resume':'Resume','rec.stop':'Stop',
@@ -571,6 +619,11 @@ const I18N = {
     'rec.stopped':'Rekaman dihentikan','rec.detected':'Terdeteksi','rec.keepalive':'Anti-putus AKTIF',
     'rec.mode':'Mesin','rec.modeAuto':'Deteksi otomatis (EN + ID)','rec.modeEn':'Hanya Inggris','rec.modeId':'Hanya Indonesia',
     'rec.engineTip':'Apakah diskusi dalam EN atau ID? Pilih untuk mengunci bahasa utama.',
+    'rec.sysAudio':'Suara Komputer',
+    'rec.sysAudioTip':'Aktifkan untuk merekam Zoom/Meet. (Transkrip langsung mungkin terjeda, tapi audio tetap tersimpan untuk diproses AI nanti)',
+    'rec.multiMic':'Multi-Mic',
+    'rec.multiMicTip':'Pilih dan gabungkan mic fisik tertentu (USB/OTG). (Jika transkrip macet di Windows, matikan ini)',
+    'mic.title':'Pilih Microphone','mic.save':'Simpan Pilihan','mic.cancel':'Batal','mic.empty':'Tidak ada microphone yang ditemukan.',
     'rec.words':'Kata','rec.segments':'Segmen','rec.chunks':'Bagian AI','rec.restarts':'Restart otomatis',
     'rec.buffer':'Kata di buffer','rec.engineLog':'Log mesin / anti-putus',
     'rec.start':'Mulai merekam','rec.pause':'Jeda','rec.resume':'Lanjut','rec.stop':'Stop',
@@ -1322,7 +1375,7 @@ const state = {
   audioCtx:null, analyser:null, micSource:null, mediaStream:null, rafId:null,
   mediaRecorder:null, audioSessionId:null, audioChunkIdx:0, audioBytes:0,
   wakeLock:null, processing:false, search:'',
-  sourceAnalysers: [], currentDetectedSpeaker: '' // TAMBAHAN UNTUK DETEKSI MIC
+  sourceAnalysers: [], currentDetectedSpeaker: '', selectedMics: []
 };
 
 function safeJson(s, fb){ try{ return s ? JSON.parse(s) : fb; }catch(e){ return fb; } }
@@ -2195,61 +2248,55 @@ async function getMixedAudioStream() {
   try {
     defaultMic = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation:true, noiseSuppression:true, autoGainControl:true } });
   } catch (err) {
-    throw new Error("Izin Microphone ditolak.");
+    throw new Error(t('t.micError', {msg: "Izin Microphone ditolak / Permission denied"}));
   }
 
-  const devices = await navigator.mediaDevices.enumerateDevices();
-  const audioInputs = devices.filter(d => d.kind === 'audioinput' && d.deviceId !== 'default' && d.deviceId !== 'communications');
-
-  let useMultipleMics = false;
-  if (audioInputs.length > 1) {
-    useMultipleMics = confirm(`🎙️ Ditemukan ${audioInputs.length} Microphone fisik.\n\nKlik OK jika Anda ingin MENGGABUNGKAN semua suara mic tersebut.`);
-  }
-
-  if (useMultipleMics) {
-    defaultMic.getTracks().forEach(t => t.stop());
-    for (let mic of audioInputs) {
+  // Cek apakah tombol "Multi-Mic" dihidupkan DAN ada mic yang dipilih
+  if ($('opt-multi-mic') && $('opt-multi-mic').checked && state.selectedMics && state.selectedMics.length > 0) {
+    defaultMic.getTracks().forEach(t => t.stop()); // Matikan mic default
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    
+    for (let deviceId of state.selectedMics) {
+      const micInfo = devices.find(d => d.deviceId === deviceId);
       try {
         const micStream = await navigator.mediaDevices.getUserMedia({
-          audio: { deviceId: { exact: mic.deviceId }, echoCancellation:true, noiseSuppression:true, autoGainControl:true }
+          audio: { deviceId: { exact: deviceId }, echoCancellation:true, noiseSuppression:true, autoGainControl:true }
         });
-        // Simpan stream dan Label asli dari sistem (misal: "Xiaomi Mic")
-        streams.push({ stream: micStream, label: mic.label || 'Mic ' + (streams.length + 1) });
+        streams.push({ stream: micStream, label: (micInfo ? micInfo.label : 'Mic') });
       } catch (e) {
-        console.warn("Gagal akses mic:", mic.label);
+        console.warn("Gagal akses mic:", deviceId);
       }
     }
   } else {
+    // Mode standar (hanya merekam 1 mic default)
     streams.push({ stream: defaultMic, label: 'Default Mic' });
   }
 
-  if (confirm("💻 GABUNG SUARA KOMPUTER?\n\nKlik OK jika ada peserta online dari Zoom/Meet.")) {
-    try {
-      const sysStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
-      streams.push({ stream: sysStream, label: 'Screen/System Audio' });
-    } catch (e) {
-      console.warn("Perekaman suara layar dibatalkan.");
-    }
+  // Cek apakah tombol "Suara Komputer" (System Audio) dihidupkan di UI
+  if ($('opt-system-audio') && $('opt-system-audio').checked && window.sysAudioStream) {
+    // Gunakan stream yang sudah diizinkan saat klik centang
+    streams.push({ stream: window.sysAudioStream, label: 'Screen/System Audio' });
   }
 
   dest.stream.originalTracks = []; 
   
   streams.forEach(item => {
     item.stream.getTracks().forEach(t => {
-      if (t.kind === 'video') t.stop(); 
-      else dest.stream.originalTracks.push(t); 
+      // Jangan di-stop, karena mematikan video akan memutus screen sharing di Chrome. Kita disable saja agar hemat CPU.
+      if (t.kind === 'video') t.enabled = false; 
+      
+      dest.stream.originalTracks.push(t); 
     });
     
     if (item.stream.getAudioTracks().length > 0) {
       const source = ctx.createMediaStreamSource(item.stream);
       
-      // BUAT ANALYSER UNTUK MENDETEKSI VOLUME SUMBER INI
+      // Buat analyser untuk mendeteksi volume masing-masing sumber
       const analyser = ctx.createAnalyser();
       analyser.fftSize = 256;
-      source.connect(analyser); // Hubungkan ke penganalisa
-      source.connect(dest);     // Hubungkan ke output gabungan
+      source.connect(analyser); 
+      source.connect(dest);     
       
-      // Simpan ke state untuk dianalisis di fungsi draw()
       state.sourceAnalysers.push({
         label: item.label,
         analyser: analyser,
@@ -2334,6 +2381,8 @@ async function hardStop(){
   $('btn-record').style.background = ''; $('btn-record').style.borderColor = '';
   $('btn-pause').disabled = true; $('btn-stop').disabled = true;
   $('btn-pause').innerHTML = '<i class="fa-solid fa-pause"></i>';
+  $('opt-system-audio').checked = false;
+  window.sysAudioStream = null;
   setStatus('stopped');
   logEngine('session stopped');
 
@@ -2409,6 +2458,64 @@ $('btn-stop').addEventListener('click', hardStop);
 $('ui-en').addEventListener('click', function(){ state.ui='en'; localStorage.setItem(LS.ui,'en'); applyI18n(); });
 $('ui-id').addEventListener('click', function(){ state.ui='id'; localStorage.setItem(LS.ui,'id'); applyI18n(); });
 
+$('opt-multi-mic').addEventListener('change', async function(){
+  if(this.checked) {
+    this.checked = false; 
+    try {
+      // BUKA MIC DAN BIARKAN MENYALA selama jendela pilihan terbuka
+      window.tempMicStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const audioInputs = devices.filter(d => d.kind === 'audioinput' && d.deviceId !== 'default' && d.deviceId !== 'communications');
+      
+      const list = $('mic-list');
+      list.innerHTML = '';
+      if(audioInputs.length === 0) {
+        list.innerHTML = '<p class="text-sm text-slate-500 italic" data-i18n="mic.empty">' + t('mic.empty') + '</p>';
+      } else {
+        audioInputs.forEach((mic, idx) => {
+          const label = mic.label || 'Microphone ' + (idx + 1);
+          list.innerHTML += '<label class="flex items-center gap-2 text-sm p-2.5 bg-slate-50 border border-slate-100 rounded-lg cursor-pointer hover:bg-white transition">'
+            + '<input type="checkbox" value="' + mic.deviceId + '" class="mic-checkbox rounded text-brand-600" checked>'
+            + '<span class="truncate">' + esc(label) + '</span></label>';
+        });
+      }
+      $('modal-mics').classList.add('open');
+    } catch(err) {
+      toast(t('t.micError', {msg: 'Permission denied'}), 'err');
+    }
+  } else {
+    state.selectedMics = []; 
+  }
+});
+
+$('opt-system-audio').addEventListener('change', async function(){
+  if(this.checked) {
+    try {
+      // Langsung minta izin saat dicentang
+      window.sysAudioStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
+      
+      // Jika user menekan tombol "Stop sharing" bawaan Chrome
+      window.sysAudioStream.getVideoTracks()[0].onended = function() {
+        $('opt-system-audio').checked = false;
+        if(window.sysAudioStream) {
+          window.sysAudioStream.getTracks().forEach(t => t.stop());
+          window.sysAudioStream = null;
+        }
+      };
+    } catch(e) {
+      console.warn("Berbagi layar dibatalkan.");
+      this.checked = false; // Batal centang otomatis
+    }
+  } else {
+    // Matikan stream jika user menghapus centang manual
+    if(window.sysAudioStream) {
+      window.sysAudioStream.getTracks().forEach(t => t.stop());
+      window.sysAudioStream = null;
+    }
+  }
+});
+
 $('recog-mode').addEventListener('change', function(){
   state.settings.recogMode = this.value; save.settings();
   if(this.value !== 'auto') switchRecogLang(this.value, 'manual');
@@ -2463,6 +2570,21 @@ document.addEventListener('click', async function(e){
   if(act==='open-help'){ $('modal-help').classList.add('open'); }
   if(act==='close-modal'){ document.querySelectorAll('.modal').forEach(function(m){ m.classList.remove('open'); }); }
   if(act==='toggle-key'){ const i=$('api-key'); i.type = i.type==='password' ? 'text' : 'password'; }
+
+  if(act==='cancel-mics'){ 
+    $('modal-mics').classList.remove('open'); 
+    $('opt-multi-mic').checked = false; 
+    // MATIKAN MIC PANCINGAN
+    if(window.tempMicStream) { window.tempMicStream.getTracks().forEach(t => t.stop()); window.tempMicStream = null; }
+  }
+  if(act==='save-mics'){ 
+    const boxes = document.querySelectorAll('.mic-checkbox:checked');
+    state.selectedMics = Array.from(boxes).map(function(b){ return b.value; });
+    $('opt-multi-mic').checked = state.selectedMics.length > 0;
+    $('modal-mics').classList.remove('open'); 
+    // MATIKAN MIC PANCINGAN
+    if(window.tempMicStream) { window.tempMicStream.getTracks().forEach(t => t.stop()); window.tempMicStream = null; }
+  }
 
   if(act==='add-note'){
     const txt = prompt(t('tr.notePrompt'));
