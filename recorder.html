@@ -160,7 +160,7 @@ tailwind.config = {
       </div>
       <div>
         <h1 class="text-[1.05rem] font-extrabold text-slate-800 leading-tight" data-i18n="app.title">Smart MoM Studio</h1>
-        <p class="text-[.7rem] text-slate-500 font-medium" data-i18n="app.subtitle">Resilient recorder · Auto EN/ID detect · Offline queue · AI minutes</p>
+        <p class="text-[.7rem] text-slate-500 font-medium" data-i18n="app.subtitle">Resilient recorder · Choose EN/ID engine · Offline queue · AI minutes</p>
       </div>
     </div>
 
@@ -231,7 +231,15 @@ tailwind.config = {
           </span>
         </div>
         <div class="flex items-center gap-2">
-          <span class="lbl" data-i18n="rec.mode">Engine</span>
+          <div class="relative group flex items-center gap-1 cursor-help">
+            <span class="lbl" data-i18n="rec.mode">Engine</span>
+            <i class="fa-solid fa-circle-question text-brand-500 animate-pulse text-[0.7rem]"></i>
+            <!-- Tooltip Popup -->
+            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-slate-800 text-white text-[0.65rem] rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 text-center shadow-lg leading-snug">
+              <span data-i18n="rec.engineTip">Are the discussions mainly in EN or ID?</span>
+              <div class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-800"></div>
+            </div>
+          </div>
           <select id="recog-mode" class="inp !w-auto !py-1.5 text-xs">
             <option value="id-ID" data-i18n="rec.modeId">Indonesian only</option>
             <option value="en-US" data-i18n="rec.modeEn">English only</option>
@@ -307,11 +315,21 @@ tailwind.config = {
           <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-300 text-xs"></i>
           <input id="tr-search" class="inp !pl-8" data-i18n-ph="tr.searchPh" placeholder="Search transcript…">
         </div>
-        <select id="speaker-select" class="inp !w-auto text-xs">
-          <option value="">— <span data-i18n="tr.noSpeaker">No speaker</span> —</option>
-          <option>Speaker 1</option><option>Speaker 2</option><option>Speaker 3</option>
-          <option>Speaker 4</option><option>Host</option><option>Me</option>
-        </select>
+        
+        <div class="relative group flex items-center gap-1 cursor-help">
+          <i class="fa-solid fa-circle-question text-sun-500 animate-pulse text-[0.8rem]"></i>
+          <!-- Tooltip Popup -->
+          <div class="absolute bottom-full right-0 mb-2 w-56 p-2 bg-slate-800 text-white text-[0.65rem] rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 text-center shadow-lg leading-snug">
+            <span data-i18n="tr.speakerTip">Leave as "No speaker" to auto-detect mic.</span>
+            <div class="absolute top-full right-4 border-4 border-transparent border-t-slate-800"></div>
+          </div>
+          <select id="speaker-select" class="inp !w-auto text-xs ml-1">
+            <option value="">— <span data-i18n="tr.noSpeaker">No speaker</span> —</option>
+            <option>Speaker 1</option><option>Speaker 2</option><option>Speaker 3</option>
+            <option>Speaker 4</option><option>Host</option><option>Me</option>
+          </select>
+        </div>
+
         <button class="btn" data-act="add-note"><i class="fa-solid fa-plus"></i><span data-i18n="tr.note">Note</span></button>
       </div>
 
@@ -496,11 +514,13 @@ const I18N = {
     'rec.ready':'Ready to record','rec.recording':'Recording…','rec.paused':'Paused',
     'rec.stopped':'Recording stopped','rec.detected':'Detected','rec.keepalive':'Keep-alive ON',
     'rec.mode':'Engine','rec.modeAuto':'Auto detect (EN + ID)','rec.modeEn':'English only','rec.modeId':'Indonesian only',
+    'rec.engineTip':'Are the discussions mainly in EN or ID? Select to lock the primary language.',
     'rec.words':'Words','rec.segments':'Segments','rec.chunks':'AI chunks','rec.restarts':'Auto-restarts',
     'rec.buffer':'Buffer words','rec.engineLog':'Engine / keep-alive log',
     'rec.start':'Start recording','rec.pause':'Pause','rec.resume':'Resume','rec.stop':'Stop',
     'tr.title':'Live transcript','tr.searchPh':'Search transcript…','tr.copy':'Copy','tr.clear':'Clear',
     'tr.note':'Note','tr.noSpeaker':'No speaker',
+    'tr.speakerTip':'Leave as "No speaker" to auto-detect hardware mic, or select to override manually.',
     'tr.placeholder':'Your words will appear here. Long pauses are fine — the engine restarts itself and keeps saving locally.',
     'tr.notePrompt':'Manual note:','tr.edit':'Edit','tr.del':'Delete','tr.save':'Save','tr.cancel':'Cancel',
     'mom.title':'Minutes of Meeting','mom.styleConcise':'Concise','mom.styleDetailed':'Detailed',
@@ -551,11 +571,13 @@ const I18N = {
     'rec.ready':'Siap merekam','rec.recording':'Sedang merekam…','rec.paused':'Dijeda',
     'rec.stopped':'Rekaman dihentikan','rec.detected':'Terdeteksi','rec.keepalive':'Anti-putus AKTIF',
     'rec.mode':'Mesin','rec.modeAuto':'Deteksi otomatis (EN + ID)','rec.modeEn':'Hanya Inggris','rec.modeId':'Hanya Indonesia',
+    'rec.engineTip':'Apakah diskusi dalam EN atau ID? Pilih untuk mengunci bahasa utama.',
     'rec.words':'Kata','rec.segments':'Segmen','rec.chunks':'Bagian AI','rec.restarts':'Restart otomatis',
     'rec.buffer':'Kata di buffer','rec.engineLog':'Log mesin / anti-putus',
     'rec.start':'Mulai merekam','rec.pause':'Jeda','rec.resume':'Lanjut','rec.stop':'Stop',
     'tr.title':'Transkrip langsung','tr.searchPh':'Cari transkrip…','tr.copy':'Salin','tr.clear':'Hapus',
     'tr.note':'Catatan','tr.noSpeaker':'Tanpa pembicara',
+    'tr.speakerTip':'Biarkan "No speaker" untuk deteksi mic otomatis, atau pilih untuk menimpa manual.',
     'tr.placeholder':'Ucapan Anda akan muncul di sini. Hening lama tidak masalah — mesin menyalakan ulang sendiri dan terus menyimpan ke lokal.',
     'tr.notePrompt':'Catatan manual:','tr.edit':'Ubah','tr.del':'Hapus','tr.save':'Simpan','tr.cancel':'Batal',
     'mom.title':'Notulen Rapat','mom.styleConcise':'Ringkas','mom.styleDetailed':'Rinci',
@@ -600,27 +622,35 @@ const HELP = {
     + '<li>The record button owns a single flag. Whenever the browser engine ends a session (silence, timeout, hiccup), <code>onend</code> restarts it automatically.</li>'
     + '<li>A watchdog checks every 2&nbsp;s: if nothing was recognised for your “silence restart” window, it performs a hard restart. Long pauses therefore never stop the session.</li>'
     + '<li>Every finalised phrase is written to <code>localStorage</code> instantly, and raw audio is streamed into IndexedDB in chunks — a crash or refresh only loses the last few seconds.</li></ul>'
-    + '<h4>2. Automatic EN / ID detection</h4><ul>'
-    + '<li>Each phrase is scored against English and Indonesian markers (stopwords + Indonesian affixes such as <code>-nya, -kan, me-, di-</code>).</li>'
-    + '<li>A rolling vote switches the recogniser language when the room changes language. If audio is loud but nothing is recognised, the engine probes the other language.</li></ul>'
-    + '<h4>3. Offline → AI later</h4><ul>'
+    + '<h4>2. Engine Selection & Language Detection</h4><ul>'
+    + '<li><b>Select your Engine:</b> Use the <i>Engine</i> dropdown (Indonesian or English) to lock the primary speech recognition engine. This is crucial to get the best baseline accuracy for your meeting.</li>'
+    + '<li>Each phrase is still scored against English and Indonesian markers. Even if locked to one engine, the app tags segments accurately (EN/ID) for the AI to process later.</li></ul>'
+    + '<h4>3. Multi-Mic & Auto-Speaker Detection</h4><ul>'
+    + '<li>When you start recording, you can combine multiple physical microphones and system audio (e.g., Zoom/Meet).</li>'
+    + '<li>The app continuously monitors the volume of each input. It automatically labels the transcript with the active hardware name (e.g., "Xiaomi Mic" or "System Audio").</li>'
+    + '<li><b>IMPORTANT:</b> Keep the speaker dropdown set to <i>"— No speaker —"</i> for this to work. If you select a specific speaker manually, it will override the automatic hardware detection.</li></ul>'
+    + '<h4>4. Offline → AI later</h4><ul>'
     + '<li>Transcript is cut into chunks by time and/or word count. Chunks are queued locally.</li>'
     + '<li>Offline or no API key → they stay <em>pending</em>. As soon as you are online with a key, they are processed automatically (also triggered by the browser <code>online</code> event).</li>'
     + '<li>No internet at all? Use <b>Offline draft</b> — a local extractive summariser. Saved audio can also be transcribed by AI later.</li></ul>'
-    + '<h4>4. Shortcuts</h4><ul><li><b>Ctrl/Cmd + Shift + R</b> start / stop</li><li><b>Ctrl/Cmd + Shift + P</b> pause / resume</li>'
+    + '<h4>5. Shortcuts</h4><ul><li><b>Ctrl/Cmd + Shift + R</b> start / stop</li><li><b>Ctrl/Cmd + Shift + P</b> pause / resume</li>'
     + '<li><b>Ctrl/Cmd + Shift + G</b> process now</li><li><b>Ctrl/Cmd + Shift + F</b> search transcript</li></ul>',
   id: '<h4>1. Rekaman yang tak mau mati</h4><ul>'
     + '<li>Tombol rekam memegang satu penanda. Setiap kali mesin browser berhenti (hening, timeout, gangguan), <code>onend</code> menyalakannya kembali otomatis.</li>'
     + '<li>Pengawas berjalan tiap 2&nbsp;detik: bila tak ada hasil selama ambang “restart saat hening”, dilakukan restart paksa. Jadi jeda panjang tidak pernah menghentikan sesi.</li>'
     + '<li>Setiap kalimat final langsung ditulis ke <code>localStorage</code>, audio mentah dialirkan ke IndexedDB per potongan — crash atau refresh hanya kehilangan beberapa detik terakhir.</li></ul>'
-    + '<h4>2. Deteksi EN / ID otomatis</h4><ul>'
-    + '<li>Setiap kalimat dinilai terhadap penanda Inggris & Indonesia (kata henti + afiks seperti <code>-nya, -kan, me-, di-</code>).</li>'
-    + '<li>Voting bergulir mengalihkan bahasa pengenal saat ruangan berganti bahasa. Bila suara nyaring tetapi tak ada hasil, mesin mencoba bahasa lainnya.</li></ul>'
-    + '<h4>3. Offline → AI menyusul</h4><ul>'
+    + '<h4>2. Pemilihan Mesin (Engine) & Deteksi Bahasa</h4><ul>'
+    + '<li><b>Pilih Mesin Anda:</b> Gunakan dropdown <i>Mesin</i> (Hanya Indonesia / Inggris) sebelum merekam untuk mengunci alat pengenal suara. Ini sangat penting untuk mendapat akurasi terbaik sesuai bahasa utama rapat.</li>'
+    + '<li>Setiap kalimat tetap dinilai terhadap penanda Inggris & Indonesia. Meskipun dikunci ke satu mesin, aplikasi tetap melabeli segmen (EN/ID) agar AI tahu konteks bahasanya nanti.</li></ul>'
+    + '<h4>3. Deteksi Multi-Mic & Speaker Otomatis</h4><ul>'
+    + '<li>Saat mulai merekam, Anda dapat menggabungkan banyak mic fisik sekaligus audio sistem komputer (Zoom/Meet).</li>'
+    + '<li>Aplikasi menganalisis volume tiap mic secara langsung. Transkrip akan otomatis dilabeli dengan nama perangkat keras yang sedang aktif bersuara (misal: "Xiaomi Mic" atau "Screen/System Audio").</li>'
+    + '<li><b>PENTING:</b> Biarkan dropdown pembicara di posisi <i>"— No speaker —"</i> agar fitur ini berjalan. Jika Anda memilih nama secara manual (misal "Speaker 1"), pilihan Anda akan menimpa hasil deteksi otomatis mesin.</li></ul>'
+    + '<h4>4. Offline → AI menyusul</h4><ul>'
     + '<li>Transkrip dipotong per waktu dan/atau jumlah kata, lalu masuk antrean lokal.</li>'
     + '<li>Offline atau tanpa API key → tetap <em>menunggu</em>. Begitu online dan ada key, otomatis diproses (juga dipicu peristiwa <code>online</code> browser).</li>'
     + '<li>Sama sekali tanpa internet? Pakai <b>Draf offline</b> — perangkum ekstraktif lokal. Audio tersimpan juga bisa ditranskrip AI nanti.</li></ul>'
-    + '<h4>4. Pintasan</h4><ul><li><b>Ctrl/Cmd + Shift + R</b> mulai / stop</li><li><b>Ctrl/Cmd + Shift + P</b> jeda / lanjut</li>'
+    + '<h4>5. Pintasan</h4><ul><li><b>Ctrl/Cmd + Shift + R</b> mulai / stop</li><li><b>Ctrl/Cmd + Shift + P</b> jeda / lanjut</li>'
     + '<li><b>Ctrl/Cmd + Shift + G</b> proses sekarang</li><li><b>Ctrl/Cmd + Shift + F</b> cari transkrip</li></ul>'
 };
 
@@ -656,7 +686,8 @@ const state = {
   startedAt:0, sessionElapsed:0,
   audioCtx:null, analyser:null, micSource:null, mediaStream:null, rafId:null,
   mediaRecorder:null, audioSessionId:null, audioChunkIdx:0, audioBytes:0,
-  wakeLock:null, processing:false, search:''
+  wakeLock:null, processing:false, search:'',
+  sourceAnalysers: [], currentDetectedSpeaker: '' // TAMBAHAN UNTUK DETEKSI MIC
 };
 
 function safeJson(s, fb){ try{ return s ? JSON.parse(s) : fb; }catch(e){ return fb; } }
@@ -773,10 +804,21 @@ function setupAudio(stream){
     state.rafId = requestAnimationFrame(draw);
     state.analyser.getByteFrequencyData(data);
 
-    let sum = 0; for(let i=0;i<bins;i++) sum += data[i];
-    state.level = sum / bins;
-    if(state.level > 12) state.audioSeenSinceLangSet = true;
-    $('level-bar').style.width = Math.min(100, state.level*1.8) + '%';
+    // --- CEK MIC MANA YANG PALING KERAS ---
+    let maxVol = 0;
+    let loudestMic = '';
+    state.sourceAnalysers.forEach(function(src) {
+      src.analyser.getByteFrequencyData(src.data);
+      let s = 0; for(let i=0; i<src.data.length; i++) s += src.data[i];
+      let avg = s / src.data.length;
+      if(avg > maxVol && avg > 5) { // 5 adalah ambang batas kebisingan (noise gate)
+        maxVol = avg;
+        loudestMic = src.label;
+      }
+    });
+    // Simpan mic yang sedang aktif ke state global
+    if(loudestMic) state.currentDetectedSpeaker = loudestMic;
+    // --------------------------------------
 
     const W = canvas.width, H = canvas.height;
     ctx.clearRect(0,0,W,H);
@@ -916,7 +958,8 @@ function initRecognition(){
     if(final && final.trim()){
       $('interim').textContent = '';
       state.resultsSinceLangSet++;
-      addSegment(final.trim(), null, ev.results[ev.resultIndex] ? ev.results[ev.resultIndex][0].confidence : null);
+      // Kirim state.currentDetectedSpeaker ke addSegment
+      addSegment(final.trim(), null, ev.results[ev.resultIndex] ? ev.results[ev.resultIndex][0].confidence : null, state.currentDetectedSpeaker);
     }
   };
 
@@ -996,10 +1039,13 @@ setInterval(function(){
 /* =======================================================================
    7. Segments
    ======================================================================= */
-function addSegment(text, kind, confidence){
+function addSegment(text, kind, confidence, autoSpeaker){
   const lang = registerLangVote(text) || state.dominantLang;
+  // Prioritas: Dropdown manual > Deteksi Otomatis > Kosong
+  const finalSpeaker = $('speaker-select').value || autoSpeaker || '';
+  
   const seg = { id:uid(), ts:Date.now(), time:nowTime(), text:text, lang:lang,
-                speaker: $('speaker-select').value || '', kind: kind || 'speech',
+                speaker: finalSpeaker, kind: kind || 'speech',
                 conf: confidence ? Math.round(confidence*100) : null };
   state.segments.push(seg);
   state.buffer += ' ' + text;
@@ -1505,8 +1551,10 @@ async function getMixedAudioStream() {
   const Ctx = window.AudioContext || window.webkitAudioContext;
   const ctx = new Ctx();
   const dest = ctx.createMediaStreamDestination();
+  
+  // Bersihkan analyser sebelumnya jika ada
+  state.sourceAnalysers = [];
 
-  // 1. Pancing izin akses mic pertama (wajib, agar sistem bisa membaca nama & ID semua mic)
   let defaultMic;
   try {
     defaultMic = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation:true, noiseSuppression:true, autoGainControl:true } });
@@ -1514,62 +1562,63 @@ async function getMixedAudioStream() {
     throw new Error("Izin Microphone ditolak.");
   }
 
-  // 2. Dapatkan daftar semua perangkat yang terhubung
   const devices = await navigator.mediaDevices.enumerateDevices();
-  // Saring khusus input audio (mic), buang ID 'default' agar tidak terjadi duplikat mic yang sama
   const audioInputs = devices.filter(d => d.kind === 'audioinput' && d.deviceId !== 'default' && d.deviceId !== 'communications');
 
   let useMultipleMics = false;
-  // Jika menemukan lebih dari 1 mic fisik, tanya user
   if (audioInputs.length > 1) {
-    useMultipleMics = confirm(`🎙️ Ditemukan ${audioInputs.length} Microphone fisik.\n\nKlik OK jika Anda ingin MENGGABUNGKAN semua suara mic tersebut (Cocok untuk rapat dengan banyak mic/OTG).`);
+    useMultipleMics = confirm(`🎙️ Ditemukan ${audioInputs.length} Microphone fisik.\n\nKlik OK jika Anda ingin MENGGABUNGKAN semua suara mic tersebut.`);
   }
 
   if (useMultipleMics) {
-    // Hentikan default mic sementara karena kita akan mengambil satu per satu dari ID fisiknya
     defaultMic.getTracks().forEach(t => t.stop());
-    
-    // Looping semua mic yang tertancap
     for (let mic of audioInputs) {
       try {
         const micStream = await navigator.mediaDevices.getUserMedia({
-          audio: { 
-            deviceId: { exact: mic.deviceId },
-            echoCancellation:true, noiseSuppression:true, autoGainControl:true
-          }
+          audio: { deviceId: { exact: mic.deviceId }, echoCancellation:true, noiseSuppression:true, autoGainControl:true }
         });
-        streams.push(micStream);
+        // Simpan stream dan Label asli dari sistem (misal: "Xiaomi Mic")
+        streams.push({ stream: micStream, label: mic.label || 'Mic ' + (streams.length + 1) });
       } catch (e) {
         console.warn("Gagal akses mic:", mic.label);
       }
     }
   } else {
-    // Jika hanya ada 1 mic atau user klik Cancel, pakai mic default
-    streams.push(defaultMic);
+    streams.push({ stream: defaultMic, label: 'Default Mic' });
   }
 
-  // 3. Tanya untuk Suara Komputer (Zoom/Meet/System Audio)
-  if (confirm("💻 GABUNG SUARA KOMPUTER?\n\nKlik OK jika ada peserta online dari Zoom/Meet.\n(Pastikan Anda mencentang 'Share/Bagikan Audio Sistem' di popup berikutnya).")) {
+  if (confirm("💻 GABUNG SUARA KOMPUTER?\n\nKlik OK jika ada peserta online dari Zoom/Meet.")) {
     try {
       const sysStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
-      streams.push(sysStream);
+      streams.push({ stream: sysStream, label: 'Screen/System Audio' });
     } catch (e) {
       console.warn("Perekaman suara layar dibatalkan.");
     }
   }
 
-  // 4. PROSES MIXING (Pencampuran)
-  dest.stream.originalTracks = []; // Array khusus untuk menyimpan jejak (wajib agar mic bisa dimatikan nanti)
+  dest.stream.originalTracks = []; 
   
-  streams.forEach(stream => {
-    stream.getTracks().forEach(t => {
-      if (t.kind === 'video') t.stop(); // Langsung matikan video agar hemat RAM (kita cuma butuh suaranya)
-      else dest.stream.originalTracks.push(t); // Simpan track audio aslinya
+  streams.forEach(item => {
+    item.stream.getTracks().forEach(t => {
+      if (t.kind === 'video') t.stop(); 
+      else dest.stream.originalTracks.push(t); 
     });
     
-    if (stream.getAudioTracks().length > 0) {
-      const source = ctx.createMediaStreamSource(stream);
-      source.connect(dest);
+    if (item.stream.getAudioTracks().length > 0) {
+      const source = ctx.createMediaStreamSource(item.stream);
+      
+      // BUAT ANALYSER UNTUK MENDETEKSI VOLUME SUMBER INI
+      const analyser = ctx.createAnalyser();
+      analyser.fftSize = 256;
+      source.connect(analyser); // Hubungkan ke penganalisa
+      source.connect(dest);     // Hubungkan ke output gabungan
+      
+      // Simpan ke state untuk dianalisis di fungsi draw()
+      state.sourceAnalysers.push({
+        label: item.label,
+        analyser: analyser,
+        data: new Uint8Array(analyser.frequencyBinCount)
+      });
     }
   });
 
