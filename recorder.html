@@ -2265,13 +2265,23 @@ function blobToBase64(blob){
     fr.onerror = rej; fr.readAsDataURL(blob);
   });
 }
-async function transcribeAudioWithAI(id){
+
+async function transcribeAudioWithAI(id, btnEl){
   if(!state.settings.apiKey){ toast(t('t.noKeyQueued'),'warn'); return; }
   if(!navigator.onLine){ toast(t('t.offlineQueued'),'warn'); return; }
   const blob = await sessionBlob(id);
   const mb = blob.size/1048576;
   if(mb > 18){ toast(t('t.tooBig',{ mb: mb.toFixed(1) }),'warn'); return; }
   toast(t('t.transcribing'),'info');
+  
+  // Ubah ikon tombol jadi animasi mutar (loading)
+  let originalHtml = '';
+  if (btnEl) {
+    originalHtml = btnEl.innerHTML;
+    btnEl.innerHTML = '<i class="fa-solid fa-spinner spin"></i>';
+    btnEl.disabled = true;
+  }
+
   try{
     const b64 = await blobToBase64(blob);
     const mime = (blob.type || 'audio/webm').split(';')[0];
@@ -2285,7 +2295,15 @@ async function transcribeAudioWithAI(id){
     addSegment('[AUDIO→AI] ' + text.slice(0, 4000), 'note', null);
     const data = await askGeminiMom(text, detectLanguage(text).lang || state.dominantLang, true);
     addMom({ type:'audio', data:data, model:state.settings.model, lang:data.language, sourceWords:words(text) });
-  }catch(e){ toast(t('t.aiError',{ msg: e.message }),'err'); }
+  }catch(e){ 
+    toast(t('t.aiError',{ msg: e.message }),'err'); 
+  }
+
+  // Kembalikan ikon seperti semula setelah selesai
+  if (btnEl) {
+    btnEl.innerHTML = originalHtml;
+    btnEl.disabled = false;
+  }
 }
 
 async function getMixedAudioStream() {
@@ -2690,7 +2708,15 @@ document.addEventListener('click', async function(e){
       return '[' + s.time + '][' + s.lang.toUpperCase() + ']' + (s.speaker ? ' ' + s.speaker + ':' : '') + ' ' + s.text; }).join('\n'));
   }
 
-  if(act==='process-now'){ flushBuffer('manual'); processQueue(true); }
+  if(act==='process-now'){ 
+    const item = flushBuffer('manual'); 
+    // Jika tidak ada teks di transkrip dan antrean kosong, munculkan peringatan
+    if(!item && !state.queue.length) {
+      toast(t('t.needTranscript'), 'warn');
+    } else {
+      processQueue(true); 
+    }
+  }
   if(act==='process-queue'){ processQueue(true); }
   if(act==='clear-queue'){ state.queue=[]; save.queue(); renderQueue(); renderStats(); }
   if(act==='retry-q'){
@@ -2780,7 +2806,7 @@ document.addEventListener('click', async function(e){
     download('recording_' + id + '.' + ext, b);
   }
   if(act==='del-audio'){ await idbDeleteSession(id); renderAudioList(); toast(t('t.deleted'),'ok'); }
-  if(act==='ai-audio') transcribeAudioWithAI(id);
+  if(act==='ai-audio') transcribeAudioWithAI(id, el);
 
   if(act==='export-backup'){
     download('smartmom_backup_' + Date.now() + '.json', JSON.stringify({
