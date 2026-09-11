@@ -592,6 +592,7 @@ const I18N = {
     'q.retry':'Retry','q.remove':'Remove','q.words':'words',
     'au.title':'Local audio archive','au.empty':'No local recordings yet.',
     'au.play':'Play','au.dl':'Download','au.del':'Delete','au.transcribe':'AI transcribe','au.recovered':'recovered',
+    'au.needsAiTip':'Contains system audio! Click to transcribe.', 'au.aiNeeded':'AI pending',
     'set.title':'Settings','set.apiKey':'Gemini API key',
     'set.apiKeyHint':'Stored only in this browser (localStorage). Without a key everything still records and queues locally.',
     'set.model':'Model','set.autoInterval':'Auto chunk interval','set.manual':'Manual only',
@@ -654,6 +655,7 @@ const I18N = {
     'q.retry':'Ulangi','q.remove':'Buang','q.words':'kata',
     'au.title':'Arsip audio lokal','au.empty':'Belum ada rekaman lokal.',
     'au.play':'Putar','au.dl':'Unduh','au.del':'Hapus','au.transcribe':'Transkrip AI','au.recovered':'terselamatkan',
+    'au.needsAiTip':'Berisi suara komputer! Mohon tekan untuk transkrip.', 'au.aiNeeded':'Butuh AI',
     'set.title':'Pengaturan','set.apiKey':'Gemini API key',
     'set.apiKeyHint':'Hanya disimpan di browser ini (localStorage). Tanpa key pun semua tetap terekam & masuk antrean lokal.',
     'set.model':'Model','set.autoInterval':'Interval potong otomatis','set.manual':'Manual saja',
@@ -1599,7 +1601,9 @@ async function startMediaRecorder(stream){
   state.audioChunkIdx = 0; state.audioBytes = 0;
   await idbPut('sessions', { id:state.audioSessionId, startedAt:Date.now(), endedAt:null,
     mime: state.mediaRecorder.mimeType || mime || 'audio/webm', bytes:0,
-    title: state.meta.title || '', lang: state.dominantLang });
+    title: state.meta.title || '', lang: state.dominantLang,
+    hasSystemAudio: $('opt-system-audio') && $('opt-system-audio').checked ? true : false,
+    isAiTranscribed: false });
 
   state.mediaRecorder.ondataavailable = async function(e){
     if(!e.data || !e.data.size) return;
@@ -2239,16 +2243,28 @@ async function renderAudioList(){
   box.innerHTML = sessions.map(function(s){
     const live = state.audioSessionId === s.id && state.isRecording;
     const rec = !s.endedAt && !live;
-    return '<div class="border border-slate-100 rounded-xl p-2.5 flex items-center gap-2 flex-wrap">'
+    const needsAI = s.hasSystemAudio && !s.isAiTranscribed && !live; // Cek apakah butuh di-klik
+    
+    // Warna Row & Efek Glowing
+    const rowClass = needsAI ? 'border-brand-300 bg-brand-50/40 shadow-[0_0_12px_rgba(59,130,246,0.15)]' : 'border-slate-100';
+    // Tombol Tongkat Ajaib
+    const wandClass = needsAI ? 'btn !px-2 !py-1 bg-brand-100 border-brand-300 text-brand-700 shadow-[0_0_8px_rgba(59,130,246,0.5)] relative' : 'btn !px-2 !py-1';
+    const wandIcon = '<i class="fa-solid fa-wand-sparkles"></i>' + (needsAI ? '<span class="absolute -top-1 -right-1 flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-brand-500"></span></span>' : '');
+    const wandTitle = needsAI ? esc(t('au.needsAiTip')) : esc(t('au.transcribe'));
+    
+    return '<div class="border rounded-xl p-2.5 flex items-center gap-2 flex-wrap transition-all duration-500 ' + rowClass + '">'
       + '<span class="chip ' + (live ? 'bg-rose-50 text-rose-600' : 'bg-brand-50 text-brand-600') + '">'
       +   '<i class="fa-solid ' + (live ? 'fa-circle-dot' : 'fa-file-audio') + '"></i>' + fmtBytes(s.bytes||0) + '</span>'
       + '<div class="flex-1 min-w-0"><div class="text-xs font-semibold text-slate-600 truncate">'
-      +   esc(s.title || new Date(s.startedAt).toLocaleString()) + (rec ? ' · <span class="text-sun-600">' + esc(t('au.recovered')) + '</span>' : '') + '</div>'
+      +   esc(s.title || new Date(s.startedAt).toLocaleString()) 
+      +   (rec ? ' · <span class="text-sun-600">' + esc(t('au.recovered')) + '</span>' : '') 
+      +   (needsAI ? ' · <span class="text-brand-600 animate-pulse font-bold"><i class="fa-solid fa-bell"></i> ' + esc(t('au.aiNeeded')) + '</span>' : '')
+      +   '</div>'
       +   '<div class="text-[.68rem] text-slate-400">' + new Date(s.startedAt).toLocaleString() + ' · ' + esc(s.mime||'') + '</div></div>'
       + '<div class="flex gap-1 no-print">'
       +   '<button class="btn !px-2 !py-1" data-act="play-audio" data-id="' + s.id + '" title="' + esc(t('au.play')) + '"><i class="fa-solid fa-play"></i></button>'
       +   '<button class="btn !px-2 !py-1" data-act="dl-audio" data-id="' + s.id + '" title="' + esc(t('au.dl')) + '"><i class="fa-solid fa-download"></i></button>'
-      +   '<button class="btn !px-2 !py-1" data-act="ai-audio" data-id="' + s.id + '" title="' + esc(t('au.transcribe')) + '"><i class="fa-solid fa-wand-sparkles"></i></button>'
+      +   '<button class="' + wandClass + '" data-act="ai-audio" data-id="' + s.id + '" title="' + wandTitle + '">' + wandIcon + '</button>'
       +   '<button class="btn !px-2 !py-1 btn-danger" data-act="del-audio" data-id="' + s.id + '"><i class="fa-solid fa-trash"></i></button>'
       + '</div></div>';
   }).join('');
@@ -2295,6 +2311,10 @@ async function transcribeAudioWithAI(id, btnEl){
     addSegment('[AUDIO→AI] ' + text.slice(0, 4000), 'note', null);
     const data = await askGeminiMom(text, detectLanguage(text).lang || state.dominantLang, true);
     addMom({ type:'audio', data:data, model:state.settings.model, lang:data.language, sourceWords:words(text) });
+    
+    // Tandai bahwa rekaman ini sudah sukses diproses AI
+    const s = await idbGet('sessions', id);
+    if (s) { s.isAiTranscribed = true; await idbPut('sessions', s); renderAudioList(); }
   }catch(e){ 
     toast(t('t.aiError',{ msg: e.message }),'err'); 
   }
