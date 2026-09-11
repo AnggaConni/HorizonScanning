@@ -275,6 +275,14 @@ tailwind.config = {
       </div>
 
       <canvas id="viz"></canvas>
+      
+      <!-- Tambahan Mini Visualizer untuk Suara Komputer -->
+      <div id="sys-viz-container" class="hidden mt-2">
+        <div class="flex items-center justify-between text-[0.65rem] text-slate-400 font-bold uppercase mb-1 px-1 tracking-wider">
+          <span><i class="fa-solid fa-desktop mr-1"></i> Suara Komputer (System Audio)</span>
+        </div>
+        <canvas id="viz-sys" style="width:100%; height:48px; display:block; border-radius:.5rem; background:#f8fafc; border: 1px solid #f1f5f9;"></canvas>
+      </div>
 
       <div class="mt-3 flex items-center gap-3">
         <i class="fa-solid fa-volume-low text-slate-400 text-xs"></i>
@@ -1480,8 +1488,13 @@ function setupAudio(stream){
   state.micSource.connect(state.analyser);
 
   const canvas = $('viz'), ctx = canvas.getContext('2d');
-  function resize(){ canvas.width = canvas.clientWidth * (window.devicePixelRatio||1);
-                     canvas.height = 96 * (window.devicePixelRatio||1); }
+  const canvasSys = $('viz-sys'), ctxSys = canvasSys.getContext('2d');
+  function resize(){ 
+    canvas.width = canvas.clientWidth * (window.devicePixelRatio||1);
+    canvas.height = 96 * (window.devicePixelRatio||1); 
+    canvasSys.width = canvasSys.clientWidth * (window.devicePixelRatio||1);
+    canvasSys.height = 48 * (window.devicePixelRatio||1);
+  }
   resize(); window.addEventListener('resize', resize);
 
   const bins = state.analyser.frequencyBinCount;
@@ -1492,25 +1505,37 @@ function setupAudio(stream){
     state.rafId = requestAnimationFrame(draw);
     state.analyser.getByteFrequencyData(data);
 
-    // --- CEK MIC MANA YANG PALING KERAS ---
+    // --- CEK MIC DAN SYSTEM AUDIO ---
     let maxVol = 0;
     let loudestMic = '';
+    let sysData = null;
+
     state.sourceAnalysers.forEach(function(src) {
       src.analyser.getByteFrequencyData(src.data);
-      let s = 0; for(let i=0; i<src.data.length; i++) s += src.data[i];
-      let avg = s / src.data.length;
-      if(avg > maxVol && avg > 5) { // 5 adalah ambang batas kebisingan (noise gate)
-        maxVol = avg;
-        loudestMic = src.label;
+      
+      // Pisahkan data suara komputer untuk digambar di canvas kecil
+      if (src.label === 'Screen/System Audio') {
+        sysData = src.data;
+      } else {
+        // Cari mic fisik mana yang paling keras (kecualikan system audio)
+        let s = 0; for(let i=0; i<src.data.length; i++) s += src.data[i];
+        let avg = s / src.data.length;
+        if(avg > maxVol && avg > 5) { 
+          maxVol = avg;
+          loudestMic = src.label;
+        }
       }
     });
-    // Simpan mic yang sedang aktif ke state global
+    
+    // Simpan mic fisik yang sedang aktif ke state global
     if(loudestMic) state.currentDetectedSpeaker = loudestMic;
     // --------------------------------------
 
     const W = canvas.width, H = canvas.height;
     ctx.clearRect(0,0,W,H);
     const bars = 64, bw = W/bars;
+
+    // Gambar Visualizer Utama (Gabungan Seluruh Suara)
     for(let i=0;i<bars;i++){
       const v = data[Math.floor(i*bins/bars)] / 255;
       const h = Math.max(2, v*H*0.92);
@@ -1526,6 +1551,34 @@ function setupAudio(stream){
       ctx.lineTo(x+w, H); ctx.lineTo(x, H); ctx.closePath(); ctx.fill();
     }
     ctx.fillStyle = 'rgba(148,163,184,.35)'; ctx.fillRect(0,H-1,W,1);
+
+    // Gambar Visualizer Kecil (Khusus Suara Komputer)
+    const sysContainer = $('sys-viz-container');
+    if (sysData && $('opt-system-audio').checked) {
+      sysContainer.classList.remove('hidden');
+      const W2 = canvasSys.width, H2 = canvasSys.height;
+      ctxSys.clearRect(0,0,W2,H2);
+      const bw2 = W2/bars;
+      
+      for(let i=0;i<bars;i++){
+        const v2 = sysData[Math.floor(i*sysData.length/bars)] / 255;
+        const h2 = Math.max(2, v2*H2*0.85);
+        // Warnanya Hijau Mint ke Tosca agar beda dari Mic Utama
+        const g2 = ctxSys.createLinearGradient(0,H2-h2,0,H2);
+        g2.addColorStop(0,'#10b981'); g2.addColorStop(1,'#6ee7b7'); 
+        ctxSys.fillStyle = g2;
+        
+        const r2 = Math.min(3, bw2/2);
+        const x2 = i*bw2+1, y2 = H2-h2, w2 = bw2-2;
+        ctxSys.beginPath();
+        ctxSys.moveTo(x2, y2+r2); ctxSys.arcTo(x2, y2, x2+r2, y2, r2);
+        ctxSys.lineTo(x2+w2-r2, y2); ctxSys.arcTo(x2+w2, y2, x2+w2, y2+r2, r2);
+        ctxSys.lineTo(x2+w2, H2); ctxSys.lineTo(x2, H2); ctxSys.closePath(); ctxSys.fill();
+      }
+      ctxSys.fillStyle = 'rgba(148,163,184,.2)'; ctxSys.fillRect(0,H2-1,W2,1);
+    } else {
+      sysContainer.classList.add('hidden');
+    }
   }
   draw();
 }
@@ -2336,6 +2389,11 @@ async function startRecording(){
     $('btn-record').style.background = '#ef4444';
     $('btn-record').style.borderColor = '#ef4444';
     $('btn-pause').disabled = false; $('btn-stop').disabled = false;
+    
+    // Kunci tombol centang agar tidak bisa diubah di tengah jalan
+    if($('opt-system-audio')) $('opt-system-audio').disabled = true;
+    if($('opt-multi-mic')) $('opt-multi-mic').disabled = true;
+
     logEngine('session started (' + state.recogLang + ')');
   }catch(e){ toast(t('t.micError',{ msg:e.message }),'err'); }
 }
@@ -2383,6 +2441,11 @@ async function hardStop(){
   $('btn-pause').innerHTML = '<i class="fa-solid fa-pause"></i>';
   $('opt-system-audio').checked = false;
   window.sysAudioStream = null;
+  if($('sys-viz-container')) $('sys-viz-container').classList.add('hidden');
+  
+  // Buka kembali kunci tombol centangnya
+  if($('opt-system-audio')) $('opt-system-audio').disabled = false;
+  if($('opt-multi-mic')) $('opt-multi-mic').disabled = false;
   setStatus('stopped');
   logEngine('session stopped');
 
