@@ -43,9 +43,10 @@ let articleCards = '';
 
 // 4. Generate HTML untuk setiap Artikel INDIVIDU & Buat Card-nya
 articles.forEach(article => {
-    // Buat slug dan URL untuk sistem
-    const slug = slugify(article.title);
-    const articleUrl = `blog/article/${slug}.html`;
+    // Gunakan slug dari data.json bila tersedia.
+    // Jika tidak ada, buat slug yang sama dengan generator artikel individual.
+    const slug = article.slug || (article.title ? slugify(article.title) : '');
+    const articleUrl = slug ? `blog/article/${slug}.html` : '#';
     const fallbackImage = 'https://via.placeholder.com/1200x600/0f172a/ffffff?text=HorizonScan+AI';
     
     // Normalisasi Gambar
@@ -478,7 +479,7 @@ let sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
 
 // Tambahkan URL dinamis untuk setiap artikel
 articles.forEach(article => {
-    const slug = slugify(article.title);
+    const slug = article.slug || (article.title ? slugify(article.title) : '');
     sitemapXml += `
   <url>
     <loc>${baseUrl}/blog/article/${slug}.html</loc>
