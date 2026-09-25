@@ -144,21 +144,46 @@
                     </aside>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-5">
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mt-5">
                     <button onclick="openPathwayById('silk-road')" class="text-left bg-white border border-slate-200 rounded-2xl p-5 hover:border-teal-300 hover:shadow-md transition-all">
                         <div class="text-[10px] uppercase tracking-widest font-black text-slate-400">Overland</div>
                         <div class="font-extrabold text-navy-900 mt-1">Silk Roads</div>
-                        <div class="text-xs text-slate-500 mt-2">Textiles, spices, foods, techniques and ideas across Eurasia.</div>
+                        <div class="text-xs text-slate-500 mt-2 leading-relaxed">Textiles, tea, spices, paper and knowledge across Eurasia.</div>
                     </button>
                     <button onclick="openPathwayById('indian-ocean')" class="text-left bg-white border border-slate-200 rounded-2xl p-5 hover:border-teal-300 hover:shadow-md transition-all">
                         <div class="text-[10px] uppercase tracking-widest font-black text-slate-400">Maritime</div>
                         <div class="font-extrabold text-navy-900 mt-1">Indian Ocean Exchange</div>
-                        <div class="text-xs text-slate-500 mt-2">Spices, rice, textiles and food knowledge across maritime networks.</div>
+                        <div class="text-xs text-slate-500 mt-2 leading-relaxed">Monsoon sailing, spices, rice, textiles and food knowledge across ports.</div>
                     </button>
                     <button onclick="openPathwayById('spice-route')" class="text-left bg-white border border-slate-200 rounded-2xl p-5 hover:border-teal-300 hover:shadow-md transition-all">
                         <div class="text-[10px] uppercase tracking-widest font-black text-slate-400">Resource corridor</div>
                         <div class="font-extrabold text-navy-900 mt-1">Spice Routes</div>
-                        <div class="text-xs text-slate-500 mt-2">Clove, nutmeg, pepper and related culinary and cultural circulation.</div>
+                        <div class="text-xs text-slate-500 mt-2 leading-relaxed">Clove, nutmeg, mace, pepper and culinary circulation.</div>
+                    </button>
+                    <button onclick="openPathwayById('trans-saharan')" class="text-left bg-white border border-slate-200 rounded-2xl p-5 hover:border-teal-300 hover:shadow-md transition-all">
+                        <div class="text-[10px] uppercase tracking-widest font-black text-slate-400">Desert network</div>
+                        <div class="font-extrabold text-navy-900 mt-1">Trans-Saharan Trade</div>
+                        <div class="text-xs text-slate-500 mt-2 leading-relaxed">Salt, gold, textiles, manuscripts and oasis markets.</div>
+                    </button>
+                    <button onclick="openPathwayById('incense-route')" class="text-left bg-white border border-slate-200 rounded-2xl p-5 hover:border-teal-300 hover:shadow-md transition-all">
+                        <div class="text-[10px] uppercase tracking-widest font-black text-slate-400">Caravan network</div>
+                        <div class="font-extrabold text-navy-900 mt-1">Incense Route</div>
+                        <div class="text-xs text-slate-500 mt-2 leading-relaxed">Frankincense, myrrh, aromatics and ritual materials.</div>
+                    </button>
+                    <button onclick="openPathwayById('tea-horse')" class="text-left bg-white border border-slate-200 rounded-2xl p-5 hover:border-teal-300 hover:shadow-md transition-all">
+                        <div class="text-[10px] uppercase tracking-widest font-black text-slate-400">Mountain network</div>
+                        <div class="font-extrabold text-navy-900 mt-1">Tea–Horse Road</div>
+                        <div class="text-xs text-slate-500 mt-2 leading-relaxed">Tea, horses, salt and highland exchange across southwest China and the Himalayas.</div>
+                    </button>
+                    <button onclick="openPathwayById('austronesian')" class="text-left bg-white border border-slate-200 rounded-2xl p-5 hover:border-teal-300 hover:shadow-md transition-all">
+                        <div class="text-[10px] uppercase tracking-widest font-black text-slate-400">Maritime</div>
+                        <div class="font-extrabold text-navy-900 mt-1">Austronesian Exchange</div>
+                        <div class="text-xs text-slate-500 mt-2 leading-relaxed">Crops, spices, navigation, boat-building and island mobility.</div>
+                    </button>
+                    <button onclick="openPathwayById('mediterranean')" class="text-left bg-white border border-slate-200 rounded-2xl p-5 hover:border-teal-300 hover:shadow-md transition-all">
+                        <div class="text-[10px] uppercase tracking-widest font-black text-slate-400">Maritime basin</div>
+                        <div class="font-extrabold text-navy-900 mt-1">Mediterranean Trade</div>
+                        <div class="text-xs text-slate-500 mt-2 leading-relaxed">Grain, olive oil, wine, salt, ceramics, textiles and metals.</div>
                     </button>
                 </div>
             </section>
@@ -423,27 +448,34 @@
     }
 
     function openPathwayById(id){
-        var p=PATHWAYS.find(function(x){return x.id===id;}); if(!p)return;
+        var p=PATHWAYS.find(function(x){return x.id===id;});
+        if(!p)return;
         var linked=ichInventory.filter(function(i){return coords(i)&&countryInPath(p,i);});
         document.getElementById("pathway-detail").innerHTML=
-            '<div><div class="text-[10px] uppercase tracking-widest font-black text-slate-400">'+esc(p.mode)+'</div><div class="text-xl font-extrabold text-navy-900 mt-1">'+esc(p.name)+'</div><p class="text-xs text-slate-500 mt-2 leading-relaxed">'+esc(p.subtitle)+'</p></div>'+
+            '<div><div class="text-[10px] uppercase tracking-widest font-black text-slate-400">'+esc(p.mode)+' · '+esc(p.period)+'</div>'+
+            '<div class="text-xl font-extrabold text-navy-900 mt-1">'+esc(p.name)+'</div>'+
+            '<p class="text-xs text-slate-500 mt-2 leading-relaxed">'+esc(p.subtitle)+'</p></div>'+
             '<div class="mt-5"><div class="text-[10px] uppercase tracking-widest font-black text-slate-400 mb-2">Resources carried</div><div class="flex flex-wrap gap-1.5">'+p.resources.map(function(x){return '<span class="px-2 py-1 rounded-full bg-slate-100 text-slate-700 text-[10px] font-bold">'+esc(x)+'</span>';}).join("")+'</div></div>'+
+            '<div class="mt-5"><div class="text-[10px] uppercase tracking-widest font-black text-slate-400 mb-2">How trade can shape culture</div><ul class="list-disc pl-4 space-y-1 text-xs text-slate-600">'+p.culturalEffects.map(function(x){return '<li>'+esc(x)+'</li>';}).join("")+'</ul></div>'+
             '<div class="mt-5"><div class="text-[10px] uppercase tracking-widest font-black text-slate-400 mb-2">Contextual heritage records</div><div class="text-xs text-slate-600">'+linked.length+' records currently fall within the configured country corridor.</div></div>'+
             '<button onclick="openPathwayModal(\''+p.id+'\')" class="w-full mt-5 py-2.5 rounded-xl bg-navy-900 text-white text-sm font-bold hover:bg-teal-600">Open pathway dossier <i class="ph ph-arrow-right"></i></button>';
         pathwayMap.fitBounds(L.latLngBounds(p.coordinates).pad(.32));
     }
 
     function openPathwayModal(id){
-        var p=PATHWAYS.find(function(x){return x.id===id;}); if(!p)return;
+        var p=PATHWAYS.find(function(x){return x.id===id;});
+        if(!p)return;
         var linked=ichInventory.filter(function(i){return coords(i)&&countryInPath(p,i);});
         document.getElementById("pathway-modal-kicker").textContent=p.mode+" pathway";
         document.getElementById("pathway-modal-title").textContent=p.name;
         document.getElementById("pathway-modal-subtitle").textContent=p.subtitle;
         document.getElementById("pathway-modal-body").innerHTML=
             '<div class="grid grid-cols-1 md:grid-cols-2 gap-5">'+
-            '<div class="p-5 rounded-2xl bg-slate-50 border border-slate-100"><div class="text-[10px] uppercase tracking-widest font-black text-slate-400 mb-2">Resources</div><div class="flex flex-wrap gap-2">'+p.resources.map(function(x){return '<span class="px-2.5 py-1.5 rounded-full bg-white border border-slate-200 text-xs font-bold">'+esc(x)+'</span>';}).join("")+'</div></div>'+
-            '<div class="p-5 rounded-2xl bg-teal-50 border border-teal-100"><div class="text-[10px] uppercase tracking-widest font-black text-teal-700 mb-2">Method note</div><p class="text-xs text-teal-900 leading-relaxed">The route line is a simplified analytical visualization. It should not be read as a precise historical boundary or exact reconstruction.</p></div>'+
-            '<div class="md:col-span-2"><div class="text-[10px] uppercase tracking-widest font-black text-slate-400 mb-3">Linked heritage records</div><div class="grid grid-cols-1 md:grid-cols-2 gap-3">'+
+            '<div class="p-5 rounded-2xl bg-white border border-slate-200"><div class="text-[10px] uppercase tracking-widest font-black text-slate-400 mb-2">Period</div><div class="text-sm font-bold text-navy-900">'+esc(p.period)+'</div></div>'+
+            '<div class="p-5 rounded-2xl bg-slate-50 border border-slate-100"><div class="text-[10px] uppercase tracking-widest font-black text-slate-400 mb-2">Resources carried</div><div class="flex flex-wrap gap-2">'+p.resources.map(function(x){return '<span class="px-2.5 py-1.5 rounded-full bg-white border border-slate-200 text-xs font-bold">'+esc(x)+'</span>';}).join("")+'</div></div>'+
+            '<div class="md:col-span-2 p-5 rounded-2xl bg-blue-50 border border-blue-100"><div class="text-[10px] uppercase tracking-widest font-black text-blue-700 mb-2">How trade can shape culture</div><ul class="list-disc pl-5 space-y-1 text-sm text-blue-900">'+p.culturalEffects.map(function(x){return '<li>'+esc(x)+'</li>';}).join("")+'</ul></div>'+
+            '<div class="md:col-span-2 p-5 rounded-2xl bg-teal-50 border border-teal-100"><div class="text-[10px] uppercase tracking-widest font-black text-teal-700 mb-2">Method note</div><p class="text-xs text-teal-900 leading-relaxed">'+esc(p.evidenceNote)+'</p></div>'+
+            '<div class="md:col-span-2"><div class="text-[10px] uppercase tracking-widest font-black text-slate-400 mb-3">Linked heritage records ('+linked.length+')</div><div class="grid grid-cols-1 md:grid-cols-2 gap-3">'+
             linked.slice(0,12).map(function(item){return '<button onclick="openHeritageById(\''+String(item.id||"").replace(/'/g,"\\'")+'\')" class="text-left p-4 rounded-2xl border border-slate-200 hover:border-teal-300"><div class="font-bold text-sm text-navy-900">'+esc(item.element_name||"Unnamed")+'</div><div class="text-[11px] text-slate-500 mt-1">'+esc(item.location&&item.location.country||"")+'</div><div class="text-[10px] text-teal-700 font-bold mt-2">Open heritage record →</div></button>';}).join("")+
             (linked.length?"":"<div class='text-sm text-slate-400'>No linked coordinate records found.</div>")+
             '</div></div></div>';
