@@ -76,6 +76,11 @@
             .foodways-track > .food-card { flex-basis: 100%; }
         }
         .route-glow { filter: drop-shadow(0 0 5px rgba(13,148,136,.65)); }
+        .heritage-dossier-section { border: 1px solid #e2e8f0; border-radius: 18px; padding: 18px; background: #fff; }
+        .heritage-dossier-label { font-size: 10px; text-transform: uppercase; letter-spacing: .09em; font-weight: 900; color: #94a3b8; margin-bottom: 8px; }
+        .heritage-dossier-text { font-size: 13px; line-height: 1.8; color: #475569; white-space: pre-wrap; }
+        .heritage-dossier-chip { display:inline-flex; align-items:center; padding:5px 9px; border-radius:999px; background:#f8fafc; border:1px solid #e2e8f0; color:#334155; font-size:10px; font-weight:800; margin:3px 4px 3px 0; }
+        .heritage-dossier-raw { background:#0f172a; color:#e2e8f0; border-radius:14px; padding:14px; font:11px/1.6 ui-monospace, SFMono-Regular, Menlo, monospace; overflow:auto; max-height:420px; white-space:pre; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans antialiased">
@@ -377,7 +382,7 @@
 
 
     <div id="pathway-modal" class="hidden fixed inset-0 z-[5000] bg-slate-950/70 backdrop-blur-sm p-4 md:p-8 overflow-y-auto">
-        <div class="max-w-4xl mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden">
+        <div class="max-w-6xl mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden">
             <div class="p-5 md:p-7 border-b border-slate-200 flex items-start justify-between gap-4">
                 <div>
                     <div id="pathway-modal-kicker" class="text-[10px] font-black uppercase tracking-widest text-teal-600"></div>
@@ -522,17 +527,130 @@
 
     function openHeritageById(id){var item=ichInventory.find(function(i){return i.id===id;});if(item)openHeritage(item);}
     function openHeritage(item){
-        var a=item.resume_analisa||{},p=item.resume_tata_cara||{},steps=Array.isArray(p.step_by_step)?p.step_by_step:[],sources=Array.isArray(item.source_urls)?item.source_urls:[];
-        document.getElementById("pathway-modal-kicker").textContent="ICH Radar record";
+        const analysis=item.resume_analisa||{};
+        const process=item.resume_tata_cara||{};
+        const shared=item.shared_heritage_detection||{};
+        const sources=Array.isArray(item.source_urls)?item.source_urls:[];
+        const materials=Array.isArray(process.materials_and_tools)?process.materials_and_tools:[];
+        const steps=Array.isArray(process.step_by_step)?process.step_by_step:[];
+        const tags=Array.isArray(analysis.gemini_tags)?analysis.gemini_tags:[];
+        const categories=cats(item);
+        const location=item.location||{};
+        const provinces=Array.isArray(location.provinces)?location.provinces:[];
+        const related=Array.isArray(shared.related_elements)?shared.related_elements:[];
+        const extraAnalysis=Object.keys(analysis).filter(function(key){return !["description","cultural_significance","gemini_tags"].includes(key);});
+        const hasCoords=Number.isFinite(Number(location.lat)) && Number.isFinite(Number(location.lng));
+        const mapLink=hasCoords ? "https://www.openstreetmap.org/?mlat="+encodeURIComponent(location.lat)+"&mlon="+encodeURIComponent(location.lng)+"#map=12/"+encodeURIComponent(location.lat)+"/"+encodeURIComponent(location.lng) : "";
+
+        document.getElementById("pathway-modal-kicker").textContent="ICH Radar · Full Record";
         document.getElementById("pathway-modal-title").textContent=item.element_name||"Heritage element";
-        document.getElementById("pathway-modal-subtitle").textContent=[item.location&&item.location.country,cats(item).join(" · ")].filter(Boolean).join(" · ");
-        document.getElementById("pathway-modal-body").innerHTML=
-            '<div class="grid grid-cols-1 md:grid-cols-2 gap-5">'+
-            '<div class="p-5 rounded-2xl border border-slate-200"><div class="text-[10px] uppercase tracking-widest font-black text-slate-400 mb-2">Identity</div><p class="text-sm text-slate-600 leading-relaxed">'+esc(a.description||"No structured description available.")+'</p></div>'+
-            '<div class="p-5 rounded-2xl bg-amber-50 border border-amber-100"><div class="text-[10px] uppercase tracking-widest font-black text-amber-700 mb-2">Pathway context</div><p class="text-xs text-amber-900">This heritage record is shown in the context of configured analytical pathways. The connector is exploratory, not proof of direct historical causation.</p></div>'+
-            '<div class="p-5 rounded-2xl bg-slate-50 border border-slate-100"><div class="text-[10px] uppercase tracking-widest font-black text-slate-400 mb-2">Practice</div><p class="text-xs text-slate-600"><strong>Type:</strong> '+esc(p.type||"Not recorded")+'</p>'+ (steps.length?'<ol class="list-decimal pl-5 mt-3 space-y-1 text-xs text-slate-600">'+steps.slice(0,6).map(function(s){return '<li>'+esc(s)+'</li>';}).join("")+'</ol>':'<p class="text-xs text-slate-400 mt-2">No step-by-step process recorded.</p>')+'</div>'+
-            '<div class="p-5 rounded-2xl bg-slate-50 border border-slate-100"><div class="text-[10px] uppercase tracking-widest font-black text-slate-400 mb-2">Sources</div>'+sources.slice(0,6).map(function(u){return '<a class="block text-xs text-teal-700 hover:underline break-all mb-2" target="_blank" rel="noopener noreferrer" href="'+esc(u)+'">'+esc(u)+'</a>';}).join("")+(sources.length?"":"<p class='text-xs text-slate-400'>No source URLs stored.</p>")+'</div>'+
-            '</div>';
+        document.getElementById("pathway-modal-subtitle").textContent=[location.country,categories.join(" · "),item.completion_status].filter(Boolean).join(" · ");
+
+        const parts=[];
+
+        parts.push(
+            '<div class="grid grid-cols-1 lg:grid-cols-12 gap-5">'+
+                '<div class="lg:col-span-4 rounded-2xl overflow-hidden border border-slate-200 bg-slate-100 min-h-[220px]">'+
+                    (item.thumbnail_url
+                        ? '<img src="'+esc(item.thumbnail_url)+'" alt="'+esc(item.element_name||"Heritage element")+'" class="w-full h-full min-h-[220px] object-cover" loading="lazy" onerror="this.style.display=\'none\';">'
+                        : '<div class="min-h-[220px] flex items-center justify-center text-slate-300"><i class="ph ph-image text-6xl"></i></div>')+
+                '</div>'+
+                '<div class="lg:col-span-8 heritage-dossier-section">'+
+                    '<div class="heritage-dossier-label">Record metadata</div>'+
+                    '<div class="grid grid-cols-1 md:grid-cols-2 gap-4">'+
+                        '<div><div class="text-[10px] font-bold uppercase text-slate-400">Record ID</div><div class="font-mono text-xs text-slate-700 mt-1">'+esc(item.id||"—")+'</div></div>'+
+                        '<div><div class="text-[10px] font-bold uppercase text-slate-400">Completion status</div><div class="text-sm font-bold text-slate-700 mt-1">'+esc(item.completion_status||"Not recorded")+'</div></div>'+
+                        '<div><div class="text-[10px] font-bold uppercase text-slate-400">Categories</div><div class="mt-1">'+(categories.length?categories.map(function(v){return '<span class="heritage-dossier-chip">'+esc(v)+'</span>';}).join(""):'<span class="text-xs text-slate-400">Not classified</span>')+'</div></div>'+
+                        '<div><div class="text-[10px] font-bold uppercase text-slate-400">Captured</div><div class="text-xs text-slate-600 mt-1">'+esc(item.scraped_at||"Not recorded")+'</div></div>'+
+                    '</div>'+
+                '</div>'+
+            '</div>'
+        );
+
+        parts.push(
+            '<div class="grid grid-cols-1 lg:grid-cols-2 gap-5">'+
+                '<section class="heritage-dossier-section"><div class="heritage-dossier-label">01 · Identity</div><div class="heritage-dossier-text">'+esc(analysis.description||"No structured description available.")+'</div></section>'+
+                '<section class="heritage-dossier-section"><div class="heritage-dossier-label">02 · Cultural significance</div><div class="heritage-dossier-text">'+esc(analysis.cultural_significance||"No structured cultural significance statement available.")+'</div></section>'+
+            '</div>'
+        );
+
+        parts.push(
+            '<section class="heritage-dossier-section">'+
+                '<div class="heritage-dossier-label">03 · Classification & tags</div>'+
+                '<div class="mb-3">'+(categories.length?categories.map(function(v){return '<span class="heritage-dossier-chip">'+esc(v)+'</span>';}).join(""):'<span class="text-xs text-slate-400">No categories</span>')+'</div>'+
+                '<div class="heritage-dossier-label">AI-derived tags</div>'+
+                (tags.length?tags.map(function(v){return '<span class="heritage-dossier-chip">'+esc(v)+'</span>';}).join(""):'<span class="text-xs text-slate-400">No tags stored</span>')+
+            '</section>'
+        );
+
+        parts.push(
+            '<section class="heritage-dossier-section">'+
+                '<div class="heritage-dossier-label">04 · Location</div>'+
+                '<div class="grid grid-cols-1 md:grid-cols-3 gap-4">'+
+                    '<div><div class="text-[10px] font-bold uppercase text-slate-400">Country</div><div class="text-sm font-bold text-slate-700 mt-1">'+esc(location.country||"Not recorded")+'</div></div>'+
+                    '<div><div class="text-[10px] font-bold uppercase text-slate-400">Provinces / areas</div><div class="text-xs text-slate-600 mt-1">'+esc(provinces.join(" · ")||"Not recorded")+'</div></div>'+
+                    '<div><div class="text-[10px] font-bold uppercase text-slate-400">Coordinates</div><div class="text-xs text-slate-600 mt-1">'+(hasCoords?esc(location.lat+", "+location.lng):"Not recorded")+(mapLink?'<div class="mt-2"><a class="text-teal-700 font-bold hover:underline" target="_blank" rel="noopener noreferrer" href="'+mapLink+'">Open map ↗</a></div>':"")+'</div></div>'+
+                '</div>'+
+            '</section>'
+        );
+
+        parts.push(
+            '<section class="heritage-dossier-section">'+
+                '<div class="heritage-dossier-label">05 · Practice / Process</div>'+
+                '<div class="text-sm font-bold text-slate-700 mb-4">'+esc(process.type||"Not recorded")+'</div>'+
+                '<div class="grid grid-cols-1 lg:grid-cols-2 gap-5">'+
+                    '<div><div class="heritage-dossier-label">Materials & tools</div>'+(materials.length?materials.map(function(v){return '<span class="heritage-dossier-chip">'+esc(v)+'</span>';}).join(""):'<span class="text-xs text-slate-400">Not recorded</span>')+'</div>'+
+                    '<div><div class="heritage-dossier-label">Step-by-step process</div>'+(steps.length?'<ol class="list-decimal pl-5 space-y-2 text-xs text-slate-600">'+steps.map(function(v){return '<li class="leading-relaxed">'+esc(v)+'</li>';}).join("")+'</ol>':'<span class="text-xs text-slate-400">No process steps recorded.</span>')+'</div>'+
+                '</div>'+
+            '</section>'
+        );
+
+        parts.push(
+            '<section class="heritage-dossier-section">'+
+                '<div class="heritage-dossier-label">06 · Shared heritage detection</div>'+
+                '<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">'+
+                    '<div><div class="text-[10px] font-bold uppercase text-slate-400">Detected</div><div class="text-sm font-bold mt-1">'+(shared.is_shared?"Yes":"No")+'</div></div>'+
+                    '<div><div class="text-[10px] font-bold uppercase text-slate-400">Confidence</div><div class="text-sm font-bold mt-1">'+(shared.confidence_score!==undefined?esc(String(shared.confidence_score)):"Not recorded")+'</div></div>'+
+                    '<div><div class="text-[10px] font-bold uppercase text-slate-400">Related records</div><div class="text-sm font-bold mt-1">'+related.length+'</div></div>'+
+                '</div>'+
+                (related.length
+                    ? '<div class="space-y-2">'+related.map(function(rel){return '<div class="p-3 rounded-xl bg-violet-50 border border-violet-100"><div class="font-bold text-xs text-violet-900">'+esc(rel.element_name||"Related element")+' · '+esc(rel.country||"")+'</div><div class="text-xs text-violet-800 mt-1">'+esc(rel.relationship_reason||"No relationship explanation recorded.")+'</div></div>';}).join("")+'</div>'
+                    : '<div class="text-xs text-slate-400">No related heritage records detected.</div>')+
+            '</section>'
+        );
+
+        if(extraAnalysis.length){
+            parts.push(
+                '<section class="heritage-dossier-section">'+
+                    '<div class="heritage-dossier-label">07 · Additional analysis / derived fields</div>'+
+                    '<div class="grid grid-cols-1 md:grid-cols-2 gap-4">'+
+                        extraAnalysis.map(function(key){
+                            return '<div class="rounded-xl bg-slate-50 border border-slate-100 p-4"><div class="text-[10px] font-black uppercase tracking-wider text-slate-400">'+esc(key.split("_").join(" "))+'</div><div class="mt-2">'+esc(JSON.stringify(analysis[key],null,2))+'</div></div>';
+                        }).join("")+
+                    '</div>'+
+                '</section>'
+            );
+        }
+
+        parts.push(
+            '<section class="heritage-dossier-section">'+
+                '<div class="heritage-dossier-label">08 · Sources ('+sources.length+')</div>'+
+                (sources.length
+                    ? '<div class="space-y-3">'+sources.map(function(url,index){return '<div class="flex gap-3 items-start"><span class="font-mono text-[10px] text-teal-600 mt-1">'+String(index+1).padStart(2,"0")+'</span><a class="text-xs text-teal-700 hover:underline break-all" target="_blank" rel="noopener noreferrer" href="'+esc(url)+'">'+esc(url)+'</a></div>';}).join("")+'</div>'
+                    : '<span class="text-xs text-slate-400">No source URLs stored.</span>')+
+            '</section>'
+        );
+
+        parts.push(
+            '<section class="heritage-dossier-section bg-slate-50">'+
+                '<details>'+
+                    '<summary class="cursor-pointer text-sm font-bold text-slate-700">Open complete raw record (JSON)</summary>'+
+                    '<div class="mt-4 heritage-dossier-raw">'+esc(JSON.stringify(item,null,2))+'</div>'+
+                '</details>'+
+            '</section>'
+        );
+
+        document.getElementById("pathway-modal-body").innerHTML='<div class="space-y-5">'+parts.join("")+'</div>';
         document.getElementById("pathway-modal").classList.remove("hidden");
     }
     function closePathwayModal(){document.getElementById("pathway-modal").classList.add("hidden");}
