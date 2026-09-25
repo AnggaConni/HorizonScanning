@@ -56,6 +56,24 @@
         .pathway-panel { background: rgba(255,255,255,.94); backdrop-filter: blur(10px); border: 1px solid rgba(148,163,184,.25); box-shadow: 0 12px 30px rgba(15,23,42,.10); }
         .food-card { transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
         .food-card:hover { transform: translateY(-4px); box-shadow: 0 18px 35px rgba(15,23,42,.08); border-color: rgba(13,148,136,.35); }
+        .foodways-viewport { overflow: hidden; position: relative; }
+        .foodways-track { display: flex; gap: 20px; transition: transform .35s ease; will-change: transform; }
+        .foodways-track > .food-card { flex: 0 0 calc((100% - 40px) / 3); min-width: 0; }
+        .foodways-nav-btn {
+            width: 40px; height: 40px; border-radius: 999px;
+            display:flex; align-items:center; justify-content:center;
+            background:#0f172a; color:white; border:0; cursor:pointer;
+            box-shadow:0 8px 18px rgba(15,23,42,.15);
+            transition:all .2s ease;
+        }
+        .foodways-nav-btn:hover { background:#0d9488; transform:translateY(-1px); }
+        .foodways-nav-btn:disabled { opacity:.35; cursor:not-allowed; transform:none; }
+        @media (max-width: 1024px) {
+            .foodways-track > .food-card { flex-basis: calc((100% - 20px) / 2); }
+        }
+        @media (max-width: 640px) {
+            .foodways-track > .food-card { flex-basis: 100%; }
+        }
         .route-glow { filter: drop-shadow(0 0 5px rgba(13,148,136,.65)); }
     </style>
 </head>
@@ -202,8 +220,16 @@
                         <select id="foodways-country" onchange="renderFoodways()" class="px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm focus:outline-none focus:border-teal-500"><option value="all">All countries</option></select>
                     </div>
                 </div>
-                <div id="foodways-status" class="text-xs text-slate-400 mb-4">Connecting to ICH Radar…</div>
-                <div id="foodways-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5"></div>
+                <div class="flex items-center justify-between gap-4 mb-4">
+                    <div id="foodways-status" class="text-xs text-slate-400">Connecting to ICH Radar…</div>
+                    <div class="flex items-center gap-2">
+                        <button id="foodways-prev" onclick="scrollFoodways(-1)" class="foodways-nav-btn" aria-label="Previous foodways"><i class="ph ph-arrow-left"></i></button>
+                        <button id="foodways-next" onclick="scrollFoodways(1)" class="foodways-nav-btn" aria-label="Next foodways"><i class="ph ph-arrow-right"></i></button>
+                    </div>
+                </div>
+                <div class="foodways-viewport">
+                    <div id="foodways-grid" class="foodways-track"></div>
+                </div>
             </section>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -504,17 +530,77 @@
         select.innerHTML='<option value="all">All countries</option>'+countries.map(function(c){return '<option value="'+esc(c)+'">'+esc(c)+'</option>';}).join("");
     }
 
-    function renderFoodways(){
-        var grid=document.getElementById("foodways-grid"), q=String(document.getElementById("foodways-search").value||"").toLowerCase(), country=document.getElementById("foodways-country").value;
-        var foods=ichInventory.filter(culinary);
-        if(country!=="all")foods=foods.filter(function(i){return i.location&&i.location.country===country;});
-        if(q)foods=foods.filter(function(i){return [i.element_name,i.location&&i.location.country,cats(i).join(" "),i.resume_analisa&&i.resume_analisa.description,JSON.stringify(i.resume_tata_cara||{})].join(" ").toLowerCase().includes(q);});
-        document.getElementById("foodways-status").textContent=foods.length+" culinary records from ICH Radar";
-        grid.innerHTML=foods.slice(0,30).map(function(item){
-            var p=item.resume_tata_cara||{},steps=Array.isArray(p.step_by_step)?p.step_by_step:[],materials=Array.isArray(p.materials_and_tools)?p.materials_and_tools:[],sources=Array.isArray(item.source_urls)?item.source_urls:[],shared=!!(item.shared_heritage_detection&&item.shared_heritage_detection.is_shared);
-            return '<article class="food-card bg-white border border-slate-200 rounded-3xl p-5 cursor-pointer" onclick="openHeritageById(\''+String(item.id||"").replace(/'/g,"\\'")+'\')"><div class="flex items-start justify-between gap-3 mb-4"><div><div class="text-[10px] uppercase tracking-widest font-black text-slate-400">Foodway record</div><h3 class="font-extrabold text-lg text-navy-900 mt-1">'+esc(item.element_name||"Unnamed")+'</h3><div class="text-xs text-slate-500 mt-1">'+esc(item.location&&item.location.country||"Unknown")+'</div></div><span class="text-2xl">🍲</span></div><p class="text-xs text-slate-600 leading-relaxed line-clamp-4">'+esc(item.resume_analisa&&item.resume_analisa.description||"No description recorded.")+'</p><div class="flex flex-wrap gap-1.5 mt-4">'+materials.slice(0,4).map(function(m){return '<span class="px-2 py-1 rounded-full bg-amber-50 text-amber-700 text-[10px] font-bold">'+esc(m)+'</span>';}).join("")+'</div><div class="grid grid-cols-3 gap-2 mt-5 pt-4 border-t border-slate-100 text-center"><div><div class="text-sm font-extrabold text-navy-900">'+steps.length+'</div><div class="text-[9px] uppercase tracking-wider text-slate-400">Steps</div></div><div><div class="text-sm font-extrabold text-navy-900">'+sources.length+'</div><div class="text-[9px] uppercase tracking-wider text-slate-400">Sources</div></div><div><div class="text-sm font-extrabold '+(shared?"text-violet-600":"text-slate-400")+'">'+(shared?"Yes":"—")+'</div><div class="text-[9px] uppercase tracking-wider text-slate-400">Shared</div></div></div></article>';
-        }).join("") || '<div class="col-span-full p-10 rounded-3xl bg-slate-50 border border-slate-200 text-center text-slate-400">No culinary records match the current filters.</div>';
+    function getFoodwaysPageStep(){
+        const grid=document.getElementById("foodways-grid");
+        if(!grid || !grid.firstElementChild) return 0;
+        const card=grid.firstElementChild;
+        const gap=parseFloat(getComputedStyle(grid).gap)||20;
+        return card.getBoundingClientRect().width + gap;
     }
+
+    function updateFoodwaysNav(){
+        const viewport=document.querySelector(".foodways-viewport");
+        const grid=document.getElementById("foodways-grid");
+        const prev=document.getElementById("foodways-prev");
+        const next=document.getElementById("foodways-next");
+        if(!viewport||!grid||!prev||!next) return;
+        prev.disabled=viewport.scrollLeft<=4;
+        next.disabled=viewport.scrollLeft+viewport.clientWidth>=grid.scrollWidth-4;
+    }
+
+    function scrollFoodways(direction){
+        const viewport=document.querySelector(".foodways-viewport");
+        const step=getFoodwaysPageStep();
+        if(!viewport||!step) return;
+        viewport.scrollBy({left:direction*step,behavior:"smooth"});
+        setTimeout(updateFoodwaysNav,380);
+    }
+
+    function renderFoodways(){
+        const grid=document.getElementById("foodways-grid"),
+              q=String(document.getElementById("foodways-search").value||"").toLowerCase(),
+              country=document.getElementById("foodways-country").value,
+              viewport=document.querySelector(".foodways-viewport");
+
+        let foods=ichInventory.filter(culinary);
+        if(country!=="all") foods=foods.filter(function(i){return i.location&&i.location.country===country;});
+        if(q) foods=foods.filter(function(i){
+            return [i.element_name,i.location&&i.location.country,cats(i).join(" "),i.resume_analisa&&i.resume_analisa.description,JSON.stringify(i.resume_tata_cara||{})]
+                .join(" ").toLowerCase().includes(q);
+        });
+
+        document.getElementById("foodways-status").textContent=foods.length+" culinary records from ICH Radar";
+
+        grid.innerHTML=foods.slice(0,30).map(function(item){
+            const p=item.resume_tata_cara||{},
+                  steps=Array.isArray(p.step_by_step)?p.step_by_step:[],
+                  materials=Array.isArray(p.materials_and_tools)?p.materials_and_tools:[],
+                  sources=Array.isArray(item.source_urls)?item.source_urls:[],
+                  shared=!!(item.shared_heritage_detection&&item.shared_heritage_detection.is_shared);
+
+            return '<article class="food-card bg-white border border-slate-200 rounded-3xl p-5 cursor-pointer" onclick="openHeritageById(\\''+
+                String(item.id||"").replace(/'/g,"\\\\'")+
+                '\\')"><div class="flex items-start justify-between gap-3 mb-4"><div><div class="text-[10px] uppercase tracking-widest font-black text-slate-400">Foodway record</div><h3 class="font-extrabold text-lg text-navy-900 mt-1">'+
+                esc(item.element_name||"Unnamed")+
+                '</h3><div class="text-xs text-slate-500 mt-1">'+esc(item.location&&item.location.country||"Unknown")+
+                '</div></div><span class="text-2xl">🍲</span></div><p class="text-xs text-slate-600 leading-relaxed line-clamp-4">'+
+                esc(item.resume_analisa&&item.resume_analisa.description||"No description recorded.")+
+                '</p><div class="flex flex-wrap gap-1.5 mt-4">'+
+                materials.slice(0,4).map(function(m){return '<span class="px-2 py-1 rounded-full bg-amber-50 text-amber-700 text-[10px] font-bold">'+esc(m)+'</span>';}).join("")+
+                '</div><div class="grid grid-cols-3 gap-2 mt-5 pt-4 border-t border-slate-100 text-center"><div><div class="text-sm font-extrabold text-navy-900">'+
+                steps.length+
+                '</div><div class="text-[9px] uppercase tracking-wider text-slate-400">Steps</div></div><div><div class="text-sm font-extrabold text-navy-900">'+
+                sources.length+
+                '</div><div class="text-[9px] uppercase tracking-wider text-slate-400">Sources</div></div><div><div class="text-sm font-extrabold '+(shared?"text-violet-600":"text-slate-400")+'">'+
+                (shared?"Yes":"—")+
+                '</div><div class="text-[9px] uppercase tracking-wider text-slate-400">Shared</div></div></div></article>';
+        }).join("") || '<div class="w-full p-10 rounded-3xl bg-slate-50 border border-slate-200 text-center text-slate-400">No culinary records match the current filters.</div>';
+
+        if(viewport) viewport.scrollLeft=0;
+        setTimeout(updateFoodwaysNav,50);
+    }
+
+
 
     document.addEventListener("DOMContentLoaded",initCulturalPathways);
     </script>
