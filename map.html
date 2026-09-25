@@ -76,6 +76,9 @@
             .foodways-track > .food-card { flex-basis: 100%; }
         }
         .route-glow { filter: drop-shadow(0 0 5px rgba(13,148,136,.65)); }
+        .heritage-full-data { border:1px solid #e2e8f0; border-radius:18px; background:#fff; padding:18px; }
+        .heritage-raw-json { background:#0f172a; color:#e2e8f0; border-radius:14px; padding:14px; font:11px/1.6 ui-monospace, SFMono-Regular, Menlo, monospace; overflow:auto; max-height:420px; white-space:pre; }
+        .heritage-meta-chip { display:inline-flex; padding:5px 9px; border-radius:999px; background:#f8fafc; border:1px solid #e2e8f0; color:#334155; font-size:10px; font-weight:800; margin:3px 4px 3px 0; }
         .heritage-dossier-section { border: 1px solid #e2e8f0; border-radius: 18px; padding: 18px; background: #fff; }
         .heritage-dossier-label { font-size: 10px; text-transform: uppercase; letter-spacing: .09em; font-weight: 900; color: #94a3b8; margin-bottom: 8px; }
         .heritage-dossier-text { font-size: 13px; line-height: 1.8; color: #475569; white-space: pre-wrap; }
@@ -522,6 +525,71 @@
             linked.slice(0,12).map(function(item){return '<button onclick="openHeritageById(\''+String(item.id||"").replace(/'/g,"\\'")+'\')" class="text-left p-4 rounded-2xl border border-slate-200 hover:border-teal-300"><div class="font-bold text-sm text-navy-900">'+esc(item.element_name||"Unnamed")+'</div><div class="text-[11px] text-slate-500 mt-1">'+esc(item.location&&item.location.country||"")+'</div><div class="text-[10px] text-teal-700 font-bold mt-2">Open heritage record →</div></button>';}).join("")+
             (linked.length?"":"<div class='text-sm text-slate-400'>No linked coordinate records found.</div>")+
             '</div></div></div>';
+        const fullData=document.createElement("div");
+        fullData.className="space-y-5 mt-5";
+
+        const location=item.location||{};
+        const provinces=Array.isArray(location.provinces)?location.provinces:[];
+        const tags=Array.isArray(analysis.gemini_tags)?analysis.gemini_tags:[];
+        const categories=cats(item);
+        const related=Array.isArray(shared.related_elements)?shared.related_elements:[];
+        const hasCoords=Number.isFinite(Number(location.lat)) && Number.isFinite(Number(location.lng));
+        const mapLink=hasCoords ? "https://www.openstreetmap.org/?mlat="+encodeURIComponent(location.lat)+"&mlon="+encodeURIComponent(location.lng)+"#map=12/"+encodeURIComponent(location.lat)+"/"+encodeURIComponent(location.lng) : "";
+
+        fullData.innerHTML=
+            '<section class="heritage-full-data">'+
+                '<div class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3">Full record metadata</div>'+
+                '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">'+
+                    '<div><div class="text-[10px] font-bold uppercase text-slate-400">Record ID</div><div class="font-mono text-slate-700 mt-1">'+escapeHtmlPathway(item.id||"—")+'</div></div>'+
+                    '<div><div class="text-[10px] font-bold uppercase text-slate-400">Status</div><div class="font-bold text-slate-700 mt-1">'+escapeHtmlPathway(item.completion_status||"Not recorded")+'</div></div>'+
+                    '<div><div class="text-[10px] font-bold uppercase text-slate-400">Captured</div><div class="text-slate-600 mt-1">'+escapeHtmlPathway(item.scraped_at||"Not recorded")+'</div></div>'+
+                    '<div><div class="text-[10px] font-bold uppercase text-slate-400">Country</div><div class="font-bold text-slate-700 mt-1">'+escapeHtmlPathway(location.country||"Not recorded")+'</div></div>'+
+                '</div>'+
+                '<div class="mt-4">'+
+                    '<div class="text-[10px] font-bold uppercase text-slate-400">Categories</div>'+
+                    (categories.length?categories.map(function(v){return '<span class="heritage-meta-chip">'+escapeHtmlPathway(v)+'</span>';}).join(""):'<span class="text-xs text-slate-400">None</span>')+
+                '</div>'+
+            '</section>'+
+
+            '<div class="grid grid-cols-1 lg:grid-cols-2 gap-5">'+
+                '<section class="heritage-full-data">'+
+                    '<div class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3">Cultural significance</div>'+
+                    '<div class="text-sm text-slate-600 leading-relaxed">'+escapeHtmlPathway(analysis.cultural_significance||"Not recorded.")+'</div>'+
+                '</section>'+
+                '<section class="heritage-full-data">'+
+                    '<div class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3">AI-derived tags</div>'+
+                    (tags.length?tags.map(function(v){return '<span class="heritage-meta-chip">'+escapeHtmlPathway(v)+'</span>';}).join(""):'<span class="text-xs text-slate-400">No tags stored.</span>')+
+                '</section>'+
+            '</div>'+
+
+            '<section class="heritage-full-data">'+
+                '<div class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3">Location & coordinates</div>'+
+                '<div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">'+
+                    '<div><div class="text-[10px] font-bold uppercase text-slate-400">Country</div><div class="font-bold text-slate-700 mt-1">'+escapeHtmlPathway(location.country||"Not recorded")+'</div></div>'+
+                    '<div><div class="text-[10px] font-bold uppercase text-slate-400">Provinces / areas</div><div class="text-slate-600 mt-1">'+escapeHtmlPathway(provinces.join(" · ")||"Not recorded")+'</div></div>'+
+                    '<div><div class="text-[10px] font-bold uppercase text-slate-400">Coordinates</div><div class="text-slate-600 mt-1">'+(hasCoords?escapeHtmlPathway(location.lat+", "+location.lng):"Not recorded")+(mapLink?'<div class="mt-2"><a href="'+mapLink+'" target="_blank" rel="noopener noreferrer" class="text-teal-700 font-bold hover:underline">Open map ↗</a></div>':"")+'</div></div>'+
+                '</div>'+
+            '</section>'+
+
+            '<section class="heritage-full-data">'+
+                '<div class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3">Shared heritage network</div>'+
+                '<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">'+
+                    '<div><div class="text-[10px] font-bold uppercase text-slate-400">Detected</div><div class="font-bold text-slate-700 mt-1">'+(shared.is_shared?"Yes":"No")+'</div></div>'+
+                    '<div><div class="text-[10px] font-bold uppercase text-slate-400">Confidence</div><div class="font-bold text-slate-700 mt-1">'+(shared.confidence_score!==undefined?escapeHtmlPathway(shared.confidence_score):"Not recorded")+'</div></div>'+
+                    '<div><div class="text-[10px] font-bold uppercase text-slate-400">Related elements</div><div class="font-bold text-slate-700 mt-1">'+related.length+'</div></div>'+
+                '</div>'+
+                (related.length?'<div class="space-y-2">'+related.map(function(rel){return '<div class="rounded-xl bg-violet-50 border border-violet-100 p-3"><div class="font-bold text-xs text-violet-900">'+escapeHtmlPathway(rel.element_name||"Related element")+' · '+escapeHtmlPathway(rel.country||"")+'</div><div class="text-xs text-violet-800 mt-1">'+escapeHtmlPathway(rel.relationship_reason||"No relationship explanation recorded.")+'</div></div>';}).join("")+'</div>':'<div class="text-xs text-slate-400">No related heritage elements recorded.</div>')+
+            '</section>'+
+
+            '<section class="heritage-full-data bg-slate-50">'+
+                '<details>'+
+                    '<summary class="cursor-pointer text-sm font-bold text-slate-700">Open complete raw record (JSON) — all fields</summary>'+
+                    '<div class="heritage-raw-json mt-4">'+escapeHtmlPathway(JSON.stringify(item,null,2))+'</div>'+
+                '</details>'+
+            '</section>';
+
+        document.getElementById("pathway-modal-body").appendChild(fullData);
+
         document.getElementById("pathway-modal").classList.remove("hidden");
     }
 
