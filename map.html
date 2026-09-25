@@ -391,7 +391,8 @@
 
 
     <script>
-    const ICH_DATA_URL = "https://raw.githubusercontent.com/AnggaConni/ICH-Radar/main/data.json";
+    const ICH_API_URL = "https://api.github.com/repos/AnggaConni/ICH-Radar/contents/data.json?ref=main";
+    const ICH_RAW_URL = "https://raw.githubusercontent.com/AnggaConni/ICH-Radar/main/data.json";
     const PATHWAYS = [
         {id:"silk-road",name:"Silk Roads",mode:"overland",color:"#0d9488",period:"Antiquity–early modern period",subtitle:"A broad network of overland and connected corridors linking East Asia, Central Asia, the Middle East and Europe.",resources:["Silk","Textiles","Tea","Spices","Metals","Paper","Ideas & techniques"],countries:["China","India","Pakistan","Afghanistan","Uzbekistan","Iran","Iraq","Turkey"],culturalEffects:["Technologies and craft knowledge moved with merchants and artisans.","Food ingredients and preservation practices travelled alongside commodities.","Religious, linguistic and artistic exchange created shared cultural forms."],evidenceNote:"The Silk Roads were a network, not one continuous road. The line shown here is a simplified analytical corridor.",coordinates:[[34.26,108.94],[39.47,75.99],[39.65,66.96],[35.69,51.39],[33.31,44.37],[41.01,28.98]]},
         {id:"indian-ocean",name:"Indian Ocean Exchange",mode:"maritime",color:"#2563eb",period:"Ancient–modern maritime exchange",subtitle:"A connected maritime world linking East Africa, Arabia, South Asia and Southeast Asia through repeated port-to-port exchange.",resources:["Spices","Rice","Coconut","Textiles","Salt","Ceramics","Preservation knowledge"],countries:["Kenya","Tanzania","Oman","Yemen","India","Sri Lanka","Malaysia","Indonesia"],culturalEffects:["Seasonal sailing supported repeated movement of merchants and communities.","Ingredients and cooking techniques were adapted locally.","Religious, linguistic and artistic influences travelled between port cities."],evidenceNote:"This is a maritime exchange system rather than one fixed sea lane. Routes changed by season, port and period.",coordinates:[[-4.04,39.67],[12.79,45.03],[23.59,58.41],[19.08,72.88],[6.93,79.86],[3.14,101.69],[-6.15,106.82]]},
@@ -405,6 +406,64 @@
     let pathwayMap=null, heritageLayer=null, pathwayLayers=[], ichInventory=[], activeLens="all";
 
     function esc(v){ return String(v==null?"":v).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c];}); }
+
+    function decodeBase64Utf8(base64){
+        var clean=String(base64||"").replace(/\\s/g,"");
+        var binary=atob(clean);
+        var bytes=new Uint8Array(binary.length);
+        for(var i=0;i<binary.length;i++) bytes[i]=binary.charCodeAt(i);
+        return new TextDecoder("utf-8").decode(bytes);
+    }
+
+    async function loadIcradarData(){
+        var status=document.getElementById("foodways-status");
+        try{
+            status.textContent="Loading ICH Radar data from GitHub…";
+            var apiResponse=await fetch(ICH_API_URL,{headers:{"Accept":"application/vnd.github+json"}});
+            if(!apiResponse.ok) throw new Error("GitHub Contents API returned HTTP "+apiResponse.status);
+            var file=await apiResponse.json();
+
+            var payload;
+            if(file.content && file.encoding==="base64"){
+                payload=JSON.parse(decodeBase64Utf8(file.content));
+            }else if(file.download_url){
+                var rawResponse=await fetch(file.download_url,{cache:"no-store"});
+                if(!rawResponse.ok) throw new Error("GitHub download_url returned HTTP "+rawResponse.status);
+                payload=await rawResponse.json();
+            }else{
+                throw new Error("GitHub API returned neither base64 content nor download_url.");
+            }
+
+            ichInventory=Array.isArray(payload&&payload.inventory)?payload.inventory:[];
+            if(!ichInventory.length) throw new Error("ICH Radar data loaded but inventory is empty.");
+
+            renderHeritageNodes();
+            populateFoodCountryFilter();
+            renderFoodways();
+
+            status.textContent=ichInventory.filter(culinary).length+" culinary records from ICH Radar · "+ichInventory.length+" heritage records total";
+        }catch(apiError){
+            console.warn("Primary ICH Radar loader failed:",apiError);
+            try{
+                status.textContent="Trying direct ICH Radar mirror…";
+                var rawResponse=await fetch(ICH_RAW_URL,{cache:"no-store"});
+                if(!rawResponse.ok) throw new Error("Raw GitHub returned HTTP "+rawResponse.status);
+                var payload=await rawResponse.json();
+                ichInventory=Array.isArray(payload&&payload.inventory)?payload.inventory:[];
+                if(!ichInventory.length) throw new Error("Raw ICH Radar data is empty.");
+
+                renderHeritageNodes();
+                populateFoodCountryFilter();
+                renderFoodways();
+                status.textContent=ichInventory.filter(culinary).length+" culinary records from ICH Radar · "+ichInventory.length+" heritage records total";
+            }catch(rawError){
+                console.error("ICH Radar data loading failed:",rawError);
+                status.textContent="ICH Radar data could not be loaded: "+(rawError.message||"unknown error");
+                document.getElementById("foodways-grid").innerHTML='<div class="col-span-full p-8 rounded-3xl bg-slate-50 border border-red-200 text-center text-red-500">Unable to load the live ICH Radar dataset. Please refresh or open the site from a web server/GitHub Pages rather than file://.</div>';
+            }
+        }
+    }
+
     function cats(item){ return Array.isArray(item&&item.categories)&&item.categories.length ? item.categories : (item&&item.category?[item.category]:[]); }
     function culinary(item){ return cats(item).some(function(c){return String(c).toLowerCase()==="culinary traditions";}); }
     function coords(item){ var lat=Number(item&&item.location&&item.location.lat), lng=Number(item&&item.location&&item.location.lng); return Number.isFinite(lat)&&Number.isFinite(lng)&&Math.abs(lat)<=90&&Math.abs(lng)<=180; }
@@ -425,17 +484,7 @@
         renderRoutes();
         const allPathwayPoints = PATHWAYS.flatMap(function(p){ return p.coordinates; });
         if(allPathwayPoints.length) pathwayMap.fitBounds(L.latLngBounds(allPathwayPoints).pad(0.12));
-        fetch(ICH_DATA_URL).then(function(r){if(!r.ok)throw new Error("ICH data request failed");return r.json();}).then(function(d){
-            ichInventory=Array.isArray(d&&d.inventory)?d.inventory:[];
-            renderHeritageNodes();
-            populateFoodCountryFilter();
-            renderFoodways();
-            document.getElementById("foodways-status").textContent=ichInventory.filter(culinary).length+" culinary records from ICH Radar";
-        }).catch(function(err){
-            console.error(err);
-            document.getElementById("foodways-status").textContent="ICH Radar data could not be loaded in this browser.";
-            document.getElementById("foodways-grid").innerHTML='<div class="col-span-full p-8 rounded-3xl bg-slate-50 border border-slate-200 text-center text-slate-400">The pathway map is available, but the live ICH dataset could not be loaded.</div>';
-        });
+        loadIcradarData();
     }
 
     function renderRoutes(){
