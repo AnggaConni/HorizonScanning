@@ -22,7 +22,13 @@ body{font-family:Inter,sans-serif}
 #detailFull.open{display:flex}
 .legend-dot{width:10px;height:10px;border-radius:50%;display:inline-block}
 .glass{background:rgba(255,255,255,.88);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
-.evidence-carousel{display:flex;gap:1rem;overflow-x:auto;scroll-snap-type:x mandatory;padding:0.25rem 0.15rem 0.75rem;scrollbar-width:thin}
+.evidence-carousel-wrap{position:relative}
+.evidence-carousel{display:flex;gap:1rem;overflow-x:auto;scroll-snap-type:x mandatory;padding:0.25rem 3.25rem 0.75rem 0.15rem;scrollbar-width:thin;scroll-behavior:smooth}
+.carousel-arrow{position:absolute;top:50%;transform:translateY(-60%);z-index:5;width:38px;height:38px;border-radius:999px;background:rgba(255,255,255,.96);border:1px solid #e2e8f0;box-shadow:0 4px 14px rgba(15,23,42,.12);display:flex;align-items:center;justify-content:center;color:#334155;transition:all .2s}
+.carousel-arrow:hover{background:#0f172a;color:#fff;border-color:#0f172a;transform:translateY(-60%) scale(1.04)}
+.carousel-arrow.left{left:-10px}
+.carousel-arrow.right{right:-10px}
+@media(max-width:640px){.carousel-arrow{width:34px;height:34px}.carousel-arrow.left{left:4px}.carousel-arrow.right{right:4px}.evidence-carousel{padding-left:2.75rem;padding-right:2.75rem}}
 .evidence-card{flex:0 0 min(320px,82vw);scroll-snap-align:start}
 .evidence-carousel::-webkit-scrollbar{height:8px}
 .evidence-carousel::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:999px}
@@ -165,7 +171,7 @@ body{font-family:Inter,sans-serif}
         <h2 class="text-2xl font-bold text-slate-900 mt-1">Transformation streams</h2>
         <p class="text-sm text-slate-500 mt-1">Newest records are surfaced within three thematic streams, using the live radar data.</p>
       </div>
-      <div class="hidden sm:block text-xs text-slate-400">← Scroll horizontally →</div>
+      <div class="hidden sm:block text-xs text-slate-400">Use the arrow buttons to browse newest evidence →</div>
     </div>
 
     <div class="space-y-8">
@@ -178,7 +184,11 @@ body{font-family:Inter,sans-serif}
           </div>
           <span id="climateCount" class="text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700"></span>
         </div>
-        <div id="climateEvidence" class="evidence-carousel"></div>
+        <div class="evidence-carousel-wrap">
+          <button class="carousel-arrow left" type="button" data-target="climateEvidence" data-dir="-1" aria-label="Scroll climate evidence left"><i class="ph ph-caret-left"></i></button>
+          <div id="climateEvidence" class="evidence-carousel"></div>
+          <button class="carousel-arrow right" type="button" data-target="climateEvidence" data-dir="1" aria-label="Scroll climate evidence right"><i class="ph ph-caret-right"></i></button>
+        </div>
       </section>
 
       <section class="section-accent pl-4 text-teal-700">
@@ -190,7 +200,11 @@ body{font-family:Inter,sans-serif}
           </div>
           <span id="ideasCount" class="text-xs font-bold px-2.5 py-1 rounded-full bg-teal-50 text-teal-700"></span>
         </div>
-        <div id="ideasEvidence" class="evidence-carousel"></div>
+        <div class="evidence-carousel-wrap">
+          <button class="carousel-arrow left" type="button" data-target="ideasEvidence" data-dir="-1" aria-label="Scroll ideas evidence left"><i class="ph ph-caret-left"></i></button>
+          <div id="ideasEvidence" class="evidence-carousel"></div>
+          <button class="carousel-arrow right" type="button" data-target="ideasEvidence" data-dir="1" aria-label="Scroll ideas evidence right"><i class="ph ph-caret-right"></i></button>
+        </div>
       </section>
 
       <section class="section-accent pl-4 text-pink-700">
@@ -202,7 +216,11 @@ body{font-family:Inter,sans-serif}
           </div>
           <span id="cultureCount" class="text-xs font-bold px-2.5 py-1 rounded-full bg-pink-50 text-pink-700"></span>
         </div>
-        <div id="cultureEvidence" class="evidence-carousel"></div>
+        <div class="evidence-carousel-wrap">
+          <button class="carousel-arrow left" type="button" data-target="cultureEvidence" data-dir="-1" aria-label="Scroll intercultural evidence left"><i class="ph ph-caret-left"></i></button>
+          <div id="cultureEvidence" class="evidence-carousel"></div>
+          <button class="carousel-arrow right" type="button" data-target="cultureEvidence" data-dir="1" aria-label="Scroll intercultural evidence right"><i class="ph ph-caret-right"></i></button>
+        </div>
       </section>
     </div>
   </section>
@@ -904,6 +922,15 @@ async function initData(){
   renderFeatured();
   renderMap();
 }
+
+document.querySelectorAll(".carousel-arrow").forEach(function(btn){
+  btn.addEventListener("click",function(){
+    const target=$(btn.dataset.target);
+    if(!target) return;
+    const amount=Math.max(280,target.clientWidth * 0.78);
+    target.scrollBy({left:Number(btn.dataset.dir) * amount,behavior:"smooth"});
+  });
+});
 
 document.addEventListener("DOMContentLoaded",function(){
   initData();
