@@ -327,16 +327,8 @@ async function loadOne(key){
     console.warn(key + " data.json failed",e);
   }
 
-  if(cfg.fallback){
-    try{
-      const raw = await fetchJSON(cfg.fallback);
-      const items = extractRecords(key,raw);
-      if(items.length) return {items:items,source:"resume.json"};
-    }catch(e){
-      console.warn(key + " fallback failed",e);
-    }
-  }
-
+  // MOST intentionally consumes the radar's item-level data.json.
+  // We do not substitute quarterly resume reports as fake records.
   state.errors.push(key);
   return {items:[],source:"unavailable"};
 }
