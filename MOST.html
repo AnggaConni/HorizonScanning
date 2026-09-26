@@ -22,6 +22,7 @@ body{font-family:Inter,sans-serif}
 #detailFull.open{display:flex}
 .legend-dot{width:10px;height:10px;border-radius:50%;display:inline-block}
 .glass{background:rgba(255,255,255,.88);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+#fullSummary{max-height:none;overflow:visible}
 @media(max-width:640px){.map-shell{height:72vh;min-height:560px}.title-wrap{max-width:92vw}}
 </style>
 </head>
@@ -108,7 +109,7 @@ body{font-family:Inter,sans-serif}
             </div>
             <button id="closeDetailFull" class="shrink-0 w-9 h-9 rounded-lg border border-slate-200 text-slate-500 hover:text-slate-900" aria-label="Close full record"><i class="ph ph-x text-lg"></i></button>
           </div>
-          <div class="flex-1 overflow-y-auto p-4 sm:p-6">
+          <div class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
             <div class="grid lg:grid-cols-3 gap-4 mb-5">
               <div class="bg-slate-50 border border-slate-200 rounded-xl p-4"><div class="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Source radar</div><div id="fullRadar" class="font-bold text-slate-800 mt-1"></div></div>
               <div class="bg-slate-50 border border-slate-200 rounded-xl p-4"><div class="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Location</div><div id="fullLocation" class="font-bold text-slate-800 mt-1"></div></div>
@@ -118,7 +119,7 @@ body{font-family:Inter,sans-serif}
             <div class="space-y-5">
               <section>
                 <div class="text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Overview</div>
-                <div id="fullSummary" class="text-sm leading-7 text-slate-700 bg-slate-50 border border-slate-200 rounded-xl p-4"></div>
+                <div id="fullSummary" class="text-sm leading-7 text-slate-700 bg-slate-50 border border-slate-200 rounded-xl p-5 whitespace-pre-wrap"></div>
               </section>
 
               <section id="fullCategoriesSection">
@@ -128,7 +129,7 @@ body{font-family:Inter,sans-serif}
 
               <section id="fullStructuredSection">
                 <div class="text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Structured intelligence</div>
-                <div id="fullStructured" class="grid md:grid-cols-2 xl:grid-cols-3 gap-3"></div>
+                <div id="fullStructured" class="space-y-4"></div>
               </section>
 
               <section>
@@ -477,7 +478,7 @@ function formatValue(value){
 function addStructuredCard(container,key,value){
   if(value === null || value === undefined || value === "") return;
   const wrap=document.createElement("div");
-  wrap.className="bg-white border border-slate-200 rounded-xl p-4";
+  wrap.className="bg-white border border-slate-200 rounded-xl p-5 w-full";
 
   const title=document.createElement("div");
   title.className="text-[10px] uppercase tracking-widest text-slate-400 font-bold";
@@ -524,7 +525,7 @@ function addStructuredCard(container,key,value){
         }
         inner.appendChild(nested);
       }else{
-        inner.innerHTML += '<div class="flex justify-between gap-4 text-sm py-1 border-b border-slate-100 last:border-0"><span class="text-slate-400">'+esc(humanLabel(k))+'</span><span class="text-slate-700 text-right font-medium">'+esc(formatValue(v))+'</span></div>';
+        inner.innerHTML += '<div class="grid grid-cols-[minmax(140px,220px)_1fr] gap-4 text-sm py-2 border-b border-slate-100 last:border-0"><span class="text-slate-400">'+esc(humanLabel(k))+'</span><span class="text-slate-700 font-medium whitespace-pre-wrap break-words">'+esc(formatValue(v))+'</span></div>';
       }
     });
     wrap.appendChild(inner);
