@@ -49,6 +49,16 @@ body{font-family:Inter,sans-serif}
 .signal-level span{display:block;height:100%;border-radius:999px}
 .watch-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto auto;gap:.75rem;align-items:center;padding:.75rem 0;border-bottom:1px solid #e2e8f0}
 .watch-row:last-child{border-bottom:0}
+.synthesis-flow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;position:relative}
+.synthesis-stage{background:#fff;border:1px solid #e2e8f0;padding:1.2rem;position:relative}
+.synthesis-stage:first-child{border-radius:1rem 0 0 1rem}
+.synthesis-stage:last-child{border-radius:0 1rem 1rem 0}
+.synthesis-stage:not(:last-child)::after{content:"→";position:absolute;right:-14px;top:50%;transform:translateY(-50%);z-index:4;width:28px;height:28px;border-radius:999px;background:#0f172a;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.8rem;box-shadow:0 3px 8px rgba(15,23,42,.16)}
+.synthesis-number{font-size:2rem;font-weight:800;line-height:1}
+.gap-item{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.75rem 0;border-bottom:1px solid #e2e8f0}
+.gap-item:last-child{border-bottom:0}
+@media(max-width:900px){.synthesis-flow{grid-template-columns:1fr;gap:.75rem}.synthesis-stage,.synthesis-stage:first-child,.synthesis-stage:last-child{border-radius:1rem}.synthesis-stage:not(:last-child)::after{content:"↓";right:50%;top:auto;bottom:-18px;transform:translateX(50%);}}
+
 @media(max-width:1000px){.foresight-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:640px){.foresight-grid{grid-template-columns:1fr}.watch-row{grid-template-columns:1fr auto;gap:.5rem}}
 .tag-cloud{display:flex;flex-wrap:wrap;gap:.45rem}
@@ -218,6 +228,42 @@ body{font-family:Inter,sans-serif}
       <p class="text-sm text-slate-500 mt-1">Coverage indicators show what the federated dataset actually contains: location, source links, narrative content and structured scoring.</p>
     </div>
     <div id="readinessCards" class="analytics-grid"></div>
+  </section>
+
+  <section id="synthesisFlow" class="mt-8">
+    <div class="mb-4">
+      <div class="text-xs font-bold tracking-widest uppercase text-teal-600">Foresight synthesis</div>
+      <h2 class="text-2xl md:text-3xl font-bold text-slate-900 mt-1">Evidence → Pattern → Question → Gap</h2>
+      <p class="text-sm text-slate-500 mt-1">A transparent synthesis path built from the live radar records. The final stage highlights missing evidence rather than pretending the dataset already answers every question.</p>
+    </div>
+
+    <div id="synthesisStages" class="synthesis-flow"></div>
+
+    <div class="grid lg:grid-cols-3 gap-4 mt-5">
+      <article class="bg-white rounded-2xl border border-slate-200 p-5">
+        <div class="text-xs font-bold tracking-widest uppercase text-slate-400">Exploratory question</div>
+        <div id="questionNexus" class="text-sm leading-6 text-slate-700 mt-3"></div>
+      </article>
+      <article class="bg-white rounded-2xl border border-slate-200 p-5">
+        <div class="text-xs font-bold tracking-widest uppercase text-slate-400">Exploratory question</div>
+        <div id="questionIdeas" class="text-sm leading-6 text-slate-700 mt-3"></div>
+      </article>
+      <article class="bg-white rounded-2xl border border-slate-200 p-5">
+        <div class="text-xs font-bold tracking-widest uppercase text-slate-400">Exploratory question</div>
+        <div id="questionICH" class="text-sm leading-6 text-slate-700 mt-3"></div>
+      </article>
+    </div>
+
+    <div class="mt-5 bg-white rounded-2xl border border-slate-200 p-5">
+      <div class="flex items-end justify-between gap-4 mb-3">
+        <div>
+          <div class="text-xs font-bold tracking-widest uppercase text-slate-400">Evidence gap watch</div>
+          <h3 class="text-xl font-bold text-slate-900 mt-1">What is still missing from the live records?</h3>
+        </div>
+        <span class="text-xs text-slate-400">Based on absent core fields</span>
+      </div>
+      <div id="gapWatch"></div>
+    </div>
   </section>
 
   <section id="priorityThemes" class="mt-8">
@@ -938,6 +984,124 @@ function renderEvidenceReadiness(){
   }
 }
 
+
+function hasNarrative(r){
+  return Boolean(displaySummary(r) && !displaySummary(r).startsWith("No narrative summary"));
+}
+
+function recordHasAffectedOrImpact(r){
+  const raw=r.raw||{};
+  return Boolean(
+    raw.potential_impact ||
+    raw.affected_elements ||
+    raw.impact ||
+    (raw.impact && Object.keys(raw.impact).length) ||
+    raw.problem_solved
+  );
+}
+
+function gapProfile(records){
+  const checks=[
+    ["Location",function(r){return r.lat!==null && r.lon!==null;}],
+    ["Source links",function(r){return Array.isArray(r.sources) && r.sources.length>0;}],
+    ["Narrative",hasNarrative],
+    ["Priority / risk scoring",function(r){return r.priority!==null || r.risk!==null || r.impact!==null;}],
+    ["Structured impact / effect",recordHasAffectedOrImpact]
+  ];
+  return checks.map(function(check){
+    const name=check[0],fn=check[1];
+    const missing=records.filter(function(r){return !fn(r);}).length;
+    return {name:name,missing:missing,coverage:records.length?Math.round(((records.length-missing)/records.length)*100):0};
+  }).sort(function(a,b){return b.missing-a.missing;});
+}
+
+function buildExploratoryQuestion(records,kind){
+  if(!records.length) return "No records are currently available for this lens.";
+
+  const ranked=records.slice().sort(function(a,b){
+    const ap=a.priority==null?-1:a.priority,bp=b.priority==null?-1:b.priority;
+    const ar=a.risk==null?-1:a.risk,br=b.risk==null?-1:b.risk;
+    return (bp-ap)||(br-ar);
+  });
+  const r=ranked[0];
+  const raw=r.raw||{};
+
+  if(kind==="NEXUS"){
+    const affected=arr(raw.potential_impact && raw.potential_impact.affected_elements).filter(Boolean).join(", ");
+    const domain=arr(raw.domain_classification).filter(Boolean).join(", ");
+    return '<div class="font-bold text-slate-900">'+esc(r.title)+'</div>' +
+      '<div class="mt-2"><b>Possible research question:</b> How might '+esc(domain||"this emerging signal")+' affect '+esc(affected||"social and ecological systems")+' as the signal evolves?</div>' +
+      '<div class="mt-2 text-xs text-slate-400">Built from the record’s observed signal, affected elements and risk fields.</div>';
+  }
+
+  if(kind==="IDEAS"){
+    const problem=first(raw.impact && raw.impact.problem_solved,raw.problem_solved);
+    const learners=raw.education_details && raw.education_details.target_learners;
+    return '<div class="font-bold text-slate-900">'+esc(r.title)+'</div>' +
+      '<div class="mt-2"><b>Possible research question:</b> Under what contexts could this '+esc(problem?"response to "+problem:"innovation")+' be adapted or replicated, and what evidence would be needed to test that?</div>' +
+      (learners?'<div class="mt-2 text-xs text-slate-500">Target group in source data: '+esc(learners)+'</div>':"") +
+      '<div class="mt-2 text-xs text-slate-400">Built from impact, replicability and implementation fields.</div>';
+  }
+
+  const shared=raw.shared_heritage_detection;
+  return '<div class="font-bold text-slate-900">'+esc(r.title)+'</div>' +
+    '<div class="mt-2"><b>Possible research question:</b> What could be learned from the cultural relationships, documentation gaps or shared-heritage connections associated with this practice?</div>' +
+    (shared && shared.is_shared===true
+      ? '<div class="mt-2 text-xs text-pink-700 font-semibold">Explicit shared-heritage evidence is present.</div>'
+      : '<div class="mt-2 text-xs text-slate-400">Built from heritage categories, source material and available shared-heritage fields.</div>');
+}
+
+function renderSynthesisFlow(){
+  const records=visibleRecords();
+  const allThemes=new Set();
+  const sourceCount=records.filter(function(r){return r.sources && r.sources.length;}).length;
+  const patternKeys=new Set();
+
+  records.forEach(function(r){
+    Object.keys(r.themes||{}).forEach(function(k){allThemes.add(k);});
+    (r.category||[]).forEach(function(k){if(k)patternKeys.add(k);});
+    arr(r.raw && r.raw.domain_classification).forEach(function(k){if(k)patternKeys.add(k);});
+  });
+
+  const questionReady=records.filter(recordHasAffectedOrImpact).length;
+  const gaps=gapProfile(records);
+  const highGap= gaps.reduce(function(sum,g){return sum+g.missing;},0);
+
+  const stages=[
+    ["Evidence",records.length,"Live records across five radar sources","ph-database"],
+    ["Pattern",patternKeys.size,"Observed categories / domains represented","ph-git-branch"],
+    ["Question",questionReady,"Records with impact / affected-system evidence","ph-question"],
+    ["Gap",highGap,"Missing core evidence-field instances","ph-warning"]
+  ];
+
+  const host=$("synthesisStages");
+  if(host){
+    host.innerHTML=stages.map(function(s,i){
+      return '<article class="synthesis-stage">' +
+        '<div class="text-xs font-bold tracking-widest uppercase text-slate-400">0'+(i+1)+'</div>' +
+        '<div class="flex items-end justify-between gap-3 mt-3"><div><div class="text-xs font-bold uppercase tracking-widest text-teal-600">'+s[0]+'</div><div class="synthesis-number text-slate-900 mt-2">'+s[1].toLocaleString()+'</div></div><i class="ph '+s[3]+' text-2xl text-slate-300"></i></div>' +
+        '<p class="text-xs text-slate-500 mt-2">'+esc(s[2])+'</p>' +
+      '</article>';
+    }).join("");
+  }
+
+  const qn=$("questionNexus");
+  if(qn) qn.innerHTML=buildExploratoryQuestion(state.byRadar.NEXUS||[],"NEXUS");
+
+  const qi=$("questionIdeas");
+  if(qi) qi.innerHTML=buildExploratoryQuestion((state.byRadar.GSI||[]).concat(state.byRadar.EDU||[]),"IDEAS");
+
+  const qc=$("questionICH");
+  if(qc) qc.innerHTML=buildExploratoryQuestion(state.byRadar.ICH||[],"ICH");
+
+  const gapHost=$("gapWatch");
+  if(gapHost){
+    gapHost.innerHTML=gaps.map(function(g){
+      return '<div class="gap-item"><div class="min-w-0"><div class="font-semibold text-sm text-slate-800">'+esc(g.name)+'</div><div class="text-xs text-slate-400">'+g.missing.toLocaleString()+' of '+records.length.toLocaleString()+' records lack this field</div></div><div class="w-36 hidden sm:block"><div class="signal-level"><span style="width:'+g.coverage+'%;background:#0f766e"></span></div></div><div class="text-xs font-bold '+(g.coverage<50?"text-rose-600":"text-slate-500")+'">'+g.coverage+'% covered</div></div>';
+    }).join("");
+  }
+}
+
 function renderFilters(){
   const box = $("filters");
   box.innerHTML = "";
@@ -957,6 +1121,7 @@ function renderFilters(){
       renderStats();
       renderForesight();
       renderEvidenceReadiness();
+      renderSynthesisFlow();
       renderAnalytics();
       renderFeatured();
       renderMap();
@@ -1774,6 +1939,7 @@ async function initData(){
   renderStats();
   renderForesight();
   renderEvidenceReadiness();
+  renderSynthesisFlow();
   renderAnalytics();
   renderFeatured();
   renderMap();
