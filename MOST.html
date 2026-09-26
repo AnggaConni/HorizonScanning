@@ -1145,7 +1145,7 @@ function renderFullRecord(r){
     if(raw.screenshot_url){
       sections.push(
         panel("Captured source image",
-          '<img src="' + esc(raw.screenshot_url) + '" alt="Captured listing source" class="max-h-96 w-full object-contain rounded-lg border border-slate-200 bg-slate-50" onerror="this.style.display=\\'none\\'">'
+          '<img src="' + esc(raw.screenshot_url) + '" alt="Captured listing source" class="max-h-96 w-full object-contain rounded-lg border border-slate-200 bg-slate-50" onerror="this.remove()">'
         )
       );
     }
@@ -1552,7 +1552,7 @@ require([
       '</div>'
     );
     if(raw.screenshot_url){
-      profileParts.push('<div class="analytics-card mt-4"><div class="text-xs uppercase tracking-widest text-slate-400 font-bold">Captured source image</div><img src="'+esc(raw.screenshot_url)+'" alt="Captured listing source" class="mt-3 max-h-80 w-full object-contain rounded-lg border border-slate-200 bg-slate-50" onerror="this.style.display=\\'none\\'"></div>');
+      profileParts.push('<div class="analytics-card mt-4"><div class="text-xs uppercase tracking-widest text-slate-400 font-bold">Captured source image</div><img src="'+esc(raw.screenshot_url)+'" alt="Captured listing source" class="mt-3 max-h-80 w-full object-contain rounded-lg border border-slate-200 bg-slate-50" onerror="this.remove()"></div>');
     }
   }
 
