@@ -37,7 +37,7 @@ body{font-family:Inter,sans-serif}
     <div class="title-wrap max-w-4xl">
       <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-400/10 border border-teal-400/20 text-teal-300 text-xs font-bold tracking-wider">PROTOTYPE · SOCIAL TRANSFORMATION</div>
       <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight mt-5">Social Transformation<br><span class="text-teal-400">Intelligence</span></h1>
-      <p class="text-slate-300 text-lg md:text-xl mt-5 max-w-3xl">A public prototype for mapping weak signals of social change across climate, technology, demography, youth and inclusion — with a spatial layer for exploration.</p>\n      <div class="flex flex-wrap gap-2 mt-4"><span class="text-xs font-semibold text-slate-300 border border-white/10 bg-white/5 rounded-full px-3 py-1">No login</span><span class="text-xs font-semibold text-slate-300 border border-white/10 bg-white/5 rounded-full px-3 py-1">Open prototype</span><span class="text-xs font-semibold text-slate-300 border border-white/10 bg-white/5 rounded-full px-3 py-1">Public data-ready architecture</span></div>
+      <p class="text-slate-300 text-lg md:text-xl mt-5 max-w-3xl">A public prototype for mapping weak signals of social change across climate, technology, demography, youth and inclusion — with a spatial layer for exploration.</p>\n      <div class="flex flex-wrap gap-2 mt-4"><span class="text-xs font-semibold text-slate-300 border border-white/10 bg-white/5 rounded-full px-3 py-1">No login / API key</span><span class="text-xs font-semibold text-slate-300 border border-white/10 bg-white/5 rounded-full px-3 py-1">Open prototype</span><span class="text-xs font-semibold text-slate-300 border border-white/10 bg-white/5 rounded-full px-3 py-1">Public data-ready architecture</span></div>
     </div>
     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-8 max-w-4xl">
       <div class="rounded-xl bg-white/5 border border-white/10 p-4"><div class="text-2xl font-extrabold" id="statSignals">0</div><div class="text-xs text-slate-400 mt-1">Signals</div></div>
@@ -208,10 +208,30 @@ function renderSignals(){
 }
 renderSignals();
 
-require(['esri/Map','esri/views/MapView','esri/geometry/support/webMercatorUtils'],(Map,MapView)=>{
- const map=new Map({basemap:'arcgis/light-gray'});
- const view=new MapView({container:'viewDiv',map,center:[110,3],zoom:3,ui:{components:['zoom','compass','attribution']}});
- view.watch('extent',()=>{});
+require([
+  'esri/Map',
+  'esri/views/MapView',
+  'esri/layers/TileLayer'
+],(Map,MapView,TileLayer)=>{
+  // Public ArcGIS legacy basemap service.
+  // No ArcGIS Online sign-in or API key required for this anonymous prototype.
+  const grayBase = new TileLayer({
+    url:'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer',
+    title:'Esri World Light Gray Base'
+  });
+
+  const map = new Map({
+    layers:[grayBase]
+  });
+
+  const view = new MapView({
+    container:'viewDiv',
+    map,
+    center:[110,3],
+    zoom:3,
+    constraints:{minZoom:2},
+    ui:{components:['zoom','compass','attribution']}
+  });
 });
 </script>
 </body>
