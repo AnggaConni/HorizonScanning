@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Social Transformation Intelligence | HorizonScan AI</title>
+<title>Horizon Scanning · Social Transformation Intelligence | HorizonScan AI</title>
 <meta name="description" content="Prototype social transformation intelligence map connecting emerging signals, communities and policy-relevant themes.">
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -43,6 +43,14 @@ body{font-family:Inter,sans-serif}
 .matrix-value{font-weight:800;color:#0f172a}
 .profile-meter{height:9px;background:#e2e8f0;border-radius:999px;overflow:hidden}
 .profile-meter>span{display:block;height:100%;border-radius:999px}
+.foresight-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem}
+.foresight-card{background:#fff;border:1px solid #e2e8f0;border-radius:1rem;padding:1.2rem;min-width:0}
+.signal-level{height:8px;border-radius:999px;background:#e2e8f0;overflow:hidden}
+.signal-level span{display:block;height:100%;border-radius:999px}
+.watch-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto auto;gap:.75rem;align-items:center;padding:.75rem 0;border-bottom:1px solid #e2e8f0}
+.watch-row:last-child{border-bottom:0}
+@media(max-width:1000px){.foresight-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:640px){.foresight-grid{grid-template-columns:1fr}.watch-row{grid-template-columns:1fr auto;gap:.5rem}}
 .tag-cloud{display:flex;flex-wrap:wrap;gap:.45rem}
 .tag-cloud span{padding:.35rem .65rem;border-radius:999px;background:#f1f5f9;color:#475569;font-size:.72rem;font-weight:600}
 @media(max-width:900px){.analytics-grid{grid-template-columns:1fr}.radar-matrix{grid-template-columns:140px repeat(5,minmax(72px,1fr));overflow-x:auto}}
@@ -67,9 +75,9 @@ body{font-family:Inter,sans-serif}
 <header class="bg-slate-950 text-white">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
     <div class="title-wrap max-w-4xl">
-      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-400/10 border border-teal-400/20 text-teal-300 text-xs font-bold tracking-wider">PROTOTYPE · SOCIAL TRANSFORMATION</div>
-      <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight mt-5">Social Transformation<br><span class="text-teal-400">Intelligence</span></h1>
-      <p class="text-slate-300 text-lg md:text-xl mt-5 max-w-3xl">A public, read-only synthesis layer for five open-source intelligence systems covering culture, grassroots innovation, education, environmental signals and heritage-market risk.</p>
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-400/10 border border-teal-400/20 text-teal-300 text-xs font-bold tracking-wider">HORIZON SCANNING · SOCIAL TRANSFORMATION</div>
+      <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight mt-5">Horizon Scanning<br><span class="text-teal-400">for Social Transformation</span></h1>
+      <p class="text-slate-300 text-lg md:text-xl mt-5 max-w-3xl">A public, read-only foresight layer that synthesizes signals from five open-source intelligence systems to explore emerging social, environmental, technological and cultural transformations.</p>
       <div class="flex flex-wrap gap-2 mt-4"><span class="text-xs font-semibold text-slate-300 border border-white/10 bg-white/5 rounded-full px-3 py-1">No login / API key</span><span class="text-xs font-semibold text-slate-300 border border-white/10 bg-white/5 rounded-full px-3 py-1">Open prototype</span><span class="text-xs font-semibold text-slate-300 border border-white/10 bg-white/5 rounded-full px-3 py-1">Public data-ready architecture</span></div>
     </div>
     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-8 max-w-4xl">
@@ -182,6 +190,36 @@ body{font-family:Inter,sans-serif}
     </div>
   </section>
 
+  <section id="foresightWatch" class="mt-8">
+    <div class="mb-4">
+      <div class="text-xs font-bold tracking-widest uppercase text-teal-600">Foresight layer</div>
+      <h2 class="text-2xl md:text-3xl font-bold text-slate-900 mt-1">What is emerging right now?</h2>
+      <p class="text-sm text-slate-500 mt-1">Derived only from signal intensity, escalation, urgency, risk and priority fields already present in the radar records. This is a current-signal watch, not a prediction.</p>
+    </div>
+
+    <div id="foresightCards" class="foresight-grid"></div>
+
+    <div class="mt-6 bg-white rounded-2xl border border-slate-200 p-5">
+      <div class="flex items-end justify-between gap-4 mb-3">
+        <div>
+          <div class="text-xs font-bold tracking-widest uppercase text-slate-400">Current transformation watchlist</div>
+          <h3 class="text-xl font-bold text-slate-900 mt-1">Signals and cases standing out in the live evidence</h3>
+        </div>
+        <span class="text-xs text-slate-400">Sorted by available priority → risk → recency</span>
+      </div>
+      <div id="watchlist" class="divide-y divide-slate-200"></div>
+    </div>
+  </section>
+
+  <section id="evidenceReadiness" class="mt-8">
+    <div class="mb-4">
+      <div class="text-xs font-bold tracking-widest uppercase text-teal-600">Evidence readiness</div>
+      <h2 class="text-2xl md:text-3xl font-bold text-slate-900 mt-1">Can the signal be used?</h2>
+      <p class="text-sm text-slate-500 mt-1">Coverage indicators show what the federated dataset actually contains: location, source links, narrative content and structured scoring.</p>
+    </div>
+    <div id="readinessCards" class="analytics-grid"></div>
+  </section>
+
   <section id="priorityThemes" class="mt-8">
     <div class="mb-4">
       <div class="text-xs font-bold tracking-widest uppercase text-teal-600">MOST-aligned evidence lens</div>
@@ -282,7 +320,7 @@ body{font-family:Inter,sans-serif}
   <section class="grid md:grid-cols-3 gap-4 mt-6">
     <article class="bg-white rounded-2xl border border-slate-200 p-5"><div class="text-teal-600 text-xl"><i class="ph ph-broadcast"></i></div><h3 class="font-bold text-slate-900 mt-3">Signal discovery</h3><p class="text-sm text-slate-500 mt-2">A place to collect weak signals, emerging patterns and contextual evidence before they become mainstream trends.</p></article>
     <article class="bg-white rounded-2xl border border-slate-200 p-5"><div class="text-blue-600 text-xl"><i class="ph ph-map-trifold"></i></div><h3 class="font-bold text-slate-900 mt-3">Spatial intelligence</h3><p class="text-sm text-slate-500 mt-2">Map signals by geography, then inspect how different transformations cluster or intersect.</p></article>
-    <article class="bg-white rounded-2xl border border-slate-200 p-5"><div class="text-pink-600 text-xl"><i class="ph ph-arrows-clockwise"></i></div><h3 class="font-bold text-slate-900 mt-3">Policy translation</h3><p class="text-sm text-slate-500 mt-2">Future version: connect evidence and signals to research questions, policy options, capacity needs and foresight work.</p></article>
+    <article class="bg-white rounded-2xl border border-slate-200 p-5"><div class="text-pink-600 text-xl"><i class="ph ph-arrows-clockwise"></i></div><h3 class="font-bold text-slate-900 mt-3">Policy translation</h3><p class="text-sm text-slate-500 mt-2">Use current signal, risk, priority, impact and implementation evidence to frame research questions, evidence gaps and foresight discussions without turning the dashboard into a policy decision-maker.</p></article>
   </section>
 
   <section id="osint-radar" class="mt-8">
@@ -786,6 +824,120 @@ function renderAnalytics(){
       makeList("Artifact platforms","ph ph-detective",state.analytics.patterns.platforms,"#d97706");
   }
 }
+
+function renderForesight(){
+  const all=visibleRecords();
+  const nexus=state.byRadar.NEXUS || [];
+  const highUrgency=nexus.filter(function(r){
+    return String((r.raw && r.raw.escalation && r.raw.escalation.urgency) || r.urgency || "").toLowerCase().includes("high");
+  });
+  const fastEscalation=nexus.filter(function(r){
+    return String((r.raw && r.raw.escalation && r.raw.escalation.speed) || "").toLowerCase().includes("high");
+  });
+  const highRisk=all.filter(function(r){return r.risk !== null && r.risk >= 8;});
+  const highPriority=all.filter(function(r){return r.priority !== null && r.priority >= 80;});
+
+  const cards=[
+    {
+      label:"High-urgency signals",
+      value:highUrgency.length,
+      note:"Nexus records explicitly marked with high urgency.",
+      color:"#dc2626",
+      icon:"ph-warning"
+    },
+    {
+      label:"Accelerating signals",
+      value:fastEscalation.length,
+      note:"Nexus records with explicit high escalation speed.",
+      color:"#ea580c",
+      icon:"ph-trend-up"
+    },
+    {
+      label:"High-risk records",
+      value:highRisk.length,
+      note:"Records carrying a risk score of 8 or above.",
+      color:"#be123c",
+      icon:"ph-shield-warning"
+    },
+    {
+      label:"High-priority records",
+      value:highPriority.length,
+      note:"Records with priority score of 80 or above.",
+      color:"#0f766e",
+      icon:"ph-target"
+    }
+  ];
+
+  const host=$("foresightCards");
+  if(host){
+    host.innerHTML=cards.map(function(card){
+      const pct=all.length ? Math.min(100,Math.round((card.value/all.length)*100)) : 0;
+      return '<article class="foresight-card">' +
+        '<div class="flex items-start justify-between gap-3">' +
+          '<div><div class="text-xs font-bold uppercase tracking-widest" style="color:'+card.color+'">'+esc(card.label)+'</div><div class="text-3xl font-extrabold text-slate-900 mt-2">'+card.value.toLocaleString()+'</div><div class="text-xs text-slate-400 mt-1">'+esc(card.note)+'</div></div>' +
+          '<div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:'+card.color+'18;color:'+card.color+'"><i class="ph '+card.icon+' text-xl"></i></div>' +
+        '</div>' +
+        '<div class="signal-level mt-5"><span style="width:'+pct+'%;background:'+card.color+'"></span></div>' +
+        '<div class="text-[10px] text-slate-400 mt-2">'+pct+'% of current federated records</div>' +
+      '</article>';
+    }).join("");
+  }
+
+  const watchHost=$("watchlist");
+  if(watchHost){
+    const watch=all.slice().sort(function(a,b){
+      const ap=a.priority==null?-1:a.priority, bp=b.priority==null?-1:b.priority;
+      const ar=a.risk==null?-1:a.risk, br=b.risk==null?-1:b.risk;
+      const at=a.timestamp?new Date(a.timestamp).getTime():0, bt=b.timestamp?new Date(b.timestamp).getTime():0;
+      return (bp-ap)||(br-ar)||(bt-at);
+    }).slice(0,10);
+
+    watchHost.innerHTML=watch.length ? watch.map(function(r){
+      const urgency=String((r.raw && r.raw.escalation && r.raw.escalation.urgency) || r.urgency || "");
+      const speed=String((r.raw && r.raw.escalation && r.raw.escalation.speed) || "");
+      return '<button class="watch-row w-full text-left hover:bg-slate-50 transition px-2 rounded-lg" data-watch="'+esc(r.radar+"::"+r.id)+'">' +
+        '<div class="min-w-0"><div class="flex items-center gap-2">'+badge(r.radar)+'<span class="font-bold text-sm text-slate-900 truncate">'+esc(r.title)+'</span></div><div class="text-xs text-slate-500 mt-1 truncate">'+esc(displaySummary(r))+'</div></div>' +
+        '<span class="text-[10px] font-bold px-2 py-1 rounded-full bg-slate-100 text-slate-600">'+esc(urgency||speed||"Observed")+'</span>' +
+        '<span class="text-[10px] font-bold px-2 py-1 rounded-full bg-teal-50 text-teal-700">'+(r.priority!==null?"P "+Math.round(r.priority):"—")+'</span>' +
+        '<span class="text-[10px] font-bold px-2 py-1 rounded-full bg-rose-50 text-rose-700">'+(r.risk!==null?"R "+Math.round(r.risk):"—")+'</span>' +
+      '</button>';
+    }).join("") : '<div class="py-6 text-sm text-slate-400">No current watchlist records.</div>';
+
+    watchHost.querySelectorAll("[data-watch]").forEach(function(btn){
+      btn.onclick=function(){
+        const p=btn.dataset.watch.split("::");
+        const r=state.records.find(function(x){return x.radar===p[0] && x.id===p[1];});
+        if(r) selectRecord(r);
+      };
+    });
+  }
+}
+
+function renderEvidenceReadiness(){
+  const records=visibleRecords();
+  const total=records.length||1;
+  const uniqueCountries=new Set(records.map(function(r){return r.country;}).filter(function(x){return x && x!=="Unknown";})).size;
+  const mapped=records.filter(function(r){return r.lat!==null&&r.lon!==null;}).length;
+  const sourced=records.filter(function(r){return r.sources&&r.sources.length;}).length;
+  const narrative=records.filter(function(r){return displaySummary(r)!=="No narrative summary is available in this record." && displaySummary(r)!=="No narrative summary is available in this record";}).length;
+  const scored=records.filter(function(r){return r.priority!==null || r.risk!==null || r.impact!==null;}).length;
+
+  const items=[
+    ["Geographic coverage",uniqueCountries.toLocaleString()+" countries / locations","ph-globe-hemisphere",uniqueCountries>0?100:0,"#2563eb"],
+    ["Mapped records",mapped.toLocaleString()+" / "+records.length.toLocaleString(), "ph-map-pin",Math.round(mapped/total*100),"#0d9488"],
+    ["Source-linked records",sourced.toLocaleString()+" / "+records.length.toLocaleString(),"ph-link",Math.round(sourced/total*100),"#7c3aed"],
+    ["Narrative-bearing records",narrative.toLocaleString()+" / "+records.length.toLocaleString(),"ph-article",Math.round(narrative/total*100),"#db2777"],
+    ["Structured scoring",scored.toLocaleString()+" / "+records.length.toLocaleString(),"ph-chart-line",Math.round(scored/total*100),"#d97706"]
+  ];
+
+  const host=$("readinessCards");
+  if(host){
+    host.innerHTML=items.map(function(it){
+      return '<article class="analytics-card"><div class="flex items-start gap-3"><div class="w-10 h-10 rounded-xl flex items-center justify-center bg-slate-100 text-slate-600"><i class="ph '+it[2]+' text-xl"></i></div><div class="min-w-0"><div class="text-xs font-bold uppercase tracking-widest text-slate-400">'+it[0]+'</div><div class="text-lg font-extrabold text-slate-900 mt-1">'+it[1]+'</div></div></div><div class="signal-level mt-4"><span style="width:'+it[3]+'%;background:'+it[4]+'"></span></div></article>';
+    }).join("");
+  }
+}
+
 function renderFilters(){
   const box = $("filters");
   box.innerHTML = "";
@@ -803,6 +955,8 @@ function renderFilters(){
       state.activeRadar = key;
       renderFilters();
       renderStats();
+      renderForesight();
+      renderEvidenceReadiness();
       renderAnalytics();
       renderFeatured();
       renderMap();
@@ -1618,6 +1772,8 @@ async function initData(){
 
   renderFilters();
   renderStats();
+  renderForesight();
+  renderEvidenceReadiness();
   renderAnalytics();
   renderFeatured();
   renderMap();
