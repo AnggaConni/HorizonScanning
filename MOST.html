@@ -33,6 +33,19 @@ body{font-family:Inter,sans-serif}
 .evidence-carousel::-webkit-scrollbar{height:8px}
 .evidence-carousel::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:999px}
 .section-accent{border-left:4px solid currentColor}
+.analytics-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}
+.analytics-card{background:#fff;border:1px solid #e2e8f0;border-radius:1rem;padding:1.15rem;min-width:0}
+.analytics-bar{height:7px;background:#e2e8f0;border-radius:999px;overflow:hidden}
+.analytics-bar>span{display:block;height:100%;border-radius:999px}
+.radar-matrix{display:grid;grid-template-columns:180px repeat(5,minmax(80px,1fr));gap:1px;background:#e2e8f0;border:1px solid #e2e8f0;border-radius:1rem;overflow:hidden}
+.radar-matrix>*{background:#fff;padding:.8rem}
+.matrix-head{font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#64748b}
+.matrix-value{font-weight:800;color:#0f172a}
+.profile-meter{height:9px;background:#e2e8f0;border-radius:999px;overflow:hidden}
+.profile-meter>span{display:block;height:100%;border-radius:999px}
+.tag-cloud{display:flex;flex-wrap:wrap;gap:.45rem}
+.tag-cloud span{padding:.35rem .65rem;border-radius:999px;background:#f1f5f9;color:#475569;font-size:.72rem;font-weight:600}
+@media(max-width:900px){.analytics-grid{grid-template-columns:1fr}.radar-matrix{grid-template-columns:140px repeat(5,minmax(72px,1fr));overflow-x:auto}}
 #fullSummary{max-height:none;overflow:visible}
 @media(max-width:640px){.map-shell{height:72vh;min-height:560px}.title-wrap{max-width:92vw}}
 </style>
@@ -138,6 +151,11 @@ body{font-family:Inter,sans-serif}
                 <div id="fullCategories" class="flex flex-wrap gap-2"></div>
               </section>
 
+              <section id="fullProfileSection">
+                <div class="text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Radar intelligence profile</div>
+                <div id="fullProfile"></div>
+              </section>
+
               <section id="fullStructuredSection">
                 <div class="text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Structured intelligence</div>
                 <div id="fullStructured" class="space-y-4"></div>
@@ -162,6 +180,42 @@ body{font-family:Inter,sans-serif}
         </div>
       </div>
     </div>
+  </section>
+
+  <section id="priorityThemes" class="mt-8">
+    <div class="mb-4">
+      <div class="text-xs font-bold tracking-widest uppercase text-teal-600">MOST-aligned evidence lens</div>
+      <h2 class="text-2xl md:text-3xl font-bold text-slate-900 mt-1">Priority themes</h2>
+      <p class="text-sm text-slate-500 mt-1">Derived from fields already present in the five radar datasets. These are an analytical crosswalk, not an official UNESCO classification of individual records.</p>
+    </div>
+    <div id="themeCards" class="analytics-grid"></div>
+  </section>
+
+  <section id="crossFocus" class="mt-8">
+    <div class="mb-4">
+      <div class="text-xs font-bold tracking-widest uppercase text-teal-600">Cross-cutting evidence</div>
+      <h2 class="text-2xl md:text-3xl font-bold text-slate-900 mt-1">Social progress, inclusion, youth &amp; Africa</h2>
+      <p class="text-sm text-slate-500 mt-1">Signals are matched only when the underlying record contains relevant evidence in its title, summary, category, domain, beneficiaries, learners, risks or location fields.</p>
+    </div>
+    <div id="crossCards" class="analytics-grid"></div>
+  </section>
+
+  <section id="radarIntelligence" class="mt-8">
+    <div class="mb-4">
+      <div class="text-xs font-bold tracking-widest uppercase text-teal-600">Federated radar intelligence</div>
+      <h2 class="text-2xl md:text-3xl font-bold text-slate-900 mt-1">What each radar contributes</h2>
+      <p class="text-sm text-slate-500 mt-1">Counts and coverage are calculated from the live item-level data.json records.</p>
+    </div>
+    <div id="radarCards" class="analytics-grid"></div>
+  </section>
+
+  <section id="evidencePatterns" class="mt-8">
+    <div class="mb-4">
+      <div class="text-xs font-bold tracking-widest uppercase text-teal-600">Evidence patterns</div>
+      <h2 class="text-2xl md:text-3xl font-bold text-slate-900 mt-1">What the datasets are actually seeing</h2>
+      <p class="text-sm text-slate-500 mt-1">Top observed domains/categories/platforms from the raw records; no additional facts are invented.</p>
+    </div>
+    <div id="patternCards" class="grid lg:grid-cols-2 gap-4"></div>
   </section>
 
   <section class="mt-6">
@@ -325,7 +379,13 @@ const state = {
   records: [],
   byRadar: {},
   activeRadar: "ALL",
-  errors: []
+  errors: [],
+  analytics: {
+    themes: {},
+    cross: {},
+    radar: {},
+    patterns: {}
+  }
 };
 
 const $ = function(id){ return document.getElementById(id); };
@@ -384,6 +444,98 @@ function coords(item){
   return {lat:lat, lon:lon};
 }
 
+const THEME_DEFS = {
+  climate: {
+    label:"Climate & Its Social Impact",
+    color:"#059669",
+    keywords:["climate","ocean","biodiversity","drr","water","environment","resilience","disaster","flood","drought","wildfire","marine","reef","mangrove","carbon","ecosystem","coastal","heatwave","bleaching"]
+  },
+  technology: {
+    label:"Technological Transformations & Its Social Impact",
+    color:"#2563eb",
+    keywords:["technology","technological","digital","ai","artificial intelligence","ict","platform","software","data","stem","3d printing","robotics","electronics","mobile classroom","digital learning","online learning","internet","solar powered","device","innovation"]
+  },
+  demography: {
+    label:"Demography & Population Dynamics",
+    color:"#7c3aed",
+    keywords:["demograph","population","aging","ageing","elderly","older persons","migration","migrant","refugee","urbanization","urbanisation","youth","children","adolescent","teen","young people","workforce","labor force","rural population","demographic dividend"]
+  }
+};
+
+const CROSS_DEFS = {
+  social_progress:{
+    label:"Social Progress",
+    color:"#0f766e",
+    keywords:["community","beneficiary","beneficiaries","livelihood","income","health","wellbeing","well-being","access","education","social cohesion","mutual aid","poverty","empower","empowerment","quality of life","food security"]
+  },
+  disability:{
+    label:"Disability Inclusion",
+    color:"#9333ea",
+    keywords:["disability","disabled","special needs","special_needs","accessibility","accessible","assistive","wheelchair","prosthetic","inclusive design","adapted learning"]
+  },
+  youth:{
+    label:"Youth",
+    color:"#db2777",
+    keywords:["youth","young people","children","child","adolescent","teenager","teen","students","learners","street children","young adults"]
+  },
+  africa:{
+    label:"Priority Africa",
+    color:"#d97706",
+    keywords:["africa","african","nigeria","ghana","kenya","senegal","ethiopia","south africa","côte d'ivoire","cote d'ivoire","tanzania","uganda","rwanda","mali","sudan","somalia","zambia","zimbabwe","mozambique","namibia","botswana","benin","togo","burkina faso","cameroon","gambia","guinea","sierra leone","liberia","malawi","madagascar","tunisia","morocco","algeria","egypt"]
+  }
+};
+
+function compactText(raw){
+  const parts=[];
+  const push=function(v){
+    if(v===null||v===undefined) return;
+    if(typeof v==="string"||typeof v==="number"||typeof v==="boolean") parts.push(String(v));
+    else if(Array.isArray(v)) v.forEach(push);
+    else if(typeof v==="object") Object.entries(v).forEach(function(pair){parts.push(pair[0]);push(pair[1]);});
+  };
+  push(raw);
+  return parts.join(" ").toLowerCase();
+}
+
+function matchKeywords(text,keywords){
+  const matched=[];
+  keywords.forEach(function(k){if(text.includes(k.toLowerCase())) matched.push(k);});
+  return [...new Set(matched)];
+}
+
+function deriveThemes(key,raw){
+  const text=compactText(raw);
+  const themes={};
+  const evidence={};
+  Object.entries(THEME_DEFS).forEach(function(pair){
+    const name=pair[0], def=pair[1];
+    const matches=matchKeywords(text,def.keywords);
+    // Keep technology from swallowing every GSI/EDU record: require explicit technology/digital evidence
+    // unless the raw record itself names a technology-oriented process/category.
+    const techExplicit = /digital|technology|technological|software|platform|ict|ai|artificial intelligence|3d printing|robotics|electronics|stem|mobile classroom|device|coding|internet/i.test(text);
+    if(name==="technology" && !techExplicit) return;
+    if(matches.length){themes[name]=true;evidence[name]=matches.slice(0,8);}
+  });
+  return {themes,evidence};
+}
+
+function deriveCross(raw){
+  const text=compactText(raw);
+  const cross={}, evidence={};
+  Object.entries(CROSS_DEFS).forEach(function(pair){
+    const name=pair[0],def=pair[1];
+    const matches=matchKeywords(text,def.keywords);
+    if(matches.length){cross[name]=true;evidence[name]=matches.slice(0,8);}
+  });
+  return {cross,evidence};
+}
+
+function valuePath(obj,path){
+  return path.reduce(function(cur,key){
+    return cur && cur[key] !== undefined ? cur[key] : null;
+  },obj);
+}
+
 function normalize(key,item,index){
   const loc = item && item.location ? item.location : {};
   const xy = coords(item);
@@ -413,6 +565,9 @@ function normalize(key,item,index){
     impact !== null ? impact * 10 : null
   ));
 
+  const themeInfo=deriveThemes(key,item);
+  const crossInfo=deriveCross(item);
+
   return {
     radar:key,
     id:String(first(item && item.id, item && item.uid, item && item.original_title, item && item.title, key + "-" + index)),
@@ -431,7 +586,11 @@ function normalize(key,item,index){
     critical:Boolean((item && item.critical_flag) || String(item && item.status || "").toLowerCase().includes("high risk")),
     hiddenGem:Boolean(item && item.hidden_gem),
     timestamp:first(item && item.timestamp, item && item.scraped_at, item && item.generated_at, null),
-    raw:item
+    raw:item,
+    themes:themeInfo.themes,
+    themeEvidence:themeInfo.evidence,
+    crossCutting:crossInfo.cross,
+    crossEvidence:crossInfo.evidence
   };
 }
 
@@ -466,6 +625,139 @@ function visibleRecords(){
   return state.activeRadar === "ALL" ? state.records : (state.byRadar[state.activeRadar] || []);
 }
 
+
+function buildAnalytics(){
+  const records=visibleRecords();
+  const themes={},cross={},radar={};
+  Object.keys(THEME_DEFS).forEach(function(k){themes[k]={count:0,byRadar:{ICH:0,GSI:0,EDU:0,NEXUS:0,ARTIFACT:0},evidence:[]};});
+  Object.keys(CROSS_DEFS).forEach(function(k){cross[k]={count:0,byRadar:{ICH:0,GSI:0,EDU:0,NEXUS:0,ARTIFACT:0},evidence:[]};});
+  Object.keys(RADARS).forEach(function(k){radar[k]={records:0,mapped:0,highRisk:0,avgPriority:0,sourceCount:0,latest:null};});
+
+  const domainCounts={},categoryCounts={},platformCounts={};
+
+  records.forEach(function(r){
+    const rs=radar[r.radar];
+    if(rs){
+      rs.records++;
+      if(r.lat!==null&&r.lon!==null) rs.mapped++;
+      if(r.risk!==null&&r.risk>=8) rs.highRisk++;
+      if(r.priority!==null) rs.avgPriority+=r.priority;
+      if(r.timestamp){
+        const t=new Date(r.timestamp).getTime();
+        if(Number.isFinite(t) && (!rs.latest || t>rs.latest)) rs.latest=t;
+      }
+      rs.sourceCount+=r.sources.length;
+    }
+
+    Object.keys(r.themes||{}).forEach(function(k){
+      if(!themes[k]) return;
+      themes[k].count++;
+      themes[k].byRadar[r.radar]++;
+      (themes[k].evidence||[]).push.apply(themes[k].evidence,r.themeEvidence?.[k]||[]);
+    });
+
+    Object.keys(r.crossCutting||{}).forEach(function(k){
+      if(!cross[k]) return;
+      cross[k].count++;
+      cross[k].byRadar[r.radar]++;
+      (cross[k].evidence||[]).push.apply(cross[k].evidence,r.crossEvidence?.[k]||[]);
+    });
+
+    if(r.radar==="NEXUS"){
+      arr(valuePath(r.raw,["domain_classification"])).forEach(function(v){
+        if(v) domainCounts[String(v)]=(domainCounts[String(v)]||0)+1;
+      });
+    }
+    if(r.radar==="ICH"){
+      arr(first(r.raw?.categories,r.raw?.category)).forEach(function(v){
+        if(v) categoryCounts["ICH · "+String(v)]=(categoryCounts["ICH · "+String(v)]||0)+1;
+      });
+    }
+    if(r.radar==="GSI"||r.radar==="EDU"){
+      arr(first(r.raw?.category,r.raw?.categories)).forEach(function(v){
+        if(v) categoryCounts[r.radar+" · "+String(v)]=(categoryCounts[r.radar+" · "+String(v)]||0)+1;
+      });
+    }
+    if(r.radar==="ARTIFACT" && r.raw?.platform){
+      const p=String(r.raw.platform);
+      platformCounts[p]=(platformCounts[p]||0)+1;
+    }
+  });
+
+  Object.values(radar).forEach(function(rs){ if(rs.records) rs.avgPriority=rs.avgPriority/rs.records; });
+  state.analytics={themes:themes,cross:cross,radar:radar,patterns:{domains:domainCounts,categories:categoryCounts,platforms:platformCounts}};
+}
+
+function percentage(v,total){
+  return total ? Math.round((v/total)*100) : 0;
+}
+
+function sourceMiniBars(byRadar,total){
+  return Object.keys(RADARS).map(function(k){
+    const v=byRadar[k]||0;
+    const pct=percentage(v,total);
+    return '<div class="mb-2"><div class="flex items-center justify-between text-[10px] mb-1"><span class="text-slate-500">'+esc(RADARS[k].label)+'</span><strong class="text-slate-700">'+v+'</strong></div><div class="analytics-bar"><span style="width:'+pct+'%;background:'+RADARS[k].color+'"></span></div></div>';
+  }).join("");
+}
+
+function renderAnalytics(){
+  buildAnalytics();
+
+  const total=visibleRecords().length;
+  const themeHost=$("themeCards");
+  if(themeHost){
+    themeHost.innerHTML=Object.keys(THEME_DEFS).map(function(k){
+      const def=THEME_DEFS[k], m=state.analytics.themes[k];
+      return '<article class="analytics-card">' +
+        '<div class="flex items-start justify-between gap-3"><div><div class="text-xs font-bold uppercase tracking-widest" style="color:'+def.color+'">'+esc(def.label)+'</div><div class="text-3xl font-extrabold text-slate-900 mt-2">'+m.count.toLocaleString()+'</div><div class="text-xs text-slate-400 mt-1">records with direct thematic evidence</div></div><div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:'+def.color+'18;color:'+def.color+'"><i class="ph ph-chart-pie-slice text-xl"></i></div></div>' +
+        '<div class="mt-5">'+sourceMiniBars(m.byRadar,m.count)+'</div>' +
+        '<div class="mt-3 text-[10px] text-slate-400">Coverage: '+percentage(m.count,total)+'% of current records</div>' +
+      '</article>';
+    }).join("");
+  }
+
+  const crossHost=$("crossCards");
+  if(crossHost){
+    crossHost.innerHTML=Object.keys(CROSS_DEFS).map(function(k){
+      const def=CROSS_DEFS[k],m=state.analytics.cross[k];
+      return '<article class="analytics-card">' +
+        '<div class="flex items-start justify-between gap-3"><div><div class="text-xs font-bold uppercase tracking-widest" style="color:'+def.color+'">'+esc(def.label)+'</div><div class="text-3xl font-extrabold text-slate-900 mt-2">'+m.count.toLocaleString()+'</div><div class="text-xs text-slate-400 mt-1">records with supporting evidence</div></div><div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:'+def.color+'18;color:'+def.color+'"><i class="ph ph-users-three text-xl"></i></div></div>' +
+        '<div class="mt-5">'+sourceMiniBars(m.byRadar,m.count)+'</div>' +
+      '</article>';
+    }).join("");
+  }
+
+  const radarHost=$("radarCards");
+  if(radarHost){
+    radarHost.innerHTML=Object.keys(RADARS).map(function(k){
+      const d=RADARS[k],m=state.analytics.radar[k];
+      const mapped=percentage(m.mapped,m.records);
+      return '<article class="analytics-card">' +
+        '<div class="flex items-start justify-between gap-3">'+badge(k)+'<span class="text-[10px] text-slate-400">'+m.records.toLocaleString()+' records</span></div>' +
+        '<div class="grid grid-cols-3 gap-2 mt-4">' +
+          '<div><div class="text-[10px] uppercase tracking-widest text-slate-400">Mapped</div><div class="text-lg font-extrabold">'+mapped+'%</div></div>' +
+          '<div><div class="text-[10px] uppercase tracking-widest text-slate-400">High risk</div><div class="text-lg font-extrabold">'+m.highRisk.toLocaleString()+'</div></div>' +
+          '<div><div class="text-[10px] uppercase tracking-widest text-slate-400">Avg priority</div><div class="text-lg font-extrabold">'+(m.avgPriority?Math.round(m.avgPriority):"—")+'</div></div>' +
+        '</div>' +
+        '<div class="mt-4 text-xs text-slate-500">Latest: '+(m.latest?new Date(m.latest).toLocaleDateString():"—")+'</div>' +
+        '<div class="mt-2 text-xs text-slate-500">Source links preserved: '+m.sourceCount.toLocaleString()+'</div>' +
+      '</article>';
+    }).join("");
+  }
+
+  const patterns=$("patternCards");
+  if(patterns){
+    const makeList=function(title,icon,object,color){
+      const items=Object.entries(object).sort(function(a,b){return b[1]-a[1];}).slice(0,12);
+      const max=items[0]?.[1]||1;
+      return '<article class="bg-white rounded-2xl border border-slate-200 p-5"><div class="flex items-center gap-2"><div class="w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center"><i class="ph '+icon+'"></i></div><div><div class="text-xs uppercase tracking-widest font-bold text-slate-400">'+title+'</div><div class="text-sm font-bold text-slate-900">Top observed signals</div></div></div><div class="mt-4 space-y-3">'+items.map(function(it){return '<div><div class="flex justify-between gap-3 text-xs"><span class="text-slate-600">'+esc(it[0])+'</span><strong>'+it[1]+'</strong></div><div class="analytics-bar mt-1"><span style="width:'+percentage(it[1],max)+'%;background:'+color+'"></span></div></div>';}).join("")+'</div></article>';
+    };
+    patterns.innerHTML =
+      makeList("Nexus domains","ph ph-radar",state.analytics.patterns.domains,"#059669") +
+      makeList("GSI / EDU categories","ph ph-lightbulb-filament",state.analytics.patterns.categories,"#2563eb") +
+      makeList("Artifact platforms","ph ph-detective",state.analytics.patterns.platforms,"#d97706");
+  }
+}
 function renderFilters(){
   const box = $("filters");
   box.innerHTML = "";
@@ -483,6 +775,7 @@ function renderFilters(){
       state.activeRadar = key;
       renderFilters();
       renderStats();
+      renderAnalytics();
       renderFeatured();
       renderMap();
     };
@@ -635,6 +928,450 @@ function renderFullRecord(r){
     empty.textContent="No additional categories";
     catWrap.appendChild(empty);
   }
+
+  const profile=$("fullProfile");
+  profile.innerHTML="";
+
+  const raw=r.raw || {};
+  const profileParts=[];
+
+  const metricBar=function(label,value,max,color){
+    if(value===null||value===undefined||value==="") return "";
+    const pct=Math.max(0,Math.min(100,(Number(value)/max)*100));
+    return '<div class="bg-white border border-slate-200 rounded-xl p-4"><div class="flex justify-between gap-3 text-xs mb-2"><span class="text-slate-500">'+esc(label)+'</span><strong class="text-slate-700">'+esc(String(value))+'</strong></div><div class="profile-meter"><span style="width:'+pct+'%;background:'+color+'"></span></div></div>';
+  };
+
+  if(r.radar==="NEXUS"){
+    profileParts.push(
+      '<div class="grid lg:grid-cols-2 gap-4">'+
+      metricBar("Priority score",r.priority,100,"#0f766e")+
+      metricBar("Risk score",r.risk,10,"#e11d48")+
+      '</div>'+
+      '<div class="grid md:grid-cols-2 gap-4 mt-4">'+
+      '<div class="analytics-card"><div class="text-xs uppercase tracking-widest text-slate-400 font-bold">Domains</div><div class="tag-cloud mt-3">'+arr(raw.domain_classification).map(function(v){return "<span>"+esc(v)+"</span>";}).join("")+"</div></div>"+
+      '<div class="analytics-card"><div class="text-xs uppercase tracking-widest text-slate-400 font-bold">Signal dynamics</div><div class="mt-3 text-sm text-slate-700 space-y-2"><div><b>Intensity:</b> '+esc(raw.signal_intensity||"—")+'</div><div><b>Escalation:</b> '+esc(raw.escalation?.speed||"—")+'</div><div><b>Urgency:</b> '+esc(raw.escalation?.urgency||"—")+'</div><div><b>Root cause:</b> '+esc((raw.root_cause_analysis?.root_cause||[]).join(" · ")||"—")+'</div></div></div>'+
+      '</div>'
+    );
+  } else if(r.radar==="GSI"||r.radar==="EDU"){
+    const details=r.radar==="EDU"?raw.education_details:null;
+    profileParts.push(
+      '<div class="grid lg:grid-cols-2 gap-4">'+
+      '<div class="analytics-card"><div class="text-xs uppercase tracking-widest text-slate-400 font-bold">Impact</div><div class="mt-3 text-sm text-slate-700"><b>Problem solved:</b> '+esc(raw.impact?.problem_solved||"—")+'</div><div class="mt-2"><b>Scale:</b> '+esc(raw.impact?.scale||"—")+'</div></div>'+
+      '<div class="analytics-card"><div class="text-xs uppercase tracking-widest text-slate-400 font-bold">Replicability</div><div class="mt-3 text-sm text-slate-700 space-y-2"><div><b>Cost:</b> '+esc(raw.replicability?.cost_level||"—")+'</div><div><b>Difficulty:</b> '+esc(raw.replicability?.difficulty||"—")+'</div></div></div>'+
+      '</div>'+
+      (raw.process?'<div class="analytics-card mt-4"><div class="text-xs uppercase tracking-widest text-slate-400 font-bold">Process &amp; implementation</div><div class="mt-3 text-sm text-slate-700 leading-7">'+esc(raw.process.how_it_works||"")+(raw.process.materials_used?.length?'<div class="mt-3"><b>Materials:</b> '+esc(raw.process.materials_used.join(" · "))+'</div>':"")+(raw.process.step_by_step?.length?'<div class="mt-3"><b>Steps:</b><ol class="list-decimal ml-5 mt-2 space-y-1">'+raw.process.step_by_step.map(function(x){return "<li>"+esc(x)+"</li>";}).join("")+"</ol></div>":"")+'</div></div>':"")+
+      (details?'<div class="analytics-card mt-4"><div class="text-xs uppercase tracking-widest text-slate-400 font-bold">Education profile</div><div class="mt-3 grid md:grid-cols-2 gap-3 text-sm text-slate-700"><div><b>Type:</b> '+esc(details.education_type||"—")+'</div><div><b>Target learners:</b> '+esc(details.target_learners||"—")+'</div><div><b>Related fields:</b> '+esc(arr(details.related_fields).join(" · ")||"—")+'</div><div><b>Learning outcomes:</b> '+esc(arr(details.learning_outcomes).join(" · ")||"—")+'</div><div class="md:col-span-2"><b>Pedagogical approach:</b> '+esc(details.pedagogical_approach||"—")+'</div></div></div>':"")+
+      (raw.origin?'<div class="analytics-card mt-4"><div class="text-xs uppercase tracking-widest text-slate-400 font-bold">Knowledge lineage</div><div class="tag-cloud mt-3">'+arr(raw.origin.knowledge_source).map(function(v){return "<span>"+esc(v)+"</span>";}).join("")+"</div></div>":"")
+    );
+  } else if(r.radar==="ICH"){
+    const analysis=raw.resume_analisa||{};
+    profileParts.push(
+      '<div class="analytics-card"><div class="text-xs uppercase tracking-widest text-slate-400 font-bold">Heritage domains</div><div class="tag-cloud mt-3">'+arr(raw.categories||raw.category).map(function(v){return "<span>"+esc(v)+"</span>";}).join("")+"</div></div>"+
+      '<div class="grid md:grid-cols-2 gap-4 mt-4">'+
+      '<div class="analytics-card"><div class="text-xs uppercase tracking-widest text-slate-400 font-bold">DRR / resilience</div><div class="mt-3 text-sm text-slate-700 space-y-2"><div><b>Relevance:</b> '+esc(analysis.drr_relevance_level||"—")+'</div><div><b>Category:</b> '+esc(analysis.drr_category||"—")+'</div><div><b>Hazards:</b> '+esc(arr(analysis.hazard_categories).join(" · ")||"—")+'</div></div></div>'+
+      '<div class="analytics-card"><div class="text-xs uppercase tracking-widest text-slate-400 font-bold">Documentation status</div><div class="mt-3 text-sm text-slate-700 space-y-2"><div><b>Completion:</b> '+esc(raw.completion_status||"—")+'</div><div><b>Image:</b> '+esc(raw.thumbnail_url||"—")+'</div><div><b>Shared heritage:</b> '+esc(formatValue(raw.shared_heritage))+'</div></div></div>'+
+      '</div>'
+    );
+    if(analysis.explanation||analysis.rationale){
+      profileParts.push('<div class="analytics-card mt-4"><div class="text-xs uppercase tracking-widest text-slate-400 font-bold">Analytical note</div><div class="text-sm text-slate-700 leading-7 mt-3">'+esc(analysis.explanation||analysis.rationale)+'</div></div>');
+    }
+  } else if(r.radar==="ARTIFACT"){
+    profileParts.push(
+      '<div class="grid lg:grid-cols-2 gap-4">'+
+      '<div class="analytics-card"><div class="text-xs uppercase tracking-widest text-slate-400 font-bold">Market intelligence</div><div class="mt-3 text-sm text-slate-700 space-y-2"><div><b>Platform:</b> '+esc(raw.platform||"—")+'</div><div><b>Price:</b> '+(raw.price_usd!==undefined?'
+
+  const raw=r.raw || {};
+  const priorityKeys=[
+    "innovation_level",
+    "education_details",
+    "impact",
+    "replicability",
+    "risk_assessment",
+    "potential_impact",
+    "manifestation",
+    "escalation",
+    "root_cause_analysis",
+    "risk_type",
+    "provenance_flag",
+    "origin",
+    "knowledge_source",
+    "completion_status",
+    "shared_heritage",
+    "drr_relevance",
+    "drr_category"
+  ];
+
+  const used=new Set(["id","timestamp","title","summary","description","sources","source_urls","urls","location","category","categories","domain","domain_classification","original_title"]);
+
+  priorityKeys.forEach(function(key){
+    if(Object.prototype.hasOwnProperty.call(raw,key) && raw[key] !== null && raw[key] !== "" && raw[key] !== undefined){
+      addStructuredCard(structured,key,raw[key]);
+      used.add(key);
+    }
+  });
+
+  // Show remaining useful scalar/simple fields without dumping the entire object.
+  Object.entries(raw).forEach(function(pair){
+    const key=pair[0], value=pair[1];
+    if(used.has(key) || value === null || value === "" || value === undefined) return;
+    if(typeof value==="string" || typeof value==="number" || typeof value==="boolean" || Array.isArray(value)){
+      addStructuredCard(structured,key,value);
+    }
+  });
+
+  const sources = r.sources || [];
+  $("fullSources").innerHTML = sources.length
+    ? sources.map(function(url){
+        return '<a href="'+esc(url)+'" target="_blank" rel="noopener noreferrer" class="block text-sm text-blue-600 hover:underline break-all bg-slate-50 border border-slate-200 rounded-lg p-3">'+esc(url)+'</a>';
+      }).join("")
+    : '<div class="text-sm text-slate-500 bg-slate-50 border border-slate-200 rounded-lg p-3">No source URLs were preserved in this record.</div>';
+
+  // Raw JSON is intentionally hidden by default every time a new record is opened.
+  $("fullJson").textContent=JSON.stringify(raw,null,2);
+  $("rawJsonWrap").classList.add("hidden");
+  $("rawToggleText").textContent="Show raw JSON";
+  $("rawToggleIcon").className="ph ph-code";
+}
+function openFullRecord(){
+  if(!currentRecord) return;
+  renderFullRecord(currentRecord);
+  $("detailFull").classList.add("open");
+  $("detailFull").setAttribute("aria-hidden","false");
+  document.body.classList.add("overflow-hidden");
+}
+
+function closeFullRecord(){
+  $("detailFull").classList.remove("open");
+  $("detailFull").setAttribute("aria-hidden","true");
+  document.body.classList.remove("overflow-hidden");
+}
+
+$("closeDetail").onclick = function(){ detail.classList.add("hidden"); };
+$("rawToggle").onclick = function(){
+  const wrap=$("rawJsonWrap");
+  const hidden=wrap.classList.contains("hidden");
+  wrap.classList.toggle("hidden");
+  $("rawToggleText").textContent=hidden ? "Hide raw JSON" : "Show raw JSON";
+  $("rawToggleIcon").className=hidden ? "ph ph-eye-slash" : "ph ph-code";
+};
+$("detailFullBtn").onclick = openFullRecord;
+$("closeDetailFull").onclick = closeFullRecord;
+$("detailFull").addEventListener("click",function(e){
+  if(e.target === $("detailFull")) closeFullRecord();
+});
+document.addEventListener("keydown",function(e){
+  if(e.key === "Escape"){
+    if($("detailFull").classList.contains("open")) closeFullRecord();
+    else detail.classList.add("hidden");
+  }
+});
+
+function renderEvidenceCard(r){
+  return '<button class="evidence-card text-left group bg-white rounded-2xl border border-slate-200 p-5 hover:shadow-md hover:border-slate-300 transition" data-key="'+esc(r.radar+"::"+r.id)+'">' +
+    '<div class="flex items-center justify-between gap-2">'+badge(r.radar)+'<i class="ph ph-arrow-up-right text-slate-300 group-hover:text-slate-700"></i></div>' +
+    '<h3 class="font-bold text-slate-900 mt-3 line-clamp-2">'+esc(r.title)+'</h3>' +
+    '<p class="text-xs text-slate-500 mt-2 line-clamp-3">'+esc(r.summary)+'</p>' +
+    '<div class="flex flex-wrap gap-1.5 mt-3">' +
+      '<span class="text-[10px] px-2 py-1 rounded-full bg-slate-100 text-slate-500">'+esc(r.country)+'</span>' +
+      (r.timestamp ? '<span class="text-[10px] px-2 py-1 rounded-full bg-slate-100 text-slate-500">'+esc(new Date(r.timestamp).toLocaleDateString())+'</span>' : '') +
+      (r.priority !== null ? '<span class="text-[10px] px-2 py-1 rounded-full bg-teal-50 text-teal-700">Priority '+Math.round(r.priority)+'</span>' : '') +
+      (r.risk !== null ? '<span class="text-[10px] px-2 py-1 rounded-full bg-rose-50 text-rose-700">Risk '+Math.round(r.risk)+'</span>' : '') +
+    '</div></button>';
+}
+
+function sortNewest(records){
+  return records.slice().sort(function(a,b){
+    const ad = a.timestamp ? new Date(a.timestamp).getTime() : 0;
+    const bd = b.timestamp ? new Date(b.timestamp).getTime() : 0;
+    return bd - ad;
+  });
+}
+
+function renderEvidenceCarousel(hostId, records, countId){
+  const host=$(hostId);
+  const count=$(countId);
+  if(!host) return;
+
+  const sorted=sortNewest(records).slice(0,20);
+  if(count) count.textContent = records.length.toLocaleString() + " records";
+
+  if(!sorted.length){
+    host.innerHTML='<div class="text-sm text-slate-400 py-4">No records available in this stream.</div>';
+    return;
+  }
+
+  host.innerHTML=sorted.map(renderEvidenceCard).join("");
+
+  host.querySelectorAll("[data-key]").forEach(function(btn){
+    btn.onclick=function(){
+      const p=btn.dataset.key.split("::");
+      const record=state.records.find(function(r){
+        return r.radar===p[0] && r.id===p[1];
+      });
+      if(record) showDetail(record);
+    };
+  });
+}
+
+function renderFeatured(){
+  const all=visibleRecords();
+
+  // Always separate by function, but respect radar filter when a specific radar is selected.
+  const climate = (state.activeRadar === "ALL" || state.activeRadar === "NEXUS")
+    ? all.filter(function(r){return r.radar === "NEXUS";})
+    : [];
+
+  const ideas = (state.activeRadar === "ALL" || state.activeRadar === "GSI" || state.activeRadar === "EDU")
+    ? all.filter(function(r){return r.radar === "GSI" || r.radar === "EDU";})
+    : [];
+
+  const culture = (state.activeRadar === "ALL" || state.activeRadar === "ICH")
+    ? all.filter(function(r){return r.radar === "ICH";})
+    : [];
+
+  renderEvidenceCarousel("climateEvidence",climate,"climateCount");
+  renderEvidenceCarousel("ideasEvidence",ideas,"ideasCount");
+  renderEvidenceCarousel("cultureEvidence",culture,"cultureCount");
+}
+function drawNode(r,x,y){
+  if(!Number.isFinite(x) || !Number.isFinite(y)) return;
+  const g=document.createElementNS("http://www.w3.org/2000/svg","g");
+  const p=document.createElementNS("http://www.w3.org/2000/svg","circle");
+  const c=document.createElementNS("http://www.w3.org/2000/svg","circle");
+  const t=document.createElementNS("http://www.w3.org/2000/svg","text");
+  const color=RADARS[r.radar].color;
+
+  g.setAttribute("class","signal-node");
+  g.style.pointerEvents="auto";
+
+  p.setAttribute("cx",x);
+  p.setAttribute("cy",y);
+  p.setAttribute("r",r.critical ? 13 : 10);
+  p.setAttribute("fill",color);
+  p.setAttribute("opacity",r.critical ? ".24" : ".13");
+
+  c.setAttribute("cx",x);
+  c.setAttribute("cy",y);
+  c.setAttribute("r",r.critical ? 5.5 : 4.5);
+  c.setAttribute("fill",color);
+  c.setAttribute("stroke","#fff");
+  c.setAttribute("stroke-width","2");
+
+  t.setAttribute("x",x+9);
+  t.setAttribute("y",y-8);
+  t.setAttribute("font-size","11");
+  t.setAttribute("font-weight","700");
+  t.setAttribute("fill","#0f172a");
+  t.setAttribute("paint-order","stroke");
+  t.setAttribute("stroke","#fff");
+  t.setAttribute("stroke-width","4");
+  t.textContent=r.title.length>28 ? r.title.slice(0,28)+"…" : r.title;
+
+  g.appendChild(p); g.appendChild(c); g.appendChild(t);
+  g.onclick=function(){showDetail(r);};
+  overlay.appendChild(g);
+}
+
+function renderMap(){
+  overlay.innerHTML="";
+  if(!window.socialMapView) return;
+
+  const visible = visibleRecords()
+    .filter(function(r){ return r.lat !== null && r.lon !== null; })
+    .sort(function(a,b){
+      const ap=a.priority == null ? -1 : a.priority;
+      const bp=b.priority == null ? -1 : b.priority;
+      const ar=a.risk == null ? -1 : a.risk;
+      const br=b.risk == null ? -1 : b.risk;
+      return (bp-ap) || (br-ar);
+    })
+    .slice(0,700);
+
+  if(window.socialSignalLayer){
+    window.socialSignalLayer.removeAll();
+  }
+
+  visible.forEach(function(r){
+    const color = RADARS[r.radar].color;
+    
+    // UBAH: Gunakan window.EsriPoint
+    const point = new window.EsriPoint({
+      longitude:r.lon,
+      latitude:r.lat,
+      spatialReference:{wkid:4326}
+    });
+
+    const size = r.critical ? 13 : (r.priority !== null && r.priority >= 80 ? 11 : 8);
+
+    // UBAH: Gunakan window.EsriGraphic dan window.EsriSimpleMarkerSymbol
+    const marker = new window.EsriGraphic({
+      geometry:point,
+      symbol:new window.EsriSimpleMarkerSymbol({
+        color:color,
+        size:size,
+        outline:{color:"#ffffff",width:1.5}
+      }),
+      attributes:{
+        radar:r.radar,
+        recordId:r.id
+      }
+    });
+
+    window.socialSignalLayer.add(marker);
+  });
+
+  const legend=$("liveLegend");
+  if(legend){
+    const counts={};
+    visible.forEach(function(r){counts[r.radar]=(counts[r.radar]||0)+1;});
+    legend.innerHTML=Object.keys(RADARS).map(function(k){
+      return '<div class="flex items-center justify-between gap-3"><span class="flex items-center gap-2"><span class="legend-dot" style="background:'+RADARS[k].color+'"></span>'+RADARS[k].label+'</span><strong>'+((counts[k]||0).toLocaleString())+'</strong></div>';
+    }).join("");
+  }
+
+  if($("mappedCount")) $("mappedCount").textContent=visible.length.toLocaleString();
+}
+async function initData(){
+  const keys=Object.keys(RADARS);
+  const results=await Promise.all(keys.map(loadOne));
+
+  state.records=[];
+  state.byRadar={};
+
+  keys.forEach(function(key,i){
+    const normalized=results[i].items.map(function(item,idx){return normalize(key,item,idx);});
+    state.byRadar[key]=normalized;
+    state.records.push.apply(state.records,normalized);
+  });
+
+  const status=$("dataStatus");
+  if(status){
+    status.textContent = state.errors.length
+      ? "Live federation loaded with " + state.errors.length + " unavailable source(s)."
+      : "Live federation loaded from all five radar repositories.";
+  }
+
+  const sourceDetail=$("sourceDetail");
+  if(sourceDetail){
+    sourceDetail.textContent=keys.map(function(key,i){
+      return RADARS[key].label + ": " + results[i].source;
+    }).join(" · ");
+  }
+
+  renderFilters();
+  renderStats();
+  renderAnalytics();
+  renderFeatured();
+  renderMap();
+}
+
+document.querySelectorAll(".carousel-arrow").forEach(function(btn){
+  btn.addEventListener("click",function(){
+    const target=$(btn.dataset.target);
+    if(!target) return;
+    const amount=Math.max(280,target.clientWidth * 0.78);
+    target.scrollBy({left:Number(btn.dataset.dir) * amount,behavior:"smooth"});
+  });
+});
+
+document.addEventListener("DOMContentLoaded",function(){
+  initData();
+});
+
+window.addEventListener("resize",function(){renderMap();});
+
+require([
+  "esri/Map",
+  "esri/views/MapView",
+  "esri/layers/TileLayer",
+  "esri/layers/GraphicsLayer",
+  "esri/Graphic",
+  "esri/geometry/Point",
+  "esri/symbols/SimpleMarkerSymbol"
+],function(Map,MapView,TileLayer,GraphicsLayer,Graphic,Point,SimpleMarkerSymbol){
+
+  window.EsriGraphic = Graphic;
+  window.EsriPoint = Point;
+  window.EsriSimpleMarkerSymbol = SimpleMarkerSymbol;
+
+  const grayBase=new TileLayer({
+    url:"https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer",
+    title:"Esri World Light Gray Base"
+  });
+
+  const signalLayer=new GraphicsLayer({
+    title:"Live Social Transformation Signals"
+  });
+
+  const map=new Map({
+    layers:[grayBase,signalLayer]
+  });
+
+  const view=new MapView({
+    container:"viewDiv",
+    map:map,
+    center:[110,3],
+    zoom:3,
+    constraints:{minZoom:2},
+    ui:{components:["zoom","compass","attribution"]}
+  });
+
+  window.socialMapView=view;
+  window.socialSignalLayer=signalLayer;
+
+  view.when(function(){
+    renderMap();
+  });
+
+  view.on("click",function(event){
+    view.hitTest(event).then(function(response){
+      const result=response.results.find(function(item){
+        return item.graphic &&
+               item.graphic.attributes &&
+               item.graphic.attributes.radar;
+      });
+
+      if(!result) return;
+
+      const attrs=result.graphic.attributes;
+      const record=state.records.find(function(r){
+        return r.radar===attrs.radar && r.id===attrs.recordId;
+      });
+
+      if(record){
+        showDetail(record);
+      }
+    });
+  });
+
+  view.watch("extent",function(){
+    window.requestAnimationFrame(function(){
+      renderMap();
+    });
+  });
+
+  view.watch("stationary",function(){
+    window.requestAnimationFrame(function(){
+      renderMap();
+    });
+  });
+});
+</script>
+</body>
+</html>
++Number(raw.price_usd||0).toLocaleString():"—")+'</div><div><b>Status:</b> '+esc(raw.status||"—")+'</div><div><b>Keyword:</b> '+esc(raw.keyword_trigger||"—")+'</div></div></div>'+
+      '<div class="analytics-card"><div class="text-xs uppercase tracking-widest text-slate-400 font-bold">Provenance &amp; risk</div><div class="mt-3 text-sm text-slate-700 space-y-2"><div><b>Risk score:</b> '+esc(raw.risk_score??"—")+'</div><div><b>Provenance flag:</b> '+esc(formatValue(raw.provenance_flag))+'</div><div><b>Origin:</b> '+esc(raw.origin_region||"—")+'</div><div><b>Reason:</b> '+esc(raw.reason||"—")+'</div></div></div>'+
+      '</div>'
+    );
+    if(raw.screenshot_url){
+      profileParts.push('<div class="analytics-card mt-4"><div class="text-xs uppercase tracking-widest text-slate-400 font-bold">Captured source image</div><img src="'+esc(raw.screenshot_url)+'" alt="Captured listing source" class="mt-3 max-h-80 w-full object-contain rounded-lg border border-slate-200 bg-slate-50" onerror="this.style.display=\\'none\\'"></div>');
+    }
+  }
+
+  if(!profileParts.length){
+    profileParts.push('<div class="text-sm text-slate-400">No radar-specific structured profile is available for this record.</div>');
+  }
+  profile.innerHTML=profileParts.join("");
 
   const structured=$("fullStructured");
   structured.innerHTML="";
