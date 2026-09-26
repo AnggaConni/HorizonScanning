@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>MOST Social Transformation Intelligence | HorizonScan AI</title>
+<meta name="description" content="Prototype social transformation intelligence map connecting emerging signals, communities and policy-relevant themes.">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/@phosphor-icons/web"></script>
+<link rel="stylesheet" href="https://js.arcgis.com/4.30/esri/themes/light/main.css">
+<script src="https://js.arcgis.com/4.30/"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{font-family:Inter,sans-serif}
+#viewDiv{position:absolute;inset:0}
+.map-shell{height:68vh;min-height:520px;position:relative}
+#signalOverlay{position:absolute;inset:0;z-index:2;pointer-events:none}
+.signal-node{cursor:pointer;pointer-events:auto}
+.legend-dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+.glass{background:rgba(255,255,255,.88);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+@media(max-width:640px){.map-shell{height:72vh;min-height:560px}.title-wrap{max-width:92vw}}
+</style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+<nav class="sticky top-0 z-50 glass border-b border-slate-200">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+    <a href="index.html" class="flex items-center gap-2 font-bold text-slate-900"><i class="ph ph-radar text-teal-600 text-2xl"></i>HorizonScan<span class="text-teal-600">AI</span></a>
+    <div class="flex items-center gap-2">
+      <a href="index.html" class="hidden sm:inline-flex px-3 py-2 text-sm font-semibold text-slate-600 hover:text-teal-600">Horizon Scanning</a>
+      <span class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-teal-50 border border-teal-100 text-teal-700 text-sm font-bold"><i class="ph ph-arrows-clockwise"></i>MOST</span>
+    </div>
+  </div>
+</nav>
+
+<header class="bg-slate-950 text-white">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="title-wrap max-w-4xl">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-400/10 border border-teal-400/20 text-teal-300 text-xs font-bold tracking-wider">PROTOTYPE · SOCIAL TRANSFORMATION</div>
+      <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight mt-5">MOST<br><span class="text-teal-400">Social Transformation Intelligence</span></h1>
+      <p class="text-slate-300 text-lg md:text-xl mt-5 max-w-3xl">A dummy interface for mapping weak signals of social change across climate, technology, demography, youth and inclusion — with a spatial layer for exploration.</p>
+    </div>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-8 max-w-4xl">
+      <div class="rounded-xl bg-white/5 border border-white/10 p-4"><div class="text-2xl font-extrabold" id="statSignals">0</div><div class="text-xs text-slate-400 mt-1">Signals</div></div>
+      <div class="rounded-xl bg-white/5 border border-white/10 p-4"><div class="text-2xl font-extrabold">3</div><div class="text-xs text-slate-400 mt-1">Priority themes</div></div>
+      <div class="rounded-xl bg-white/5 border border-white/10 p-4"><div class="text-2xl font-extrabold">5</div><div class="text-xs text-slate-400 mt-1">Cross-cutting lenses</div></div>
+      <div class="rounded-xl bg-white/5 border border-white/10 p-4"><div class="text-2xl font-extrabold">DEMO</div><div class="text-xs text-slate-400 mt-1">Data status</div></div>
+    </div>
+  </div>
+</header>
+
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <section class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 md:p-6">
+    <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 mb-4">
+      <div>
+        <div class="text-xs font-bold uppercase tracking-widest text-teal-600">Spatial signal layer</div>
+        <h2 class="text-2xl font-bold text-slate-900 mt-1">Where social transformation signals are emerging</h2>
+        <p class="text-sm text-slate-500 mt-1">The SVG network is rendered above the Esri basemap as a prototype interaction layer.</p>
+      </div>
+      <div class="flex flex-wrap gap-2" id="filters"></div>
+    </div>
+
+    <div class="map-shell rounded-xl overflow-hidden border border-slate-200">
+      <div id="viewDiv"></div>
+      <svg id="signalOverlay" viewBox="0 0 1200 680" preserveAspectRatio="none" aria-label="Social transformation signals overlay"></svg>
+      <div class="absolute top-3 left-3 z-10 glass rounded-xl border border-slate-200 p-3 text-xs shadow-sm max-w-xs">
+        <div class="font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="ph-fill ph-info text-teal-600"></i> Prototype legend</div>
+        <div class="space-y-1.5">
+          <div><span class="legend-dot" style="background:#0d9488"></span> Technology & social impact</div>
+          <div><span class="legend-dot" style="background:#2563eb"></span> Climate & resilience</div>
+          <div><span class="legend-dot" style="background:#db2777"></span> Demography & inclusion</div>
+        </div>
+      </div>
+      <div id="detail" class="absolute bottom-3 right-3 z-10 w-[min(380px,calc(100%-1.5rem))] glass rounded-xl border border-slate-200 shadow-lg hidden">
+        <div class="p-4">
+          <div class="flex items-start justify-between gap-3">
+            <div><div id="detailTheme" class="text-[10px] font-bold uppercase tracking-widest text-teal-600"></div><h3 id="detailTitle" class="font-bold text-lg text-slate-900 mt-1"></h3></div>
+            <button id="closeDetail" class="text-slate-400 hover:text-slate-700"><i class="ph ph-x text-lg"></i></button>
+          </div>
+          <p id="detailDesc" class="text-sm text-slate-600 mt-3"></p>
+          <div class="grid grid-cols-2 gap-2 mt-4 text-xs">
+            <div class="bg-slate-50 border border-slate-100 rounded-lg p-2"><span class="text-slate-400">Signal horizon</span><div id="detailHorizon" class="font-bold text-slate-700 mt-0.5"></div></div>
+            <div class="bg-slate-50 border border-slate-100 rounded-lg p-2"><span class="text-slate-400">Relevance</span><div id="detailRelevance" class="font-bold text-slate-700 mt-0.5"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="grid md:grid-cols-3 gap-4 mt-6">
+    <article class="bg-white rounded-2xl border border-slate-200 p-5"><div class="text-teal-600 text-xl"><i class="ph ph-broadcast"></i></div><h3 class="font-bold text-slate-900 mt-3">Signal discovery</h3><p class="text-sm text-slate-500 mt-2">A place to collect weak signals, emerging patterns and contextual evidence before they become mainstream trends.</p></article>
+    <article class="bg-white rounded-2xl border border-slate-200 p-5"><div class="text-blue-600 text-xl"><i class="ph ph-map-trifold"></i></div><h3 class="font-bold text-slate-900 mt-3">Spatial intelligence</h3><p class="text-sm text-slate-500 mt-2">Map signals by geography, then inspect how different transformations cluster or intersect.</p></article>
+    <article class="bg-white rounded-2xl border border-slate-200 p-5"><div class="text-pink-600 text-xl"><i class="ph ph-arrows-clockwise"></i></div><h3 class="font-bold text-slate-900 mt-3">Policy translation</h3><p class="text-sm text-slate-500 mt-2">Future version: connect evidence and signals to research questions, policy options, capacity needs and foresight work.</p></article>
+  </section>
+
+  <section class="mt-8 rounded-2xl bg-slate-950 text-white p-6 md:p-8">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+      <div><div class="text-xs font-bold tracking-widest uppercase text-teal-300">Next build</div><h2 class="text-2xl font-bold mt-2">From dummy map → transformation intelligence system</h2><p class="text-slate-400 mt-2 max-w-3xl">Potential future layers: source provenance, horizon, confidence, affected groups, policy domain, trend relationships, knowledge graph and quarterly social transformation briefs.</p></div>
+      <a href="index.html" class="shrink-0 inline-flex items-center justify-center gap-2 px-5 py-3 bg-teal-600 hover:bg-teal-500 rounded-xl font-bold"><i class="ph ph-arrow-left"></i>Back to HorizonScan</a>
+    </div>
+  </section>
+</main>
+
+<script>
+const signals=[
+ {id:1,theme:'Technology',color:'#0d9488',title:'AI-mediated public services',desc:'Public services increasingly incorporate AI interfaces, automation and digital triage. Dummy signal for interface testing.',lat:1.3521,lon:103.8198,horizon:'0–3 years',relevance:'High'},
+ {id:2,theme:'Climate',color:'#2563eb',title:'Community-led climate adaptation',desc:'Local adaptation practices become more visible as communities respond to climate-driven disruption and infrastructure stress.',lat:-6.2088,lon:106.8456,horizon:'1–5 years',relevance:'High'},
+ {id:3,theme:'Demography',color:'#db2777',title:'Ageing + new care ecosystems',desc:'Demographic ageing creates demand for new combinations of family, community, technology and public support systems.',lat:35.6762,lon:139.6503,horizon:'3–10 years',relevance:'Medium'},
+ {id:4,theme:'Technology',color:'#0d9488',title:'Digital divide 2.0',desc:'The divide shifts from access to quality: AI literacy, data agency and the ability to benefit from digital platforms.',lat:14.5995,lon:120.9842,horizon:'1–5 years',relevance:'High'},
+ {id:5,theme:'Climate',color:'#2563eb',title:'Urban heat as social inequality signal',desc:'Heat exposure increasingly interacts with housing quality, income, mobility and access to public services.',lat:13.7563,lon:100.5018,horizon:'0–3 years',relevance:'High'},
+ {id:6,theme:'Demography',color:'#db2777',title:'Youth-led civic experimentation',desc:'Young people use digital tools to create new forms of learning, participation, mutual aid and local problem solving.',lat:-6.9175,lon:107.6191,horizon:'0–3 years',relevance:'Medium'},
+ {id:7,theme:'Technology',color:'#0d9488',title:'Platform governance in local communities',desc:'Local institutions increasingly need practical approaches to platform rules, data use, trust and algorithmic accountability.',lat:3.1390,lon:101.6869,horizon:'1–5 years',relevance:'Medium'},
+ {id:8,theme:'Climate',color:'#2563eb',title:'Coastal livelihood transformation',desc:'Coastal communities combine ecological restoration, blue-economy opportunities and new livelihood models.',lat:-8.6500,lon:115.2167,horizon:'1–5 years',relevance:'High'}
+];
+document.getElementById('statSignals').textContent=signals.length;
+
+const themeDefs=[['All','all'],['Technology','Technology'],['Climate','Climate'],['Demography','Demography']];
+let active='all';
+const filterBox=document.getElementById('filters');
+themeDefs.forEach(([label,val])=>{
+ const b=document.createElement('button');
+ b.className='px-3 py-2 rounded-lg border text-xs font-bold transition '+(val==='all'?'bg-slate-900 text-white border-slate-900':'bg-white text-slate-600 border-slate-200 hover:border-teal-300');
+ b.textContent=label;
+ b.onclick=()=>{active=val;document.querySelectorAll('#filters button').forEach(x=>{x.className='px-3 py-2 rounded-lg border text-xs font-bold transition '+(x===b?'bg-slate-900 text-white border-slate-900':'bg-white text-slate-600 border-slate-200 hover:border-teal-300')});renderSignals();};
+ filterBox.appendChild(b);
+});
+
+const overlay=document.getElementById('signalOverlay');
+const detail=document.getElementById('detail');
+const mapState={xmin:-180,xmax:180,ymin:-60,ymax:70};
+
+function project(lon,lat,w,h){
+ const x=(lon-mapState.xmin)/(mapState.xmax-mapState.xmin)*w;
+ const y=(1-(lat-mapState.ymin)/(mapState.ymax-mapState.ymin))*h;
+ return [x,y];
+}
+function showDetail(s){
+ document.getElementById('detailTheme').textContent=s.theme+' · signal';
+ document.getElementById('detailTitle').textContent=s.title;
+ document.getElementById('detailDesc').textContent=s.desc;
+ document.getElementById('detailHorizon').textContent=s.horizon;
+ document.getElementById('detailRelevance').textContent=s.relevance;
+ detail.classList.remove('hidden');
+}
+document.getElementById('closeDetail').onclick=()=>detail.classList.add('hidden');
+
+function renderSignals(){
+ overlay.innerHTML='';
+ const visible=signals.filter(s=>active==='all'||s.theme===active);
+ const w=1200,h=680;
+ visible.forEach((s,i)=>{
+   const [x,y]=project(s.lon,s.lat,w,h);
+   const g=document.createElementNS('http://www.w3.org/2000/svg','g');
+   g.setAttribute('class','signal-node');
+   const pulse=document.createElementNS('http://www.w3.org/2000/svg','circle');
+   pulse.setAttribute('cx',x);pulse.setAttribute('cy',y);pulse.setAttribute('r',15);
+   pulse.setAttribute('fill',s.color);pulse.setAttribute('opacity','.12');
+   const c=document.createElementNS('http://www.w3.org/2000/svg','circle');
+   c.setAttribute('cx',x);c.setAttribute('cy',y);c.setAttribute('r',6);
+   c.setAttribute('fill',s.color);c.setAttribute('stroke','#fff');c.setAttribute('stroke-width','2');
+   const t=document.createElementNS('http://www.w3.org/2000/svg','text');
+   t.setAttribute('x',x+10);t.setAttribute('y',y-10);t.setAttribute('font-size','12');t.setAttribute('font-weight','700');t.setAttribute('fill','#0f172a');t.setAttribute('paint-order','stroke');t.setAttribute('stroke','#fff');t.setAttribute('stroke-width','4');t.setAttribute('stroke-linejoin','round');
+   t.textContent=s.title.length>28?s.title.slice(0,28)+'…':s.title;
+   g.appendChild(pulse);g.appendChild(c);g.appendChild(t);g.onclick=()=>showDetail(s);overlay.appendChild(g);
+ });
+}
+renderSignals();
+
+require(['esri/Map','esri/views/MapView','esri/geometry/support/webMercatorUtils'],(Map,MapView)=>{
+ const map=new Map({basemap:'arcgis/light-gray'});
+ const view=new MapView({container:'viewDiv',map,center:[110,3],zoom:3,ui:{components:['zoom','compass','attribution']}});
+ view.watch('extent',()=>{});
+});
+</script>
+</body>
+</html>
