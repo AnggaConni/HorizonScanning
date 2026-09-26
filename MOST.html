@@ -586,6 +586,7 @@ function normalize(key,item,index){
     critical:Boolean((item && item.critical_flag) || String(item && item.status || "").toLowerCase().includes("high risk")),
     hiddenGem:Boolean(item && item.hidden_gem),
     timestamp:first(item && item.timestamp, item && item.scraped_at, item && item.generated_at, null),
+    sources:arr(first(item && item.sources, item && item.source_urls, item && item.urls)).filter(Boolean),
     raw:item,
     themes:themeInfo.themes,
     themeEvidence:themeInfo.evidence,
