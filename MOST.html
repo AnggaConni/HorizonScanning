@@ -40,14 +40,14 @@ body{font-family:Inter,sans-serif}
     <div class="title-wrap max-w-4xl">
       <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-400/10 border border-teal-400/20 text-teal-300 text-xs font-bold tracking-wider">PROTOTYPE · SOCIAL TRANSFORMATION</div>
       <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight mt-5">Social Transformation<br><span class="text-teal-400">Intelligence</span></h1>
-      <p class="text-slate-300 text-lg md:text-xl mt-5 max-w-3xl">A public prototype for mapping weak signals of social change across climate, technology, demography, youth and inclusion — with a spatial layer for exploration.</p>
+      <p class="text-slate-300 text-lg md:text-xl mt-5 max-w-3xl">A public, read-only synthesis layer for five open-source intelligence systems covering culture, grassroots innovation, education, environmental signals and heritage-market risk.</p>
       <div class="flex flex-wrap gap-2 mt-4"><span class="text-xs font-semibold text-slate-300 border border-white/10 bg-white/5 rounded-full px-3 py-1">No login / API key</span><span class="text-xs font-semibold text-slate-300 border border-white/10 bg-white/5 rounded-full px-3 py-1">Open prototype</span><span class="text-xs font-semibold text-slate-300 border border-white/10 bg-white/5 rounded-full px-3 py-1">Public data-ready architecture</span></div>
     </div>
     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-8 max-w-4xl">
       <div class="rounded-xl bg-white/5 border border-white/10 p-4"><div class="text-2xl font-extrabold" id="statSignals">0</div><div class="text-xs text-slate-400 mt-1">Signals</div></div>
-      <div class="rounded-xl bg-white/5 border border-white/10 p-4"><div class="text-2xl font-extrabold">3</div><div class="text-xs text-slate-400 mt-1">Priority themes</div></div>
-      <div class="rounded-xl bg-white/5 border border-white/10 p-4"><div class="text-2xl font-extrabold">5</div><div class="text-xs text-slate-400 mt-1">Cross-cutting lenses</div></div>
-      <div class="rounded-xl bg-white/5 border border-white/10 p-4"><div class="text-2xl font-extrabold">DEMO</div><div class="text-xs text-slate-400 mt-1">Data status</div></div>
+      <div class="rounded-xl bg-white/5 border border-white/10 p-4"><div class="text-2xl font-extrabold" id="statThemes">0</div><div class="text-xs text-slate-400 mt-1">Active radars</div></div>
+      <div class="rounded-xl bg-white/5 border border-white/10 p-4"><div class="text-2xl font-extrabold" id="statLenses">0</div><div class="text-xs text-slate-400 mt-1">Mapped records</div></div>
+      <div class="rounded-xl bg-white/5 border border-white/10 p-4"><div class="text-2xl font-extrabold">LIVE</div><div id="statsStatus" class="text-xs text-slate-400 mt-1">Loading…</div></div>
     </div>
   </div>
 </header>
@@ -58,7 +58,7 @@ body{font-family:Inter,sans-serif}
       <div>
         <div class="text-xs font-bold uppercase tracking-widest text-teal-600">Spatial signal layer</div>
         <h2 class="text-2xl font-bold text-slate-900 mt-1">Where social transformation signals are emerging</h2>
-        <p class="text-sm text-slate-500 mt-1">The SVG network is rendered above the Esri basemap as a prototype interaction layer.</p>
+        <p class="text-sm text-slate-500 mt-1">Live records from five public GitHub repositories are rendered above the Esri basemap. The SVG layer follows the map as you pan and zoom.</p><div id="dataStatus" class="text-xs text-teal-700 font-semibold mt-2">Loading live federation…</div><div id="sourceDetail" class="text-[10px] text-slate-400 mt-1 break-words"></div>
       </div>
       <div class="flex flex-wrap gap-2" id="filters"></div>
     </div>
@@ -88,6 +88,17 @@ body{font-family:Inter,sans-serif}
         </div>
       </div>
     </div>
+  </section>
+
+  <section class="mt-6">
+    <div class="flex items-end justify-between gap-4 mb-4">
+      <div>
+        <div class="text-xs font-bold tracking-widest uppercase text-teal-600">Live evidence</div>
+        <h2 class="text-2xl font-bold text-slate-900 mt-1">Records entering the transformation picture</h2>
+        <p class="text-sm text-slate-500 mt-1">Selected from the live federated dataset. Filter above to inspect each radar source system.</p>
+      </div>
+    </div>
+    <div id="featuredSignals" class="grid md:grid-cols-2 xl:grid-cols-4 gap-4"></div>
   </section>
 
   <section class="grid md:grid-cols-3 gap-4 mt-6">
@@ -148,93 +159,436 @@ body{font-family:Inter,sans-serif}
 </main>
 
 <script>
-const signals=[
- {id:1,theme:'Technology',color:'#0d9488',title:'AI-mediated public services',desc:'Public services increasingly incorporate AI interfaces, automation and digital triage. Dummy signal for interface testing.',lat:1.3521,lon:103.8198,horizon:'0–3 years',relevance:'High'},
- {id:2,theme:'Climate',color:'#2563eb',title:'Community-led climate adaptation',desc:'Local adaptation practices become more visible as communities respond to climate-driven disruption and infrastructure stress.',lat:-6.2088,lon:106.8456,horizon:'1–5 years',relevance:'High'},
- {id:3,theme:'Demography',color:'#db2777',title:'Ageing + new care ecosystems',desc:'Demographic ageing creates demand for new combinations of family, community, technology and public support systems.',lat:35.6762,lon:139.6503,horizon:'3–10 years',relevance:'Medium'},
- {id:4,theme:'Technology',color:'#0d9488',title:'Digital divide 2.0',desc:'The divide shifts from access to quality: AI literacy, data agency and the ability to benefit from digital platforms.',lat:14.5995,lon:120.9842,horizon:'1–5 years',relevance:'High'},
- {id:5,theme:'Climate',color:'#2563eb',title:'Urban heat as social inequality signal',desc:'Heat exposure increasingly interacts with housing quality, income, mobility and access to public services.',lat:13.7563,lon:100.5018,horizon:'0–3 years',relevance:'High'},
- {id:6,theme:'Demography',color:'#db2777',title:'Youth-led civic experimentation',desc:'Young people use digital tools to create new forms of learning, participation, mutual aid and local problem solving.',lat:-6.9175,lon:107.6191,horizon:'0–3 years',relevance:'Medium'},
- {id:7,theme:'Technology',color:'#0d9488',title:'Platform governance in local communities',desc:'Local institutions increasingly need practical approaches to platform rules, data use, trust and algorithmic accountability.',lat:3.1390,lon:101.6869,horizon:'1–5 years',relevance:'Medium'},
- {id:8,theme:'Climate',color:'#2563eb',title:'Coastal livelihood transformation',desc:'Coastal communities combine ecological restoration, blue-economy opportunities and new livelihood models.',lat:-8.6500,lon:115.2167,horizon:'1–5 years',relevance:'High'}
-];
-document.getElementById('statSignals').textContent=signals.length;
+const RADARS = {
+  ICH: {
+    label: "ICH Radar",
+    color: "#db2777",
+    data: "https://raw.githubusercontent.com/AnggaConni/ICH-Radar/main/data.json",
+    fallback: "https://raw.githubusercontent.com/AnggaConni/ICH-Radar/main/resume.json",
+    icon: "ph-sparkle"
+  },
+  GSI: {
+    label: "GSI Radar",
+    color: "#0d9488",
+    data: "https://raw.githubusercontent.com/AnggaConni/GSI-Radar/main/data.json",
+    fallback: "https://raw.githubusercontent.com/AnggaConni/GSI-Radar/main/resume.json",
+    icon: "ph-lightbulb-filament"
+  },
+  EDU: {
+    label: "EDU Radar",
+    color: "#2563eb",
+    data: "https://raw.githubusercontent.com/AnggaConni/EDU-Innovation/main/data.json",
+    fallback: "https://raw.githubusercontent.com/AnggaConni/EDU-Innovation/main/resume.json",
+    icon: "ph-graduation-cap"
+  },
+  NEXUS: {
+    label: "Nexus Radar",
+    color: "#059669",
+    data: "https://raw.githubusercontent.com/AnggaConni/Nexus-Radar/main/data.json",
+    fallback: "https://raw.githubusercontent.com/AnggaConni/Nexus-Radar/main/resume.json",
+    icon: "ph-radar"
+  },
+  ARTIFACT: {
+    label: "Artifact Radar",
+    color: "#d97706",
+    data: "https://raw.githubusercontent.com/AnggaConni/artifact-radar/main/data.json",
+    fallback: null,
+    icon: "ph-detective"
+  }
+};
 
-const themeDefs=[['All','all'],['Technology','Technology'],['Climate','Climate'],['Demography','Demography']];
-let active='all';
-const filterBox=document.getElementById('filters');
-themeDefs.forEach(([label,val])=>{
- const b=document.createElement('button');
- b.className='px-3 py-2 rounded-lg border text-xs font-bold transition '+(val==='all'?'bg-slate-900 text-white border-slate-900':'bg-white text-slate-600 border-slate-200 hover:border-teal-300');
- b.textContent=label;
- b.onclick=()=>{active=val;document.querySelectorAll('#filters button').forEach(x=>{x.className='px-3 py-2 rounded-lg border text-xs font-bold transition '+(x===b?'bg-slate-900 text-white border-slate-900':'bg-white text-slate-600 border-slate-200 hover:border-teal-300')});renderSignals();};
- filterBox.appendChild(b);
+const state = {
+  records: [],
+  byRadar: {},
+  activeRadar: "ALL",
+  errors: []
+};
+
+const $ = function(id){ return document.getElementById(id); };
+const overlay = $("signalOverlay");
+const detail = $("detail");
+
+function arr(v){
+  if(Array.isArray(v)) return v;
+  return v == null ? [] : [v];
+}
+
+function num(v, fallback){
+  const n = Number(v);
+  return Number.isFinite(n) ? n : (fallback == null ? null : fallback);
+}
+
+function first(){
+  for(let i=0;i<arguments.length;i++){
+    const v = arguments[i];
+    if(v !== undefined && v !== null && v !== "") return v;
+  }
+  return null;
+}
+
+function esc(v){
+  return String(v == null ? "" : v)
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+function extractRecords(key, raw){
+  if(!raw) return [];
+  if(key === "ICH"){
+    return Array.isArray(raw) ? raw : (Array.isArray(raw.inventory) ? raw.inventory : []);
+  }
+  if(key === "ARTIFACT"){
+    return Array.isArray(raw.listings) ? raw.listings : [];
+  }
+  if(Array.isArray(raw)) return raw;
+  if(Array.isArray(raw.inventory)) return raw.inventory;
+  if(Array.isArray(raw.signals)) return raw.signals;
+  if(Array.isArray(raw.innovations)) return raw.innovations;
+  return [];
+}
+
+function coords(item){
+  const loc = item && item.location ? item.location : {};
+  const lat = num(first(loc.lat, loc.latitude, item && item.lat, item && item.latitude));
+  const lon = num(first(loc.lon, loc.lng, loc.longitude, item && item.lon, item && item.lng));
+  if(lat === null || lon === null || Math.abs(lat) > 90 || Math.abs(lon) > 180){
+    return {lat:null, lon:null};
+  }
+  return {lat:lat, lon:lon};
+}
+
+function normalize(key,item,index){
+  const loc = item && item.location ? item.location : {};
+  const xy = coords(item);
+  const category = arr(first(
+    item && item.category,
+    item && item.categories,
+    item && item.domain_classification,
+    item && item.domain,
+    item && item.keyword_trigger
+  )).flatMap(function(x){
+    return typeof x === "string" ? x.split("|").map(function(y){return y.trim();}) : [String(x)];
+  }).filter(Boolean);
+
+  const impact = num(first(
+    item && item.impact && item.impact.impact_score,
+    item && item.impact_score
+  ));
+
+  const risk = num(first(
+    item && item.risk_assessment && item.risk_assessment.risk_score,
+    item && item.risk_score
+  ));
+
+  const priority = num(first(
+    item && item.priority_score,
+    item && item.priority,
+    impact !== null ? impact * 10 : null
+  ));
+
+  return {
+    radar:key,
+    id:String(first(item && item.id, item && item.uid, item && item.original_title, item && item.title, key + "-" + index)),
+    title:String(first(item && item.title, item && item.element_name, item && item.original_title, item && item.name, "Untitled " + key + " #" + (index+1))),
+    summary:String(first(item && item.summary, item && item.description, item && item.desc, item && item.reason, "")),
+    category:category,
+    country:String(first(loc.country, item && item.country, item && item.origin_region, "Unknown")),
+    region:String(first(loc.region, loc.province, item && item.origin_region, "Unknown")),
+    lat:xy.lat,
+    lon:xy.lon,
+    impact:impact,
+    risk:risk,
+    priority:priority,
+    urgency:String(first(item && item.escalation && item.escalation.urgency, item && item.urgency, item && item.status, "")),
+    intensity:String(first(item && item.signal_intensity, item && item.escalation && item.escalation.speed, item && item.status, "")),
+    critical:Boolean((item && item.critical_flag) || String(item && item.status || "").toLowerCase().includes("high risk")),
+    hiddenGem:Boolean(item && item.hidden_gem),
+    timestamp:first(item && item.timestamp, item && item.scraped_at, item && item.generated_at, null),
+    raw:item
+  };
+}
+
+async function fetchJSON(url){
+  const res = await fetch(url,{cache:"no-store"});
+  if(!res.ok) throw new Error(res.status + " " + res.statusText);
+  return res.json();
+}
+
+async function loadOne(key){
+  const cfg = RADARS[key];
+  try{
+    const raw = await fetchJSON(cfg.data);
+    const items = extractRecords(key,raw);
+    if(items.length) return {items:items,source:"data.json"};
+  }catch(e){
+    console.warn(key + " data.json failed",e);
+  }
+
+  if(cfg.fallback){
+    try{
+      const raw = await fetchJSON(cfg.fallback);
+      const items = extractRecords(key,raw);
+      if(items.length) return {items:items,source:"resume.json"};
+    }catch(e){
+      console.warn(key + " fallback failed",e);
+    }
+  }
+
+  state.errors.push(key);
+  return {items:[],source:"unavailable"};
+}
+
+function badge(key){
+  const cfg = RADARS[key];
+  return '<span class="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-bold" style="background:'+cfg.color+'18;color:'+cfg.color+'"><i class="ph '+cfg.icon+'"></i>'+cfg.label+'</span>';
+}
+
+function visibleRecords(){
+  return state.activeRadar === "ALL" ? state.records : (state.byRadar[state.activeRadar] || []);
+}
+
+function renderFilters(){
+  const box = $("filters");
+  box.innerHTML = "";
+  const all = [["ALL","All"]].concat(Object.keys(RADARS).map(function(k){return [k,RADARS[k].label];}));
+  all.forEach(function(pair){
+    const key=pair[0], label=pair[1];
+    const count = key === "ALL" ? state.records.length : (state.byRadar[key] || []).length;
+    const b = document.createElement("button");
+    b.className = "px-3 py-2 rounded-lg border text-xs font-bold transition " +
+      (state.activeRadar === key
+        ? "bg-slate-900 text-white border-slate-900"
+        : "bg-white text-slate-600 border-slate-200 hover:border-teal-300");
+    b.textContent = label + " " + count.toLocaleString();
+    b.onclick = function(){
+      state.activeRadar = key;
+      renderFilters();
+      renderStats();
+      renderFeatured();
+      renderMap();
+    };
+    box.appendChild(b);
+  });
+}
+
+function renderStats(){
+  const visible = visibleRecords();
+  const mapped = visible.filter(function(r){return r.lat !== null && r.lon !== null;}).length;
+  const flagged = visible.filter(function(r){return r.critical;}).length;
+
+  $("statSignals").textContent = visible.length.toLocaleString();
+  $("statThemes").textContent = new Set(visible.map(function(r){return r.radar;})).size;
+  $("statLenses").textContent = mapped.toLocaleString();
+
+  const status = $("statsStatus");
+  if(status) status.textContent = mapped.toLocaleString() + " mapped · " + flagged.toLocaleString() + " flagged";
+}
+
+function showDetail(r){
+  $("detailTheme").innerHTML = badge(r.radar) + ' <span class="ml-2 text-[10px] text-slate-400">'+esc(r.category.slice(0,3).join(" · "))+"</span>";
+  $("detailTitle").textContent = r.title;
+  $("detailDesc").textContent = r.summary || "No summary available.";
+  $("detailHorizon").textContent = r.urgency || r.intensity || (r.timestamp ? new Date(r.timestamp).toLocaleDateString() : "Observed");
+  $("detailRelevance").textContent =
+    r.priority !== null ? "Priority " + Math.round(r.priority) :
+    r.impact !== null ? "Impact " + Math.round(r.impact) :
+    r.risk !== null ? "Risk " + Math.round(r.risk) : "Observed";
+  detail.classList.remove("hidden");
+}
+
+$("closeDetail").onclick = function(){ detail.classList.add("hidden"); };
+
+function renderFeatured(){
+  const host = $("featuredSignals");
+  if(!host) return;
+
+  const ranked = visibleRecords().slice().sort(function(a,b){
+    const ap=a.priority == null ? -1 : a.priority;
+    const bp=b.priority == null ? -1 : b.priority;
+    const ar=a.risk == null ? -1 : a.risk;
+    const br=b.risk == null ? -1 : b.risk;
+    return (bp-ap) || (br-ar);
+  }).slice(0,8);
+
+  if(!ranked.length){
+    host.innerHTML = '<div class="col-span-full text-center py-8 text-sm text-slate-500">No records available.</div>';
+    return;
+  }
+
+  host.innerHTML = ranked.map(function(r){
+    return '<button class="text-left group bg-white rounded-2xl border border-slate-200 p-5 hover:shadow-md hover:border-slate-300 transition" data-key="'+esc(r.radar+"::"+r.id)+'">' +
+      '<div class="flex items-center justify-between gap-2">'+badge(r.radar)+'<i class="ph ph-arrow-up-right text-slate-300 group-hover:text-slate-700"></i></div>' +
+      '<h3 class="font-bold text-slate-900 mt-3 line-clamp-2">'+esc(r.title)+'</h3>' +
+      '<p class="text-xs text-slate-500 mt-2 line-clamp-3">'+esc(r.summary)+'</p>' +
+      '<div class="flex flex-wrap gap-1.5 mt-3">' +
+      '<span class="text-[10px] px-2 py-1 rounded-full bg-slate-100 text-slate-500">'+esc(r.country)+'</span>' +
+      (r.priority !== null ? '<span class="text-[10px] px-2 py-1 rounded-full bg-teal-50 text-teal-700">Priority '+Math.round(r.priority)+'</span>' : '') +
+      (r.risk !== null ? '<span class="text-[10px] px-2 py-1 rounded-full bg-rose-50 text-rose-700">Risk '+Math.round(r.risk)+'</span>' : '') +
+      '</div></button>';
+  }).join("");
+
+  host.querySelectorAll("[data-key]").forEach(function(btn){
+    btn.onclick = function(){
+      const p=btn.dataset.key.split("::");
+      const record=state.records.find(function(r){return r.radar===p[0] && r.id===p[1];});
+      if(record) showDetail(record);
+    };
+  });
+}
+
+function drawNode(r,x,y){
+  if(!Number.isFinite(x) || !Number.isFinite(y)) return;
+  const g=document.createElementNS("http://www.w3.org/2000/svg","g");
+  const p=document.createElementNS("http://www.w3.org/2000/svg","circle");
+  const c=document.createElementNS("http://www.w3.org/2000/svg","circle");
+  const t=document.createElementNS("http://www.w3.org/2000/svg","text");
+  const color=RADARS[r.radar].color;
+
+  g.setAttribute("class","signal-node");
+  g.style.pointerEvents="auto";
+
+  p.setAttribute("cx",x);
+  p.setAttribute("cy",y);
+  p.setAttribute("r",r.critical ? 13 : 10);
+  p.setAttribute("fill",color);
+  p.setAttribute("opacity",r.critical ? ".24" : ".13");
+
+  c.setAttribute("cx",x);
+  c.setAttribute("cy",y);
+  c.setAttribute("r",r.critical ? 5.5 : 4.5);
+  c.setAttribute("fill",color);
+  c.setAttribute("stroke","#fff");
+  c.setAttribute("stroke-width","2");
+
+  t.setAttribute("x",x+9);
+  t.setAttribute("y",y-8);
+  t.setAttribute("font-size","11");
+  t.setAttribute("font-weight","700");
+  t.setAttribute("fill","#0f172a");
+  t.setAttribute("paint-order","stroke");
+  t.setAttribute("stroke","#fff");
+  t.setAttribute("stroke-width","4");
+  t.textContent=r.title.length>28 ? r.title.slice(0,28)+"…" : r.title;
+
+  g.appendChild(p); g.appendChild(c); g.appendChild(t);
+  g.onclick=function(){showDetail(r);};
+  overlay.appendChild(g);
+}
+
+function renderMap(){
+  overlay.innerHTML="";
+  const shell=document.querySelector(".map-shell");
+  if(!shell) return;
+  const width=Math.max(320,shell.clientWidth);
+  const height=Math.max(400,shell.clientHeight);
+  overlay.setAttribute("viewBox","0 0 "+width+" "+height);
+
+  if(!window.socialMapView) return;
+
+  const visible=visibleRecords().filter(function(r){return r.lat!==null && r.lon!==null;})
+    .sort(function(a,b){
+      const ap=a.priority == null ? -1 : a.priority;
+      const bp=b.priority == null ? -1 : b.priority;
+      return bp-ap;
+    })
+    .slice(0,700);
+
+  visible.forEach(function(r){
+    const point={
+      type:"point",
+      longitude:r.lon,
+      latitude:r.lat,
+      spatialReference:{wkid:4326}
+    };
+    const p=window.socialMapView.toScreen(point);
+    if(p) drawNode(r,p.x,p.y);
+  });
+
+  const legend=$("liveLegend");
+  if(legend){
+    const counts={};
+    visible.forEach(function(r){counts[r.radar]=(counts[r.radar]||0)+1;});
+    legend.innerHTML=Object.keys(RADARS).map(function(k){
+      return '<div class="flex items-center justify-between gap-3"><span class="flex items-center gap-2"><span class="legend-dot" style="background:'+RADARS[k].color+'"></span>'+RADARS[k].label+'</span><strong>'+((counts[k]||0).toLocaleString())+'</strong></div>';
+    }).join("");
+  }
+}
+
+async function initData(){
+  const keys=Object.keys(RADARS);
+  const results=await Promise.all(keys.map(loadOne));
+
+  state.records=[];
+  state.byRadar={};
+
+  keys.forEach(function(key,i){
+    const normalized=results[i].items.map(function(item,idx){return normalize(key,item,idx);});
+    state.byRadar[key]=normalized;
+    state.records.push.apply(state.records,normalized);
+  });
+
+  const status=$("dataStatus");
+  if(status){
+    status.textContent = state.errors.length
+      ? "Live federation loaded with " + state.errors.length + " unavailable source(s)."
+      : "Live federation loaded from all five radar repositories.";
+  }
+
+  const sourceDetail=$("sourceDetail");
+  if(sourceDetail){
+    sourceDetail.textContent=keys.map(function(key,i){
+      return RADARS[key].label + ": " + results[i].source;
+    }).join(" · ");
+  }
+
+  renderFilters();
+  renderStats();
+  renderFeatured();
+  renderMap();
+}
+
+document.addEventListener("DOMContentLoaded",function(){
+  initData();
 });
 
-const overlay=document.getElementById('signalOverlay');
-const detail=document.getElementById('detail');
-const mapState={xmin:-180,xmax:180,ymin:-60,ymax:70};
-
-function project(lon,lat,w,h){
- const x=(lon-mapState.xmin)/(mapState.xmax-mapState.xmin)*w;
- const y=(1-(lat-mapState.ymin)/(mapState.ymax-mapState.ymin))*h;
- return [x,y];
-}
-function showDetail(s){
- document.getElementById('detailTheme').textContent=s.theme+' · signal';
- document.getElementById('detailTitle').textContent=s.title;
- document.getElementById('detailDesc').textContent=s.desc;
- document.getElementById('detailHorizon').textContent=s.horizon;
- document.getElementById('detailRelevance').textContent=s.relevance;
- detail.classList.remove('hidden');
-}
-document.getElementById('closeDetail').onclick=()=>detail.classList.add('hidden');
-
-function renderSignals(){
- overlay.innerHTML='';
- const visible=signals.filter(s=>active==='all'||s.theme===active);
- const w=1200,h=680;
- visible.forEach((s,i)=>{
-   const [x,y]=project(s.lon,s.lat,w,h);
-   const g=document.createElementNS('http://www.w3.org/2000/svg','g');
-   g.setAttribute('class','signal-node');
-   const pulse=document.createElementNS('http://www.w3.org/2000/svg','circle');
-   pulse.setAttribute('cx',x);pulse.setAttribute('cy',y);pulse.setAttribute('r',15);
-   pulse.setAttribute('fill',s.color);pulse.setAttribute('opacity','.12');
-   const c=document.createElementNS('http://www.w3.org/2000/svg','circle');
-   c.setAttribute('cx',x);c.setAttribute('cy',y);c.setAttribute('r',6);
-   c.setAttribute('fill',s.color);c.setAttribute('stroke','#fff');c.setAttribute('stroke-width','2');
-   const t=document.createElementNS('http://www.w3.org/2000/svg','text');
-   t.setAttribute('x',x+10);t.setAttribute('y',y-10);t.setAttribute('font-size','12');t.setAttribute('font-weight','700');t.setAttribute('fill','#0f172a');t.setAttribute('paint-order','stroke');t.setAttribute('stroke','#fff');t.setAttribute('stroke-width','4');t.setAttribute('stroke-linejoin','round');
-   t.textContent=s.title.length>28?s.title.slice(0,28)+'…':s.title;
-   g.appendChild(pulse);g.appendChild(c);g.appendChild(t);g.onclick=()=>showDetail(s);overlay.appendChild(g);
- });
-}
-renderSignals();
+window.addEventListener("resize",function(){renderMap();});
 
 require([
-  'esri/Map',
-  'esri/views/MapView',
-  'esri/layers/TileLayer'
-],(Map,MapView,TileLayer)=>{
-  // Public ArcGIS legacy basemap service.
-  // No ArcGIS Online sign-in or API key required for this anonymous prototype.
-  const grayBase = new TileLayer({
-    url:'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer',
-    title:'Esri World Light Gray Base'
+  "esri/Map",
+  "esri/views/MapView",
+  "esri/layers/TileLayer"
+],function(Map,MapView,TileLayer){
+  const grayBase=new TileLayer({
+    url:"https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer",
+    title:"Esri World Light Gray Base"
   });
 
-  const map = new Map({
-    layers:[grayBase]
-  });
+  const map=new Map({layers:[grayBase]});
 
-  const view = new MapView({
-    container:'viewDiv',
-    map,
+  const view=new MapView({
+    container:"viewDiv",
+    map:map,
     center:[110,3],
     zoom:3,
     constraints:{minZoom:2},
-    ui:{components:['zoom','compass','attribution']}
+    ui:{components:["zoom","compass","attribution"]}
+  });
+
+  window.socialMapView=view;
+
+  view.when(function(){
+    renderMap();
+  });
+
+  view.watch("extent",function(){
+    window.requestAnimationFrame(renderMap);
+  });
+
+  view.watch("stationary",function(){
+    window.requestAnimationFrame(renderMap);
   });
 });
 </script>
