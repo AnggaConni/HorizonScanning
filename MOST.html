@@ -330,7 +330,7 @@ body{font-family:Inter,sans-serif}
 
   <section class="mt-8 rounded-2xl bg-slate-950 text-white p-6 md:p-8">
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-      <div><div class="text-xs font-bold tracking-widest uppercase text-teal-300">Next build</div><h2 class="text-2xl font-bold mt-2">From dummy map → transformation intelligence system</h2><p class="text-slate-400 mt-2 max-w-3xl">Potential future layers: source provenance, horizon, confidence, affected groups, policy domain, trend relationships, knowledge graph and quarterly social transformation briefs.</p></div>
+      <div><div class="text-xs font-bold tracking-widest uppercase text-teal-300">Next build</div><h2 class="text-2xl font-bold mt-2">From data map → transformation intelligence system</h2><p class="text-slate-400 mt-2 max-w-3xl">Potential future layers: source provenance, horizon, confidence, affected groups, policy domain, trend relationships, knowledge graph and quarterly social transformation briefs.</p></div>
       <a href="index.html" class="shrink-0 inline-flex items-center justify-center gap-2 px-5 py-3 bg-teal-600 hover:bg-teal-500 rounded-xl font-bold"><i class="ph ph-arrow-left"></i>Back to HorizonScan</a>
     </div>
   </section>
@@ -1248,7 +1248,14 @@ document.addEventListener("keydown",function(e){
 });
 
 function renderEvidenceCard(r){
+  const image = first(
+    r.raw && r.raw.image_url,
+    r.raw && r.raw.thumbnail_url,
+    r.raw && r.raw.screenshot_url
+  );
+
   return '<button class="evidence-card text-left group bg-white rounded-2xl border border-slate-200 p-5 hover:shadow-md hover:border-slate-300 transition" data-key="'+esc(r.radar+"::"+r.id)+'">' +
+    (image ? '<img src="'+esc(image)+'" alt="" loading="lazy" class="w-full h-36 object-cover rounded-xl border border-slate-200 bg-slate-50 mb-3" onerror="this.remove()">' : '') +
     '<div class="flex items-center justify-between gap-2">'+badge(r.radar)+'<i class="ph ph-arrow-up-right text-slate-300 group-hover:text-slate-700"></i></div>' +
     '<h3 class="font-bold text-slate-900 mt-3 line-clamp-2">'+esc(r.title)+'</h3>' +
     '<p class="text-xs text-slate-500 mt-2 line-clamp-3">'+esc(r.summary)+'</p>' +
