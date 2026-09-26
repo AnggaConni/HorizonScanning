@@ -22,6 +22,11 @@ body{font-family:Inter,sans-serif}
 #detailFull.open{display:flex}
 .legend-dot{width:10px;height:10px;border-radius:50%;display:inline-block}
 .glass{background:rgba(255,255,255,.88);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.evidence-carousel{display:flex;gap:1rem;overflow-x:auto;scroll-snap-type:x mandatory;padding:0.25rem 0.15rem 0.75rem;scrollbar-width:thin}
+.evidence-card{flex:0 0 min(320px,82vw);scroll-snap-align:start}
+.evidence-carousel::-webkit-scrollbar{height:8px}
+.evidence-carousel::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:999px}
+.section-accent{border-left:4px solid currentColor}
 #fullSummary{max-height:none;overflow:visible}
 @media(max-width:640px){.map-shell{height:72vh;min-height:560px}.title-wrap{max-width:92vw}}
 </style>
@@ -154,14 +159,52 @@ body{font-family:Inter,sans-serif}
   </section>
 
   <section class="mt-6">
-    <div class="flex items-end justify-between gap-4 mb-4">
+    <div class="flex items-end justify-between gap-4 mb-5">
       <div>
         <div class="text-xs font-bold tracking-widest uppercase text-teal-600">Live evidence</div>
-        <h2 class="text-2xl font-bold text-slate-900 mt-1">Records entering the transformation picture</h2>
-        <p class="text-sm text-slate-500 mt-1">Selected from the live federated dataset. Filter above to inspect each radar source system.</p>
+        <h2 class="text-2xl font-bold text-slate-900 mt-1">Transformation streams</h2>
+        <p class="text-sm text-slate-500 mt-1">Newest records are surfaced within three thematic streams, using the live radar data.</p>
       </div>
+      <div class="hidden sm:block text-xs text-slate-400">← Scroll horizontally →</div>
     </div>
-    <div id="featuredSignals" class="grid md:grid-cols-2 xl:grid-cols-4 gap-4"></div>
+
+    <div class="space-y-8">
+      <section class="section-accent pl-4 text-emerald-700">
+        <div class="flex items-end justify-between gap-3 mb-3">
+          <div>
+            <div class="text-xs font-bold tracking-widest uppercase">Climate &amp; Environmental Signals</div>
+            <h3 class="text-xl font-bold text-slate-900 mt-1">Nexus Radar</h3>
+            <p class="text-sm text-slate-500 mt-1">Latent environmental and societal signals, ordered by most recent observation.</p>
+          </div>
+          <span id="climateCount" class="text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700"></span>
+        </div>
+        <div id="climateEvidence" class="evidence-carousel"></div>
+      </section>
+
+      <section class="section-accent pl-4 text-teal-700">
+        <div class="flex items-end justify-between gap-3 mb-3">
+          <div>
+            <div class="text-xs font-bold tracking-widest uppercase">Laboratory of Ideas</div>
+            <h3 class="text-xl font-bold text-slate-900 mt-1">GSI + EDU Radar</h3>
+            <p class="text-sm text-slate-500 mt-1">Grassroots innovation and educational experimentation as a living idea laboratory.</p>
+          </div>
+          <span id="ideasCount" class="text-xs font-bold px-2.5 py-1 rounded-full bg-teal-50 text-teal-700"></span>
+        </div>
+        <div id="ideasEvidence" class="evidence-carousel"></div>
+      </section>
+
+      <section class="section-accent pl-4 text-pink-700">
+        <div class="flex items-end justify-between gap-3 mb-3">
+          <div>
+            <div class="text-xs font-bold tracking-widest uppercase">Intercultural Inclusion</div>
+            <h3 class="text-xl font-bold text-slate-900 mt-1">ICH Radar</h3>
+            <p class="text-sm text-slate-500 mt-1">Living heritage, cultural practices and cross-community knowledge.</p>
+          </div>
+          <span id="cultureCount" class="text-xs font-bold px-2.5 py-1 rounded-full bg-pink-50 text-pink-700"></span>
+        </div>
+        <div id="cultureEvidence" class="evidence-carousel"></div>
+      </section>
+    </div>
   </section>
 
   <section class="grid md:grid-cols-3 gap-4 mt-6">
@@ -664,44 +707,73 @@ document.addEventListener("keydown",function(e){
   }
 });
 
-function renderFeatured(){
-  const host = $("featuredSignals");
+function renderEvidenceCard(r){
+  return '<button class="evidence-card text-left group bg-white rounded-2xl border border-slate-200 p-5 hover:shadow-md hover:border-slate-300 transition" data-key="'+esc(r.radar+"::"+r.id)+'">' +
+    '<div class="flex items-center justify-between gap-2">'+badge(r.radar)+'<i class="ph ph-arrow-up-right text-slate-300 group-hover:text-slate-700"></i></div>' +
+    '<h3 class="font-bold text-slate-900 mt-3 line-clamp-2">'+esc(r.title)+'</h3>' +
+    '<p class="text-xs text-slate-500 mt-2 line-clamp-3">'+esc(r.summary)+'</p>' +
+    '<div class="flex flex-wrap gap-1.5 mt-3">' +
+      '<span class="text-[10px] px-2 py-1 rounded-full bg-slate-100 text-slate-500">'+esc(r.country)+'</span>' +
+      (r.timestamp ? '<span class="text-[10px] px-2 py-1 rounded-full bg-slate-100 text-slate-500">'+esc(new Date(r.timestamp).toLocaleDateString())+'</span>' : '') +
+      (r.priority !== null ? '<span class="text-[10px] px-2 py-1 rounded-full bg-teal-50 text-teal-700">Priority '+Math.round(r.priority)+'</span>' : '') +
+      (r.risk !== null ? '<span class="text-[10px] px-2 py-1 rounded-full bg-rose-50 text-rose-700">Risk '+Math.round(r.risk)+'</span>' : '') +
+    '</div></button>';
+}
+
+function sortNewest(records){
+  return records.slice().sort(function(a,b){
+    const ad = a.timestamp ? new Date(a.timestamp).getTime() : 0;
+    const bd = b.timestamp ? new Date(b.timestamp).getTime() : 0;
+    return bd - ad;
+  });
+}
+
+function renderEvidenceCarousel(hostId, records, countId){
+  const host=$(hostId);
+  const count=$(countId);
   if(!host) return;
 
-  const ranked = visibleRecords().slice().sort(function(a,b){
-    const ap=a.priority == null ? -1 : a.priority;
-    const bp=b.priority == null ? -1 : b.priority;
-    const ar=a.risk == null ? -1 : a.risk;
-    const br=b.risk == null ? -1 : b.risk;
-    return (bp-ap) || (br-ar);
-  }).slice(0,8);
+  const sorted=sortNewest(records).slice(0,20);
+  if(count) count.textContent = records.length.toLocaleString() + " records";
 
-  if(!ranked.length){
-    host.innerHTML = '<div class="col-span-full text-center py-8 text-sm text-slate-500">No records available.</div>';
+  if(!sorted.length){
+    host.innerHTML='<div class="text-sm text-slate-400 py-4">No records available in this stream.</div>';
     return;
   }
 
-  host.innerHTML = ranked.map(function(r){
-    return '<button class="text-left group bg-white rounded-2xl border border-slate-200 p-5 hover:shadow-md hover:border-slate-300 transition" data-key="'+esc(r.radar+"::"+r.id)+'">' +
-      '<div class="flex items-center justify-between gap-2">'+badge(r.radar)+'<i class="ph ph-arrow-up-right text-slate-300 group-hover:text-slate-700"></i></div>' +
-      '<h3 class="font-bold text-slate-900 mt-3 line-clamp-2">'+esc(r.title)+'</h3>' +
-      '<p class="text-xs text-slate-500 mt-2 line-clamp-3">'+esc(r.summary)+'</p>' +
-      '<div class="flex flex-wrap gap-1.5 mt-3">' +
-      '<span class="text-[10px] px-2 py-1 rounded-full bg-slate-100 text-slate-500">'+esc(r.country)+'</span>' +
-      (r.priority !== null ? '<span class="text-[10px] px-2 py-1 rounded-full bg-teal-50 text-teal-700">Priority '+Math.round(r.priority)+'</span>' : '') +
-      (r.risk !== null ? '<span class="text-[10px] px-2 py-1 rounded-full bg-rose-50 text-rose-700">Risk '+Math.round(r.risk)+'</span>' : '') +
-      '</div></button>';
-  }).join("");
+  host.innerHTML=sorted.map(renderEvidenceCard).join("");
 
   host.querySelectorAll("[data-key]").forEach(function(btn){
-    btn.onclick = function(){
+    btn.onclick=function(){
       const p=btn.dataset.key.split("::");
-      const record=state.records.find(function(r){return r.radar===p[0] && r.id===p[1];});
+      const record=state.records.find(function(r){
+        return r.radar===p[0] && r.id===p[1];
+      });
       if(record) showDetail(record);
     };
   });
 }
 
+function renderFeatured(){
+  const all=visibleRecords();
+
+  // Always separate by function, but respect radar filter when a specific radar is selected.
+  const climate = (state.activeRadar === "ALL" || state.activeRadar === "NEXUS")
+    ? all.filter(function(r){return r.radar === "NEXUS";})
+    : [];
+
+  const ideas = (state.activeRadar === "ALL" || state.activeRadar === "GSI" || state.activeRadar === "EDU")
+    ? all.filter(function(r){return r.radar === "GSI" || r.radar === "EDU";})
+    : [];
+
+  const culture = (state.activeRadar === "ALL" || state.activeRadar === "ICH")
+    ? all.filter(function(r){return r.radar === "ICH";})
+    : [];
+
+  renderEvidenceCarousel("climateEvidence",climate,"climateCount");
+  renderEvidenceCarousel("ideasEvidence",ideas,"ideasCount");
+  renderEvidenceCarousel("cultureEvidence",culture,"cultureCount");
+}
 function drawNode(r,x,y){
   if(!Number.isFinite(x) || !Number.isFinite(y)) return;
   const g=document.createElementNS("http://www.w3.org/2000/svg","g");
