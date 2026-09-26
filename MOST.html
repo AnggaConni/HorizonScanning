@@ -115,14 +115,36 @@ body{font-family:Inter,sans-serif}
               <div class="bg-slate-50 border border-slate-200 rounded-xl p-4"><div class="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Metrics</div><div id="fullMetrics" class="font-bold text-slate-800 mt-1"></div></div>
             </div>
 
-            <div class="mb-5">
-              <div class="text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">All source fields</div>
-              <pre id="fullJson" class="text-xs leading-relaxed bg-slate-950 text-slate-100 rounded-xl p-4 overflow-auto whitespace-pre-wrap break-words"></pre>
-            </div>
+            <div class="space-y-5">
+              <section>
+                <div class="text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Overview</div>
+                <div id="fullSummary" class="text-sm leading-7 text-slate-700 bg-slate-50 border border-slate-200 rounded-xl p-4"></div>
+              </section>
 
-            <div>
-              <div class="text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Sources</div>
-              <div id="fullSources" class="space-y-2"></div>
+              <section id="fullCategoriesSection">
+                <div class="text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Classification &amp; context</div>
+                <div id="fullCategories" class="flex flex-wrap gap-2"></div>
+              </section>
+
+              <section id="fullStructuredSection">
+                <div class="text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Structured intelligence</div>
+                <div id="fullStructured" class="grid md:grid-cols-2 xl:grid-cols-3 gap-3"></div>
+              </section>
+
+              <section>
+                <div class="text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Evidence &amp; source material</div>
+                <div id="fullSources" class="space-y-2"></div>
+              </section>
+
+              <section>
+                <button id="rawToggle" type="button" class="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-xs font-bold text-slate-700">
+                  <i id="rawToggleIcon" class="ph ph-code"></i>
+                  <span id="rawToggleText">Show raw JSON</span>
+                </button>
+                <div id="rawJsonWrap" class="hidden mt-3">
+                  <pre id="fullJson" class="text-xs leading-relaxed bg-slate-950 text-slate-100 rounded-xl p-4 overflow-auto whitespace-pre-wrap break-words"></pre>
+                </div>
+              </section>
             </div>
           </div>
         </div>
@@ -435,12 +457,97 @@ function showDetail(r){
   detail.classList.remove("hidden");
 }
 
+function humanLabel(key){
+  return String(key || "")
+    .replace(/_/g," ")
+    .replace(/-/g," ")
+    .replace(/([a-z])([A-Z])/g,"$1 $2")
+    .replace(/\\b\\w/g,function(m){return m.toUpperCase();});
+}
+
+function formatValue(value){
+  if(value === null || value === undefined || value === "") return "Not specified";
+  if(typeof value === "boolean") return value ? "Yes" : "No";
+  if(typeof value === "number") return Number.isFinite(value) ? value.toLocaleString() : String(value);
+  if(Array.isArray(value)) return value.length ? value.join(" · ") : "None";
+  if(typeof value === "object") return "";
+  return String(value);
+}
+
+function addStructuredCard(container,key,value){
+  if(value === null || value === undefined || value === "") return;
+  const wrap=document.createElement("div");
+  wrap.className="bg-white border border-slate-200 rounded-xl p-4";
+
+  const title=document.createElement("div");
+  title.className="text-[10px] uppercase tracking-widest text-slate-400 font-bold";
+  title.textContent=humanLabel(key);
+  wrap.appendChild(title);
+
+  if(Array.isArray(value)){
+    const list=value.filter(v=>v!==null && v!==undefined && v!=="");
+    if(list.length){
+      const ul=document.createElement("ul");
+      ul.className="mt-2 space-y-1.5";
+      list.forEach(function(item){
+        const li=document.createElement("li");
+        li.className="text-sm text-slate-700 flex gap-2";
+        li.innerHTML='<span class="text-teal-600 mt-1">•</span><span>'+esc(typeof item==="object"?JSON.stringify(item):String(item))+'</span>';
+        ul.appendChild(li);
+      });
+      wrap.appendChild(ul);
+    }else{
+      const p=document.createElement("div");
+      p.className="text-sm text-slate-400 mt-2";
+      p.textContent="None";
+      wrap.appendChild(p);
+    }
+  }else if(typeof value==="object"){
+    const inner=document.createElement("div");
+    inner.className="mt-2 space-y-2";
+    Object.entries(value).forEach(function(pair){
+      const k=pair[0],v=pair[1];
+      if(v===null || v===undefined || v==="") return;
+      if(typeof v==="object"){
+        const nested=document.createElement("div");
+        nested.className="rounded-lg bg-slate-50 border border-slate-100 p-3";
+        nested.innerHTML='<div class="text-[10px] uppercase tracking-widest text-slate-400 font-bold">'+esc(humanLabel(k))+'</div>';
+        if(Array.isArray(v)){
+          nested.innerHTML += '<div class="text-sm text-slate-700 mt-1">'+esc(v.join(" · "))+'</div>';
+        }else{
+          const lines=[];
+          Object.entries(v).forEach(function(sub){
+            if(sub[1]===null || sub[1]===undefined || sub[1]==="") return;
+            lines.push('<div class="flex justify-between gap-4 text-xs py-1"><span class="text-slate-400">'+esc(humanLabel(sub[0]))+'</span><span class="text-slate-700 text-right">'+esc(formatValue(sub[1]))+'</span></div>');
+          });
+          nested.innerHTML += lines.join("");
+        }
+        inner.appendChild(nested);
+      }else{
+        inner.innerHTML += '<div class="flex justify-between gap-4 text-sm py-1 border-b border-slate-100 last:border-0"><span class="text-slate-400">'+esc(humanLabel(k))+'</span><span class="text-slate-700 text-right font-medium">'+esc(formatValue(v))+'</span></div>';
+      }
+    });
+    wrap.appendChild(inner);
+  }else{
+    const valueEl=document.createElement("div");
+    valueEl.className="text-sm text-slate-700 mt-2 leading-6";
+    valueEl.textContent=formatValue(value);
+    wrap.appendChild(valueEl);
+  }
+
+  container.appendChild(wrap);
+}
+
 function renderFullRecord(r){
   $("fullTheme").innerHTML = badge(r.radar) + ' <span class="ml-2 text-[10px] text-slate-400">'+esc(r.category.join(" · "))+"</span>";
   $("fullTitle").textContent = r.title;
   $("fullMeta").textContent = (r.timestamp ? new Date(r.timestamp).toLocaleString() : "Timestamp unavailable") + " · " + r.id;
+
   $("fullRadar").textContent = RADARS[r.radar].label;
-  $("fullLocation").textContent = [r.country, r.region].filter(Boolean).join(" · ") + (r.lat !== null && r.lon !== null ? " · " + r.lat + ", " + r.lon : "");
+  $("fullLocation").textContent =
+    [r.country, r.region].filter(function(x){return x && x !== "Unknown";}).join(" · ") +
+    (r.lat !== null && r.lon !== null ? " · " + r.lat + ", " + r.lon : "");
+
   $("fullMetrics").textContent = [
     r.priority !== null ? "Priority " + Math.round(r.priority) : null,
     r.impact !== null ? "Impact " + Math.round(r.impact) : null,
@@ -448,9 +555,66 @@ function renderFullRecord(r){
     r.critical ? "FLAGGED" : null
   ].filter(Boolean).join(" · ") || "No scored metrics";
 
-  // Preserve the original item exactly as received from the radar,
-  // without flattening or discarding its native fields.
-  $("fullJson").textContent = JSON.stringify(r.raw, null, 2);
+  $("fullSummary").textContent = r.summary || "No summary available.";
+
+  const catWrap=$("fullCategories");
+  catWrap.innerHTML="";
+  const cats=(r.category || []).filter(Boolean);
+  if(cats.length){
+    cats.forEach(function(cat){
+      const pill=document.createElement("span");
+      pill.className="inline-flex items-center px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-semibold";
+      pill.textContent=cat;
+      catWrap.appendChild(pill);
+    });
+  }else{
+    const empty=document.createElement("span");
+    empty.className="text-sm text-slate-400";
+    empty.textContent="No additional categories";
+    catWrap.appendChild(empty);
+  }
+
+  const structured=$("fullStructured");
+  structured.innerHTML="";
+
+  const raw=r.raw || {};
+  const priorityKeys=[
+    "innovation_level",
+    "education_details",
+    "impact",
+    "replicability",
+    "risk_assessment",
+    "potential_impact",
+    "manifestation",
+    "escalation",
+    "root_cause_analysis",
+    "risk_type",
+    "provenance_flag",
+    "origin",
+    "knowledge_source",
+    "completion_status",
+    "shared_heritage",
+    "drr_relevance",
+    "drr_category"
+  ];
+
+  const used=new Set(["id","timestamp","title","summary","description","sources","source_urls","urls","location","category","categories","domain","domain_classification","original_title"]);
+
+  priorityKeys.forEach(function(key){
+    if(Object.prototype.hasOwnProperty.call(raw,key) && raw[key] !== null && raw[key] !== "" && raw[key] !== undefined){
+      addStructuredCard(structured,key,raw[key]);
+      used.add(key);
+    }
+  });
+
+  // Show remaining useful scalar/simple fields without dumping the entire object.
+  Object.entries(raw).forEach(function(pair){
+    const key=pair[0], value=pair[1];
+    if(used.has(key) || value === null || value === "" || value === undefined) return;
+    if(typeof value==="string" || typeof value==="number" || typeof value==="boolean" || Array.isArray(value)){
+      addStructuredCard(structured,key,value);
+    }
+  });
 
   const sources = r.sources || [];
   $("fullSources").innerHTML = sources.length
@@ -458,8 +622,13 @@ function renderFullRecord(r){
         return '<a href="'+esc(url)+'" target="_blank" rel="noopener noreferrer" class="block text-sm text-blue-600 hover:underline break-all bg-slate-50 border border-slate-200 rounded-lg p-3">'+esc(url)+'</a>';
       }).join("")
     : '<div class="text-sm text-slate-500 bg-slate-50 border border-slate-200 rounded-lg p-3">No source URLs were preserved in this record.</div>';
-}
 
+  // Raw JSON is intentionally hidden by default every time a new record is opened.
+  $("fullJson").textContent=JSON.stringify(raw,null,2);
+  $("rawJsonWrap").classList.add("hidden");
+  $("rawToggleText").textContent="Show raw JSON";
+  $("rawToggleIcon").className="ph ph-code";
+}
 function openFullRecord(){
   if(!currentRecord) return;
   renderFullRecord(currentRecord);
@@ -475,6 +644,13 @@ function closeFullRecord(){
 }
 
 $("closeDetail").onclick = function(){ detail.classList.add("hidden"); };
+$("rawToggle").onclick = function(){
+  const wrap=$("rawJsonWrap");
+  const hidden=wrap.classList.contains("hidden");
+  wrap.classList.toggle("hidden");
+  $("rawToggleText").textContent=hidden ? "Hide raw JSON" : "Show raw JSON";
+  $("rawToggleIcon").className=hidden ? "ph ph-eye-slash" : "ph ph-code";
+};
 $("detailFullBtn").onclick = openFullRecord;
 $("closeDetailFull").onclick = closeFullRecord;
 $("detailFull").addEventListener("click",function(e){
