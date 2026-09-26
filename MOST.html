@@ -1372,7 +1372,7 @@ function renderEvidenceCard(r){
     (image ? '<img src="'+esc(image)+'" alt="" loading="lazy" class="w-full h-36 object-cover rounded-xl border border-slate-200 bg-slate-50 mb-3" onerror="this.remove()">' : '') +
     '<div class="flex items-center justify-between gap-2">'+badge(r.radar)+'<i class="ph ph-arrow-up-right text-slate-300 group-hover:text-slate-700"></i></div>' +
     '<h3 class="font-bold text-slate-900 mt-3 line-clamp-2">'+esc(r.title)+'</h3>' +
-    '<p class="text-xs text-slate-500 mt-2 line-clamp-3">'+esc(r.summary)+'</p>' +
+    '<p class="text-xs text-slate-500 mt-2 line-clamp-3">'+esc(displaySummary(r))+'</p>' +
     '<div class="flex flex-wrap gap-1.5 mt-3">' +
       '<span class="text-[10px] px-2 py-1 rounded-full bg-slate-100 text-slate-500">'+esc(r.country)+'</span>' +
       (r.timestamp ? '<span class="text-[10px] px-2 py-1 rounded-full bg-slate-100 text-slate-500">'+esc(new Date(r.timestamp).toLocaleDateString())+'</span>' : '') +
