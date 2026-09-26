@@ -391,6 +391,7 @@ const state = {
 const $ = function(id){ return document.getElementById(id); };
 const overlay = $("signalOverlay");
 const detail = $("detail");
+let focusPulseTimer = null;
 
 function arr(v){
   if(Array.isArray(v)) return v;
@@ -568,11 +569,25 @@ function normalize(key,item,index){
   const themeInfo=deriveThemes(key,item);
   const crossInfo=deriveCross(item);
 
+  const rawSummary = first(
+    item && item.summary,
+    item && item.description,
+    item && item.desc,
+    item && item.reason,
+    item && item.documentation_notes,
+    item && item.details,
+    item && item.explanation,
+    item && item.rationale,
+    item && item.resume_analisa && (item.resume_analisa.explanation || item.resume_analisa.rationale)
+  );
+
+  const summaryText = rawSummary === null || rawSummary === undefined ? "" : String(rawSummary);
+
   return {
     radar:key,
     id:String(first(item && item.id, item && item.uid, item && item.original_title, item && item.title, key + "-" + index)),
     title:String(first(item && item.title, item && item.element_name, item && item.original_title, item && item.name, "Untitled " + key + " #" + (index+1))),
-    summary:String(first(item && item.summary, item && item.description, item && item.desc, item && item.reason, "")),
+    summary:summaryText,
     category:category,
     country:String(first(loc.country, item && item.country, item && item.origin_region, "Unknown")),
     region:String(first(loc.region, loc.province, item && item.origin_region, "Unknown")),
@@ -800,18 +815,117 @@ function renderStats(){
 
 let currentRecord = null;
 
+function displaySummary(r){
+  if(r.summary) return r.summary;
+
+  const raw=r.raw || {};
+  const fallback = first(
+    raw.documentation_notes,
+    raw.details,
+    raw.explanation,
+    raw.rationale,
+    raw.resume_analisa && (raw.resume_analisa.explanation || raw.resume_analisa.rationale),
+    raw.learning_outcomes && (Array.isArray(raw.learning_outcomes) ? raw.learning_outcomes.join(" · ") : raw.learning_outcomes),
+    raw.manifestation && raw.manifestation.how_it_is_observed,
+    raw.potential_impact && raw.potential_impact.affected_elements && arr(raw.potential_impact.affected_elements).join(" · "),
+    raw.process && raw.process.how_it_works
+  );
+
+  return fallback === null || fallback === undefined || fallback === "" ? "No narrative summary is available in this record." : String(fallback);
+}
+
 function showDetail(r){
   currentRecord = r;
-  $("detailTheme").innerHTML = badge(r.radar) + ' <span class="ml-2 text-[10px] text-slate-400">'+esc(r.category.slice(0,3).join(" · "))+"</span>";
+  $("detailTheme").innerHTML = badge(r.radar) + ' <span class="ml-2 text-[10px] text-slate-400">' + esc(r.category.slice(0,3).join(" · ")) + "</span>";
   $("detailTitle").textContent = r.title;
-  $("detailDesc").textContent = r.summary || "No summary available.";
-  $("detailHorizon").textContent = r.urgency || r.intensity || (r.timestamp ? new Date(r.timestamp).toLocaleDateString() : "Observed");
+  $("detailDesc").textContent = displaySummary(r);
+  $("detailHorizon").textContent =
+    r.urgency ||
+    r.intensity ||
+    (r.timestamp ? new Date(r.timestamp).toLocaleDateString() : "Observed");
   $("detailRelevance").textContent =
     r.priority !== null ? "Priority " + Math.round(r.priority) :
     r.impact !== null ? "Impact " + Math.round(r.impact) :
     r.risk !== null ? "Risk " + Math.round(r.risk) : "Observed";
   detail.classList.remove("hidden");
 }
+
+function renderFocusGraphics(r, size){
+  if(!window.socialFocusLayer || !window.EsriPoint || !window.EsriGraphic || !window.EsriSimpleMarkerSymbol) return;
+  if(r.lat === null || r.lon === null) return;
+
+  window.socialFocusLayer.removeAll();
+
+  const point = new window.EsriPoint({
+    longitude:r.lon,
+    latitude:r.lat,
+    spatialReference:{wkid:4326}
+  });
+
+  window.socialFocusLayer.add(new window.EsriGraphic({
+    geometry:point,
+    symbol:new window.EsriSimpleMarkerSymbol({
+      color:[13,148,136,0.15],
+      size:size + 26,
+      outline:{color:[13,148,136,0.35],width:3}
+    })
+  }));
+
+  window.socialFocusLayer.add(new window.EsriGraphic({
+    geometry:point,
+    symbol:new window.EsriSimpleMarkerSymbol({
+      color:[255,255,255,0.98],
+      size:size,
+      outline:{color:[13,148,136,1],width:4}
+    }),
+    attributes:{radar:r.radar,recordId:r.id,focus:true}
+  }));
+}
+
+async function selectRecord(r){
+  currentRecord = r;
+
+  if(focusPulseTimer){
+    clearInterval(focusPulseTimer);
+    focusPulseTimer = null;
+  }
+
+  // Mini preview appears immediately.
+  showDetail(r);
+
+  if(window.socialMapView && r.lat !== null && r.lon !== null){
+    try{
+      await window.socialMapView.goTo({
+        target:new window.EsriPoint({
+          longitude:r.lon,
+          latitude:r.lat,
+          spatialReference:{wkid:4326}
+        }),
+        zoom:Math.max(window.socialMapView.zoom || 3, 6)
+      },{
+        duration:850,
+        easing:"ease-in-out"
+      });
+    }catch(e){
+      console.warn("Map focus failed",e);
+    }
+
+    renderFocusGraphics(r,14);
+
+    let pulseUp=true;
+    focusPulseTimer=setInterval(function(){
+      if(!window.socialFocusLayer) return;
+      renderFocusGraphics(r,pulseUp ? 18 : 11);
+      pulseUp=!pulseUp;
+    },650);
+  }
+
+  // Let the map focus + preview render, then open the full record automatically.
+  window.setTimeout(function(){
+    openFullRecord();
+  },420);
+}
+
 
 function humanLabel(key){
   return String(key || "")
@@ -911,7 +1025,7 @@ function renderFullRecord(r){
     r.critical ? "FLAGGED" : null
   ].filter(Boolean).join(" · ") || "No scored metrics";
 
-  $("fullSummary").textContent = r.summary || "No summary available.";
+  $("fullSummary").textContent = displaySummary(r);
 
   const catWrap = $("fullCategories");
   catWrap.innerHTML = "";
@@ -1296,7 +1410,7 @@ function renderEvidenceCarousel(hostId, records, countId){
       const record=state.records.find(function(r){
         return r.radar===p[0] && r.id===p[1];
       });
-      if(record) showDetail(record);
+      if(record) selectRecord(record);
     };
   });
 }
@@ -1491,8 +1605,12 @@ require([
     title:"Live Social Transformation Signals"
   });
 
+  const focusLayer=new GraphicsLayer({
+    title:"Focused Record"
+  });
+
   const map=new Map({
-    layers:[grayBase,signalLayer]
+    layers:[grayBase,signalLayer,focusLayer]
   });
 
   const view=new MapView({
@@ -1506,6 +1624,7 @@ require([
 
   window.socialMapView=view;
   window.socialSignalLayer=signalLayer;
+  window.socialFocusLayer=focusLayer;
 
   view.when(function(){
     renderMap();
@@ -1516,7 +1635,8 @@ require([
       const result=response.results.find(function(item){
         return item.graphic &&
                item.graphic.attributes &&
-               item.graphic.attributes.radar;
+               item.graphic.attributes.radar &&
+               !item.graphic.attributes.focus;
       });
 
       if(!result) return;
@@ -1527,7 +1647,7 @@ require([
       });
 
       if(record){
-        showDetail(record);
+        selectRecord(record);
       }
     });
   });
