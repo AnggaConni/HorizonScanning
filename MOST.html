@@ -895,7 +895,7 @@ function addStructuredCard(container,key,value){
 }
 
 function renderFullRecord(r){
-  $("fullTheme").innerHTML = badge(r.radar) + ' <span class="ml-2 text-[10px] text-slate-400">'+esc(r.category.join(" · "))+"</span>";
+  $("fullTheme").innerHTML = badge(r.radar) + ' <span class="ml-2 text-[10px] text-slate-400">' + esc(r.category.join(" · ")) + "</span>";
   $("fullTitle").textContent = r.title;
   $("fullMeta").textContent = (r.timestamp ? new Date(r.timestamp).toLocaleString() : "Timestamp unavailable") + " · " + r.id;
 
@@ -913,76 +913,254 @@ function renderFullRecord(r){
 
   $("fullSummary").textContent = r.summary || "No summary available.";
 
-  const catWrap=$("fullCategories");
-  catWrap.innerHTML="";
-  const cats=(r.category || []).filter(Boolean);
+  const catWrap = $("fullCategories");
+  catWrap.innerHTML = "";
+  const cats = (r.category || []).filter(Boolean);
   if(cats.length){
     cats.forEach(function(cat){
-      const pill=document.createElement("span");
-      pill.className="inline-flex items-center px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-semibold";
-      pill.textContent=cat;
+      const pill = document.createElement("span");
+      pill.className = "inline-flex items-center px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-semibold";
+      pill.textContent = cat;
       catWrap.appendChild(pill);
     });
   }else{
-    const empty=document.createElement("span");
-    empty.className="text-sm text-slate-400";
-    empty.textContent="No additional categories";
+    const empty = document.createElement("span");
+    empty.className = "text-sm text-slate-400";
+    empty.textContent = "No additional categories";
     catWrap.appendChild(empty);
   }
 
-  const profile=$("fullProfile");
-  profile.innerHTML="";
+  const profile = $("fullProfile");
+  profile.innerHTML = "";
 
-  const raw=r.raw || {};
-  const profileParts=[];
+  const raw = r.raw || {};
+  const sections = [];
 
-  const metricBar=function(label,value,max,color){
-    if(value===null||value===undefined||value==="") return "";
-    const pct=Math.max(0,Math.min(100,(Number(value)/max)*100));
-    return '<div class="bg-white border border-slate-200 rounded-xl p-4"><div class="flex justify-between gap-3 text-xs mb-2"><span class="text-slate-500">'+esc(label)+'</span><strong class="text-slate-700">'+esc(String(value))+'</strong></div><div class="profile-meter"><span style="width:'+pct+'%;background:'+color+'"></span></div></div>';
-  };
+  function escText(v){
+    return esc(v === null || v === undefined || v === "" ? "Not specified" : String(v));
+  }
 
-  if(r.radar==="NEXUS"){
-    profileParts.push(
-      '<div class="grid lg:grid-cols-2 gap-4">'+
-      metricBar("Priority score",r.priority,100,"#0f766e")+
-      metricBar("Risk score",r.risk,10,"#e11d48")+
-      '</div>'+
-      '<div class="grid md:grid-cols-2 gap-4 mt-4">'+
-      '<div class="analytics-card"><div class="text-xs uppercase tracking-widest text-slate-400 font-bold">Domains</div><div class="tag-cloud mt-3">'+arr(raw.domain_classification).map(function(v){return "<span>"+esc(v)+"</span>";}).join("")+"</div></div>"+
-      '<div class="analytics-card"><div class="text-xs uppercase tracking-widest text-slate-400 font-bold">Signal dynamics</div><div class="mt-3 text-sm text-slate-700 space-y-2"><div><b>Intensity:</b> '+esc(raw.signal_intensity||"—")+'</div><div><b>Escalation:</b> '+esc(raw.escalation?.speed||"—")+'</div><div><b>Urgency:</b> '+esc(raw.escalation?.urgency||"—")+'</div><div><b>Root cause:</b> '+esc((raw.root_cause_analysis?.root_cause||[]).join(" · ")||"—")+'</div></div></div>'+
+  function panel(title, body){
+    return '<div class="analytics-card">' +
+      '<div class="text-xs uppercase tracking-widest text-slate-400 font-bold">' + esc(title) + '</div>' +
+      '<div class="mt-3">' + body + '</div>' +
+      '</div>';
+  }
+
+  function tags(values){
+    const list = arr(values).filter(function(v){ return v !== null && v !== undefined && v !== ""; });
+    return list.length
+      ? '<div class="tag-cloud">' + list.map(function(v){ return '<span>' + esc(v) + '</span>'; }).join("") + '</div>'
+      : '<div class="text-sm text-slate-400">Not specified</div>';
+  }
+
+  function metric(label,value,max,color){
+    if(value === null || value === undefined || value === "") return "";
+    const n = Number(value);
+    const pct = Number.isFinite(n) ? Math.max(0,Math.min(100,(n/max)*100)) : 0;
+    return '<div class="bg-white border border-slate-200 rounded-xl p-4">' +
+      '<div class="flex justify-between gap-3 text-xs mb-2"><span class="text-slate-500">' + esc(label) + '</span><strong class="text-slate-700">' + esc(String(value)) + '</strong></div>' +
+      '<div class="profile-meter"><span style="width:' + pct + '%;background:' + color + '"></span></div>' +
+      '</div>';
+  }
+
+  if(r.radar === "NEXUS"){
+    sections.push(
+      '<div class="grid lg:grid-cols-2 gap-4">' +
+        metric("Priority score",r.priority,100,"#0f766e") +
+        metric("Risk score",r.risk,10,"#e11d48") +
       '</div>'
     );
-  } else if(r.radar==="GSI"||r.radar==="EDU"){
-    const details=r.radar==="EDU"?raw.education_details:null;
-    profileParts.push(
-      '<div class="grid lg:grid-cols-2 gap-4">'+
-      '<div class="analytics-card"><div class="text-xs uppercase tracking-widest text-slate-400 font-bold">Impact</div><div class="mt-3 text-sm text-slate-700"><b>Problem solved:</b> '+esc(raw.impact?.problem_solved||"—")+'</div><div class="mt-2"><b>Scale:</b> '+esc(raw.impact?.scale||"—")+'</div></div>'+
-      '<div class="analytics-card"><div class="text-xs uppercase tracking-widest text-slate-400 font-bold">Replicability</div><div class="mt-3 text-sm text-slate-700 space-y-2"><div><b>Cost:</b> '+esc(raw.replicability?.cost_level||"—")+'</div><div><b>Difficulty:</b> '+esc(raw.replicability?.difficulty||"—")+'</div></div></div>'+
-      '</div>'+
-      (raw.process?'<div class="analytics-card mt-4"><div class="text-xs uppercase tracking-widest text-slate-400 font-bold">Process &amp; implementation</div><div class="mt-3 text-sm text-slate-700 leading-7">'+esc(raw.process.how_it_works||"")+(raw.process.materials_used?.length?'<div class="mt-3"><b>Materials:</b> '+esc(raw.process.materials_used.join(" · "))+'</div>':"")+(raw.process.step_by_step?.length?'<div class="mt-3"><b>Steps:</b><ol class="list-decimal ml-5 mt-2 space-y-1">'+raw.process.step_by_step.map(function(x){return "<li>"+esc(x)+"</li>";}).join("")+"</ol></div>":"")+'</div></div>':"")+
-      (details?'<div class="analytics-card mt-4"><div class="text-xs uppercase tracking-widest text-slate-400 font-bold">Education profile</div><div class="mt-3 grid md:grid-cols-2 gap-3 text-sm text-slate-700"><div><b>Type:</b> '+esc(details.education_type||"—")+'</div><div><b>Target learners:</b> '+esc(details.target_learners||"—")+'</div><div><b>Related fields:</b> '+esc(arr(details.related_fields).join(" · ")||"—")+'</div><div><b>Learning outcomes:</b> '+esc(arr(details.learning_outcomes).join(" · ")||"—")+'</div><div class="md:col-span-2"><b>Pedagogical approach:</b> '+esc(details.pedagogical_approach||"—")+'</div></div></div>':"")+
-      (raw.origin?'<div class="analytics-card mt-4"><div class="text-xs uppercase tracking-widest text-slate-400 font-bold">Knowledge lineage</div><div class="tag-cloud mt-3">'+arr(raw.origin.knowledge_source).map(function(v){return "<span>"+esc(v)+"</span>";}).join("")+"</div></div>":"")
-    );
-  } else if(r.radar==="ICH"){
-    const analysis=raw.resume_analisa||{};
-    profileParts.push(
-      '<div class="analytics-card"><div class="text-xs uppercase tracking-widest text-slate-400 font-bold">Heritage domains</div><div class="tag-cloud mt-3">'+arr(raw.categories||raw.category).map(function(v){return "<span>"+esc(v)+"</span>";}).join("")+"</div></div>"+
-      '<div class="grid md:grid-cols-2 gap-4 mt-4">'+
-      '<div class="analytics-card"><div class="text-xs uppercase tracking-widest text-slate-400 font-bold">DRR / resilience</div><div class="mt-3 text-sm text-slate-700 space-y-2"><div><b>Relevance:</b> '+esc(analysis.drr_relevance_level||"—")+'</div><div><b>Category:</b> '+esc(analysis.drr_category||"—")+'</div><div><b>Hazards:</b> '+esc(arr(analysis.hazard_categories).join(" · ")||"—")+'</div></div></div>'+
-      '<div class="analytics-card"><div class="text-xs uppercase tracking-widest text-slate-400 font-bold">Documentation status</div><div class="mt-3 text-sm text-slate-700 space-y-2"><div><b>Completion:</b> '+esc(raw.completion_status||"—")+'</div><div><b>Image:</b> '+esc(raw.thumbnail_url||"—")+'</div><div><b>Shared heritage:</b> '+esc(formatValue(raw.shared_heritage))+'</div></div></div>'+
+
+    sections.push(
+      '<div class="grid md:grid-cols-2 gap-4 mt-4">' +
+        panel("Domains",tags(raw.domain_classification)) +
+        panel("Signal dynamics",
+          '<div class="space-y-2 text-sm text-slate-700">' +
+            '<div><b>Signal intensity:</b> ' + escText(raw.signal_intensity) + '</div>' +
+            '<div><b>Escalation speed:</b> ' + escText(raw.escalation && raw.escalation.speed) + '</div>' +
+            '<div><b>Urgency:</b> ' + escText(raw.escalation && raw.escalation.urgency) + '</div>' +
+            '<div><b>Root cause:</b> ' + escText(arr(raw.root_cause_analysis && raw.root_cause_analysis.root_cause).join(" · ")) + '</div>' +
+          '</div>'
+        ) +
       '</div>'
     );
-    if(analysis.explanation||analysis.rationale){
-      profileParts.push('<div class="analytics-card mt-4"><div class="text-xs uppercase tracking-widest text-slate-400 font-bold">Analytical note</div><div class="text-sm text-slate-700 leading-7 mt-3">'+esc(analysis.explanation||analysis.rationale)+'</div></div>');
+
+    if(raw.manifestation){
+      sections.push(panel("Manifestation",
+        '<div class="text-sm leading-7 text-slate-700">' +
+          '<div><b>How it is observed:</b> ' + escText(raw.manifestation.how_it_is_observed) + '</div>' +
+          '<div class="mt-3"><b>Key indicators:</b></div>' +
+          '<ul class="list-disc ml-5 mt-2 space-y-1">' +
+            arr(raw.manifestation.key_indicators).map(function(v){return '<li>' + esc(v) + '</li>';}).join("") +
+          '</ul>' +
+        '</div>'
+      ));
     }
-  } else if(r.radar==="ARTIFACT"){
-    profileParts.push(
-      '<div class="grid lg:grid-cols-2 gap-4">'+
-      '<div class="analytics-card"><div class="text-xs uppercase tracking-widest text-slate-400 font-bold">Market intelligence</div><div class="mt-3 text-sm text-slate-700 space-y-2"><div><b>Platform:</b> '+esc(raw.platform||"—")+'</div><div><b>Price:</b> '+(raw.price_usd!==undefined?'
 
-  const raw=r.raw || {};
-  const priorityKeys=[
+    if(raw.potential_impact){
+      sections.push(panel("Potential impact",
+        '<div class="text-sm text-slate-700 space-y-2">' +
+          '<div><b>Threat level:</b> ' + escText(raw.potential_impact.threat_level) + '</div>' +
+          '<div><b>Affected elements:</b> ' + escText(arr(raw.potential_impact.affected_elements).join(" · ")) + '</div>' +
+        '</div>'
+      ));
+    }
+
+    if(raw.risk_assessment){
+      sections.push(panel("Risk assessment",
+        '<div class="text-sm text-slate-700 space-y-2">' +
+          '<div><b>Severity:</b> ' + escText(raw.risk_assessment.severity_level) + '</div>' +
+          '<div><b>Risk types:</b> ' + escText(arr(raw.risk_assessment.risk_type).join(" · ")) + '</div>' +
+          '<div><b>Immediate intervention:</b> ' + escText(raw.risk_assessment.needs_immediate_intervention) + '</div>' +
+          '<div class="mt-3 leading-7">' + escText(raw.risk_assessment.explanation) + '</div>' +
+        '</div>'
+      ));
+    }
+  }
+
+  if(r.radar === "GSI" || r.radar === "EDU"){
+    sections.push(
+      '<div class="grid md:grid-cols-2 gap-4">' +
+        panel("Impact",
+          '<div class="text-sm text-slate-700 space-y-2">' +
+            '<div><b>Problem solved:</b> ' + escText(raw.impact && raw.impact.problem_solved) + '</div>' +
+            '<div><b>Scale:</b> ' + escText(raw.impact && raw.impact.scale) + '</div>' +
+          '</div>'
+        ) +
+        panel("Replicability",
+          '<div class="text-sm text-slate-700 space-y-2">' +
+            '<div><b>Cost:</b> ' + escText(raw.replicability && raw.replicability.cost_level) + '</div>' +
+            '<div><b>Difficulty:</b> ' + escText(raw.replicability && raw.replicability.difficulty) + '</div>' +
+          '</div>'
+        ) +
+      '</div>'
+    );
+
+    if(raw.innovation_level){
+      sections.push(panel("Innovation level",escText(raw.innovation_level)));
+    }
+
+    if(raw.process){
+      sections.push(panel("Process & implementation",
+        '<div class="text-sm text-slate-700 leading-7">' +
+          '<div>' + escText(raw.process.how_it_works) + '</div>' +
+          (arr(raw.process.materials_used).length
+            ? '<div class="mt-3"><b>Materials:</b> ' + escText(arr(raw.process.materials_used).join(" · ")) + '</div>' : "") +
+          (arr(raw.process.step_by_step).length
+            ? '<div class="mt-3"><b>Steps:</b><ol class="list-decimal ml-5 mt-2 space-y-1">' +
+                arr(raw.process.step_by_step).map(function(v){return '<li>' + esc(v) + '</li>';}).join("") +
+              '</ol></div>' : "") +
+        '</div>'
+      ));
+    }
+
+    if(r.radar === "EDU" && raw.education_details){
+      const e=raw.education_details;
+      sections.push(panel("Education profile",
+        '<div class="grid md:grid-cols-2 gap-3 text-sm text-slate-700">' +
+          '<div><b>Education type:</b> ' + escText(e.education_type) + '</div>' +
+          '<div><b>Target learners:</b> ' + escText(e.target_learners) + '</div>' +
+          '<div><b>Related fields:</b> ' + escText(arr(e.related_fields).join(" · ")) + '</div>' +
+          '<div><b>Learning outcomes:</b> ' + escText(arr(e.learning_outcomes).join(" · ")) + '</div>' +
+          '<div class="md:col-span-2"><b>Pedagogical approach:</b> ' + escText(e.pedagogical_approach) + '</div>' +
+        '</div>'
+      ));
+    }
+
+    if(raw.origin){
+      sections.push(panel("Knowledge lineage",
+        tags(raw.origin.knowledge_source)
+      ));
+    }
+
+    if(raw.risk_assessment){
+      sections.push(panel("Risk assessment",
+        '<div class="text-sm text-slate-700 space-y-2">' +
+          '<div><b>Risk score:</b> ' + escText(raw.risk_assessment.risk_score) + '</div>' +
+          '<div><b>Safety level:</b> ' + escText(raw.risk_assessment.safety_level) + '</div>' +
+          '<div><b>Needs intervention:</b> ' + escText(raw.risk_assessment.needs_intervention) + '</div>' +
+          '<div class="mt-3 leading-7">' + escText(raw.risk_assessment.explanation) + '</div>' +
+        '</div>'
+      ));
+    }
+  }
+
+  if(r.radar === "ICH"){
+    const analysis = raw.resume_analisa || {};
+    sections.push(panel("Heritage domains",tags(raw.categories || raw.category)));
+
+    sections.push(
+      '<div class="grid md:grid-cols-2 gap-4">' +
+        panel("DRR / resilience",
+          '<div class="text-sm text-slate-700 space-y-2">' +
+            '<div><b>Relevance:</b> ' + escText(analysis.drr_relevance_level) + '</div>' +
+            '<div><b>Category:</b> ' + escText(analysis.drr_category) + '</div>' +
+            '<div><b>Hazards:</b> ' + escText(arr(analysis.hazard_categories).join(" · ")) + '</div>' +
+          '</div>'
+        ) +
+        panel("Documentation status",
+          '<div class="text-sm text-slate-700 space-y-2">' +
+            '<div><b>Completion:</b> ' + escText(raw.completion_status) + '</div>' +
+            '<div><b>Thumbnail:</b> ' + escText(raw.thumbnail_url) + '</div>' +
+            '<div><b>Shared heritage:</b> ' + escText(formatValue(raw.shared_heritage)) + '</div>' +
+          '</div>'
+        ) +
+      '</div>'
+    );
+
+    if(analysis.explanation || analysis.rationale){
+      sections.push(panel("Analytical note",
+        '<div class="text-sm leading-7 text-slate-700">' + escText(analysis.explanation || analysis.rationale) + '</div>'
+      ));
+    }
+  }
+
+  if(r.radar === "ARTIFACT"){
+    const price = raw.price_usd !== undefined && raw.price_usd !== null
+      ? "$" + Number(raw.price_usd || 0).toLocaleString()
+      : "Not specified";
+
+    sections.push(
+      '<div class="grid md:grid-cols-2 gap-4">' +
+        panel("Market intelligence",
+          '<div class="text-sm text-slate-700 space-y-2">' +
+            '<div><b>Platform:</b> ' + escText(raw.platform) + '</div>' +
+            '<div><b>Price:</b> ' + escText(price) + '</div>' +
+            '<div><b>Status:</b> ' + escText(raw.status) + '</div>' +
+            '<div><b>Keyword trigger:</b> ' + escText(raw.keyword_trigger) + '</div>' +
+          '</div>'
+        ) +
+        panel("Provenance & risk",
+          '<div class="text-sm text-slate-700 space-y-2">' +
+            '<div><b>Risk score:</b> ' + escText(raw.risk_score) + '</div>' +
+            '<div><b>Provenance flag:</b> ' + escText(formatValue(raw.provenance_flag)) + '</div>' +
+            '<div><b>Origin:</b> ' + escText(raw.origin_region) + '</div>' +
+            '<div class="mt-3 leading-7">' + escText(raw.reason) + '</div>' +
+          '</div>'
+        ) +
+      '</div>'
+    );
+
+    if(raw.screenshot_url){
+      sections.push(
+        panel("Captured source image",
+          '<img src="' + esc(raw.screenshot_url) + '" alt="Captured listing source" class="max-h-96 w-full object-contain rounded-lg border border-slate-200 bg-slate-50" onerror="this.style.display=\\'none\\'">'
+        )
+      );
+    }
+  }
+
+  if(!sections.length){
+    sections.push('<div class="text-sm text-slate-400">No radar-specific structured profile is available for this record.</div>');
+  }
+
+  profile.innerHTML = sections.join("<div class="+"\"mt-4\""+"></div>");
+
+  const structured = $("fullStructured");
+  structured.innerHTML = "";
+
+  const priorityKeys = [
     "innovation_level",
     "education_details",
     "impact",
@@ -998,11 +1176,15 @@ function renderFullRecord(r){
     "knowledge_source",
     "completion_status",
     "shared_heritage",
+    "resume_analisa",
     "drr_relevance",
     "drr_category"
   ];
 
-  const used=new Set(["id","timestamp","title","summary","description","sources","source_urls","urls","location","category","categories","domain","domain_classification","original_title"]);
+  const used = new Set([
+    "id","timestamp","title","summary","description","sources","source_urls","urls",
+    "location","category","categories","domain","domain_classification","original_title"
+  ]);
 
   priorityKeys.forEach(function(key){
     if(Object.prototype.hasOwnProperty.call(raw,key) && raw[key] !== null && raw[key] !== "" && raw[key] !== undefined){
@@ -1011,10 +1193,9 @@ function renderFullRecord(r){
     }
   });
 
-  // Show remaining useful scalar/simple fields without dumping the entire object.
   Object.entries(raw).forEach(function(pair){
     const key=pair[0], value=pair[1];
-    if(used.has(key) || value === null || value === "" || value === undefined) return;
+    if(used.has(key) || value===null || value==="" || value===undefined) return;
     if(typeof value==="string" || typeof value==="number" || typeof value==="boolean" || Array.isArray(value)){
       addStructuredCard(structured,key,value);
     }
@@ -1023,15 +1204,14 @@ function renderFullRecord(r){
   const sources = r.sources || [];
   $("fullSources").innerHTML = sources.length
     ? sources.map(function(url){
-        return '<a href="'+esc(url)+'" target="_blank" rel="noopener noreferrer" class="block text-sm text-blue-600 hover:underline break-all bg-slate-50 border border-slate-200 rounded-lg p-3">'+esc(url)+'</a>';
+        return '<a href="' + esc(url) + '" target="_blank" rel="noopener noreferrer" class="block text-sm text-blue-600 hover:underline break-all bg-slate-50 border border-slate-200 rounded-lg p-3">' + esc(url) + '</a>';
       }).join("")
     : '<div class="text-sm text-slate-500 bg-slate-50 border border-slate-200 rounded-lg p-3">No source URLs were preserved in this record.</div>';
 
-  // Raw JSON is intentionally hidden by default every time a new record is opened.
-  $("fullJson").textContent=JSON.stringify(raw,null,2);
+  $("fullJson").textContent = JSON.stringify(raw,null,2);
   $("rawJsonWrap").classList.add("hidden");
-  $("rawToggleText").textContent="Show raw JSON";
-  $("rawToggleIcon").className="ph ph-code";
+  $("rawToggleText").textContent = "Show raw JSON";
+  $("rawToggleIcon").className = "ph ph-code";
 }
 function openFullRecord(){
   if(!currentRecord) return;
