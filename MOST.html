@@ -1202,10 +1202,54 @@ function renderFullRecord(r){
 
   if(r.radar === "ICH"){
     const analysis = raw.resume_analisa || {};
+    const shared = raw.shared_heritage_detection || {};
+    const related = Array.isArray(shared.related_elements) ? shared.related_elements : [];
+
     sections.push(panel("Heritage domains",tags(raw.categories || raw.category)));
 
+    // Shared heritage is displayed as an intercultural-dialogue context when the
+    // source record explicitly identifies cross-border/shared relationships.
+    if(shared.is_shared === true || related.length){
+      sections.push(
+        '<div class="analytics-card mt-4 border-pink-200 bg-pink-50/40">' +
+          '<div class="flex items-start justify-between gap-3">' +
+            '<div>' +
+              '<div class="text-xs uppercase tracking-widest text-pink-600 font-bold">Intercultural dialogue</div>' +
+              '<div class="text-lg font-extrabold text-slate-900 mt-1">Shared heritage connection</div>' +
+              '<p class="text-sm text-slate-600 mt-2">This record contains an explicit shared-heritage assessment in the ICH Radar source data.</p>' +
+            '</div>' +
+            (shared.confidence_score !== undefined && shared.confidence_score !== null
+              ? '<div class="shrink-0 px-3 py-2 rounded-lg bg-white border border-pink-100 text-xs font-bold text-pink-700">Confidence ' + Math.round(Number(shared.confidence_score) * 100) + '%</div>'
+              : '') +
+          '</div>' +
+          '<div class="mt-4 space-y-3">' +
+            (related.length
+              ? related.map(function(rel){
+                  return '<div class="bg-white border border-pink-100 rounded-xl p-4">' +
+                    '<div class="flex flex-wrap items-center gap-2">' +
+                      (rel.country ? '<span class="text-xs font-bold px-2 py-1 rounded-full bg-pink-100 text-pink-700">' + esc(rel.country) + '</span>' : '') +
+                      (rel.element_name ? '<span class="text-sm font-bold text-slate-800">' + esc(rel.element_name) + '</span>' : '') +
+                    '</div>' +
+                    (rel.relationship_reason
+                      ? '<div class="text-sm text-slate-600 leading-6 mt-2">' + esc(rel.relationship_reason) + '</div>'
+                      : '') +
+                  '</div>';
+                }).join('')
+              : '<div class="text-sm text-slate-500">The source marks this heritage as shared but does not provide related elements.</div>') +
+          '</div>' +
+        '</div>'
+      );
+    } else {
+      sections.push(
+        '<div class="analytics-card mt-4">' +
+          '<div class="text-xs uppercase tracking-widest text-slate-400 font-bold">Intercultural dialogue</div>' +
+          '<div class="text-sm text-slate-500 mt-2">No shared-heritage connection is identified in this record.</div>' +
+        '</div>'
+      );
+    }
+
     sections.push(
-      '<div class="grid md:grid-cols-2 gap-4">' +
+      '<div class="grid md:grid-cols-2 gap-4 mt-4">' +
         panel("DRR / resilience",
           '<div class="text-sm text-slate-700 space-y-2">' +
             '<div><b>Relevance:</b> ' + escText(analysis.drr_relevance_level) + '</div>' +
@@ -1217,7 +1261,7 @@ function renderFullRecord(r){
           '<div class="text-sm text-slate-700 space-y-2">' +
             '<div><b>Completion:</b> ' + escText(raw.completion_status) + '</div>' +
             '<div><b>Thumbnail:</b> ' + escText(raw.thumbnail_url) + '</div>' +
-            '<div><b>Shared heritage:</b> ' + escText(formatValue(raw.shared_heritage)) + '</div>' +
+            '<div><b>Shared heritage:</b> ' + escText(shared.is_shared === true ? "Yes" : "Not identified") + '</div>' +
           '</div>'
         ) +
       '</div>'
