@@ -1155,7 +1155,7 @@ function renderFullRecord(r){
     sections.push('<div class="text-sm text-slate-400">No radar-specific structured profile is available for this record.</div>');
   }
 
-  profile.innerHTML = sections.join("<div class="+"\"mt-4\""+"></div>");
+    profile.innerHTML = sections.join('<div class="mt-4"></div>');
 
   const structured = $("fullStructured");
   structured.innerHTML = "";
