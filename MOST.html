@@ -15,6 +15,8 @@ body{font-family:Inter,sans-serif}
 #viewDiv{position:absolute;inset:0;z-index:0}
 .map-shell{height:68vh;min-height:520px;position:relative;overflow:hidden}
 #signalOverlay{position:absolute;inset:0;width:100%;height:100%;z-index:20;pointer-events:none;display:block}
+#mapPointHint{position:absolute;left:12px;bottom:12px;z-index:31}
+.arcgis-point-pulse{filter:drop-shadow(0 0 5px rgba(13,148,136,.45))}
 .signal-node{cursor:pointer;pointer-events:auto}
 #detailFull{position:fixed;inset:0;z-index:9999;display:none}
 #detailFull.open{display:flex}
@@ -68,6 +70,7 @@ body{font-family:Inter,sans-serif}
     <div class="map-shell rounded-xl overflow-hidden border border-slate-200">
       <div id="viewDiv"></div>
       <svg id="signalOverlay" viewBox="0 0 1200 680" preserveAspectRatio="none" aria-label="Social transformation signals overlay"></svg>
+      <div id="mapPointHint" class="glass rounded-lg border border-slate-200 px-3 py-2 text-[10px] font-bold text-slate-600 shadow-sm">Mapped nodes: <span id="mappedCount">0</span></div>
       <div class="absolute top-3 left-3 z-10 glass rounded-xl border border-slate-200 p-3 text-xs shadow-sm max-w-xs">
         <div class="font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="ph-fill ph-broadcast text-teal-600"></i> Live radar layer</div>
         <div class="space-y-1.5">
@@ -411,6 +414,7 @@ function renderStats(){
   $("statSignals").textContent = visible.length.toLocaleString();
   $("statThemes").textContent = new Set(visible.map(function(r){return r.radar;})).size;
   $("statLenses").textContent = mapped.toLocaleString();
+  if($("mappedCount")) $("mappedCount").textContent = mapped.toLocaleString();
 
   const status = $("statsStatus");
   if(status) status.textContent = mapped.toLocaleString() + " mapped · " + flagged.toLocaleString() + " flagged";
@@ -562,30 +566,47 @@ function drawNode(r,x,y){
 
 function renderMap(){
   overlay.innerHTML="";
-  const shell=document.querySelector(".map-shell");
-  if(!shell) return;
-  const width=Math.max(320,shell.clientWidth);
-  const height=Math.max(400,shell.clientHeight);
-  overlay.setAttribute("viewBox","0 0 "+width+" "+height);
-
   if(!window.socialMapView) return;
 
-  const visible=visibleRecords().filter(function(r){return r.lat!==null && r.lon!==null;})
+  const visible = visibleRecords()
+    .filter(function(r){ return r.lat !== null && r.lon !== null; })
     .sort(function(a,b){
       const ap=a.priority == null ? -1 : a.priority;
       const bp=b.priority == null ? -1 : b.priority;
-      return bp-ap;
+      const ar=a.risk == null ? -1 : a.risk;
+      const br=b.risk == null ? -1 : b.risk;
+      return (bp-ap) || (br-ar);
     })
     .slice(0,700);
 
+  if(window.socialSignalLayer){
+    window.socialSignalLayer.removeAll();
+  }
+
   visible.forEach(function(r){
+    const color = RADARS[r.radar].color;
     const point = new Point({
       longitude:r.lon,
       latitude:r.lat,
       spatialReference:{wkid:4326}
     });
-    const p = window.socialMapView.toScreen(point);
-    if(p && Number.isFinite(p.x) && Number.isFinite(p.y)) drawNode(r,p.x,p.y);
+
+    const size = r.critical ? 13 : (r.priority !== null && r.priority >= 80 ? 11 : 8);
+
+    const marker = new Graphic({
+      geometry:point,
+      symbol:new SimpleMarkerSymbol({
+        color:color,
+        size:size,
+        outline:{color:"#ffffff",width:1.5}
+      }),
+      attributes:{
+        radar:r.radar,
+        recordId:r.id
+      }
+    });
+
+    window.socialSignalLayer.add(marker);
   });
 
   const legend=$("liveLegend");
@@ -596,8 +617,9 @@ function renderMap(){
       return '<div class="flex items-center justify-between gap-3"><span class="flex items-center gap-2"><span class="legend-dot" style="background:'+RADARS[k].color+'"></span>'+RADARS[k].label+'</span><strong>'+((counts[k]||0).toLocaleString())+'</strong></div>';
     }).join("");
   }
-}
 
+  if($("mappedCount")) $("mappedCount").textContent=visible.length.toLocaleString();
+}
 async function initData(){
   const keys=Object.keys(RADARS);
   const results=await Promise.all(keys.map(loadOne));
@@ -641,14 +663,23 @@ require([
   "esri/Map",
   "esri/views/MapView",
   "esri/layers/TileLayer",
-  "esri/geometry/Point"
-],function(Map,MapView,TileLayer,Point){
+  "esri/layers/GraphicsLayer",
+  "esri/Graphic",
+  "esri/geometry/Point",
+  "esri/symbols/SimpleMarkerSymbol"
+],function(Map,MapView,TileLayer,GraphicsLayer,Graphic,Point,SimpleMarkerSymbol){
   const grayBase=new TileLayer({
     url:"https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer",
     title:"Esri World Light Gray Base"
   });
 
-  const map=new Map({layers:[grayBase]});
+  const signalLayer=new GraphicsLayer({
+    title:"Live Social Transformation Signals"
+  });
+
+  const map=new Map({
+    layers:[grayBase,signalLayer]
+  });
 
   const view=new MapView({
     container:"viewDiv",
@@ -660,19 +691,43 @@ require([
   });
 
   window.socialMapView=view;
+  window.socialSignalLayer=signalLayer;
 
   view.when(function(){
-    requestAnimationFrame(function(){
-      renderMap();
+    renderMap();
+  });
+
+  view.on("click",function(event){
+    view.hitTest(event).then(function(response){
+      const result=response.results.find(function(item){
+        return item.graphic &&
+               item.graphic.attributes &&
+               item.graphic.attributes.radar;
+      });
+
+      if(!result) return;
+
+      const attrs=result.graphic.attributes;
+      const record=state.records.find(function(r){
+        return r.radar===attrs.radar && r.id===attrs.recordId;
+      });
+
+      if(record){
+        showDetail(record);
+      }
     });
   });
 
   view.watch("extent",function(){
-    window.requestAnimationFrame(renderMap);
+    window.requestAnimationFrame(function(){
+      renderMap();
+    });
   });
 
   view.watch("stationary",function(){
-    window.requestAnimationFrame(renderMap);
+    window.requestAnimationFrame(function(){
+      renderMap();
+    });
   });
 });
 </script>
