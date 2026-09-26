@@ -192,7 +192,7 @@ body{font-family:Inter,sans-serif}
 
   <section class="mt-8 rounded-2xl bg-slate-950 text-white p-6 md:p-8">
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-      <div><div class="text-xs font-bold tracking-widest uppercase text-teal-300">Next build</div><h2 class="text-2xl font-bold mt-2">From data map → transformation intelligence system</h2><p class="text-slate-400 mt-2 max-w-3xl">Potential future layers: source provenance, horizon, confidence, affected groups, policy domain, trend relationships, knowledge graph and quarterly social transformation briefs.</p></div>
+      <div><div class="text-xs font-bold tracking-widest uppercase text-teal-300">Next build</div><h2 class="text-2xl font-bold mt-2">From dummy map → transformation intelligence system</h2><p class="text-slate-400 mt-2 max-w-3xl">Potential future layers: source provenance, horizon, confidence, affected groups, policy domain, trend relationships, knowledge graph and quarterly social transformation briefs.</p></div>
       <a href="index.html" class="shrink-0 inline-flex items-center justify-center gap-2 px-5 py-3 bg-teal-600 hover:bg-teal-500 rounded-xl font-bold"><i class="ph ph-arrow-left"></i>Back to HorizonScan</a>
     </div>
   </section>
@@ -585,7 +585,9 @@ function renderMap(){
 
   visible.forEach(function(r){
     const color = RADARS[r.radar].color;
-    const point = new Point({
+    
+    // UBAH: Gunakan window.EsriPoint
+    const point = new window.EsriPoint({
       longitude:r.lon,
       latitude:r.lat,
       spatialReference:{wkid:4326}
@@ -593,9 +595,10 @@ function renderMap(){
 
     const size = r.critical ? 13 : (r.priority !== null && r.priority >= 80 ? 11 : 8);
 
-    const marker = new Graphic({
+    // UBAH: Gunakan window.EsriGraphic dan window.EsriSimpleMarkerSymbol
+    const marker = new window.EsriGraphic({
       geometry:point,
-      symbol:new SimpleMarkerSymbol({
+      symbol:new window.EsriSimpleMarkerSymbol({
         color:color,
         size:size,
         outline:{color:"#ffffff",width:1.5}
@@ -668,6 +671,11 @@ require([
   "esri/geometry/Point",
   "esri/symbols/SimpleMarkerSymbol"
 ],function(Map,MapView,TileLayer,GraphicsLayer,Graphic,Point,SimpleMarkerSymbol){
+
+  window.EsriGraphic = Graphic;
+  window.EsriPoint = Point;
+  window.EsriSimpleMarkerSymbol = SimpleMarkerSymbol;
+
   const grayBase=new TileLayer({
     url:"https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer",
     title:"Esri World Light Gray Base"
