@@ -569,17 +569,29 @@ function normalize(key,item,index){
   const themeInfo=deriveThemes(key,item);
   const crossInfo=deriveCross(item);
 
-  const rawSummary = first(
-    item && item.summary,
-    item && item.description,
-    item && item.desc,
-    item && item.reason,
-    item && item.documentation_notes,
-    item && item.details,
-    item && item.explanation,
-    item && item.rationale,
-    item && item.resume_analisa && (item.resume_analisa.explanation || item.resume_analisa.rationale)
-  );
+  const rawSummary = key === "ICH"
+    ? first(
+        item && item.desc,
+        item && item.summary,
+        item && item.description,
+        item && item.reason,
+        item && item.documentation_notes,
+        item && item.details,
+        item && item.explanation,
+        item && item.rationale,
+        item && item.resume_analisa && (item.resume_analisa.explanation || item.resume_analisa.rationale)
+      )
+    : first(
+        item && item.summary,
+        item && item.description,
+        item && item.desc,
+        item && item.reason,
+        item && item.documentation_notes,
+        item && item.details,
+        item && item.explanation,
+        item && item.rationale,
+        item && item.resume_analisa && (item.resume_analisa.explanation || item.resume_analisa.rationale)
+      );
 
   const summaryText = rawSummary === null || rawSummary === undefined ? "" : String(rawSummary);
 
