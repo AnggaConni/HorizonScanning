@@ -866,9 +866,9 @@ B = strategic value 6 − friction 0 = 6</div>
 
 <div class="sim">
 <div class="toggle">
-<button id="rd71relBtn" onclick="window.rd71Mode('rel')">Relationship mode</button>
-<button id="rd71dipBtn" class="alt" onclick="window.rd71Mode('dip')">Diplomacy mode</button>
-<button class="alt" onclick="window.rd71Reset()">Reset</button>
+<button type="button" id="rd71relBtn" onclick="window.rd71Mode('rel')">Relationship mode</button>
+<button type="button" id="rd71dipBtn" class="alt" onclick="window.rd71Mode('dip')">Diplomacy mode</button>
+<button type="button" class="alt" onclick="window.rd71Reset()">Reset</button>
 </div>
 
 <div class="simgrid">
@@ -1138,8 +1138,8 @@ B = strategic value 6 − friction 0 = 6</div>
     state.mode=mode;
     var dip=mode==="dip";
 
-    document.getElementById("rd71RelBtn").className=dip?"alt":"";
-    document.getElementById("rd71DipBtn").className=dip?"":"alt";
+    document.getElementById("rd71relBtn").className=dip?"alt":"";
+    document.getElementById("rd71dipBtn").className=dip?"":"alt";
 
     document.getElementById("rd71ATitle").textContent=dip?"State / Partner A":"Option A";
     document.getElementById("rd71BTitle").textContent=dip?"State / Partner B":"Option B";
