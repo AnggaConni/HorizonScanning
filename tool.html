@@ -1031,6 +1031,39 @@
             }
         ];
 
+        // Tutorial metadata enrichment: demonstrates how a professional signal record can carry
+        // evidence, confidence, time horizon, and typed relationships.
+        const tutorialMetadata = {
+            d1:  { evidenceType:'official', evidence:'Illustrative evidence: AI regulation is treated as an institutional signal with a formal regulatory source.', sourceUrl:'https://eur-lex.europa.eu/eli/reg/2024/1689/oj', sourceDate:'2024-07-12', confidence:'high', timeHorizon:'now',  connectionTypes:{d2:'constrains', d9:'constrains'} },
+            d2:  { evidenceType:'research', evidence:'Illustrative evidence: adoption of generative AI is monitored through industry and research indicators; this sample intentionally avoids claiming a precise market percentage.', sourceUrl:'https://hai.stanford.edu/ai-index/', sourceDate:'2025-04-07', confidence:'medium', timeHorizon:'now', connectionTypes:{d10:'enables'} },
+            d3:  { evidenceType:'research', evidence:'Illustrative evidence: advances in quantum computing are tracked through research milestones and engineering capability.', sourceUrl:'https://www.nist.gov/pqc', sourceDate:'2024-08-13', confidence:'medium', timeHorizon:'long', connectionTypes:{d15:'causes'} },
+            d4:  { evidenceType:'research', evidence:'Illustrative evidence: climate-system thresholds and cascading risks are tracked through assessment literature.', sourceUrl:'https://www.ipcc.ch/report/ar6/syr/', sourceDate:'2023-03-20', confidence:'medium', timeHorizon:'long', connectionTypes:{d16:'amplifies'} },
+            d5:  { evidenceType:'observation', evidence:'Illustrative evidence: distributed and hybrid work remains a structural workplace signal with implications for cities and organisations.', sourceUrl:'https://www.ilo.org/', sourceDate:'2025-01-15', confidence:'medium', timeHorizon:'now', connectionTypes:{d6:'amplifies'} },
+            d6:  { evidenceType:'official', evidence:'Illustrative evidence: demographic change is monitored through population projections and age-structure indicators.', sourceUrl:'https://population.un.org/wpp/', sourceDate:'2024-07-11', confidence:'high', timeHorizon:'long', connectionTypes:{} },
+            d7:  { evidenceType:'research', evidence:'Illustrative evidence: controlled-environment agriculture is tracked through food-system, technology, and cost signals.', sourceUrl:'https://www.fao.org/', sourceDate:'2025-02-10', confidence:'medium', timeHorizon:'mid', connectionTypes:{} },
+            d8:  { evidenceType:'official', evidence:'Illustrative evidence: provenance and authenticity standards are emerging responses to synthetic media and AI-generated content.', sourceUrl:'https://c2pa.org/', sourceDate:'2025-01-20', confidence:'medium', timeHorizon:'now', connectionTypes:{} },
+            d9:  { evidenceType:'research', evidence:'Illustrative evidence: non-invasive brain-computer interfaces are tracked through biomedical research and accessibility applications.', sourceUrl:'https://braininitiative.nih.gov/', sourceDate:'2025-03-05', confidence:'medium', timeHorizon:'mid', connectionTypes:{} },
+            d10: { evidenceType:'official', evidence:'Illustrative evidence: decentralised identity is tracked through open standards for verifiable digital identity.', sourceUrl:'https://www.w3.org/TR/did-core/', sourceDate:'2022-07-19', confidence:'high', timeHorizon:'mid', connectionTypes:{} },
+            d11: { evidenceType:'hypothesis', evidence:'Illustrative early signal: space-based solar power is retained as a weak signal requiring continued scanning rather than as a forecast.', sourceUrl:'https://www.nasa.gov/', sourceDate:'2024-01-10', confidence:'low', timeHorizon:'long', connectionTypes:{} },
+            d12: { evidenceType:'research', evidence:'Illustrative evidence: longevity research is monitored as a possible driver of changing life-course expectations and health markets.', sourceUrl:'https://www.nia.nih.gov/', sourceDate:'2025-02-01', confidence:'low', timeHorizon:'long', connectionTypes:{d6:'amplifies'} },
+            d13: { evidenceType:'research', evidence:'Illustrative evidence: decentralised and hybrid energy systems are monitored through renewable-energy and distributed-system developments.', sourceUrl:'https://www.iea.org/topics/renewables', sourceDate:'2025-10-01', confidence:'medium', timeHorizon:'mid', connectionTypes:{d1:'enables', d7:'enables'} },
+            d14: { evidenceType:'expert', evidence:'Illustrative futures hypothesis: AI-assisted governance is treated as a possible transformation of public-sector decision support, not as an established reality.', sourceUrl:'https://oecd.ai/', sourceDate:'2025-06-10', confidence:'low', timeHorizon:'long', connectionTypes:{d1:'enables', d2:'enables'} },
+            d15: { evidenceType:'official', evidence:'Illustrative evidence: migration to post-quantum cryptography is tracked as a preparedness issue for legacy encryption systems.', sourceUrl:'https://www.nist.gov/pqc', sourceDate:'2024-08-13', confidence:'high', timeHorizon:'near', connectionTypes:{d3:'responds_to'} },
+            d16: { evidenceType:'official', evidence:'Illustrative evidence: seabed mineral governance and geopolitical competition are monitored through international regulatory developments.', sourceUrl:'https://www.isa.org.jm/', sourceDate:'2025-01-01', confidence:'medium', timeHorizon:'mid', connectionTypes:{d4:'responds_to', d17:'amplifies'} },
+            d17: { evidenceType:'hypothesis', evidence:'Illustrative weak signal: infrastructure sabotage is retained as a low-confidence risk hypothesis for scanning exercises.', sourceUrl:'https://www.cisa.gov/topics/critical-infrastructure-security-and-resilience', sourceDate:'2025-01-01', confidence:'low', timeHorizon:'near', connectionTypes:{} },
+            d18: { evidenceType:'hypothesis', evidence:'Illustrative scenario hypothesis: large-scale basic-income policy is modelled as a possible response to labour-market disruption.', sourceUrl:'https://www.worldbank.org/en/topic/socialprotection', sourceDate:'2025-01-01', confidence:'low', timeHorizon:'long', connectionTypes:{d2:'responds_to', d14:'responds_to'} },
+            d19: { evidenceType:'hypothesis', evidence:'Illustrative wild-card hypothesis about corporate territorial autonomy; included to demonstrate low-confidence weak-signal capture.', sourceUrl:'', sourceDate:'', confidence:'low', timeHorizon:'far', connectionTypes:{d5:'competes', d10:'enables'} }
+        };
+
+        function enrichTutorialData() {
+            return dummyData.map(node => normalizeNodeMeta({
+                ...node,
+                ...(tutorialMetadata[node.id] || {}),
+                connections: [...(node.connections || [])],
+                connectionTypes: { ...((tutorialMetadata[node.id] || {}).connectionTypes || {}) }
+            }));
+        }
+
         // INIT
         window.onload = function() {
             // Check API Key
@@ -1094,7 +1127,7 @@
 
         function startTutorial() {
             // Tutorial Start with Enhanced Real-World Data
-            appState.nodes = JSON.parse(JSON.stringify(dummyData)).map(normalizeNodeMeta); // Deep copy
+            appState.nodes = enrichTutorialData();
             initializeAppCommon();
             
             // Start Tutorial Sequence
