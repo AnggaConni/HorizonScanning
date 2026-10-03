@@ -721,6 +721,27 @@
         </div>
     </div>
 
+    <!-- REPORT DATA-ONLY CONFIRMATION MODAL -->
+    <div id="report-confirm-modal" class="hidden fixed inset-0 z-[110] bg-navy-900/80 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
+        <div class="bg-white w-full max-w-md p-6 rounded-xl shadow-2xl border border-amber-400 relative">
+            <div class="flex items-start gap-4">
+                <div class="w-11 h-11 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center flex-shrink-0">
+                    <i class="fa-solid fa-triangle-exclamation text-lg"></i>
+                </div>
+                <div class="flex-1">
+                    <h3 id="report-confirm-title" class="text-lg font-bold text-navy-900 mb-2">AI Analysis Unavailable</h3>
+                    <p id="report-confirm-message" class="text-sm text-slate-600 leading-relaxed">
+                        No Gemini API Key is available, so the report cannot include AI-generated analysis.
+                    </p>
+                </div>
+            </div>
+            <div class="mt-6 flex justify-end gap-2 border-t border-slate-100 pt-4">
+                <button id="report-confirm-no" type="button" class="px-4 py-2 rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50 text-xs font-bold">No</button>
+                <button id="report-confirm-yes" type="button" class="px-4 py-2 rounded-lg bg-navy-900 text-white hover:bg-navy-800 text-xs font-bold shadow">Yes, Generate Report</button>
+            </div>
+        </div>
+    </div>
+
     <div id="help-modal" class="hidden fixed inset-0 z-[100] bg-navy-900/80 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
         <div class="bg-white w-full max-w-md p-6 rounded-xl shadow-2xl border border-teal-500 relative">
             <button onclick="closeHelpModal()" class="absolute top-4 right-4 text-slate-400 hover:text-red-500 transition-colors">
@@ -1536,6 +1557,46 @@
         function closeHelpModal() {
             document.getElementById('help-modal').classList.add('hidden');
         }
+
+        function confirmDataOnlyReport(reason = 'no-key') {
+            return new Promise((resolve) => {
+                const modal = document.getElementById('report-confirm-modal');
+                const title = document.getElementById('report-confirm-title');
+                const message = document.getElementById('report-confirm-message');
+                const yesBtn = document.getElementById('report-confirm-yes');
+                const noBtn = document.getElementById('report-confirm-no');
+
+                if (!modal || !yesBtn || !noBtn) {
+                    resolve(false);
+                    return;
+                }
+
+                const isId = currentLang === 'id';
+                if (reason === 'analysis-failed') {
+                    title.innerText = isId ? 'Analisa AI Tidak Tersedia' : 'AI Analysis Unavailable';
+                    message.innerText = isId
+                        ? 'Analisa AI masih kosong atau gagal dibuat. Report dapat dibuat hanya dari data yang sudah ada: matrix, signals, evidence, metadata, dan relationships. Lanjutkan membuat report data-only?'
+                        : 'AI analysis is still empty or could not be generated. The report can be created using only the information already available: matrix, signals, evidence, metadata, and relationships. Continue with a data-only report?';
+                } else {
+                    title.innerText = isId ? 'Gemini API Key Tidak Ditemukan' : 'Gemini API Key Not Found';
+                    message.innerText = isId
+                        ? 'Tidak ada Gemini API Key, sehingga report tidak dapat memuat analisa AI. Report hanya akan menuliskan informasi yang sudah tersedia di project: matrix, signals, evidence, metadata, dan relationships. Tetap buat report?'
+                        : 'No Gemini API Key is available, so the report cannot include AI-generated analysis. The report will contain only the information already available in the project: matrix, signals, evidence, metadata, and relationships. Generate the report anyway?';
+                }
+
+                modal.classList.remove('hidden');
+
+                const finish = (result) => {
+                    modal.classList.add('hidden');
+                    yesBtn.onclick = null;
+                    noBtn.onclick = null;
+                    resolve(result);
+                };
+
+                yesBtn.onclick = () => finish(true);
+                noBtn.onclick = () => finish(false);
+            });
+        }
         
         function updateRangeVal(id, val) { 
             const el = document.getElementById(id);
@@ -2064,17 +2125,25 @@ IMPORTANT: Provide a comprehensive analysis worthy of a professional foresight c
         }
 
         async function exportReport() {
-            // Auto-run analysis if not yet done
+            const key = document.getElementById('api-key')?.value || localStorage.getItem('gemini_api_key');
+
+            // No API key: explicitly ask whether the user wants a data-only report.
+            if (!key) {
+                const proceed = await confirmDataOnlyReport('no-key');
+                if (!proceed) return;
+            }
+
+            // API key exists, but analysis is empty: try AI analysis first.
+            if (key && (!appState.analysis || appState.analysis.trim() === "")) {
+                showToast(currentLang === 'id' ? "Menjalankan Analisa AI untuk laporan..." : "Auto-running AI Analysis for report...", "info");
+                await runAnalysis();
+                await new Promise(r => setTimeout(r, 500));
+            }
+
+            // If analysis is still empty, explicitly ask before producing a data-only report.
             if (!appState.analysis || appState.analysis.trim() === "") {
-                const key = document.getElementById('api-key')?.value || localStorage.getItem('gemini_api_key');
-                if (key && appState.nodes.length >= 3) {
-                    showToast(currentLang === 'id' ? "Menjalankan Analisa AI untuk laporan..." : "Auto-running AI Analysis for report...", "info");
-                    await runAnalysis();
-                    await new Promise(r => setTimeout(r, 2000)); // Wait for analysis
-                } else {
-                    showToast("No Analysis Available - Report will be data-only", "error");
-                    await new Promise(r => setTimeout(r, 1500));
-                }
+                const proceed = await confirmDataOnlyReport('analysis-failed');
+                if (!proceed) return;
             }
 
             // Capture chart as image
