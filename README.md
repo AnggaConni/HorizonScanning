@@ -9,7 +9,7 @@
   <img src="https://img.shields.io/badge/status-active-success?style=for-the-badge">
   <img src="https://img.shields.io/badge/AI-Gemini-orange?style=for-the-badge">
   <img src="https://img.shields.io/badge/platform-web-lightgrey?style=for-the-badge">
-  <img src="https://img.shields.io/github/license/AnggaConni/HorizonScanning?style=for-the-badge">
+  <img src="https://img.shields.io/badge/license-PolyForm%20Noncommercial%201.0.0-blueviolet?style=for-the-badge">
 </p>
 
 ---
