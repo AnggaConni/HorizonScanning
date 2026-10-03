@@ -578,12 +578,20 @@
                 </div>
 
                 <div id="panel-analysis" class="hidden flex-1 flex flex-col overflow-hidden bg-white">
-                    <div class="p-4 border-b border-slate-100">
+                    <div class="p-4 border-b border-slate-100 space-y-2">
                         <button onclick="runAnalysis()" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded shadow flex items-center justify-center gap-2 transition-colors text-xs">
                             <i class="fa-solid fa-wand-magic-sparkles"></i> <span data-i18n="btn_run_ai">Run Full AI Analysis</span>
                         </button>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="openManualAnalysisModal()" class="border border-slate-300 hover:border-teal-500 hover:text-teal-600 text-slate-600 font-bold py-2 rounded text-[11px] flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-user-pen"></i> Add Manual Analysis
+                            </button>
+                            <button onclick="clearAllAnalysis()" class="border border-red-200 hover:border-red-400 hover:text-red-600 text-red-500 font-bold py-2 rounded text-[11px] flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-trash"></i> Delete Analysis
+                            </button>
+                        </div>
                     </div>
-                    <div class="flex-1 overflow-y-auto p-5 prose prose-sm prose-slate max-w-none" id="analysis-output">
+                    <div class="flex-1 overflow-y-auto p-5" id="analysis-output">
                         <p class="text-slate-400 italic text-center mt-10">Analysis results will appear here.</p>
                     </div>
                 </div>
@@ -593,6 +601,27 @@
                         <i class="fa-solid fa-plus"></i> Manual Add
                     </button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MANUAL ANALYSIS MODAL -->
+    <div id="manual-analysis-modal" class="hidden fixed inset-0 z-[105] bg-navy-900/70 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-2xl p-6 rounded-xl shadow-2xl border border-teal-500 animate-fade-in">
+            <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
+                <h3 class="text-lg font-bold text-navy-900 flex items-center gap-2">
+                    <i class="fa-solid fa-user-pen text-teal-500"></i> Add Manual Analysis
+                </h3>
+                <button onclick="closeManualAnalysisModal()" class="text-slate-400 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="space-y-3">
+                <input id="manual-analysis-title" type="text" placeholder="Analysis title, e.g. Human Interpretation / Policy Context" class="w-full bg-slate-50 border border-slate-300 rounded p-2 text-sm font-semibold text-navy-900">
+                <textarea id="manual-analysis-content" rows="12" placeholder="Write your analysis in Markdown. You can combine expert judgement, contextual interpretation, caveats, policy observations, or questions for further investigation." class="w-full bg-slate-50 border border-slate-300 rounded p-3 text-sm text-navy-900 font-mono focus:border-teal-500 focus:outline-none"></textarea>
+                <p class="text-[10px] text-slate-400">Human-authored analysis is stored alongside AI-generated analysis. Use Markdown for headings, bullets, and emphasis.</p>
+            </div>
+            <div class="mt-5 flex justify-end gap-2 border-t border-slate-100 pt-4">
+                <button onclick="closeManualAnalysisModal()" class="px-4 py-2 rounded border border-slate-300 text-slate-600 text-xs font-bold">Cancel</button>
+                <button onclick="saveManualAnalysis()" class="px-4 py-2 rounded bg-navy-900 text-white text-xs font-bold hover:bg-navy-800">Save Analysis</button>
             </div>
         </div>
     </div>
@@ -774,7 +803,8 @@
         let appState = {
             config: { xLabel: "Probability", yLabel: "Impact", template: "impact-prob", gridStep: 1 },
             nodes: [],
-            analysis: null
+            analysis: null,
+            analysisEntries: []
         };
 
         const STATUS_COLORS = { 
@@ -1064,6 +1094,115 @@
             }));
         }
 
+        const tutorialAnalysisEntries = [
+            {
+                id: 'sample-ai-analysis',
+                type: 'ai',
+                title: 'Sample AI Strategic Analysis',
+                createdAt: '2026-10-03T00:00:00.000Z',
+                content: '## 📊 Executive Summary\nThe sample landscape shows a concentrated cluster of high-impact signals around AI governance, synthetic media, climate-system risk, and geopolitical competition. The matrix should be read as a structured exploration rather than a prediction.\n\n## 🧩 Cluster & Pattern Analysis\n**AI Regulation Framework** sits in the high-probability/high-impact zone and is connected to enterprise adoption. **Synthetic Media Proliferation** has a strong Z-axis because its implications may extend beyond technology into trust and institutional legitimacy.\n\n## 🌊 Behavioral / System Dynamics\nAI Regulation Framework → constrains → Enterprise AI Adoption\nEnterprise AI Adoption → enables → Decentralized Identity Systems\nDeep Sea Mining Geopolitics → amplifies → Climate Tipping Point Cascade\n\n## ⚠️ Uncertainty\nSeveral weak signals, including space-based solar power and corporate micro-nations, are intentionally retained with lower confidence. Their presence does not mean they are expected outcomes; they demonstrate why horizon scanning keeps plausible alternatives visible.\n\n## ⚡ Strategic Questions\n1. Which signals require monitoring indicators rather than immediate intervention?\n2. Which low-confidence signals could become important if a trigger event occurs?\n3. Where should institutions build optionality instead of committing to one forecast?'
+            },
+            {
+                id: 'sample-human-analysis',
+                type: 'manual',
+                title: 'Human Interpretation — Foresight Note',
+                createdAt: '2026-10-03T00:00:00.000Z',
+                content: '## 🧠 Human Interpretation\nThe most useful insight is not simply which node is “critical”, but **how different signals may interact across time horizons**.\n\nI would treat the high-confidence institutional signals as anchors, while keeping speculative signals visible as weak-signal candidates. The practical next step is to define indicators that would justify moving a signal from **Emerging → Watchlist → Escalating**.\n\n> This note is intentionally human-authored. It demonstrates that AI output and professional judgement can coexist in the same analysis workspace.'
+            }
+        ];
+
+        function syncAnalysisText() {
+            appState.analysis = (appState.analysisEntries || [])
+                .map(e => e.content || '')
+                .filter(Boolean)
+                .join('\n\n---\n\n');
+        }
+
+        function renderAnalysisEntries() {
+            const out = document.getElementById('analysis-output');
+            if (!out) return;
+
+            const entries = appState.analysisEntries || [];
+            if (!entries.length) {
+                out.innerHTML = '<p class="text-slate-400 italic text-center mt-10">No analysis yet. Run AI Analysis or add a manual analysis.</p>';
+                return;
+            }
+
+            out.innerHTML = entries.map(entry => {
+                const isAI = entry.type === 'ai';
+                const badge = isAI
+                    ? '<span class="px-2 py-1 rounded-full bg-teal-100 text-teal-700 text-[9px] font-bold uppercase">AI</span>'
+                    : '<span class="px-2 py-1 rounded-full bg-blue-100 text-blue-700 text-[9px] font-bold uppercase">Human</span>';
+                const date = entry.createdAt ? new Date(entry.createdAt).toLocaleDateString() : '';
+                const safeHtml = DOMPurify.sanitize(marked.parse(entry.content || ''));
+                return `
+                    <article class="mb-5 border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white">
+                        <div class="px-4 py-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between gap-3">
+                            <div class="min-w-0">
+                                <div class="flex items-center gap-2 flex-wrap">${badge}<h3 class="font-bold text-sm text-navy-900 truncate">${entry.title || (isAI ? 'AI Analysis' : 'Human Analysis')}</h3></div>
+                                <div class="text-[9px] text-slate-400 mt-1">${date}</div>
+                            </div>
+                            <button onclick="deleteAnalysisEntry('${entry.id}')" class="text-slate-400 hover:text-red-500 p-1.5" title="Delete this analysis"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                        <div class="p-4 prose prose-sm prose-slate max-w-none">${safeHtml}</div>
+                    </article>
+                `;
+            }).join('');
+        }
+
+        function openManualAnalysisModal() {
+            document.getElementById('manual-analysis-modal')?.classList.remove('hidden');
+            document.getElementById('manual-analysis-title').value = '';
+            document.getElementById('manual-analysis-content').value = '';
+        }
+
+        function closeManualAnalysisModal() {
+            document.getElementById('manual-analysis-modal')?.classList.add('hidden');
+        }
+
+        function saveManualAnalysis() {
+            const title = document.getElementById('manual-analysis-title')?.value.trim() || 'Human Interpretation';
+            const content = document.getElementById('manual-analysis-content')?.value.trim();
+
+            if (!content) {
+                showToast(currentLang === 'id' ? 'Isi analisa terlebih dahulu.' : 'Write an analysis first.', 'error');
+                return;
+            }
+
+            if (!Array.isArray(appState.analysisEntries)) appState.analysisEntries = [];
+            appState.analysisEntries.push({
+                id: 'manual-' + Date.now(),
+                type: 'manual',
+                title,
+                content,
+                createdAt: new Date().toISOString()
+            });
+            syncAnalysisText();
+            renderAnalysisEntries();
+            closeManualAnalysisModal();
+            switchTab('analysis');
+            showToast(currentLang === 'id' ? 'Analisa manusia ditambahkan.' : 'Manual analysis added.', 'info');
+        }
+
+        function deleteAnalysisEntry(id) {
+            const entry = (appState.analysisEntries || []).find(e => e.id === id);
+            if (!entry) return;
+            if (!confirm(currentLang === 'id' ? `Hapus analisa "${entry.title}"?` : `Delete analysis "${entry.title}"?`)) return;
+            appState.analysisEntries = (appState.analysisEntries || []).filter(e => e.id !== id);
+            syncAnalysisText();
+            renderAnalysisEntries();
+            showToast(currentLang === 'id' ? 'Analisa dihapus.' : 'Analysis deleted.', 'info');
+        }
+
+        function clearAllAnalysis() {
+            if (!(appState.analysisEntries || []).length && !(appState.analysis || '').trim()) return;
+            if (!confirm(currentLang === 'id' ? 'Hapus semua analisa, termasuk hasil AI dan catatan manusia?' : 'Delete all analysis, including AI results and human notes?')) return;
+            appState.analysisEntries = [];
+            appState.analysis = null;
+            renderAnalysisEntries();
+            showToast(currentLang === 'id' ? 'Semua analisa dihapus.' : 'All analysis deleted.', 'info');
+        }
+
         // INIT
         window.onload = function() {
             // Check API Key
@@ -1128,6 +1267,8 @@
         function startTutorial() {
             // Tutorial Start with Enhanced Real-World Data
             appState.nodes = enrichTutorialData();
+            appState.analysisEntries = JSON.parse(JSON.stringify(tutorialAnalysisEntries));
+            syncAnalysisText();
             initializeAppCommon();
             
             // Start Tutorial Sequence
@@ -1154,9 +1295,7 @@
             document.getElementById('setup-screen').classList.add('hidden');
             document.getElementById('main-app').classList.remove('hidden');
 
-            if(appState.analysis) {
-                document.getElementById('analysis-output').innerHTML = marked.parse(appState.analysis);
-            }
+            renderAnalysisEntries();
 
             initChart();
             renderNodeList();
@@ -2055,8 +2194,18 @@ IMPORTANT: Provide a comprehensive analysis worthy of a professional foresight c
         throw new Error(`AI blocked the response. Reason: ${blockReason}`);
     }
         const md = data.candidates[0].content.parts[0].text;
-        appState.analysis = md;
-        out.innerHTML = DOMPurify.sanitize(marked.parse(md));
+        if (!Array.isArray(appState.analysisEntries)) appState.analysisEntries = [];
+        // Keep one current AI analysis entry; manual notes remain untouched.
+        appState.analysisEntries = appState.analysisEntries.filter(e => e.type !== 'ai');
+        appState.analysisEntries.push({
+            id: 'ai-' + Date.now(),
+            type: 'ai',
+            title: currentLang === 'id' ? 'AI Strategic Analysis' : 'AI Strategic Analysis',
+            content: md,
+            createdAt: new Date().toISOString()
+        });
+        syncAnalysisText();
+        renderAnalysisEntries();
         showToast(currentLang === 'id' ? "Analisa Selesai!" : "Analysis Complete!", "info");
         
     } catch(e) { 
@@ -2093,7 +2242,8 @@ IMPORTANT: Provide a comprehensive analysis worthy of a professional foresight c
                     timestamp: new Date().toISOString(),
                     config: appState.config,
                     nodes: appState.nodes,
-                    analysis: appState.analysis
+                    analysis: appState.analysis,
+                    analysisEntries: appState.analysisEntries || []
                 };
 
                 const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObject, null, 2));
@@ -2128,7 +2278,16 @@ IMPORTANT: Provide a comprehensive analysis worthy of a professional foresight c
                         // 1. Restore State
                         appState.config = { ...data.config };
                         appState.nodes = JSON.parse(JSON.stringify(data.nodes)).map(normalizeNodeMeta); // Deep copy + backward-compatible defaults
-                        appState.analysis = data.analysis || null;
+                        appState.analysisEntries = Array.isArray(data.analysisEntries)
+                            ? JSON.parse(JSON.stringify(data.analysisEntries))
+                            : (data.analysis ? [{
+                                id: 'legacy-analysis',
+                                type: 'ai',
+                                title: 'Imported Analysis',
+                                content: data.analysis,
+                                createdAt: data.timestamp || new Date().toISOString()
+                            }] : []);
+                        syncAnalysisText();
 
                         // --- BUG FIX START ---
                         // Update the Setup UI inputs to match the loaded config
