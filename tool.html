@@ -1578,10 +1578,15 @@
                         ? 'Analisa AI masih kosong atau gagal dibuat. Report dapat dibuat hanya dari data yang sudah ada: matrix, signals, evidence, metadata, dan relationships. Lanjutkan membuat report data-only?'
                         : 'AI analysis is still empty or could not be generated. The report can be created using only the information already available: matrix, signals, evidence, metadata, and relationships. Continue with a data-only report?';
                 } else {
+                    const hasSavedAnalysis = !!(appState.analysis && appState.analysis.trim());
                     title.innerText = isId ? 'Gemini API Key Tidak Ditemukan' : 'Gemini API Key Not Found';
-                    message.innerText = isId
-                        ? 'Tidak ada Gemini API Key, sehingga report tidak dapat memuat analisa AI. Report hanya akan menuliskan informasi yang sudah tersedia di project: matrix, signals, evidence, metadata, dan relationships. Tetap buat report?'
-                        : 'No Gemini API Key is available, so the report cannot include AI-generated analysis. The report will contain only the information already available in the project: matrix, signals, evidence, metadata, and relationships. Generate the report anyway?';
+                    message.innerText = hasSavedAnalysis
+                        ? (isId
+                            ? 'Tidak ada Gemini API Key untuk membuat analisa baru. Analisa yang sudah tersimpan tetap dapat dimasukkan ke report, bersama matrix, signals, evidence, metadata, dan relationships. Tetap buat report?'
+                            : 'No Gemini API Key is available to generate new analysis. Any analysis already saved in this project can still be included, together with the matrix, signals, evidence, metadata, and relationships. Generate the report anyway?')
+                        : (isId
+                            ? 'Tidak ada Gemini API Key dan analisa AI masih kosong. Report hanya akan menuliskan informasi yang sudah tersedia di project: matrix, signals, evidence, metadata, dan relationships. Tetap buat report?'
+                            : 'No Gemini API Key is available and AI analysis is empty. The report will contain only the information already available in the project: matrix, signals, evidence, metadata, and relationships. Generate the report anyway?');
                 }
 
                 modal.classList.remove('hidden');
