@@ -624,6 +624,50 @@
                     <textarea id="node-desc" rows="2" class="w-full bg-slate-50 border border-slate-300 rounded p-2 text-navy-900 text-xs focus:border-teal-500 focus:outline-none"></textarea>
                 </div>
 
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1">Evidence Type</label>
+                        <select id="node-evidence-type" class="w-full bg-slate-50 border border-slate-300 rounded p-2 text-xs text-navy-900">
+                            <option value="observation">Direct Observation</option>
+                            <option value="official">Official / Institutional</option>
+                            <option value="research">Research / Academic</option>
+                            <option value="media">Media / Reporting</option>
+                            <option value="expert">Expert Judgement</option>
+                            <option value="secondary">Secondary / Synthesized</option>
+                            <option value="hypothesis">Hypothesis / Early Signal</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1">Confidence</label>
+                        <select id="node-confidence" class="w-full bg-slate-50 border border-slate-300 rounded p-2 text-xs text-navy-900">
+                            <option value="high">High</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="low">Low</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1">Time Horizon</label>
+                        <select id="node-time-horizon" class="w-full bg-slate-50 border border-slate-300 rounded p-2 text-xs text-navy-900">
+                            <option value="now">Now / 0–12 months</option>
+                            <option value="near" selected>Near-term / 1–2 years</option>
+                            <option value="mid">Medium-term / 3–5 years</option>
+                            <option value="long">Long-term / 5–10 years</option>
+                            <option value="far">Long-range / 10+ years</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1">Evidence Date</label>
+                        <input type="date" id="node-source-date" class="w-full bg-slate-50 border border-slate-300 rounded p-2 text-xs text-navy-900">
+                    </div>
+                </div>
+
+                <div class="bg-slate-50 border border-slate-200 rounded p-3">
+                    <label class="block text-xs font-bold text-slate-500 mb-1">Evidence / Rationale</label>
+                    <textarea id="node-evidence" rows="3" placeholder="What observation, source, event, or rationale supports this signal?" class="w-full bg-white border border-slate-300 rounded p-2 text-navy-900 text-xs"></textarea>
+                    <label class="block text-[10px] font-bold text-slate-500 mt-2 mb-1">Source URL</label>
+                    <input type="url" id="node-source-url" placeholder="https://..." class="w-full bg-white border border-slate-300 rounded p-2 text-navy-900 text-xs">
+                </div>
+
                 <div class="bg-slate-50 p-3 rounded border border-slate-200">
                     <div class="grid grid-cols-2 gap-4 mb-4">
                         <div>
@@ -651,6 +695,19 @@
                     <div>
                     <label class="block text-xs font-bold text-slate-500 mb-1" data-i18n="lbl_connect">Connect Nodes (Ctrl+Click)</label>
                     <select id="node-connections" multiple class="w-full bg-slate-50 border border-slate-300 rounded p-2 text-xs text-navy-900 h-24 focus:border-teal-500 focus:outline-none"></select>
+                    <div class="mt-2">
+                        <label class="block text-[10px] font-bold text-slate-500 mb-1">Default Relationship Type</label>
+                        <select id="node-connection-type" class="w-full bg-white border border-slate-300 rounded p-2 text-xs text-navy-900">
+                            <option value="causes">Causes</option>
+                            <option value="enables">Enables</option>
+                            <option value="amplifies">Amplifies</option>
+                            <option value="constrains">Constrains</option>
+                            <option value="depends_on">Depends on</option>
+                            <option value="competes">Competes with</option>
+                            <option value="responds_to">Responds to</option>
+                        </select>
+                        <p class="text-[10px] text-slate-400 mt-1">Applied to newly created connections.</p>
+                    </div>
                 </div>
                 </div>
 
@@ -706,6 +763,44 @@
             'critical': '#ef4444', 
             'structural': '#3b82f6' 
         };
+
+        const RELATIONSHIP_TYPES = {
+            causes: 'Causes',
+            enables: 'Enables',
+            amplifies: 'Amplifies',
+            constrains: 'Constrains',
+            depends_on: 'Depends on',
+            competes: 'Competes with',
+            responds_to: 'Responds to'
+        };
+
+        const TIME_HORIZONS = {
+            now: 'Now / 0–12 months',
+            near: 'Near-term / 1–2 years',
+            mid: 'Medium-term / 3–5 years',
+            long: 'Long-term / 5–10 years',
+            far: 'Long-range / 10+ years'
+        };
+
+        function normalizeNodeMeta(node) {
+            const n = node || {};
+            return {
+                ...n,
+                desc: n.desc || '',
+                status: n.status || 'emerging',
+                x: Number.isFinite(parseFloat(n.x)) ? parseFloat(n.x) : 0,
+                y: Number.isFinite(parseFloat(n.y)) ? parseFloat(n.y) : 0,
+                z: Number.isFinite(parseFloat(n.z)) ? parseFloat(n.z) : 0,
+                connections: Array.isArray(n.connections) ? n.connections : [],
+                evidenceType: n.evidenceType || 'observation',
+                evidence: n.evidence || '',
+                sourceUrl: n.sourceUrl || '',
+                sourceDate: n.sourceDate || '',
+                confidence: n.confidence || 'medium',
+                timeHorizon: n.timeHorizon || 'near',
+                connectionTypes: (n.connectionTypes && typeof n.connectionTypes === 'object') ? n.connectionTypes : {}
+            };
+        }
         
         let chartInstance = null;
         let isDragging = false;
@@ -978,7 +1073,7 @@
 
         function startTutorial() {
             // Tutorial Start with Enhanced Real-World Data
-            appState.nodes = JSON.parse(JSON.stringify(dummyData)); // Deep copy
+            appState.nodes = JSON.parse(JSON.stringify(dummyData)).map(normalizeNodeMeta); // Deep copy
             initializeAppCommon();
             
             // Start Tutorial Sequence
@@ -1398,6 +1493,15 @@
                 document.getElementById('btn-delete')?.classList.remove('hidden');
                 document.getElementById('modal-title').innerText = t('modal_edit');
                 document.getElementById('node-z').value = node.z !== undefined ? node.z : 0;
+                document.getElementById('node-evidence-type').value = node.evidenceType || 'observation';
+                document.getElementById('node-evidence').value = node.evidence || '';
+                document.getElementById('node-source-url').value = node.sourceUrl || '';
+                document.getElementById('node-source-date').value = node.sourceDate || '';
+                document.getElementById('node-confidence').value = node.confidence || 'medium';
+                document.getElementById('node-time-horizon').value = node.timeHorizon || 'near';
+                const existingTypes = (node.connections || []).map(cid => node.connectionTypes?.[cid] || 'depends_on');
+                const uniqueTypes = [...new Set(existingTypes)];
+                document.getElementById('node-connection-type').value = uniqueTypes.length === 1 ? uniqueTypes[0] : 'depends_on';
             } else {
                 document.getElementById('node-id').value = '';
                 document.getElementById('node-title').value = '';
@@ -1408,6 +1512,13 @@
                 document.getElementById('btn-delete')?.classList.add('hidden');
                 document.getElementById('modal-title').innerText = t('modal_add');
                 document.getElementById('node-z').value = 0;
+                document.getElementById('node-evidence-type').value = 'observation';
+                document.getElementById('node-evidence').value = '';
+                document.getElementById('node-source-url').value = '';
+                document.getElementById('node-source-date').value = '';
+                document.getElementById('node-confidence').value = 'medium';
+                document.getElementById('node-time-horizon').value = 'near';
+                document.getElementById('node-connection-type').value = 'depends_on';
             }
             updateRangeVal('val-x', document.getElementById('node-x').value);
             updateRangeVal('val-y', document.getElementById('node-y').value);
@@ -1446,15 +1557,39 @@
                 status: document.getElementById('node-status')?.value || 'emerging',
                 x: parseFloat(document.getElementById('node-x')?.value || 0),
                 y: parseFloat(document.getElementById('node-y')?.value || 0),
-                z: parseFloat(document.getElementById('node-z')?.value || 0), // <--- TAMBAHKAN BARIS INI
-                connections: Array.from(document.getElementById('node-connections')?.selectedOptions || []).map(o => o.value)
+                z: parseFloat(document.getElementById('node-z')?.value || 0),
+                connections: Array.from(document.getElementById('node-connections')?.selectedOptions || []).map(o => o.value),
+                evidenceType: document.getElementById('node-evidence-type')?.value || 'observation',
+                evidence: document.getElementById('node-evidence')?.value || '',
+                sourceUrl: document.getElementById('node-source-url')?.value || '',
+                sourceDate: document.getElementById('node-source-date')?.value || '',
+                confidence: document.getElementById('node-confidence')?.value || 'medium',
+                timeHorizon: document.getElementById('node-time-horizon')?.value || 'near',
+                connectionTypes: {}
             };
 
+            const selectedConnectionIds = newNode.connections || [];
+            const previous = id ? (appState.nodes.find(n => n.id === id) || {}) : {};
+            const previousTypes = previous.connectionTypes || {};
+            const defaultRelation = document.getElementById('node-connection-type')?.value || 'depends_on';
+
+            selectedConnectionIds.forEach(targetId => {
+                newNode.connectionTypes[targetId] = previousTypes[targetId] || defaultRelation;
+            });
+
+            Object.keys(newNode.connectionTypes).forEach(targetId => {
+                if (!selectedConnectionIds.includes(targetId)) delete newNode.connectionTypes[targetId];
+                if (!RELATIONSHIP_TYPES[newNode.connectionTypes[targetId]]) {
+                    newNode.connectionTypes[targetId] = defaultRelation;
+                }
+            });
+
+            const normalizedNode = normalizeNodeMeta(newNode);
             if(id) {
                 const idx = appState.nodes.findIndex(n => n.id === id);
-                if(idx > -1) appState.nodes[idx] = newNode;
+                if(idx > -1) appState.nodes[idx] = normalizedNode;
             } else {
-                appState.nodes.push(newNode);
+                appState.nodes.push(normalizedNode);
             }
             
             closeModal();
@@ -1683,8 +1818,17 @@
                     status: n.status,
                     x: n.x,
                     y: n.y,
-                    z: n.z || 0, 
-                    links: n.connections ? n.connections.map(c => appState.nodes.find(x=>x.id===c)?.title || c) : []
+                    z: n.z || 0,
+                    evidenceType: n.evidenceType || 'observation',
+                    evidence: n.evidence || '',
+                    sourceUrl: n.sourceUrl || '',
+                    sourceDate: n.sourceDate || '',
+                    confidence: n.confidence || 'medium',
+                    timeHorizon: n.timeHorizon || 'near',
+                    relations: n.connections ? n.connections.map(c => ({
+                        target: appState.nodes.find(x=>x.id===c)?.title || c,
+                        type: n.connectionTypes?.[c] || 'depends_on'
+                    })) : []
                 }));
 
                 // --- PROMPT ENGINEERING BASED ON LANGUAGE ---
@@ -1774,7 +1918,15 @@
                     (Provide 3–5 concrete action steps formatted as a numbered list with bold titles).`;
                 }
 
-                userPrompt += `\n\nIMPORTANT: Provide a comprehensive analysis worthy of a professional foresight consultant report. Use emojis in headers. REMEMBER YOUR MASTER LANGUAGE RULE.`;
+                userPrompt += `\n\nEVIDENCE & UNCERTAINTY RULES:
+- Distinguish documented evidence from expert judgement and analytical inference.
+- Do not invent sources, dates, facts, or evidence that are not present in the data.
+- Confidence describes the user's confidence in the evidence, not statistical probability.
+- Use timeHorizon to separate immediate, near-term, medium-term, long-term, and long-range implications.
+- Use typed relationships in relations to explain system dynamics; do not infer causal direction where it is not explicitly supported.
+- Surface low-confidence or weak-evidence signals as uncertainty rather than overstating them.
+
+IMPORTANT: Provide a comprehensive analysis worthy of a professional foresight consultant report. Use emojis in headers. REMEMBER YOUR MASTER LANGUAGE RULE.`;
 
 
     try {
@@ -1841,9 +1993,8 @@
                 const exportObject = {
                     _info: "this is a save files, not export report, please use the apps and import this",
                     _url: "please go to 'https://anggaconni.github.io/HorizonScanning/' to open the apps",
-                    version: "1.0",
+                    version: "2.0",
                     timestamp: new Date().toISOString(),
-                    apiKey: currentKey, // Saved here, will be hidden in app input
                     config: appState.config,
                     nodes: appState.nodes,
                     analysis: appState.analysis
@@ -1880,7 +2031,7 @@
                         
                         // 1. Restore State
                         appState.config = { ...data.config };
-                        appState.nodes = JSON.parse(JSON.stringify(data.nodes)); // Deep copy
+                        appState.nodes = JSON.parse(JSON.stringify(data.nodes)).map(normalizeNodeMeta); // Deep copy + backward-compatible defaults
                         appState.analysis = data.analysis || null;
 
                         // --- BUG FIX START ---
