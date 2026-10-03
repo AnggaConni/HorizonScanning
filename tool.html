@@ -2038,10 +2038,6 @@
                     showToast(currentLang === 'id' ? "API Key tidak ditemukan" : "API Key Missing", "error");
                     return;
                 }
-                if(!key) { 
-                    showToast(currentLang === 'id' ? "API Key tidak ditemukan" : "API Key Missing", "error"); 
-                    return; 
-                }
                 localStorage.setItem('gemini_api_key', key);
 
                 if(appState.nodes.length < 3) {
