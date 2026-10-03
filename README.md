@@ -467,52 +467,54 @@ AI output should therefore be treated as **analytical assistance**, not authorit
 
 ## 📜 Licensing
 
-This repository is **source-available software** licensed under the **PolyForm Noncommercial License 1.0.0**.
+### Version 2.0 and later
 
-The license permits noncommercial use, including personal research, experimentation, study, testing, and use by qualifying noncommercial organizations such as educational institutions, public research organizations, government institutions, and other organizations described in the license. urlRead the full PolyForm Noncommercial 1.0.0 licensehttps://polyformproject.org/licenses/noncommercial/1.0.0
+**Horizon Scan AI version 2.0+ is licensed under the PolyForm Noncommercial License 1.0.0.**
 
-### ✅ You may
+This means the current 2.0+ release is available for:
 
-- Copy the software for permitted noncommercial purposes
-- Study how it works
-- Modify it for permitted noncommercial purposes
-- Build noncommercial derivative works
-- Use it for learning, research, experimentation, training, and expert practice where the use is noncommercial
-- Redistribute permitted copies in accordance with the license
+- learning and personal study
+- research and experimentation
+- testing and prototyping
+- noncommercial expert practice
+- qualifying educational, public-research, environmental, public-safety/health, and government use as described by the license
 
-### 🚫 Commercial use is not granted
+Commercial use is **not granted** by the 2.0+ license. Examples include paid SaaS, commercial redistribution, paid product embedding, commercial consulting/training use, and other commercial exploitation of the software. Separate commercial permission may be requested from the copyright holder.
 
-The license does **not** grant permission to use, deploy, distribute, modify, or commercially exploit the software.
+Read the PolyForm Noncommercial 1.0.0 license: https://polyformproject.org/licenses/noncommercial/1.0.0
 
-Examples that may require separate commercial permission include:
+### Versions before 2.0
 
-- Selling the software or a derivative version
-- Offering it as a paid SaaS or hosted service
-- Using it as part of a paid commercial product or service
-- Commercial consulting, training, or workshops where the software itself is used as part of the paid offering
-- Commercial redistribution or white-labelling
+**Versions released before 2.0 were distributed under GNU GPL-3.0.**
 
-Commercial licensing may be requested separately from the copyright holder.
+Those historical versions remain governed by the GPL-3.0 terms under which they were released. GPL-3.0 is a free-software license and permits commercial use subject to its own conditions.
 
-### 👤 Copyright
+For clarity:
+
+| Version | License | Commercial use |
+|---|---|---|
+| **< 2.0** | GPL-3.0 | Permitted under GPL-3.0 terms |
+| **2.0+** | PolyForm Noncommercial 1.0.0 | Not granted without separate permission |
+
+The repository keeps the historical GPL text in [LICENSE-GPL-3.0-LEGACY.md](./LICENSE-GPL-3.0-LEGACY.md) for version-specific reference.
+
+### Current version
+
+The **current repository version is 2.0**, and the current `LICENSE` file applies to version 2.0 and later.
+
+### Copyright
 
 Copyright © 2026 **Angga Conni Saputra**.
 
-The repository license applies to the project's own software. Third-party libraries, services, assets, APIs, and dependencies remain subject to their respective licenses and terms.
+The project license applies to the project's own software. Third-party libraries, services, assets, APIs, and dependencies remain subject to their respective licenses and terms.
 
-### 🔄 Previous releases
+### Source-available, not open-source
 
-Earlier versions of the repository may have been distributed under a different license. The licensing terms attached to a version you already received continue to govern that version. The current repository is distributed under the PolyForm Noncommercial License 1.0.0 unless a specific file or release states otherwise.
+Because the current license restricts commercial use, Horizon Scan AI 2.0+ is best described as **source-available** rather than OSI-approved open-source software.
 
-### ⚠️ Open-source terminology
-
-Because this license restricts commercial use, this repository should be described as **source-available** rather than as OSI-approved open-source software. The Open Source Definition requires licenses to permit commercial use. urlOpen Source Initiative — Open Source Definitionhttps://opensource.org/osd
-
-This project is intended to remain freely accessible for **learning, research, experimentation, and noncommercial expert practice**, while commercial use remains subject to separate permission.
-
+The project is intentionally free to access for **learning, research, experimentation, and noncommercial expert practice**, while commercial use remains subject to separate permission.
 
 ---
-
 ## 👤 Author
 
 **Angga Conni Saputra**
