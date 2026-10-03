@@ -467,25 +467,49 @@ AI output should therefore be treated as **analytical assistance**, not authorit
 
 ## 📜 Licensing
 
-This repository currently uses the **GNU General Public License v3.0 (GPL-3.0)**.
+This repository is **source-available software** licensed under the **PolyForm Noncommercial License 1.0.0**.
 
-Under GPL-3.0, users may use, study, modify, and redistribute the software, subject to the conditions of the license. GPL is a free-software license and does **not** restrict use to non-commercial purposes.
+The license permits noncommercial use, including personal research, experimentation, study, testing, and use by qualifying noncommercial organizations such as educational institutions, public research organizations, government institutions, and other organizations described in the license. urlRead the full PolyForm Noncommercial 1.0.0 licensehttps://polyformproject.org/licenses/noncommercial/1.0.0
 
-See the full license in [LICENSE](./LICENSE).
+### ✅ You may
 
-### Important distinction
+- Copy the software for permitted noncommercial purposes
+- Study how it works
+- Modify it for permitted noncommercial purposes
+- Build noncommercial derivative works
+- Use it for learning, research, experimentation, training, and expert practice where the use is noncommercial
+- Redistribute permitted copies in accordance with the license
 
-If the intended policy is specifically:
+### 🚫 Commercial use is not granted
 
-> "Free to copy, modify, and use for learning and expert work, but commercial use requires permission,"
+The license does **not** grant permission to use, deploy, distribute, modify, or commercially exploit the software.
 
-then GPL-3.0 is **not** the right license for that policy.
+Examples that may require separate commercial permission include:
 
-Creative Commons advises against using its core CC licenses for software because software-specific licenses are better suited to source-code distribution. See the Creative Commons guidance on software licensing: https://creativecommons.org/faq/#can-i-apply-a-cc-license-to-software
+- Selling the software or a derivative version
+- Offering it as a paid SaaS or hosted service
+- Using it as part of a paid commercial product or service
+- Commercial consulting, training, or workshops where the software itself is used as part of the paid offering
+- Commercial redistribution or white-labelling
 
-A future release could instead use a different software licensing strategy, but the exact wording should be selected carefully because a non-commercial restriction is not an OSI-approved open-source model.
+Commercial licensing may be requested separately from the copyright holder.
 
-For now, this repository remains GPL-3.0.
+### 👤 Copyright
+
+Copyright © 2026 **Angga Conni Saputra**.
+
+The repository license applies to the project's own software. Third-party libraries, services, assets, APIs, and dependencies remain subject to their respective licenses and terms.
+
+### 🔄 Previous releases
+
+Earlier versions of the repository may have been distributed under a different license. The licensing terms attached to a version you already received continue to govern that version. The current repository is distributed under the PolyForm Noncommercial License 1.0.0 unless a specific file or release states otherwise.
+
+### ⚠️ Open-source terminology
+
+Because this license restricts commercial use, this repository should be described as **source-available** rather than as OSI-approved open-source software. The Open Source Definition requires licenses to permit commercial use. urlOpen Source Initiative — Open Source Definitionhttps://opensource.org/osd
+
+This project is intended to remain freely accessible for **learning, research, experimentation, and noncommercial expert practice**, while commercial use remains subject to separate permission.
+
 
 ---
 
