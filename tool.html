@@ -2350,233 +2350,58 @@ IMPORTANT: Provide a comprehensive analysis worthy of a professional foresight c
                 if (!proceed) return;
             }
 
-            const esc = (value) => String(value ?? '')
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#39;');
+            try {
+                const canvas = document.getElementById('matrixChart');
+                let matrixImage = '';
+                if (canvas) {
+                    const ctx = canvas.getContext('2d');
+                    ctx.save();
+                    ctx.globalCompositeOperation = 'destination-over';
+                    ctx.fillStyle = 'white';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    matrixImage = canvas.toDataURL('image/png');
+                    ctx.restore();
+                }
 
-            const safeUrl = (url) => {
-                const raw = String(url || '').trim();
-                if (!(raw.startsWith('http://') || raw.startsWith('https://'))) return '';
-                return esc(raw);
-            };
+                const reportId = 'horizon-report-' + Date.now() + '-' + Math.random().toString(36).slice(2);
+                const payload = {
+                    version: 1,
+                    generatedAt: new Date().toISOString(),
+                    currentLang,
+                    config: JSON.parse(JSON.stringify(appState.config || {})),
+                    nodes: JSON.parse(JSON.stringify(appState.nodes || [])),
+                    analysis: appState.analysis || '',
+                    analysisEntries: JSON.parse(JSON.stringify(appState.analysisEntries || [])),
+                    matrixImage
+                };
 
-            const horizonLabel = (key) => TIME_HORIZONS[key] || 'Not specified';
-            const evidenceLabels = {
-                observation: 'Direct Observation',
-                official: 'Official / Institutional',
-                research: 'Research / Academic',
-                media: 'Media / Reporting',
-                expert: 'Expert Judgement',
-                secondary: 'Secondary / Synthesized',
-                hypothesis: 'Hypothesis / Early Signal'
-            };
-            const statusMeta = {
-                critical: ['Critical', '#dc2626', '#fef2f2'],
-                escalating: ['Escalating', '#ea580c', '#fff7ed'],
-                watchlist: ['Watchlist', '#d97706', '#fffbeb'],
-                emerging: ['Emerging', '#059669', '#ecfdf5'],
-                structural: ['Structural Trend', '#2563eb', '#eff6ff']
-            };
-            const confidenceMeta = {
-                high: ['High', '#047857', '#ecfdf5'],
-                medium: ['Medium', '#b45309', '#fffbeb'],
-                low: ['Low', '#b91c1c', '#fef2f2']
-            };
-            const relationLabel = (type) => RELATIONSHIP_TYPES[type] || 'Related to';
+                localStorage.setItem(reportId, JSON.stringify(payload));
 
-            const canvas = document.getElementById('matrixChart');
-            const ctx = canvas.getContext('2d');
-            ctx.save();
-            ctx.globalCompositeOperation = 'destination-over';
-            ctx.fillStyle = 'white';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            const img = canvas.toDataURL("image/png");
-            ctx.restore();
+                const reportUrl = 'report.html?report=' + encodeURIComponent(reportId);
+                const reportWindow = window.open(reportUrl, '_blank');
 
-            const timestamp = new Date().toLocaleString();
-            const dateOnly = new Date().toISOString().slice(0, 10);
+                if (!reportWindow) {
+                    localStorage.removeItem(reportId);
+                    showToast(currentLang === 'id' ? "Popup diblokir browser." : "Popup blocked by browser.", "error");
+                    return;
+                }
 
-            let analysisEntries = Array.isArray(appState.analysisEntries)
-                ? appState.analysisEntries.filter(e => e && e.content)
-                : [];
-            if (!analysisEntries.length && appState.analysis) {
-                analysisEntries = [{
-                    id: 'legacy-analysis',
-                    type: 'ai',
-                    title: 'Imported Analysis',
-                    content: appState.analysis,
-                    createdAt: new Date().toISOString()
-                }];
+                showToast(
+                    currentLang === 'id'
+                        ? "Report dibuka di tab baru."
+                        : "Report opened in a new tab.",
+                    "info"
+                );
+            } catch (e) {
+                console.error("Report export error:", e);
+                showToast(
+                    currentLang === 'id'
+                        ? "Gagal membuka report: " + e.message
+                        : "Failed to open report: " + e.message,
+                    "error"
+                );
             }
-
-            const counts = {
-                total: appState.nodes.length,
-                critical: appState.nodes.filter(n => n.status === 'critical').length,
-                escalating: appState.nodes.filter(n => n.status === 'escalating').length,
-                watchlist: appState.nodes.filter(n => n.status === 'watchlist').length,
-                emerging: appState.nodes.filter(n => n.status === 'emerging').length,
-                structural: appState.nodes.filter(n => n.status === 'structural').length,
-                highConfidence: appState.nodes.filter(n => (n.confidence || 'medium') === 'high').length,
-                lowConfidence: appState.nodes.filter(n => (n.confidence || 'medium') === 'low').length,
-                sourced: appState.nodes.filter(n => !!String(n.sourceUrl || '').trim()).length,
-                evidenced: appState.nodes.filter(n => !!String(n.evidence || '').trim()).length,
-                dated: appState.nodes.filter(n => !!String(n.sourceDate || '').trim()).length,
-                connected: appState.nodes.filter(n => Array.isArray(n.connections) && n.connections.length > 0).length
-            };
-
-            const relationshipRows = [];
-            appState.nodes.forEach(source => {
-                (source.connections || []).forEach(targetId => {
-                    const target = appState.nodes.find(n => n.id === targetId);
-                    if (target) relationshipRows.push({
-                        source: source.title,
-                        target: target.title,
-                        type: source.connectionTypes?.[targetId] || 'depends_on'
-                    });
-                });
-            });
-
-            const relationshipHtml = relationshipRows.length
-                ? relationshipRows.map(r => '<tr><td><strong>' + esc(r.source) + '</strong></td><td><span class="relation-pill">' + esc(relationLabel(r.type)) + '</span></td><td><strong>' + esc(r.target) + '</strong></td></tr>').join('')
-                : '<tr><td colspan="3" class="muted center">No explicit relationships recorded.</td></tr>';
-
-            const analysisHtml = analysisEntries.length
-                ? analysisEntries.map(entry => {
-                    const isAI = entry.type === 'ai';
-                    const badgeClass = isAI ? 'badge-ai' : 'badge-human';
-                    const badgeText = isAI ? 'AI' : 'HUMAN';
-                    const title = esc(entry.title || (isAI ? 'AI Strategic Analysis' : 'Human Analysis'));
-                    const created = entry.createdAt ? esc(new Date(entry.createdAt).toLocaleString()) : '';
-                    const body = DOMPurify.sanitize(marked.parse(entry.content || ''));
-                    return '<section class="analysis-entry">' +
-                        '<div class="analysis-entry-head"><div><span class="' + badgeClass + '">' + badgeText + '</span><h3>' + title + '</h3></div><span class="analysis-date">' + created + '</span></div>' +
-                        '<div class="analysis-body">' + body + '</div></section>';
-                }).join('')
-                : '<div class="empty-box">No analytical entry is available. This report contains recorded signal data and metadata only.</div>';
-
-            const nodeRows = appState.nodes.map((n, idx) => {
-                const status = statusMeta[n.status] || ['Unknown', '#64748b', '#f8fafc'];
-                const conf = confidenceMeta[n.confidence || 'medium'] || confidenceMeta.medium;
-                const evidenceType = evidenceLabels[n.evidenceType || 'observation'] || 'Direct Observation';
-                const source = safeUrl(n.sourceUrl);
-                const relationCount = Array.isArray(n.connections) ? n.connections.length : 0;
-                const relTypes = (n.connections || []).map(cid => relationLabel(n.connectionTypes?.[cid] || 'depends_on')).join(', ');
-                return '<tr>' +
-                    '<td class="index-cell">' + (idx + 1) + '</td>' +
-                    '<td><div class="signal-title">' + esc(n.title) + '</div><div class="signal-desc">' + esc(n.desc || '') + '</div></td>' +
-                    '<td><span class="badge-status" style="color:' + status[1] + ';background:' + status[2] + '">' + esc(status[0]) + '</span></td>' +
-                    '<td class="mono">' + Number(n.x || 0).toFixed(1) + '</td>' +
-                    '<td class="mono">' + Number(n.y || 0).toFixed(1) + '</td>' +
-                    '<td class="mono">' + Number(n.z || 0).toFixed(1) + '</td>' +
-                    '<td>' + esc(horizonLabel(n.timeHorizon || 'near')) + '</td>' +
-                    '<td><span class="badge-status" style="color:' + conf[1] + ';background:' + conf[2] + '">' + esc(conf[0]) + '</span></td>' +
-                    '<td>' + esc(evidenceType) + '<br><span class="muted small">' + esc(n.sourceDate || 'Date not recorded') + '</span></td>' +
-                    '<td>' + (n.evidence ? '<div class="evidence-text">' + esc(n.evidence) + '</div>' : '<span class="muted">Not recorded</span>') +
-                        (source ? '<div class="source-link"><a href="' + source + '" target="_blank">' + source + '</a></div>' : '') + '</td>' +
-                    '<td><strong>' + relationCount + '</strong>' + (relTypes ? '<br><span class="muted small">' + esc(relTypes) + '</span>' : '') + '</td>' +
-                    '</tr>';
-            }).join('');
-
-            const horizonRows = Object.keys(TIME_HORIZONS).map(h => {
-                const nodes = appState.nodes.filter(n => (n.timeHorizon || 'near') === h);
-                return '<tr><td>' + esc(TIME_HORIZONS[h]) + '</td><td><strong>' + nodes.length + '</strong></td><td>' +
-                    (nodes.length ? nodes.map(n => esc(n.title)).join(', ') : '<span class="muted">None</span>') +
-                    '</td></tr>';
-            }).join('');
-
-            const detailCards = appState.nodes.map((n, idx) => {
-                const status = statusMeta[n.status] || ['Unknown', '#64748b', '#f8fafc'];
-                const conf = confidenceMeta[n.confidence || 'medium'] || confidenceMeta.medium;
-                const rels = (n.connections || []).map(cid => {
-                    const target = appState.nodes.find(x => x.id === cid);
-                    if (!target) return '';
-                    return '<li><strong>' + esc(relationLabel(n.connectionTypes?.[cid] || 'depends_on')) + ':</strong> ' + esc(target.title) + '</li>';
-                }).filter(Boolean).join('');
-                const source = safeUrl(n.sourceUrl);
-                return '<div class="detail-card">' +
-                    '<div class="detail-head"><div><div class="section-kicker">Signal ' + (idx + 1) + '</div><h3 class="detail-title">' + esc(n.title) + '</h3><div class="muted">' + esc(n.desc || 'No description recorded.') + '</div></div><span class="badge-status" style="color:' + status[1] + ';background:' + status[2] + '">' + esc(status[0]) + '</span></div>' +
-                    '<div class="detail-grid">' +
-                        '<div class="detail-item"><div class="k">' + esc(appState.config.xLabel) + '</div><div class="v">' + Number(n.x || 0).toFixed(1) + '</div></div>' +
-                        '<div class="detail-item"><div class="k">' + esc(appState.config.yLabel) + '</div><div class="v">' + Number(n.y || 0).toFixed(1) + '</div></div>' +
-                        '<div class="detail-item"><div class="k">Z Axis</div><div class="v">' + Number(n.z || 0).toFixed(1) + '</div></div>' +
-                        '<div class="detail-item"><div class="k">Confidence</div><div class="v" style="color:' + conf[1] + '">' + esc(conf[0]) + '</div></div>' +
-                        '<div class="detail-item"><div class="k">Time Horizon</div><div class="v">' + esc(horizonLabel(n.timeHorizon || 'near')) + '</div></div>' +
-                        '<div class="detail-item"><div class="k">Evidence Type</div><div class="v">' + esc(evidenceLabels[n.evidenceType || 'observation'] || 'Direct Observation') + '</div></div>' +
-                        '<div class="detail-item"><div class="k">Evidence Date</div><div class="v">' + esc(n.sourceDate || 'Not recorded') + '</div></div>' +
-                        '<div class="detail-item"><div class="k">Connections</div><div class="v">' + ((n.connections || []).length) + '</div></div>' +
-                    '</div>' +
-                    '<div class="evidence-panel"><strong>Evidence / rationale</strong><div style="margin-top:5px">' + esc(n.evidence || 'No explicit evidence or rationale recorded.') + '</div>' +
-                        (source ? '<div class="source-link"><strong>Source:</strong> <a href="' + source + '" target="_blank">' + source + '</a></div>' : '') +
-                    '</div>' +
-                    '<div class="detail-rel"><strong>Relationships</strong>' + (rels ? '<ul style="margin:5px 0 0 18px">' + rels + '</ul>' : '<div class="muted" style="margin-top:5px">No explicit relationships recorded.</div>') + '</div>' +
-                '</div>';
-            }).join('');
-
-            const reportHTML = '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">' +
-                '<title>Horizon Scan Strategic Report - ' + dateOnly + '</title>' +
-                '<style>' +
-                '@page{size:A4;margin:15mm 13mm 17mm}' +
-                '*{box-sizing:border-box}' +
-                'body{margin:0;background:#eef2f7;color:#18212f;font-family:Inter,Segoe UI,Arial,sans-serif;line-height:1.55;font-size:10px}' +
-                '.page{max-width:1120px;margin:20px auto;background:#fff;box-shadow:0 12px 36px rgba(15,23,42,.08)}' +
-                '.cover{min-height:250mm;height:250mm;padding:58px;display:flex;flex-direction:column;justify-content:space-between;background:linear-gradient(145deg,#0f172a 0%,#172554 55%,#0f766e 100%);color:#fff;break-after:page;page-break-after:always}' +
-                '.eyebrow{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:#99f6e4;font-weight:800}' +
-                '.cover h1{font-size:40px;line-height:1.06;margin:16px 0 12px;max-width:780px}.cover h2{font-size:16px;font-weight:500;color:#cbd5e1;margin:0;max-width:720px}' +
-                '.cover-meta{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:30px}.cover-card{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);padding:14px;border-radius:10px}.cover-card .label{font-size:8px;text-transform:uppercase;letter-spacing:.12em;color:#94a3b8}.cover-card .value{font-size:14px;font-weight:700;margin-top:3px}' +
-                '.cover-foot{font-size:8px;color:#cbd5e1;display:flex;justify-content:space-between;gap:20px;border-top:1px solid rgba(255,255,255,.15);padding-top:14px}' +
-                '.section{padding:30px 44px;break-inside:auto;page-break-inside:auto}.section + .section{border-top:1px solid #e5e7eb}.section-title{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:16px}' +
-                'h2{font-size:19px;line-height:1.2;margin:0;color:#0f172a}h3{font-size:13px;color:#0f172a;margin:0 0 7px}.section-kicker{font-size:8px;text-transform:uppercase;letter-spacing:.14em;color:#0d9488;font-weight:800;margin-bottom:4px}.lead{font-size:11.5px;color:#334155;max-width:900px}' +
-                '.summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin:18px 0}.stat{border:1px solid #e2e8f0;border-radius:9px;padding:12px;background:#f8fafc}.stat .n{font-size:22px;font-weight:800;color:#0f172a}.stat .l{font-size:8px;text-transform:uppercase;letter-spacing:.08em;color:#64748b}' +
-                '.callout{border-left:4px solid #0d9488;background:#f0fdfa;border-radius:0 9px 9px 0;padding:12px 14px;margin:14px 0}.chart-wrap{border:1px solid #e2e8f0;border-radius:10px;padding:10px;background:#fff}.chart{display:block;width:100%;border-radius:7px}' +
-                '.analysis-entry{border:1px solid #e2e8f0;border-radius:10px;margin:0 0 15px;overflow:hidden;break-inside:avoid}.analysis-entry-head{background:#f8fafc;border-bottom:1px solid #e2e8f0;padding:11px 14px;display:flex;align-items:center;justify-content:space-between;gap:14px}.analysis-entry-head>div{display:flex;align-items:center;gap:8px}.analysis-entry-head h3{margin:0}.analysis-body{padding:15px 18px}.analysis-body h1,.analysis-body h2{margin-top:18px}.analysis-body h2{font-size:14px;color:#0d9488;border-bottom:2px solid #ccfbf1;padding-bottom:3px;display:inline-block}.analysis-body ul,.analysis-body ol{padding-left:20px}.analysis-date{font-size:8px;color:#94a3b8}.badge-ai,.badge-human,.badge-status,.relation-pill{display:inline-flex;align-items:center;white-space:nowrap;border-radius:999px;font-size:7px;font-weight:800;padding:3px 7px}.badge-ai{background:#ccfbf1;color:#0f766e}.badge-human{background:#dbeafe;color:#1d4ed8}.relation-pill{background:#f1f5f9;color:#475569}' +
-                'table{width:100%;border-collapse:collapse}th,td{border-bottom:1px solid #e5e7eb;padding:7px 6px;text-align:left;vertical-align:top}th{font-size:7px;text-transform:uppercase;letter-spacing:.05em;color:#475569;background:#f8fafc}td{font-size:8px}tr{break-inside:avoid}.index-cell{color:#94a3b8;font-weight:700;width:24px}.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.signal-title{font-weight:800;color:#0f172a}.signal-desc{font-size:7.5px;color:#64748b;margin-top:2px}.evidence-text{white-space:pre-wrap;color:#334155}.source-link{margin-top:3px;font-size:7px;word-break:break-all}.source-link a{color:#0d9488}.muted{color:#94a3b8}.small{font-size:7px}.center{text-align:center}.registry-table th:nth-child(2){min-width:150px}.registry-table th:nth-child(10){min-width:180px}' +
-                '.detail-card{border:1px solid #e2e8f0;border-radius:10px;padding:15px;margin-bottom:12px;break-inside:avoid}.detail-head{display:flex;justify-content:space-between;gap:14px;align-items:flex-start}.detail-title{font-size:16px!important;margin-bottom:3px}.detail-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:11px 0}.detail-item{background:#f8fafc;border-radius:7px;padding:8px}.detail-item .k{font-size:7px;text-transform:uppercase;color:#64748b;letter-spacing:.06em}.detail-item .v{font-size:9px;font-weight:700;color:#0f172a;margin-top:2px}.evidence-panel{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px;margin-top:9px}.detail-rel{margin-top:9px}.empty-box{padding:18px;border:1px dashed #cbd5e1;border-radius:8px;color:#64748b;background:#f8fafc}.footer{margin-top:28px;padding-top:12px;border-top:1px solid #e2e8f0;color:#94a3b8;font-size:7.5px;display:flex;justify-content:space-between;gap:14px}.page-break{page-break-before:always}.avoid-break{break-inside:avoid}' +
-                '@media print{body{background:#fff}.page{box-shadow:none;margin:0;max-width:none}.cover{break-after:page;page-break-after:always}.section{padding-left:0;padding-right:0}.summary-grid,.callout,table,.chart-wrap,.analysis-entry,.detail-card{break-inside:avoid;page-break-inside:avoid}}' +
-                '</style></head><body><div class="page">' +
-
-                '<section class="cover"><div><div class="eyebrow">Strategic Foresight • Horizon Scanning</div><h1>Horizon Scan<br>Strategic Report</h1><h2>Structured view of signals, evidence, uncertainty, relationships, analytical interpretation and time horizons.</h2>' +
-                '<div class="cover-meta"><div class="cover-card"><div class="label">Generated</div><div class="value">' + esc(timestamp) + '</div></div><div class="cover-card"><div class="label">Matrix</div><div class="value">' + esc(appState.config.xLabel) + ' × ' + esc(appState.config.yLabel) + '</div></div><div class="cover-card"><div class="label">Signals</div><div class="value">' + counts.total + '</div></div></div></div>' +
-                '<div><div class="callout" style="background:rgba(255,255,255,.08);border-left-color:#5eead4;color:#e2e8f0"><strong style="color:#99f6e4">Reading note:</strong> This report documents the project state at generation time. Matrix positions are analytical inputs, not statistical forecasts. Confidence refers to the quality or strength assigned to the underlying evidence, not probability of occurrence.</div><div class="cover-foot"><span>Horizon Scan AI • Professional Edition</span><span>' + esc(dateOnly) + '</span></div></div></section>' +
-
-                '<section class="section"><div class="section-title"><div><div class="section-kicker">01 • Snapshot</div><h2>Signal Landscape</h2></div></div>' +
-                '<p class="lead">The project contains <strong>' + counts.total + '</strong> recorded signals across a configurable <strong>' + esc(appState.config.xLabel) + '</strong> × <strong>' + esc(appState.config.yLabel) + '</strong> matrix, with evidence, confidence, time horizon and systemic relationships captured where available.</p>' +
-                '<div class="summary-grid"><div class="stat"><div class="n">' + counts.critical + '</div><div class="l">Critical</div></div><div class="stat"><div class="n">' + counts.escalating + '</div><div class="l">Escalating</div></div><div class="stat"><div class="n">' + counts.watchlist + '</div><div class="l">Watchlist</div></div><div class="stat"><div class="n">' + counts.emerging + '</div><div class="l">Emerging</div></div><div class="stat"><div class="n">' + counts.structural + '</div><div class="l">Structural</div></div><div class="stat"><div class="n">' + counts.highConfidence + '</div><div class="l">High confidence</div></div><div class="stat"><div class="n">' + counts.lowConfidence + '</div><div class="l">Low confidence</div></div><div class="stat"><div class="n">' + counts.sourced + '</div><div class="l">With sources</div></div></div>' +
-                '<div class="callout"><strong>Data completeness:</strong> ' + counts.evidenced + '/' + counts.total + ' signals have an explicit evidence/rationale entry; ' + counts.dated + '/' + counts.total + ' have an evidence date; ' + counts.connected + '/' + counts.total + ' participate in at least one relationship.</div>' +
-                '<table><tr><th>Matrix template</th><td>' + esc(appState.config.template) + '</td></tr><tr><th>X axis</th><td>' + esc(appState.config.xLabel) + '</td></tr><tr><th>Y axis</th><td>' + esc(appState.config.yLabel) + '</td></tr><tr><th>Z-axis</th><td>Behavioral / systemic magnitude</td></tr><tr><th>Total relationships</th><td>' + relationshipRows.length + '</td></tr><tr><th>Analytical entries</th><td>' + analysisEntries.length + '</td></tr></table></section>' +
-
-                '<section class="section"><div class="section-title"><div><div class="section-kicker">02 • Visual Map</div><h2>Signal Distribution Matrix</h2></div></div><div class="chart-wrap"><img src="' + img + '" class="chart" alt="Horizon scan signal distribution matrix"></div></section>' +
-
-                '<section class="section page-break"><div class="section-title"><div><div class="section-kicker">03 • Analytical Record</div><h2>AI & Human Analysis</h2></div></div><p class="lead">Analytical entries are preserved with authorship labels so AI-generated interpretation and human professional judgement remain distinguishable.</p>' + analysisHtml + '</section>' +
-
-                '<section class="section page-break"><div class="section-title"><div><div class="section-kicker">04 • Time Structure</div><h2>Time Horizon Distribution</h2></div></div><table><thead><tr><th>Horizon</th><th>Signals</th><th>Signals in this horizon</th></tr></thead><tbody>' + horizonRows + '</tbody></table></section>' +
-
-                '<section class="section page-break"><div class="section-title"><div><div class="section-kicker">05 • Signal Registry</div><h2>Complete Signal Dataset</h2></div></div><p class="lead">Every signal is included with matrix coordinates, Z-axis, lifecycle status, time horizon, confidence, evidence, source and relationships.</p><div class="avoid-break"><table class="registry-table"><thead><tr><th>#</th><th>Signal</th><th>Status</th><th>' + esc(appState.config.xLabel) + '</th><th>' + esc(appState.config.yLabel) + '</th><th>Z</th><th>Time Horizon</th><th>Confidence</th><th>Evidence Type / Date</th><th>Evidence / Source</th><th>Relations</th></tr></thead><tbody>' + nodeRows + '</tbody></table></div></section>' +
-
-                '<section class="section page-break"><div class="section-title"><div><div class="section-kicker">06 • Signal Dossiers</div><h2>Evidence & Signal Detail</h2></div></div>' + detailCards + '</section>' +
-
-                '<section class="section page-break"><div class="section-title"><div><div class="section-kicker">07 • System Structure</div><h2>Relationship Register</h2></div></div><p class="lead">Typed relationships describe how signals are connected in the project model. They represent the current systems-thinking interpretation and should be revisited as evidence changes.</p><table><thead><tr><th>Source signal</th><th>Relationship</th><th>Target signal</th></tr></thead><tbody>' + relationshipHtml + '</tbody></table></section>' +
-
-                '<section class="section"><div class="section-title"><div><div class="section-kicker">08 • Method & Scope</div><h2>Interpretation Notes</h2></div></div>' +
-                '<div class="callout"><strong>Evidence:</strong> Evidence fields capture the rationale or source basis entered by the analyst. Empty fields should not be interpreted as absence of evidence.</div>' +
-                '<div class="callout"><strong>Confidence:</strong> Confidence is a qualitative assessment of the evidence base. It is intentionally separate from the probability axis.</div>' +
-                '<div class="callout"><strong>Time horizon:</strong> Horizons indicate when a signal matters within the project framing; they are not guaranteed dates.</div>' +
-                '<div class="callout"><strong>Relationships:</strong> Typed links represent the recorded systems interpretation and may require review as evidence changes.</div>' +
-                '<div class="footer"><span>Generated by <strong>Horizon Scan AI</strong> • Professional Foresight Platform</span><span>' + esc(dateOnly) + ' • ' + esc(appState.config.template || 'custom') + '</span></div></section>' +
-
-                '<script>setTimeout(function(){window.print();},900);<\\/script></div></body></html>';
-
-            const win = window.open('', '_blank');
-            if (!win) {
-                showToast(currentLang === 'id' ? "Popup diblokir browser." : "Popup blocked by browser.", "error");
-                return;
-            }
-            win.document.write(reportHTML);
-            win.document.close();
         }
-
 
         function showToast(msg, type='info') {
             const container = document.getElementById('toast-container');
