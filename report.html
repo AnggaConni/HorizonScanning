@@ -58,10 +58,22 @@
         .editor-close:hover{background:#1e293b}
         @media(max-width:760px){.toolbar{left:12px;right:12px;top:12px;justify-content:flex-start;overflow:auto}.toolbar button{white-space:nowrap}.edit-panel{left:12px;right:12px;top:68px;width:auto}.edit-panel-grid{grid-template-columns:1fr}}
 
+        .preview-overlay{position:fixed;inset:0;z-index:2000;background:rgba(2,6,23,.72);backdrop-filter:blur(8px);padding:24px;display:flex;align-items:center;justify-content:center}
+        .preview-shell{width:min(1220px,96vw);height:min(94vh,1100px);background:#e2e8f0;border:1px solid rgba(255,255,255,.12);border-radius:18px;box-shadow:0 28px 90px rgba(0,0,0,.32);overflow:hidden;display:flex;flex-direction:column}
+        .preview-header{height:68px;flex:0 0 auto;background:#0f172a;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 18px 0 20px}
+        .preview-title{font-size:16px;font-weight:800;margin-top:2px}.preview-header .section-kicker{color:#5eead4;margin:0}
+        .preview-header-actions{display:flex;gap:8px}.preview-header-actions button{border:0;border-radius:9px;padding:9px 12px;font-size:11px;font-weight:800;cursor:pointer}
+        .preview-print-btn{background:#2dd4bf;color:#042f2e}.preview-close-btn{background:#334155;color:#fff}
+        .preview-frame-wrap{flex:1;overflow:auto;padding:30px;background:linear-gradient(#475569,#334155)}
+        .preview-paper{width:210mm;min-height:297mm;margin:0 auto 28px;background:#fff;box-shadow:0 10px 36px rgba(0,0,0,.22)}
+        .preview-paper.landscape{width:297mm;min-height:210mm}
+        .preview-paper .page{box-shadow:none!important;margin:0!important;max-width:none!important}
+        @media(max-width:760px){.preview-overlay{padding:10px}.preview-header{height:auto;min-height:64px;gap:10px}.preview-frame-wrap{padding:14px}.preview-paper{transform:scale(.82);transform-origin:top left;margin-right:-37mm;margin-bottom:-53mm}}
+
         @media print{
             @page{size:A4 portrait;margin:15mm 13mm 17mm}
             body{background:#fff!important;color:#18212f!important}
-            #loading,#error,#toolbar,#edit-panel{display:none!important}
+            #loading,#error,#toolbar,#edit-panel,#preview-modal{display:none!important}
             #report-root{display:block!important;outline:none!important}
             .page{box-shadow:none;margin:0;max-width:none}
             .cover{break-after:page;page-break-after:always}
@@ -109,6 +121,21 @@
   <div class="edit-panel-hint">
     <span>✎</span>
     <span>Edit the report text directly. Press <strong>Enter</strong> for a new paragraph. Changes stay in this tab until you print or download.</span>
+  </div>
+</div>
+<div id="preview-modal" class="preview-overlay" style="display:none">
+  <div class="preview-shell">
+    <div class="preview-header">
+      <div>
+        <div class="section-kicker">Print Preview</div>
+        <div class="preview-title">Review before printing</div>
+      </div>
+      <div class="preview-header-actions">
+        <button class="preview-print-btn" onclick="printFromPreview()">Print / Save PDF</button>
+        <button class="preview-close-btn" onclick="closePrintPreview()">Close</button>
+      </div>
+    </div>
+    <div id="preview-frame-wrap" class="preview-frame-wrap"></div>
   </div>
 </div>
 <div id="toolbar" class="toolbar" style="display:none">
