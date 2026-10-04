@@ -633,5 +633,11 @@
     "oni_value": 1.8,
     "status": "El Ni\u00f1o",
     "periode": "JJA 2026"
+  },
+  {
+    "date": "2026-10-04",
+    "oni_value": 2.16,
+    "status": "El Ni\u00f1o",
+    "periode": "JAS 2026"
   }
 ]
