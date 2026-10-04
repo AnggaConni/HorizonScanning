@@ -48,7 +48,7 @@
         .edit-panel{position:fixed;right:22px;top:82px;width:min(430px,calc(100vw - 44px));z-index:999;background:rgba(255,255,255,.98);border:1px solid #dbe4ee;border-radius:16px;box-shadow:0 18px 48px rgba(15,23,42,.18);backdrop-filter:blur(12px);overflow:hidden}
         .edit-panel-head{display:flex;align-items:center;justify-content:space-between;padding:15px 16px;border-bottom:1px solid #e2e8f0;background:linear-gradient(135deg,#f8fafc,#eefcf9)}
         .edit-panel-title{font-size:17px;font-weight:800;color:#0f172a;margin-top:2px}
-        .editor-close{border:0;background:#0f172a;color:#fff;border-radius:8px;padding:8px 11px;font-size:11px;font-weight:800;cursor:pointer}
+        .editor-actions{display:flex;gap:6px;align-items:center}.editor-minimize{border:0;background:#e2e8f0;color:#334155;border-radius:8px;width:30px;height:30px;font-weight:900;cursor:pointer}.editor-close{border:0;background:#0f172a;color:#fff;border-radius:8px;padding:8px 11px;font-size:11px;font-weight:800;cursor:pointer}
         .edit-panel-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:16px}
         .edit-panel-grid label{font-size:10px;font-weight:800;color:#475569;display:flex;flex-direction:column;gap:6px}
         .edit-panel-grid input,.edit-panel-grid textarea,.edit-panel-grid select{width:100%;font:inherit;font-weight:500;color:#0f172a;background:#fff;border:1px solid #cbd5e1;border-radius:9px;padding:9px 10px;outline:none;transition:border .18s ease,box-shadow .18s ease}
@@ -102,7 +102,7 @@
       <div class="section-kicker">Document Editor</div>
       <div class="edit-panel-title">Edit Report</div>
     </div>
-    <button class="editor-close" onclick="toggleEdit()">Done</button>
+    <div class="editor-actions"><button class="editor-minimize" onclick="toggleEdit()" title="Hide editor">—</button><button class="editor-close" onclick="toggleEdit()">Done</button></div>
   </div>
   <div class="edit-panel-grid">
     <label>Cover title
@@ -392,6 +392,84 @@
             : '@media print{@page portrait{size:A4 portrait !important;margin:15mm 13mm !important}}';
     }
 
+    function buildPrintableClone(){
+        const clone=document.getElementById('report-root')?.cloneNode(true);
+        if(!clone) throw new Error('Report content is not ready.');
+        clone.removeAttribute('contenteditable');
+        clone.querySelectorAll('[contenteditable]').forEach(el=>el.removeAttribute('contenteditable'));
+        return clone;
+    }
+
+    function showPrintPreview(){
+        const modal=document.getElementById('preview-modal');
+        const wrap=document.getElementById('preview-frame-wrap');
+        if(!modal || !wrap) return;
+
+        const clone=buildPrintableClone();
+        wrap.innerHTML='';
+
+        const paper=document.createElement('div');
+        const landscape=document.getElementById('report-root')?.classList.contains('landscape-page');
+        paper.className='preview-paper'+(landscape?' landscape':'');
+        paper.innerHTML=clone.innerHTML;
+        wrap.appendChild(paper);
+        modal.style.display='flex';
+        document.body.classList.add('preview-open');
+    }
+
+    function closePrintPreview(){
+        const modal=document.getElementById('preview-modal');
+        if(modal) modal.style.display='none';
+        document.body.classList.remove('preview-open');
+    }
+
+    function printFromPreview(){
+        closePrintPreview();
+        setTimeout(function(){ window.print(); }, 120);
+    }
+
+    async function downloadPdf(){
+        try{
+            if(!window.html2pdf){
+                const script=document.createElement('script');
+                script.src='https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+                document.head.appendChild(script);
+                await new Promise((resolve,reject)=>{
+                    script.onload=resolve;
+                    script.onerror=()=>reject(new Error('Could not load PDF library.'));
+                });
+            }
+
+            const element=buildPrintableClone();
+            const landscape=document.getElementById('report-root')?.classList.contains('landscape-page');
+            element.style.width=landscape?'271mm':'184mm';
+
+            await window.html2pdf().set({
+                margin: landscape ? [8,8,8,8] : [10,10,10,10],
+                filename:'horizon-scan-report-'+new Date().toISOString().slice(0,10)+'.pdf',
+                image:{type:'jpeg',quality:0.98},
+                html2canvas:{
+                    scale:2,
+                    useCORS:true,
+                    backgroundColor:'#ffffff',
+                    logging:false
+                },
+                jsPDF:{
+                    unit:'mm',
+                    format:'a4',
+                    orientation:landscape?'landscape':'portrait'
+                },
+                pagebreak:{
+                    mode:['css','legacy'],
+                    avoid:['.chart-wrap']
+                }
+            }).from(element).save();
+        }catch(error){
+            console.error('PDF export failed:',error);
+            window.print();
+        }
+    }
+
     function startEditor(){
         const panel=document.getElementById('edit-panel');
         const btn=document.querySelector('#toolbar .btn-edit');
@@ -414,6 +492,20 @@
         root.focus();
     }
 
+    document.addEventListener('keydown',function(e){
+        if(e.key==='Escape'){
+            const preview=document.getElementById('preview-modal');
+            if(preview?.style.display==='flex'){
+                closePrintPreview();
+                return;
+            }
+            const editor=document.getElementById('edit-panel');
+            if(editor?.style.display==='block'){
+                stopEditor();
+            }
+        }
+    });
+
     function stopEditor(){
         const panel=document.getElementById('edit-panel');
         const btn=document.querySelector('#toolbar .btn-edit');
@@ -433,6 +525,10 @@
     }
 
     window.applyEditorSettings=applyEditorSettings;
+    window.showPrintPreview=showPrintPreview;
+    window.closePrintPreview=closePrintPreview;
+    window.printFromPreview=printFromPreview;
+    window.downloadPdf=downloadPdf;
     window.handleLogoUpload=handleLogoUpload;
     window.toggleEdit=toggleEdit;
     window.startEditor=startEditor;
