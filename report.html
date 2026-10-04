@@ -54,6 +54,7 @@
         .edit-panel-grid input,.edit-panel-grid textarea,.edit-panel-grid select{width:100%;font:inherit;font-weight:500;color:#0f172a;background:#fff;border:1px solid #cbd5e1;border-radius:9px;padding:9px 10px;outline:none;transition:border .18s ease,box-shadow .18s ease}
         .edit-panel-grid textarea{resize:vertical;min-height:76px}
         .edit-panel-grid input:focus,.edit-panel-grid textarea:focus,.edit-panel-grid select:focus{border-color:#14b8a6;box-shadow:0 0 0 3px rgba(20,184,166,.12)}
+        .edit-panel-grid input[type="file"]{padding:7px;background:#f8fafc;cursor:pointer}.file-note{font-size:9px;color:#94a3b8;font-weight:500}
         .edit-panel-hint{display:flex;gap:9px;align-items:flex-start;padding:12px 16px;background:#f8fafc;border-top:1px solid #e2e8f0;color:#64748b;font-size:10px;line-height:1.45}
         .editor-close:hover{background:#1e293b}
         @media(max-width:760px){.toolbar{left:12px;right:12px;top:12px;justify-content:flex-start;overflow:auto}.toolbar button{white-space:nowrap}.edit-panel{left:12px;right:12px;top:68px;width:auto}.edit-panel-grid{grid-template-columns:1fr}}
@@ -84,7 +85,9 @@
             h1,h2,h3{break-after:avoid;page-break-after:avoid}
             p{orphans:3;widows:3}
             a{color:inherit;text-decoration:none}
-            body.landscape-print{page:landscape}
+            #report-root{page:portrait}
+            #report-root.landscape-page{page:landscape}
+            @page portrait{size:A4 portrait;margin:15mm 13mm}
             @page landscape{size:A4 landscape;margin:11mm 12mm}
         }
     </style>
@@ -108,14 +111,16 @@
     <label>Cover subtitle
       <textarea id="cover-subtitle-input" rows="3" oninput="applyEditorSettings()"></textarea>
     </label>
-    <label>Logo URL
-      <input id="cover-logo-input" type="url" placeholder="https://.../logo.png" oninput="applyEditorSettings()">
+    <label>Logo
+      <input id="cover-logo-input" type="file" accept="image/png,image/jpeg,image/svg+xml,image/webp" onchange="handleLogoUpload(this)">
+      <span id="logo-file-name" class="file-note">PNG, JPG, SVG, or WebP</span>
     </label>
     <label>Page orientation
       <select id="orientation-input" onchange="applyEditorSettings()">
         <option value="portrait">A4 Portrait</option>
         <option value="landscape">A4 Landscape</option>
       </select>
+      <span class="file-note">Applies to Print Preview and Download PDF.</span>
     </label>
   </div>
   <div class="edit-panel-hint">
@@ -344,28 +349,38 @@
     }
 
 
+    function handleLogoUpload(input){
+        const file=input?.files?.[0];
+        const img=document.getElementById('cover-logo');
+        const wrap=document.getElementById('cover-logo-wrap');
+        const name=document.getElementById('logo-file-name');
+        if(!file || !img || !wrap) return;
+        if(!file.type.startsWith('image/')){
+            if(name) name.textContent='Please choose an image file.';
+            return;
+        }
+        const reader=new FileReader();
+        reader.onload=function(e){
+            img.src=e.target.result;
+            wrap.style.display='block';
+            if(name) name.textContent=file.name;
+        };
+        reader.readAsDataURL(file);
+    }
+
     function applyEditorSettings(){
         const title=document.getElementById('cover-title-input')?.value.trim() || 'Horizon Scan Strategic Report';
         const subtitle=document.getElementById('cover-subtitle-input')?.value.trim() || '';
-        const logo=document.getElementById('cover-logo-input')?.value.trim() || '';
         const titleEl=document.getElementById('report-cover-title');
         const subtitleEl=document.getElementById('report-cover-subtitle');
         if(titleEl) titleEl.textContent=title;
         if(subtitleEl) subtitleEl.textContent=subtitle;
 
-        const wrap=document.getElementById('cover-logo-wrap');
-        const img=document.getElementById('cover-logo');
-        if(logo){
-            img.src=logo;
-            wrap.style.display='block';
-            img.onerror=()=>{wrap.style.display='none';};
-        }else{
-            img.removeAttribute('src');
-            wrap.style.display='none';
-        }
-
         const orientation=document.getElementById('orientation-input')?.value === 'landscape' ? 'landscape' : 'portrait';
+        const reportRoot=document.getElementById('report-root');
+        reportRoot?.classList.toggle('landscape-page',orientation==='landscape');
         document.body.classList.toggle('landscape-print',orientation==='landscape');
+
         let pageStyle=document.getElementById('dynamic-page-style');
         if(!pageStyle){
             pageStyle=document.createElement('style');
@@ -373,8 +388,8 @@
             document.head.appendChild(pageStyle);
         }
         pageStyle.textContent=orientation==='landscape'
-            ? '@page{size:A4 landscape;margin:11mm 12mm}'
-            : '@page{size:A4 portrait;margin:15mm 13mm}';
+            ? '@media print{@page landscape{size:A4 landscape !important;margin:11mm 12mm !important}}'
+            : '@media print{@page portrait{size:A4 portrait !important;margin:15mm 13mm !important}}';
     }
 
     function startEditor(){
@@ -384,8 +399,11 @@
 
         document.getElementById('cover-title-input').value=document.getElementById('report-cover-title')?.textContent || 'Horizon Scan Strategic Report';
         document.getElementById('cover-subtitle-input').value=document.getElementById('report-cover-subtitle')?.textContent || '';
-        document.getElementById('cover-logo-input').value='';
-        document.getElementById('orientation-input').value=document.body.classList.contains('landscape-print')?'landscape':'portrait';
+        const logoInput=document.getElementById('cover-logo-input');
+        if(logoInput) logoInput.value='';
+        const logoNote=document.getElementById('logo-file-name');
+        if(logoNote) logoNote.textContent='PNG, JPG, SVG, or WebP';
+        document.getElementById('orientation-input').value=document.getElementById('report-root')?.classList.contains('landscape-page')?'landscape':'portrait';
 
         root.setAttribute('contenteditable','true');
         root.classList.add('report-editable');
@@ -415,6 +433,7 @@
     }
 
     window.applyEditorSettings=applyEditorSettings;
+    window.handleLogoUpload=handleLogoUpload;
     window.toggleEdit=toggleEdit;
     window.startEditor=startEditor;
     window.stopEditor=stopEditor;
