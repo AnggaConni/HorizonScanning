@@ -180,6 +180,38 @@
 .article-wrap73 .tool-card{padding:1.45rem;border-radius:1.2rem;background:linear-gradient(135deg,#102a43,#315d77);color:#fff;margin:2.4rem 0}
 .article-wrap73 .tool-card a{display:inline-block;margin-top:.65rem;padding:.75rem 1rem;border-radius:.7rem;background:#fff;color:#102a43;text-decoration:none;font-weight:900}
 @media(max-width:640px){.article-wrap73 .mini-grid{grid-template-columns:1fr}}
+
+.article-wrap73 .calc-head{display:flex;justify-content:space-between;align-items:flex-end;gap:1rem;margin-bottom:1rem;flex-wrap:wrap}
+.article-wrap73 .calc-title{font-size:1.15rem;font-weight:950;color:#102a43;margin:0}
+.article-wrap73 .calc-note{font-size:.84rem;color:#64748b;margin:0;max-width:42rem}
+.article-wrap73 .score-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(240px,.72fr);gap:1rem;align-items:stretch}
+.article-wrap73 .score-panel{padding:1.1rem;border:1px solid #dbe4ec;border-radius:1rem;background:#fff}
+.article-wrap73 .score-kicker{font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:#64748b;font-weight:900}
+.article-wrap73 .score-band{display:flex;align-items:flex-end;justify-content:space-between;gap:1rem;margin:.35rem 0 .6rem}
+.article-wrap73 .score-big{font-size:3.3rem;font-weight:950;line-height:.95;color:#102a43}
+.article-wrap73 .score-denom{font-size:.9rem;color:#64748b;font-weight:800;margin-bottom:.25rem}
+.article-wrap73 .pill-row{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:.8rem}
+.article-wrap73 .pill{display:inline-flex;align-items:center;gap:.35rem;padding:.38rem .6rem;border-radius:999px;background:#f1f5f9;border:1px solid #e2e8f0;font-size:.78rem;font-weight:800;color:#334155}
+.article-wrap73 .pill strong{color:#102a43}
+.article-wrap73 .insight{padding:.85rem;border-radius:.85rem;background:#f8fafc;border:1px solid #e2e8f0;margin-top:.75rem}
+.article-wrap73 .insight strong{display:block;margin-bottom:.2rem;color:#102a43}
+.article-wrap73 .subhead{font-size:.82rem;font-weight:950;letter-spacing:.08em;text-transform:uppercase;color:#315d77;margin:1.1rem 0 .65rem}
+.article-wrap73 .whatif{background:#f8fafc;border:1px dashed #bfd0de}
+.article-wrap73 .delta{font-size:1.05rem;font-weight:900;color:#102a43}
+.article-wrap73 .delta.positive{color:#246246}
+.article-wrap73 .delta.negative{color:#9d3c30}
+.article-wrap73 .two-col{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.article-wrap73 .recommend{display:grid;gap:.6rem;margin-top:.8rem}
+.article-wrap73 .recommend-item{padding:.75rem .85rem;border-radius:.75rem;background:#fff;border:1px solid #e2e8f0}
+.article-wrap73 .recommend-item strong{display:block;color:#102a43;margin-bottom:.18rem}
+.article-wrap73 .smallbar{height:9px;background:#e2e8f0;border-radius:999px;overflow:hidden;margin-top:.35rem}
+.article-wrap73 .smallbar > div{height:100%;width:0%;background:#315d77;transition:width .2s ease}
+.article-wrap73 .score-legend{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-top:.8rem}
+.article-wrap73 .legend-item{font-size:.74rem;padding:.5rem .55rem;border-radius:.7rem;text-align:center;background:#f8fafc;border:1px solid #e2e8f0;font-weight:800;color:#475569}
+.article-wrap73 .legend-item span{display:block;font-size:.68rem;font-weight:700;color:#94a3b8;margin-top:.15rem}
+.article-wrap73 .live-chip{font-size:.74rem;font-weight:900;color:#246246;background:#eef8f2;border:1px solid #b9ddc4;border-radius:999px;padding:.35rem .6rem;white-space:nowrap}
+@media(max-width:780px){.article-wrap73 .score-layout,.article-wrap73 .two-col{grid-template-columns:1fr}}
+
 </style>
 
 <div class="article-wrap73">
@@ -251,21 +283,99 @@
 
 <h3>Part V — Click the Model: Shortcut Pressure Calculator</h3>
 <div class="calc">
-<div class="calc-grid">
-<div class="control"><label for="s73scenario">Quick scenario <span></span></label><select id="s73scenario"><option value="custom">Custom</option><option value="doping">Doping</option><option value="motor">Hidden motor / cheating</option><option value="judol">Judol / gambling</option><option value="corruption">Corruption</option><option value="manipulation">Manipulation / forced outcome</option></select></div>
-<div class="control"><label>Goal urgency <span id="s73uVal">5</span>/10</label><input id="s73u" type="range" min="0" max="10" value="5"></div>
-<div class="control"><label>Immediate reward <span id="s73rVal">5</span>/10</label><input id="s73r" type="range" min="0" max="10" value="5"></div>
-<div class="control"><label>Process friction <span id="s73pVal">5</span>/10</label><input id="s73p" type="range" min="0" max="10" value="5"></div>
-<div class="control"><label>Failure aversion <span id="s73fVal">5</span>/10</label><input id="s73f" type="range" min="0" max="10" value="5"></div>
-<div class="control"><label>Shortcut access <span id="s73aVal">5</span>/10</label><input id="s73a" type="range" min="0" max="10" value="5"></div>
-<div class="control"><label>Future-cost salience <span id="s73lVal">5</span>/10</label><input id="s73l" type="range" min="0" max="10" value="5"></div>
-</div>
-<div class="btnrow">
-<button type="button" onclick="window.s73Calc()">Calculate</button>
-<button type="button" class="alt" onclick="window.s73Reset()">Reset</button>
-</div>
-<div class="result"><div class="tiny">CONCEPTUAL SHORTCUT PRESSURE SCORE</div><div class="result-num" id="s73score">—</div><div class="meter"><div id="s73bar"></div></div><div id="s73reading">Adjust the sliders, then calculate.</div></div>
-<p class="tiny">Teaching prototype only. Equal weights are intentional so the model stays inspectable. Do not use this as a validated individual risk diagnosis.</p>
+  <div class="calc-head">
+    <div>
+      <p class="calc-title">Shortcut Pressure &amp; Behavioural System Simulator</p>
+      <p class="calc-note">Use the sliders to diagnose why the shortcut is attractive. Then switch to the redesign panel and test how changing the system could alter the pressure.</p>
+    </div>
+    <div class="live-chip">Interactive teaching prototype</div>
+  </div>
+
+  <div class="calc-grid">
+    <div class="control">
+      <label for="s73scenario">Quick scenario <span></span></label>
+      <select id="s73scenario">
+        <option value="custom">Custom</option>
+        <option value="doping">Doping</option>
+        <option value="motor">Hidden motor / cheating</option>
+        <option value="judol">Judol / gambling</option>
+        <option value="corruption">Corruption</option>
+        <option value="manipulation">Manipulation / forced outcome</option>
+      </select>
+    </div>
+    <div class="control"><label for="s73u">Goal urgency <span><b id="s73uVal">5</b>/10</span></label><input id="s73u" type="range" min="0" max="10" value="5"></div>
+    <div class="control"><label for="s73r">Immediate reward <span><b id="s73rVal">5</b>/10</span></label><input id="s73r" type="range" min="0" max="10" value="5"></div>
+    <div class="control"><label for="s73p">Process friction <span><b id="s73pVal">5</b>/10</span></label><input id="s73p" type="range" min="0" max="10" value="5"></div>
+    <div class="control"><label for="s73f">Failure aversion <span><b id="s73fVal">5</b>/10</span></label><input id="s73f" type="range" min="0" max="10" value="5"></div>
+    <div class="control"><label for="s73a">Shortcut access <span><b id="s73aVal">5</b>/10</span></label><input id="s73a" type="range" min="0" max="10" value="5"></div>
+    <div class="control"><label for="s73l">Future-cost salience <span><b id="s73lVal">5</b>/10</span></label><input id="s73l" type="range" min="0" max="10" value="5"></div>
+  </div>
+
+  <div class="btnrow">
+    <button type="button" id="s73Calculate">Calculate pressure</button>
+    <button type="button" class="alt" id="s73Reset">Reset</button>
+  </div>
+
+  <div class="score-layout" style="margin-top:1rem">
+    <div class="score-panel">
+      <div class="score-kicker">Current system</div>
+      <div class="score-band">
+        <div class="score-big" id="s73score">—</div>
+        <div class="score-denom">/ 100</div>
+      </div>
+      <div class="meter"><div id="s73bar"></div></div>
+      <div id="s73reading">Adjust the sliders, then calculate.</div>
+      <div class="pill-row">
+        <span class="pill">Primary driver: <strong id="s73driver">—</strong></span>
+        <span class="pill">Protective factor: <strong id="s73protector">—</strong></span>
+      </div>
+      <div class="insight"><strong id="s73driverTitle">Where should we intervene?</strong><span id="s73driverAdvice">Calculate the system first to identify the biggest leverage point.</span></div>
+      <div class="score-legend">
+        <div class="legend-item">0–49<span>Lower pressure</span></div>
+        <div class="legend-item">50–74<span>Moderate pressure</span></div>
+        <div class="legend-item">75–100<span>High pressure</span></div>
+      </div>
+    </div>
+
+    <div class="score-panel whatif">
+      <div class="score-kicker">What-if redesign</div>
+      <div class="subhead">Change the environment</div>
+      <div class="control"><label for="s73wp">Legitimate-route friction <span><b id="s73wpVal">5</b>/10</span></label><input id="s73wp" type="range" min="0" max="10" value="5"></div>
+      <div class="control"><label for="s73lr">Legitimate immediate reward <span><b id="s73lrVal">5</b>/10</span></label><input id="s73lr" type="range" min="0" max="10" value="5"></div>
+      <div class="control"><label for="s73wa">Shortcut access <span><b id="s73waVal">5</b>/10</span></label><input id="s73wa" type="range" min="0" max="10" value="5"></div>
+      <div class="control"><label for="s73wl">Future-cost salience <span><b id="s73wlVal">5</b>/10</span></label><input id="s73wl" type="range" min="0" max="10" value="5"></div>
+      <div class="btnrow"><button type="button" id="s73Simulate">Simulate redesign</button></div>
+      <div class="result" style="margin-top:.8rem">
+        <div class="tiny">REDESIGNED SYSTEM</div>
+        <div class="delta" id="s73whatif">—</div>
+        <div class="meter"><div id="s73whatifbar"></div></div>
+        <div id="s73whatifText">Set the design sliders and simulate.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col" style="margin-top:1rem">
+    <div class="score-panel">
+      <div class="score-kicker">System diagnosis</div>
+      <div class="subhead">Where is the pressure coming from?</div>
+      <div class="recommend">
+        <div class="recommend-item"><strong>Goal urgency</strong><div class="smallbar"><div id="s73uBar"></div></div></div>
+        <div class="recommend-item"><strong>Immediate reward</strong><div class="smallbar"><div id="s73rBar"></div></div></div>
+        <div class="recommend-item"><strong>Process friction</strong><div class="smallbar"><div id="s73pBar"></div></div></div>
+        <div class="recommend-item"><strong>Failure aversion</strong><div class="smallbar"><div id="s73fBar"></div></div></div>
+        <div class="recommend-item"><strong>Shortcut access</strong><div class="smallbar"><div id="s73aBar"></div></div></div>
+      </div>
+    </div>
+    <div class="score-panel">
+      <div class="score-kicker">Interpretation</div>
+      <div class="subhead">Target the largest gap first</div>
+      <div class="insight"><strong>High friction?</strong><span>Make the legitimate route shorter, easier or better supported before demanding more willpower.</span></div>
+      <div class="insight"><strong>High immediate reward?</strong><span>Create legitimate progress, recognition or small wins that can compete with the pull of “now”.</span></div>
+      <div class="insight"><strong>High shortcut access?</strong><span>Use proportionate friction, safeguards and better defaults around the harmful option.</span></div>
+    </div>
+  </div>
+
+  <p class="tiny" style="margin-top:1rem">Teaching prototype only. Equal weights are intentional for inspectability. The redesign simulator is an illustrative what-if model, not a validated predictive or diagnostic instrument.</p>
 </div>
 
 <h3>Part VI — Why the Same Shortcut Appears in So Many Domains</h3>
@@ -284,7 +394,7 @@
 <h3>Part VIII — Click the COM-B Bottleneck</h3>
 <div class="calc">
 <div class="calc-grid"><div class="control"><label>Capability for legitimate route <span id="s73cVal">6</span>/10</label><input id="s73c" type="range" min="0" max="10" value="6"></div><div class="control"><label>Opportunity for legitimate route <span id="s73oVal">6</span>/10</label><input id="s73o" type="range" min="0" max="10" value="6"></div><div class="control"><label>Motivation for legitimate route <span id="s73mVal">6</span>/10</label><input id="s73m" type="range" min="0" max="10" value="6"></div></div>
-<div class="btnrow"><button type="button" onclick="window.s73Bottleneck()">Diagnose bottleneck</button></div>
+<div class="btnrow"><button type="button" id="s73Bottleneck">Diagnose bottleneck</button></div>
 <div class="result"><div class="tiny">PRIMARY BOTTLENECK</div><div class="result-num" id="s73bottleneck">—</div><p id="s73advice">Move the sliders and diagnose the system.</p></div>
 <p class="tiny">The three slider values are a teaching aid, not a formal COM-B score.</p>
 </div>
@@ -392,37 +502,143 @@ THEN I will pause, name the shortcut, and choose one legitimate action I can com
 
 <script>
 (function(){
-  function val(id){ return Number(document.getElementById(id).value); }
-  function bind(id,out){ var el=document.getElementById(id), o=document.getElementById(out); if(!el||!o) return; el.addEventListener('input',function(){o.textContent=el.value;}); }
-  ['u','r','p','f','a','l'].forEach(function(x){bind('s73'+x,'s73'+x+'Val');});
-  ['c','o','m'].forEach(function(x){bind('s73'+x,'s73'+x+'Val');});
-  window.s73Calc=function(){
-    var sc=document.getElementById('s73scenario').value;
-    var sets={doping:[9,9,8,8,7,3],motor:[8,8,7,7,6,4],judol:[10,10,5,8,10,1],corruption:[9,9,9,7,6,2],manipulation:[8,8,6,8,4,3]};
-    if(sc!=='custom'){
-      var v=sets[sc];
-      ['u','r','p','f','a','l'].forEach(function(x,i){document.getElementById('s73'+x).value=v[i];document.getElementById('s73'+x+'Val').textContent=v[i];});
-    }
-    var U=val('s73u'),R=val('s73r'),P=val('s73p'),F=val('s73f'),A=val('s73a'),L=val('s73l');
+  'use strict';
+  function byId(id){ return document.getElementById(id); }
+  function val(id){ var el=byId(id); return el ? Number(el.value) : 0; }
+  function setText(id, value){ var el=byId(id); if(el) el.textContent=value; }
+  function setWidth(id, value){ var el=byId(id); if(el) el.style.width=Math.max(0,Math.min(100,value))+'%'; }
+  function bind(id,out){
+    var el=byId(id), o=byId(out);
+    if(!el || !o) return;
+    el.addEventListener('input', function(){ o.textContent=el.value; });
+  }
+
+  ['u','r','p','f','a','l'].forEach(function(x){ bind('s73'+x,'s73'+x+'Val'); });
+  ['c','o','m'].forEach(function(x){ bind('s73'+x,'s73'+x+'Val'); });
+  ['wp','lr','wa','wl'].forEach(function(x){ bind('s73'+x,'s73'+x+'Val'); });
+
+  var presets={
+    doping:[9,9,8,8,7,3],
+    motor:[8,8,7,7,6,4],
+    judol:[10,10,5,8,10,1],
+    corruption:[9,9,9,7,6,2],
+    manipulation:[8,8,6,8,4,3]
+  };
+
+  function calculateScore(U,R,P,F,A,L){
     var base=(U+R+P+F+A)/50;
     var salience=0.5+0.5*(1-L/10);
-    var score=Math.round(Math.max(0,Math.min(100,100*base*salience)));
-    document.getElementById('s73score').textContent=score;
-    document.getElementById('s73bar').style.width=score+'%';
-    document.getElementById('s73reading').textContent=score>=75?'High shortcut pressure: reduce shortcut access and redesign the legitimate pathway.':score>=50?'Moderate shortcut pressure: the system is vulnerable; target the biggest friction or reward gap.':'Lower shortcut pressure: focus on reinforcement and maintenance.';
-  };
-  window.s73Reset=function(){
-    document.getElementById('s73scenario').value='custom';
-    ['u','r','p','f','a','l'].forEach(function(x){document.getElementById('s73'+x).value=5;document.getElementById('s73'+x+'Val').textContent='5';});
-    document.getElementById('s73score').textContent='—';document.getElementById('s73bar').style.width='0%';document.getElementById('s73reading').textContent='Adjust the sliders, then calculate.';
-  };
-  window.s73Bottleneck=function(){
-    var vals=[['Capability',val('s73c')],['Opportunity',val('s73o')],['Motivation',val('s73m')]].sort(function(a,b){return a[1]-b[1]});
+    return Math.round(Math.max(0,Math.min(100,100*base*salience)));
+  }
+
+  function pressureReading(score){
+    if(score>=75) return 'High shortcut pressure: reduce shortcut access and redesign the legitimate pathway.';
+    if(score>=50) return 'Moderate shortcut pressure: the system is vulnerable; target the biggest friction or reward gap.';
+    return 'Lower shortcut pressure: focus on reinforcement, maintenance and monitoring.';
+  }
+
+  function analyseSystem(U,R,P,F,A,L){
+    var drivers=[
+      ['Goal urgency',U,'Urgency is making “now” feel unusually important.'],
+      ['Immediate reward',R,'The shortcut offers an attractive reward in the present.'],
+      ['Process friction',P,'The legitimate pathway feels costly, slow or difficult.'],
+      ['Failure aversion',F,'The prospect of failing is increasing the appeal of escape routes.'],
+      ['Shortcut access',A,'The tempting option is relatively easy to reach.']
+    ].sort(function(a,b){ return b[1]-a[1]; });
+    var driver=drivers[0];
+    setText('s73driver',driver[0]+' '+driver[1]+'/10');
+    setText('s73driverTitle','Primary leverage point: '+driver[0]);
+    setText('s73driverAdvice',driver[2]);
+    var protector=L>=7?'Future-cost salience '+L+'/10': 'Future-cost salience is only '+L+'/10';
+    setText('s73protector',protector);
+    setWidth('s73uBar',U*10); setWidth('s73rBar',R*10); setWidth('s73pBar',P*10); setWidth('s73fBar',F*10); setWidth('s73aBar',A*10);
+  }
+
+  function readCurrent(){
+    return {U:val('s73u'),R:val('s73r'),P:val('s73p'),F:val('s73f'),A:val('s73a'),L:val('s73l')};
+  }
+
+  function applyPreset(name){
+    var v=presets[name];
+    if(!v) return;
+    ['u','r','p','f','a','l'].forEach(function(x,i){
+      var el=byId('s73'+x); if(el) el.value=v[i];
+      setText('s73'+x+'Val',v[i]);
+    });
+    // Start the redesign panel from the scenario's current state.
+    setText('s73wpVal',v[2]); if(byId('s73wp')) byId('s73wp').value=v[2];
+    setText('s73waVal',v[4]); if(byId('s73wa')) byId('s73wa').value=v[4];
+    setText('s73wlVal',v[5]); if(byId('s73wl')) byId('s73wl').value=v[5];
+    setText('s73lrVal',5); if(byId('s73lr')) byId('s73lr').value=5;
+  }
+
+  function renderScore(){
+    var d=readCurrent();
+    var score=calculateScore(d.U,d.R,d.P,d.F,d.A,d.L);
+    setText('s73score',score);
+    setWidth('s73bar',score);
+    setText('s73reading',pressureReading(score));
+    analyseSystem(d.U,d.R,d.P,d.F,d.A,d.L);
+    return score;
+  }
+
+  function resetAll(){
+    if(byId('s73scenario')) byId('s73scenario').value='custom';
+    ['u','r','p','f','a','l'].forEach(function(x){ if(byId('s73'+x)) byId('s73'+x).value=5; setText('s73'+x+'Val','5'); });
+    ['wp','lr','wa','wl'].forEach(function(x){ if(byId('s73'+x)) byId('s73'+x).value=5; setText('s73'+x+'Val','5'); });
+    setText('s73score','—'); setWidth('s73bar',0); setText('s73reading','Adjust the sliders, then calculate.');
+    setText('s73driver','—'); setText('s73protector','—'); setText('s73driverTitle','Where should we intervene?'); setText('s73driverAdvice','Calculate the system first to identify the biggest leverage point.');
+    setText('s73whatif','—'); setWidth('s73whatifbar',0); setText('s73whatifText','Set the design sliders and simulate.');
+    ['u','r','p','f','a'].forEach(function(x){ setWidth('s73'+x+'Bar',50); });
+  }
+
+  function simulateRedesign(){
+    var base=readCurrent();
+    var P2=val('s73wp'), A2=val('s73wa'), L2=val('s73wl'), LR=val('s73lr');
+    // Illustrative extension: legitimate immediate reward narrows the effective reward gap.
+    var effectiveShortcutReward=Math.max(0,base.R-(0.6*LR));
+    var after=calculateScore(base.U,effectiveShortcutReward,P2,base.F,A2,L2);
+    var before=calculateScore(base.U,base.R,base.P,base.F,base.A,base.L);
+    var delta=after-before;
+    setText('s73whatif',before+' → '+after);
+    setWidth('s73whatifbar',after);
+    setText('s73whatifText', delta<0 ? Math.abs(delta)+' point reduction in conceptual shortcut pressure. The redesign shifts the environment toward the legitimate route.' : delta===0 ? 'No change under this illustrative redesign. Increase leverage on friction, shortcut access, future-cost salience or legitimate reward.' : 'Pressure increased in this simulation. Recheck which redesign setting is moving in the wrong direction.');
+    var d=byId('s73whatif'); if(d){ d.classList.remove('positive','negative'); d.classList.add(delta<0?'positive':delta>0?'negative':''); }
+  }
+
+  function bottleneck(){
+    var vals=[['Capability',val('s73c')],['Opportunity',val('s73o')],['Motivation',val('s73m')]].sort(function(a,b){return a[1]-b[1];});
     var w=vals[0][0], n=vals[0][1];
-    var advice=w==='Capability'?'Target training, coaching, skills, rehearsal and enablement for the legitimate route.':w==='Opportunity'?'Redesign access, defaults, friction and the social environment so the legitimate route is easier to take.':'Increase the immediate attractiveness of the legitimate route; use salient feedback, commitment devices and if–then planning.';
-    document.getElementById('s73bottleneck').textContent=w+' ('+n+'/10)';document.getElementById('s73advice').textContent=advice;
-  };
-  var sc=document.getElementById('s73scenario');if(sc) sc.addEventListener('change',function(){ if(this.value!=='custom') window.s73Calc(); });
+    var advice=w==='Capability'
+      ?'Target training, coaching, skills, rehearsal and enablement for the legitimate route.'
+      :w==='Opportunity'
+        ?'Redesign access, defaults, friction and the social environment so the legitimate route is easier to take.'
+        :'Increase the immediate attractiveness of the legitimate route; use salient feedback, commitment devices and if–then planning.';
+    setText('s73bottleneck',w+' ('+n+'/10)');
+    setText('s73advice',advice);
+  }
+
+  function init(){
+    var calc=byId('s73Calculate'), reset=byId('s73Reset'), sim=byId('s73Simulate'), sc=byId('s73scenario');
+    if(calc) calc.addEventListener('click',renderScore);
+    if(reset) reset.addEventListener('click',resetAll);
+    if(sim) sim.addEventListener('click',simulateRedesign);
+    if(sc) sc.addEventListener('change',function(){
+      if(sc.value!=='custom'){
+        applyPreset(sc.value);
+        renderScore();
+      }
+    });
+    var bd=byId('s73Bottleneck'); if(bd) bd.addEventListener('click',bottleneck);
+    // Initialise bars without automatically calculating a score.
+    ['u','r','p','f','a'].forEach(function(x){ setWidth('s73'+x+'Bar',val('s73'+x)*10); });
+  }
+
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init); else init();
+  window.s73Calc=renderScore;
+  window.s73Reset=resetAll;
+  window.s73Bottleneck=bottleneck;
+  window.s73Simulate=simulateRedesign;
 })();
 </script>
 
