@@ -251,11 +251,24 @@
         const toolbar=document.getElementById('toolbar');
         const btn=toolbar ? toolbar.querySelector('.btn-edit') : null;
         const enabled=root.getAttribute('contenteditable') === 'true';
+
         root.setAttribute('contenteditable', String(!enabled));
+        root.classList.toggle('report-editable', !enabled);
         document.body.classList.toggle('edit-mode', !enabled);
-        if(btn) btn.textContent = enabled ? 'Edit Report' : 'Done Editing';
-        if(!enabled) root.focus();
+
+        if(btn) {
+            btn.textContent = enabled ? 'Edit Report' : 'Done Editing';
+            btn.classList.toggle('active', !enabled);
+        }
+
+        if(!enabled) {
+            root.focus();
+        }
     }
+
+    // Inline onclick handlers run in the global scope, while this report is
+    // wrapped in an IIFE. Explicitly expose the handler.
+    window.toggleEdit = toggleEdit;
 
     try{
         if(!storageKey) throw new Error('Missing report payload.');
