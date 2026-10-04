@@ -362,6 +362,15 @@
         }catch(e){console.error(e);window.print();}
     }
 
+    // Inline onclick handlers need to be exposed on window because the report logic is wrapped in an IIFE.
+    window.openCustomize = openCustomize;
+    window.closeCustomize = closeCustomize;
+    window.applyCustomization = applyCustomization;
+    window.showPrintPreview = showPrintPreview;
+    window.closePrintPreview = closePrintPreview;
+    window.printFromPreview = printFromPreview;
+    window.downloadPdf = downloadPdf;
+
     function toggleEdit(){
         const root=document.getElementById('report-root');
         const toolbar=document.getElementById('toolbar');
