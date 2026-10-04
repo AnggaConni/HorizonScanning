@@ -29,11 +29,39 @@
         .detail-card{border:1px solid #e2e8f0;border-radius:10px;padding:15px;margin-bottom:12px;break-inside:avoid}.detail-head{display:flex;justify-content:space-between;gap:14px;align-items:flex-start}.detail-title{font-size:16px!important;margin-bottom:3px}.detail-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:11px 0}.detail-item{background:#f8fafc;border-radius:7px;padding:8px}.detail-item .k{font-size:7px;text-transform:uppercase;color:#64748b;letter-spacing:.06em}.detail-item .v{font-size:9px;font-weight:700;color:#0f172a;margin-top:2px}.evidence-panel{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px;margin-top:9px}.detail-rel{margin-top:9px}.empty-box{padding:18px;border:1px dashed #cbd5e1;border-radius:8px;color:#64748b;background:#f8fafc}.footer{margin-top:28px;padding-top:12px;border-top:1px solid #e2e8f0;color:#94a3b8;font-size:7.5px;display:flex;justify-content:space-between;gap:14px}.page-break{page-break-before:always}.avoid-break{break-inside:avoid}
         #loading{min-height:100vh;display:flex;align-items:center;justify-content:center;color:#475569;font-size:14px;background:#f8fafc}
         #error{display:none;max-width:720px;margin:10vh auto;padding:24px;background:#fff;border:1px solid #fecaca;border-radius:12px;box-shadow:0 12px 36px rgba(15,23,42,.08)}
-        .toolbar{position:fixed;right:18px;top:18px;z-index:1000;display:flex;gap:8px}.toolbar button{border:0;border-radius:8px;padding:9px 12px;font-weight:700;font-size:12px;cursor:pointer;box-shadow:0 5px 15px rgba(15,23,42,.12)}.btn-print{background:#0f766e;color:#fff}.btn-edit{background:#0f172a;color:#fff}.btn-close{background:#fff;color:#0f172a}.edit-mode #report-root{outline:3px solid #14b8a6;outline-offset:6px}.edit-mode #report-root p,.edit-mode #report-root li{cursor:text}.analysis-body p,.detail-card p,.lead{margin:0 0 10px}.analysis-body h1,.analysis-body h2,.analysis-body h3{break-after:avoid;page-break-after:avoid}.analysis-body p{orphans:3;widows:3}.section{break-inside:auto;page-break-inside:auto}.analysis-entry,.detail-card{break-inside:auto;page-break-inside:auto}.chart{max-height:210mm;object-fit:contain}
+        .toolbar{position:fixed;right:22px;top:18px;z-index:1000;display:flex;align-items:center;gap:8px;padding:7px;background:rgba(15,23,42,.94);border:1px solid rgba(255,255,255,.08);border-radius:14px;box-shadow:0 14px 34px rgba(15,23,42,.22);backdrop-filter:blur(10px)}
+        .toolbar button{border:0;border-radius:9px;padding:9px 13px;font-weight:800;font-size:11px;cursor:pointer;transition:.18s ease;box-shadow:none}
+        .toolbar button:hover{transform:translateY(-1px)}
+        .btn-preview{background:#334155;color:#fff}.btn-preview:hover{background:#475569}
+        .btn-pdf{background:#0f766e;color:#fff}.btn-pdf:hover{background:#0d9488}
+        .btn-edit{background:#fff;color:#0f172a}.btn-edit:hover{background:#f1f5f9}.btn-edit.active{background:#2dd4bf;color:#042f2e}
+        .btn-close{background:transparent;color:#cbd5e1}.btn-close:hover{background:rgba(255,255,255,.08);color:#fff}
+        .edit-mode #report-root{outline:3px solid rgba(20,184,166,.75);outline-offset:8px}
+        .edit-mode #report-root p,.edit-mode #report-root li,.edit-mode #report-root h1,.edit-mode #report-root h2,.edit-mode #report-root h3{cursor:text}
+        .report-editable [contenteditable="true"]{outline:none}
+        .analysis-body p,.detail-card p,.lead{margin:0 0 10px}
+        .analysis-body h1,.analysis-body h2,.analysis-body h3{break-after:avoid;page-break-after:avoid}
+        .analysis-body p{orphans:3;widows:3}
+        .section{break-inside:auto;page-break-inside:auto}
+        .analysis-entry,.detail-card{break-inside:auto;page-break-inside:auto}
+        .chart{max-height:210mm;object-fit:contain}
+        .edit-panel{position:fixed;right:22px;top:82px;width:min(430px,calc(100vw - 44px));z-index:999;background:rgba(255,255,255,.98);border:1px solid #dbe4ee;border-radius:16px;box-shadow:0 18px 48px rgba(15,23,42,.18);backdrop-filter:blur(12px);overflow:hidden}
+        .edit-panel-head{display:flex;align-items:center;justify-content:space-between;padding:15px 16px;border-bottom:1px solid #e2e8f0;background:linear-gradient(135deg,#f8fafc,#eefcf9)}
+        .edit-panel-title{font-size:17px;font-weight:800;color:#0f172a;margin-top:2px}
+        .editor-close{border:0;background:#0f172a;color:#fff;border-radius:8px;padding:8px 11px;font-size:11px;font-weight:800;cursor:pointer}
+        .edit-panel-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:16px}
+        .edit-panel-grid label{font-size:10px;font-weight:800;color:#475569;display:flex;flex-direction:column;gap:6px}
+        .edit-panel-grid input,.edit-panel-grid textarea,.edit-panel-grid select{width:100%;font:inherit;font-weight:500;color:#0f172a;background:#fff;border:1px solid #cbd5e1;border-radius:9px;padding:9px 10px;outline:none;transition:border .18s ease,box-shadow .18s ease}
+        .edit-panel-grid textarea{resize:vertical;min-height:76px}
+        .edit-panel-grid input:focus,.edit-panel-grid textarea:focus,.edit-panel-grid select:focus{border-color:#14b8a6;box-shadow:0 0 0 3px rgba(20,184,166,.12)}
+        .edit-panel-hint{display:flex;gap:9px;align-items:flex-start;padding:12px 16px;background:#f8fafc;border-top:1px solid #e2e8f0;color:#64748b;font-size:10px;line-height:1.45}
+        .editor-close:hover{background:#1e293b}
+        @media(max-width:760px){.toolbar{left:12px;right:12px;top:12px;justify-content:flex-start;overflow:auto}.toolbar button{white-space:nowrap}.edit-panel{left:12px;right:12px;top:68px;width:auto}.edit-panel-grid{grid-template-columns:1fr}}
+
         @media print{
             @page{size:A4 portrait;margin:15mm 13mm 17mm}
             body{background:#fff!important;color:#18212f!important}
-            #loading,#error,#toolbar,#customize-modal,#preview-modal{display:none!important}
+            #loading,#error,#toolbar,#edit-panel{display:none!important}
             #report-root{display:block!important;outline:none!important}
             .page{box-shadow:none;margin:0;max-width:none}
             .cover{break-after:page;page-break-after:always}
@@ -53,26 +81,38 @@
 <div id="loading">Loading report…</div>
 <div id="error"></div>
 
-<div id="customize-modal" class="modal-backdrop" style="display:none">
-  <div class="settings-modal">
-    <div class="settings-head"><div><div class="section-kicker">Report Settings</div><h2>Customize Report</h2></div><button class="modal-x" onclick="closeCustomize()">×</button></div>
-    <div class="settings-grid">
-      <label>Cover title<input id="cover-title-input" type="text"></label>
-      <label>Cover subtitle<textarea id="cover-subtitle-input" rows="3"></textarea></label>
-      <label>Logo URL<input id="cover-logo-input" type="url" placeholder="https://.../logo.png"></label>
-      <label>Page orientation<select id="orientation-input"><option value="portrait">A4 Portrait</option><option value="landscape">A4 Landscape</option></select></label>
+<div id="edit-panel" class="edit-panel" style="display:none">
+  <div class="edit-panel-head">
+    <div>
+      <div class="section-kicker">Document Editor</div>
+      <div class="edit-panel-title">Edit Report</div>
     </div>
-    <div class="settings-actions"><button class="btn-close" onclick="closeCustomize()">Cancel</button><button class="btn-print" onclick="applyCustomization()">Apply</button></div>
+    <button class="editor-close" onclick="toggleEdit()">Done</button>
   </div>
-</div>
-<div id="preview-modal" class="modal-backdrop" style="display:none">
-  <div class="preview-modal">
-    <div class="preview-head"><div><div class="section-kicker">Print Preview</div><strong>Preview before printing</strong></div><div><button class="btn-print" onclick="printFromPreview()">Print / Save PDF</button><button class="btn-close" onclick="closePrintPreview()">Close</button></div></div>
-    <div id="preview-frame-wrap" class="preview-frame-wrap"></div>
+  <div class="edit-panel-grid">
+    <label>Cover title
+      <input id="cover-title-input" type="text" oninput="applyEditorSettings()">
+    </label>
+    <label>Cover subtitle
+      <textarea id="cover-subtitle-input" rows="3" oninput="applyEditorSettings()"></textarea>
+    </label>
+    <label>Logo URL
+      <input id="cover-logo-input" type="url" placeholder="https://.../logo.png" oninput="applyEditorSettings()">
+    </label>
+    <label>Page orientation
+      <select id="orientation-input" onchange="applyEditorSettings()">
+        <option value="portrait">A4 Portrait</option>
+        <option value="landscape">A4 Landscape</option>
+      </select>
+    </label>
+  </div>
+  <div class="edit-panel-hint">
+    <span>✎</span>
+    <span>Edit the report text directly. Press <strong>Enter</strong> for a new paragraph. Changes stay in this tab until you print or download.</span>
   </div>
 </div>
 <div id="toolbar" class="toolbar" style="display:none">
-    <button class="btn-customize" onclick="openCustomize()">Customize</button><button class="btn-preview" onclick="showPrintPreview()">Print Preview</button><button class="btn-pdf" onclick="downloadPdf()">Download PDF</button><button class="btn-edit" onclick="toggleEdit()">Edit Report</button>
+    <button class="btn-preview" onclick="showPrintPreview()">Print Preview</button><button class="btn-pdf" onclick="downloadPdf()">Download PDF</button><button class="btn-edit" onclick="toggleEdit()">Edit Report</button>
     <button class="btn-close" onclick="window.close()">Close</button>
 </div>
 <div id="report-root" class="page" style="display:none"></div>
@@ -277,123 +317,80 @@
     }
 
 
-    function openCustomize(){
-        const modal=document.getElementById('customize-modal');
-        if(!modal)return;
-        const title=document.getElementById('report-cover-title');
-        const subtitle=document.getElementById('report-cover-subtitle');
-        document.getElementById('cover-title-input').value=title?title.textContent:'Horizon Scan Strategic Report';
-        document.getElementById('cover-subtitle-input').value=subtitle?subtitle.textContent:'';
-        document.getElementById('orientation-input').value=document.body.classList.contains('landscape-print')?'landscape':'portrait';
-        modal.style.display='flex';
-    }
-    function closeCustomize(){
-        const modal=document.getElementById('customize-modal');
-        if(modal)modal.style.display='none';
-    }
-    function applyCustomization(){
-        const title=document.getElementById('cover-title-input').value.trim()||'Horizon Scan Strategic Report';
-        const subtitle=document.getElementById('cover-subtitle-input').value.trim();
-        const logo=document.getElementById('cover-logo-input').value.trim();
+    function applyEditorSettings(){
+        const title=document.getElementById('cover-title-input')?.value.trim() || 'Horizon Scan Strategic Report';
+        const subtitle=document.getElementById('cover-subtitle-input')?.value.trim() || '';
+        const logo=document.getElementById('cover-logo-input')?.value.trim() || '';
         const titleEl=document.getElementById('report-cover-title');
         const subtitleEl=document.getElementById('report-cover-subtitle');
-        if(titleEl)titleEl.textContent=title;
-        if(subtitleEl)subtitleEl.textContent=subtitle;
+        if(titleEl) titleEl.textContent=title;
+        if(subtitleEl) subtitleEl.textContent=subtitle;
+
         const wrap=document.getElementById('cover-logo-wrap');
         const img=document.getElementById('cover-logo');
-        if(logo){img.src=logo;wrap.style.display='block';img.onerror=()=>wrap.style.display='none';}
-        else{img.removeAttribute('src');wrap.style.display='none';}
-        const isLandscape=document.getElementById('orientation-input').value==='landscape';
-        document.body.classList.toggle('landscape-print',isLandscape);
+        if(logo){
+            img.src=logo;
+            wrap.style.display='block';
+            img.onerror=()=>{wrap.style.display='none';};
+        }else{
+            img.removeAttribute('src');
+            wrap.style.display='none';
+        }
+
+        const orientation=document.getElementById('orientation-input')?.value === 'landscape' ? 'landscape' : 'portrait';
+        document.body.classList.toggle('landscape-print',orientation==='landscape');
         let pageStyle=document.getElementById('dynamic-page-style');
         if(!pageStyle){
             pageStyle=document.createElement('style');
             pageStyle.id='dynamic-page-style';
             document.head.appendChild(pageStyle);
         }
-        pageStyle.textContent=isLandscape
+        pageStyle.textContent=orientation==='landscape'
             ? '@page{size:A4 landscape;margin:11mm 12mm}'
-            : '@page{size:A4 portrait;margin:15mm 13mm 17mm}';
-        closeCustomize();
-    }
-    function buildPrintableClone(){
-        const clone=document.getElementById('report-root').cloneNode(true);
-        clone.removeAttribute('contenteditable');
-        clone.querySelectorAll('[contenteditable="true"]').forEach(el=>el.removeAttribute('contenteditable'));
-        return clone;
-    }
-    function showPrintPreview(){
-        const modal=document.getElementById('preview-modal');
-        const wrap=document.getElementById('preview-frame-wrap');
-        if(!modal||!wrap)return;
-        wrap.innerHTML='';
-        const paper=document.createElement('div');
-        paper.className='preview-paper'+(document.body.classList.contains('landscape-print')?' landscape':'');
-        paper.innerHTML=buildPrintableClone().innerHTML;
-        wrap.appendChild(paper);
-        modal.style.display='flex';
-    }
-    function closePrintPreview(){
-        const modal=document.getElementById('preview-modal');
-        if(modal)modal.style.display='none';
-    }
-    function printFromPreview(){
-        closePrintPreview();
-        setTimeout(()=>window.print(),150);
-    }
-    async function downloadPdf(){
-        try{
-            if(!window.html2pdf){
-                const script=document.createElement('script');
-                script.src='https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
-                document.head.appendChild(script);
-                await new Promise((resolve,reject)=>{script.onload=resolve;script.onerror=reject;});
-            }
-            const element=buildPrintableClone();
-            element.style.width=document.body.classList.contains('landscape-print')?'277mm':'184mm';
-            await window.html2pdf().set({
-                margin:[10,10,10,10],
-                filename:'horizon-scan-report-'+new Date().toISOString().slice(0,10)+'.pdf',
-                image:{type:'jpeg',quality:0.97},
-                html2canvas:{scale:1.7,useCORS:true,backgroundColor:'#ffffff'},
-                jsPDF:{unit:'mm',format:'a4',orientation:document.body.classList.contains('landscape-print')?'landscape':'portrait'},
-                pagebreak:{mode:['css','legacy'],avoid:['.chart-wrap']}
-            }).from(element).save();
-        }catch(e){console.error(e);window.print();}
+            : '@page{size:A4 portrait;margin:15mm 13mm}';
     }
 
-    // Inline onclick handlers need to be exposed on window because the report logic is wrapped in an IIFE.
-    window.openCustomize = openCustomize;
-    window.closeCustomize = closeCustomize;
-    window.applyCustomization = applyCustomization;
-    window.showPrintPreview = showPrintPreview;
-    window.closePrintPreview = closePrintPreview;
-    window.printFromPreview = printFromPreview;
-    window.downloadPdf = downloadPdf;
+    function startEditor(){
+        const panel=document.getElementById('edit-panel');
+        const btn=document.querySelector('#toolbar .btn-edit');
+        const root=document.getElementById('report-root');
+
+        document.getElementById('cover-title-input').value=document.getElementById('report-cover-title')?.textContent || 'Horizon Scan Strategic Report';
+        document.getElementById('cover-subtitle-input').value=document.getElementById('report-cover-subtitle')?.textContent || '';
+        document.getElementById('cover-logo-input').value='';
+        document.getElementById('orientation-input').value=document.body.classList.contains('landscape-print')?'landscape':'portrait';
+
+        root.setAttribute('contenteditable','true');
+        root.classList.add('report-editable');
+        document.body.classList.add('edit-mode');
+        panel.style.display='block';
+        btn.textContent='Done Editing';
+        btn.classList.add('active');
+        root.focus();
+    }
+
+    function stopEditor(){
+        const panel=document.getElementById('edit-panel');
+        const btn=document.querySelector('#toolbar .btn-edit');
+        const root=document.getElementById('report-root');
+        root.setAttribute('contenteditable','false');
+        root.classList.remove('report-editable');
+        document.body.classList.remove('edit-mode');
+        panel.style.display='none';
+        btn.textContent='Edit Report';
+        btn.classList.remove('active');
+    }
 
     function toggleEdit(){
-        const root=document.getElementById('report-root');
-        const toolbar=document.getElementById('toolbar');
-        const btn=toolbar ? toolbar.querySelector('.btn-edit') : null;
-        const enabled=root.getAttribute('contenteditable') === 'true';
-
-        root.setAttribute('contenteditable', String(!enabled));
-        root.classList.toggle('report-editable', !enabled);
-        document.body.classList.toggle('edit-mode', !enabled);
-
-        if(btn) {
-            btn.textContent = enabled ? 'Edit Report' : 'Done Editing';
-            btn.classList.toggle('active', !enabled);
-        }
-
-        if(!enabled) {
-            root.focus();
-        }
+        const editing=document.getElementById('edit-panel')?.style.display === 'block';
+        if(editing) stopEditor();
+        else startEditor();
     }
 
-    // Inline onclick handlers run in the global scope, while this report is
-    // wrapped in an IIFE. Explicitly expose the handler.
-    window.toggleEdit = toggleEdit;
+    window.applyEditorSettings=applyEditorSettings;
+    window.toggleEdit=toggleEdit;
+    window.startEditor=startEditor;
+    window.stopEditor=stopEditor;
 
     try{
         if(!storageKey) throw new Error('Missing report payload.');
