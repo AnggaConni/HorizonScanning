@@ -29,11 +29,19 @@
         .detail-card{border:1px solid #e2e8f0;border-radius:10px;padding:15px;margin-bottom:12px;break-inside:avoid}.detail-head{display:flex;justify-content:space-between;gap:14px;align-items:flex-start}.detail-title{font-size:16px!important;margin-bottom:3px}.detail-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:11px 0}.detail-item{background:#f8fafc;border-radius:7px;padding:8px}.detail-item .k{font-size:7px;text-transform:uppercase;color:#64748b;letter-spacing:.06em}.detail-item .v{font-size:9px;font-weight:700;color:#0f172a;margin-top:2px}.evidence-panel{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px;margin-top:9px}.detail-rel{margin-top:9px}.empty-box{padding:18px;border:1px dashed #cbd5e1;border-radius:8px;color:#64748b;background:#f8fafc}.footer{margin-top:28px;padding-top:12px;border-top:1px solid #e2e8f0;color:#94a3b8;font-size:7.5px;display:flex;justify-content:space-between;gap:14px}.page-break{page-break-before:always}.avoid-break{break-inside:avoid}
         #loading{min-height:100vh;display:flex;align-items:center;justify-content:center;color:#475569;font-size:14px;background:#f8fafc}
         #error{display:none;max-width:720px;margin:10vh auto;padding:24px;background:#fff;border:1px solid #fecaca;border-radius:12px;box-shadow:0 12px 36px rgba(15,23,42,.08)}
-        .toolbar{position:fixed;right:18px;top:18px;z-index:1000;display:flex;gap:8px}.toolbar button{border:0;border-radius:8px;padding:9px 12px;font-weight:700;font-size:12px;cursor:pointer;box-shadow:0 5px 15px rgba(15,23,42,.12)}.btn-print{background:#0f766e;color:#fff}.btn-close{background:#fff;color:#0f172a}
+        .toolbar{position:fixed;right:18px;top:18px;z-index:1000;display:flex;gap:8px}.toolbar button{border:0;border-radius:8px;padding:9px 12px;font-weight:700;font-size:12px;cursor:pointer;box-shadow:0 5px 15px rgba(15,23,42,.12)}.btn-print{background:#0f766e;color:#fff}.btn-edit{background:#0f172a;color:#fff}.btn-close{background:#fff;color:#0f172a}.edit-mode #report-root{outline:3px solid #14b8a6;outline-offset:6px}.edit-mode #report-root p,.edit-mode #report-root li{cursor:text}.analysis-body p,.detail-card p,.lead{margin:0 0 10px}.analysis-body h1,.analysis-body h2,.analysis-body h3{break-after:avoid;page-break-after:avoid}.analysis-body p{orphans:3;widows:3}
         @media print{
-            body{background:#fff}.page{box-shadow:none;margin:0;max-width:none}.toolbar{display:none}
-            .cover{break-after:page;page-break-after:always}.section{padding-left:0;padding-right:0}
+            body{background:#fff!important;color:#18212f!important}
+            #loading,#error,#toolbar{display:none!important}
+            #report-root{display:block!important;outline:none!important}
+            .page{box-shadow:none;margin:0;max-width:none}
+            .cover{break-after:page;page-break-after:always}
+            .section{padding-left:0;padding-right:0}
             .summary-grid,.callout,table,.chart-wrap,.analysis-entry,.detail-card{break-inside:avoid;page-break-inside:avoid}
+            .page-break{break-before:page;page-break-before:always}
+            h1,h2,h3{break-after:avoid;page-break-after:avoid}
+            p{orphans:3;widows:3}
+            a{color:inherit;text-decoration:none}
         }
     </style>
 </head>
@@ -41,7 +49,7 @@
 <div id="loading">Loading report…</div>
 <div id="error"></div>
 <div id="toolbar" class="toolbar" style="display:none">
-    <button class="btn-print" onclick="window.print()">Print / Save PDF</button>
+    <button class="btn-edit" onclick="toggleEdit()">Edit Report</button><button class="btn-print" onclick="window.print()">Print / Save PDF</button>
     <button class="btn-close" onclick="window.close()">Close</button>
 </div>
 <div id="report-root" class="page" style="display:none"></div>
@@ -236,6 +244,17 @@
         document.getElementById('toolbar').style.display = 'flex';
 
         setTimeout(function(){ window.print(); }, 700);
+    }
+
+    function toggleEdit(){
+        const root=document.getElementById('report-root');
+        const toolbar=document.getElementById('toolbar');
+        const btn=toolbar ? toolbar.querySelector('.btn-edit') : null;
+        const enabled=root.getAttribute('contenteditable') === 'true';
+        root.setAttribute('contenteditable', String(!enabled));
+        document.body.classList.toggle('edit-mode', !enabled);
+        if(btn) btn.textContent = enabled ? 'Edit Report' : 'Done Editing';
+        if(!enabled) root.focus();
     }
 
     try{
