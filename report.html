@@ -303,7 +303,17 @@
         const img=document.getElementById('cover-logo');
         if(logo){img.src=logo;wrap.style.display='block';img.onerror=()=>wrap.style.display='none';}
         else{img.removeAttribute('src');wrap.style.display='none';}
-        document.body.classList.toggle('landscape-print',document.getElementById('orientation-input').value==='landscape');
+        const isLandscape=document.getElementById('orientation-input').value==='landscape';
+        document.body.classList.toggle('landscape-print',isLandscape);
+        let pageStyle=document.getElementById('dynamic-page-style');
+        if(!pageStyle){
+            pageStyle=document.createElement('style');
+            pageStyle.id='dynamic-page-style';
+            document.head.appendChild(pageStyle);
+        }
+        pageStyle.textContent=isLandscape
+            ? '@page{size:A4 landscape;margin:11mm 12mm}'
+            : '@page{size:A4 portrait;margin:15mm 13mm 17mm}';
         closeCustomize();
     }
     function buildPrintableClone(){
