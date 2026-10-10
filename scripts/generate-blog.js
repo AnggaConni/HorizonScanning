@@ -2,9 +2,9 @@ const fs = require('fs');
 const path = require('path');
 
 // 1. Setup Paths
-const dataPath = path.join(__dirname, '../blog/data.json');
+const dataDir = path.join(__dirname, '../blog');
 const blogIndexPath = path.join(__dirname, '../blog.html');
-const articlesDir = path.join(__dirname, '../blog/article');
+const articlesDir = path.join(dataDir, 'article');
 
 // Base URL website Anda (PENTING untuk Meta Tag Social Media)
 const baseUrl = 'https://horizon-scanning.org';
@@ -25,8 +25,51 @@ function slugify(text) {
         .replace(/\-\-+/g, '-');        // Ganti multiple - dengan single -
 }
 
-// 3. Baca data dari JSON
-const articles = JSON.parse(fs.readFileSync(dataPath, 'utf-8'));
+// 3. Baca dan gabungkan semua data artikel dari data.json, data-1.json, data-2.json, dst.
+// File hanya diproses jika cocok dengan pola data*.json di folder /blog.
+const dataFiles = fs.readdirSync(dataDir)
+    .filter(file => /^data(?:-\d+)?\.json$/i.test(file))
+    .sort((a, b) => {
+        // data.json terlebih dahulu, lalu data-1.json, data-2.json ... secara numerik.
+        const numberOf = name => {
+            const match = name.match(/^data-(\d+)\.json$/i);
+            return match ? Number(match[1]) : 0;
+        };
+        return numberOf(a) - numberOf(b);
+    });
+
+if (dataFiles.length === 0) {
+    throw new Error('Tidak ditemukan file data JSON di folder blog/.');
+}
+
+const articles = [];
+for (const file of dataFiles) {
+    const filePath = path.join(dataDir, file);
+    try {
+        const parsed = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+        if (!Array.isArray(parsed)) {
+            throw new Error('Format harus berupa JSON array (daftar artikel).');
+        }
+        articles.push(...parsed);
+        console.log(`📚 Loaded ${parsed.length} articles from ${file}`);
+    } catch (error) {
+        throw new Error(`Gagal membaca ${file}: ${error.message}`);
+    }
+}
+
+// Cegah slug duplikat yang dapat membuat halaman artikel saling menimpa.
+const seenSlugs = new Set();
+for (const article of articles) {
+    const slug = article.slug || (article.title ? slugify(article.title) : '');
+    if (!slug) {
+        throw new Error('Artikel ditemukan tanpa title/slug; proses dihentikan agar data tidak hilang.');
+    }
+    if (seenSlugs.has(slug)) {
+        throw new Error(`Slug artikel duplikat: "${slug}". Pastikan setiap artikel memiliki slug unik.`);
+    }
+    seenSlugs.add(slug);
+}
+console.log(`✅ Total articles loaded: ${articles.length} from ${dataFiles.length} JSON file(s).`);
 
 // Urutkan artikel dari yang paling baru (Newest) ke yang lama (Oldest)
 articles.sort((a, b) => new Date(b.date) - new Date(a.date));
