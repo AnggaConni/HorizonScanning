@@ -13,6 +13,13 @@
     .prose h4 { font-size: 1.25rem; font-weight: bold; margin-top: 1.5em; margin-bottom: 1em; color: #0f172a; }
     .prose blockquote { border-left: 4px solid #38bdf8; padding-left: 1rem; font-style: italic; color: #475569; }
     .hidden-section { display: none !important; }
+    #preview-content.visual-edit-mode { outline: 2px dashed #8b5cf6; outline-offset: 5px; border-radius: 8px; padding: 8px; }
+    #preview-content.visual-edit-mode [data-vbuilder-node="true"] { cursor: grab; outline: 1px dashed transparent; outline-offset: 3px; border-radius: 4px; }
+    #preview-content.visual-edit-mode [data-vbuilder-node="true"]:hover { outline-color: #a78bfa; }
+    #preview-content.visual-edit-mode [data-vbuilder-node="true"]:active { cursor: grabbing; }
+    #preview-content.visual-edit-mode .vbuilder-dragging { opacity: .45; outline: 2px solid #8b5cf6; }
+    #preview-content.visual-edit-mode .vbuilder-drop-target { box-shadow: inset 0 3px 0 #8b5cf6; }
+
     /* Scrollbar styling for a cleaner look in the 2-column layout */
     .custom-scroll::-webkit-scrollbar { width: 6px; }
     .custom-scroll::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
@@ -174,10 +181,15 @@
 
         <!-- COLUMN 2: LIVE PREVIEW (RIGHT) -->
         <div class="bg-white p-6 rounded-2xl shadow-xl flex flex-col h-full border-2 border-slate-200">
-          <div class="flex justify-between items-center border-b pb-2 mb-4">
+          <div class="flex flex-wrap justify-between items-center border-b pb-2 mb-3 gap-2">
             <h2 class="text-lg font-bold text-slate-800"><i class="fa-solid fa-eye mr-2 text-emerald-500"></i>Live Preview</h2>
-            <span class="text-xs font-semibold text-slate-400 bg-slate-100 px-2 py-1 rounded">Updates as you type</span>
+            <div class="flex flex-wrap items-center gap-2">
+              <span id="visual-mode-status" class="text-xs font-semibold text-slate-500 bg-slate-100 px-2 py-1 rounded">Code sync on</span>
+              <button type="button" id="visual-edit-toggle" onclick="toggleVisualEdit()" class="text-xs font-bold bg-violet-600 hover:bg-violet-700 text-white px-3 py-2 rounded-lg"><i class="fa-solid fa-hand-pointer mr-1"></i>Visual Edit</button>
+              <button type="button" id="visual-sync-button" onclick="finishVisualEdit()" class="hidden text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg"><i class="fa-solid fa-check mr-1"></i>Finish & Sync</button>
+            </div>
           </div>
+          <p id="visual-edit-help" class="hidden text-xs text-violet-800 bg-violet-50 border border-violet-200 rounded-lg p-3 mb-3">Visual mode: click text to edit it directly. Drag a highlighted block to reorder it. Changes are synchronized back to the HTML code on the left. Complex nested layouts and SVG internals may still need code editing.</p>
           <div class="overflow-y-auto custom-scroll pr-4 flex-1 prose max-w-none" id="preview-content">
             <!-- Live preview will be injected here -->
             <div class="text-slate-400 italic text-center mt-20">Preview konten akan muncul di sini...</div>
@@ -438,6 +450,7 @@
       persistLocalDraft();
       const content = document.getElementById('edit-content').value;
       const previewBox = document.getElementById('preview-content');
+      if (visualEditMode && document.activeElement === previewBox) return;
       
       if (content.trim() === '') {
         previewBox.innerHTML = '<div class="text-slate-400 italic text-center mt-20">Preview konten akan muncul di sini...</div>';
@@ -448,6 +461,133 @@
       }
     }
 
+
+
+    // --- VISUAL BUILDER (WYSIWYG-LITE) ---
+    let visualEditMode = false;
+    let draggedVisualNode = null;
+
+    function toggleVisualEdit() {
+      const box = document.getElementById('preview-content');
+      if (!box || !document.getElementById('edit-content').value.trim()) {
+        alert('Add or load some article HTML before using Visual Edit.');
+        return;
+      }
+      visualEditMode = !visualEditMode;
+      box.contentEditable = visualEditMode ? 'true' : 'false';
+      box.classList.toggle('visual-edit-mode', visualEditMode);
+      document.getElementById('visual-edit-toggle').classList.toggle('hidden', visualEditMode);
+      document.getElementById('visual-sync-button').classList.toggle('hidden', !visualEditMode);
+      document.getElementById('visual-edit-help').classList.toggle('hidden', !visualEditMode);
+      const status = document.getElementById('visual-mode-status');
+      status.textContent = visualEditMode ? 'Visual mode active' : 'Code sync on';
+      status.className = visualEditMode
+        ? 'text-xs font-bold text-violet-800 bg-violet-100 px-2 py-1 rounded'
+        : 'text-xs font-semibold text-slate-500 bg-slate-100 px-2 py-1 rounded';
+      if (visualEditMode) {
+        prepareVisualNodes();
+        box.focus();
+      } else {
+        syncVisualToCode();
+      }
+    }
+
+    function prepareVisualNodes() {
+      const box = document.getElementById('preview-content');
+      if (!box) return;
+      // Drag direct child blocks to reorder them without breaking nested layout structures.
+      Array.from(box.children).forEach((node, index) => {
+        if (node.dataset.vbuilderPlaceholder === 'true') return;
+        node.dataset.vbuilderNode = 'true';
+        node.draggable = true;
+        node.dataset.vbuilderIndex = String(index);
+      });
+    }
+
+    function syncVisualToCode() {
+      const box = document.getElementById('preview-content');
+      const textarea = document.getElementById('edit-content');
+      if (!box || !textarea) return;
+      // Remove editor-only attributes/classes before serializing HTML.
+      box.querySelectorAll('[data-vbuilder-node], [data-vbuilder-index], .vbuilder-dragging, .vbuilder-drop-target').forEach(node => {
+        node.removeAttribute('data-vbuilder-node');
+        node.removeAttribute('data-vbuilder-index');
+        node.classList.remove('vbuilder-dragging', 'vbuilder-drop-target');
+        if (!node.className) node.removeAttribute('class');
+      });
+      textarea.value = box.innerHTML;
+      savedSelection = { start: textarea.value.length, end: textarea.value.length };
+      persistLocalDraft();
+      updateExportJSON();
+      validateJSONData();
+      prepareVisualNodesIfActive();
+    }
+
+    function prepareVisualNodesIfActive() {
+      if (visualEditMode) prepareVisualNodes();
+    }
+
+    function finishVisualEdit() {
+      syncVisualToCode();
+      visualEditMode = false;
+      const box = document.getElementById('preview-content');
+      box.contentEditable = 'false';
+      box.classList.remove('visual-edit-mode');
+      document.getElementById('visual-edit-toggle').classList.remove('hidden');
+      document.getElementById('visual-sync-button').classList.add('hidden');
+      document.getElementById('visual-edit-help').classList.add('hidden');
+      const status = document.getElementById('visual-mode-status');
+      status.textContent = 'Changes synced to code';
+      status.className = 'text-xs font-bold text-emerald-800 bg-emerald-100 px-2 py-1 rounded';
+      updatePreview();
+    }
+
+    function bindVisualBuilderEvents() {
+      const box = document.getElementById('preview-content');
+      if (!box) return;
+      box.addEventListener('input', () => {
+        if (visualEditMode) syncVisualToCode();
+      });
+      box.addEventListener('dragstart', event => {
+        if (!visualEditMode) return;
+        const node = event.target.closest('[data-vbuilder-node="true"]');
+        if (!node || node.parentElement !== box) { event.preventDefault(); return; }
+        draggedVisualNode = node;
+        node.classList.add('vbuilder-dragging');
+        if (event.dataTransfer) {
+          event.dataTransfer.effectAllowed = 'move';
+          event.dataTransfer.setData('text/plain', node.dataset.vbuilderIndex || '');
+        }
+      });
+      box.addEventListener('dragover', event => {
+        if (!visualEditMode || !draggedVisualNode) return;
+        const target = event.target.closest('[data-vbuilder-node="true"]');
+        if (!target || target === draggedVisualNode || target.parentElement !== box) return;
+        event.preventDefault();
+        box.querySelectorAll('.vbuilder-drop-target').forEach(el => el.classList.remove('vbuilder-drop-target'));
+        target.classList.add('vbuilder-drop-target');
+      });
+      box.addEventListener('drop', event => {
+        if (!visualEditMode || !draggedVisualNode) return;
+        const target = event.target.closest('[data-vbuilder-node="true"]');
+        if (!target || target === draggedVisualNode || target.parentElement !== box) return;
+        event.preventDefault();
+        const rect = target.getBoundingClientRect();
+        const insertAfter = event.clientY > rect.top + rect.height / 2;
+        target.classList.remove('vbuilder-drop-target');
+        if (insertAfter) target.after(draggedVisualNode);
+        else target.before(draggedVisualNode);
+        draggedVisualNode.classList.remove('vbuilder-dragging');
+        draggedVisualNode = null;
+        prepareVisualNodes();
+        syncVisualToCode();
+      });
+      box.addEventListener('dragend', () => {
+        if (draggedVisualNode) draggedVisualNode.classList.remove('vbuilder-dragging');
+        draggedVisualNode = null;
+        box.querySelectorAll('.vbuilder-drop-target').forEach(el => el.classList.remove('vbuilder-drop-target'));
+      });
+    }
 
     // --- ENHANCED DRAFT / VALIDATION / ASSET TOOLS ---
     const LOCAL_DRAFT_KEY = 'horizonscan-maker-draft-v2';
@@ -636,6 +776,7 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+      bindVisualBuilderEvents();
       restoreLocalDraft();
       const ids = ['edit-id', 'edit-title', 'edit-category', 'edit-author', 'edit-date', 'edit-image', 'edit-excerpt', 'edit-content'];
       ids.forEach(id => {
