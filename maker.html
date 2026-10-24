@@ -196,6 +196,7 @@
         <div class="bg-white p-6 rounded-2xl shadow-xl">
           <h2 class="text-xl font-bold text-slate-800 mb-2"><i class="fa-solid fa-file-import text-amber-500 mr-2"></i>1. Import JSON</h2>
           <p class="text-sm text-slate-500 mb-4">Paste your existing data.json code here to load the articles.</p>
+          <p class="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg p-3 mb-3">Tip: Keep a backup copy before importing. Imported JSON replaces the current in-memory article list.</p>
           <textarea id="import-json" rows="10" class="w-full font-mono text-xs border border-slate-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-amber-500 mb-4 custom-scroll" placeholder="[ { ... } ]"></textarea>
           <button onclick="loadJSON()" class="w-full bg-amber-500 hover:bg-amber-600 text-white py-3 rounded-lg font-bold shadow-md transition-all">Load Data to Website</button>
         </div>
@@ -216,6 +217,44 @@
     // State
     let articlesData = [];
 
+
+    <!-- ENHANCED JSON WORKSPACE -->
+    <section id="enhanced-tools" class="max-w-5xl mx-auto mb-8">
+      <div class="bg-white border border-slate-200 rounded-2xl shadow-sm p-5">
+        <div class="flex flex-wrap items-start justify-between gap-3 mb-4">
+          <div>
+            <p class="text-xs uppercase tracking-widest font-extrabold text-sky-600">Safer authoring workflow</p>
+            <h2 class="text-xl font-extrabold text-slate-900 mt-1">Draft Safety & Visual Assets</h2>
+            <p class="text-sm text-slate-500 mt-1">Local drafts, JSON validation, image checks and SVG insertion.</p>
+          </div>
+          <span id="draft-status" class="text-xs font-bold px-3 py-2 rounded-full bg-slate-100 text-slate-600">No local draft yet</span>
+        </div>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <button onclick="downloadJSON()" class="rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold p-3 text-sm"><i class="fa-solid fa-download mr-2"></i>Download JSON</button>
+          <button onclick="validateJSONData()" class="rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold p-3 text-sm"><i class="fa-solid fa-shield-check mr-2"></i>Validate Data</button>
+          <button onclick="insertSVGBlock()" class="rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-bold p-3 text-sm"><i class="fa-solid fa-diagram-project mr-2"></i>Insert SVG Block</button>
+          <button onclick="clearLocalDraft()" class="rounded-xl bg-slate-700 hover:bg-slate-800 text-white font-bold p-3 text-sm"><i class="fa-solid fa-trash-can mr-2"></i>Clear Local Draft</button>
+        </div>
+        <div class="mt-4 grid md:grid-cols-2 gap-4">
+          <div class="rounded-xl bg-slate-50 border border-slate-200 p-4">
+            <h3 class="font-bold text-slate-800 mb-1">Thumbnail preview & URL</h3>
+            <p class="text-xs text-slate-500 mb-3">Uses the image path entered in the editor. A broken preview may mean the file path is wrong or not deployed.</p>
+            <div class="aspect-video bg-slate-200 rounded-lg overflow-hidden grid place-items-center">
+              <img id="thumbnail-preview" alt="Article thumbnail preview" class="hidden w-full h-full object-cover">
+              <span id="thumbnail-placeholder" class="text-sm text-slate-500 px-4 text-center">Open an article to preview its thumbnail.</span>
+            </div>
+            <p id="thumbnail-url-status" class="text-xs mt-2 text-slate-500 break-all"></p>
+            <button onclick="checkThumbnail()" class="mt-2 text-sm font-bold text-sky-700 hover:underline">Check thumbnail URL</button>
+          </div>
+          <div class="rounded-xl bg-slate-50 border border-slate-200 p-4">
+            <h3 class="font-bold text-slate-800 mb-1">JSON integrity report</h3>
+            <p class="text-xs text-slate-500 mb-3">Checks syntax, required article fields, duplicate IDs and suspicious content.</p>
+            <pre id="validation-report" class="text-xs whitespace-pre-wrap text-slate-700 min-h-28">Import JSON data to run validation.</pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
     // --- NAVIGATION ---
     function switchTab(tabId) {
       document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden-section'));
@@ -227,7 +266,7 @@
       });
 
       if(tabId === 'home') renderList();
-      if(tabId === 'json-manager') updateExportJSON();
+      if(tabId === 'json-manager') { updateExportJSON(); validateJSONData(); }
     }
 
     // --- JSON MANAGEMENT ---
@@ -235,16 +274,19 @@
       try {
         const input = document.getElementById('import-json').value;
         const parsed = JSON.parse(input);
-        if (Array.isArray(parsed)) {
-          articlesData = parsed;
-          alert(`Successfully loaded ${articlesData.length} articles!`);
-          updateExportJSON();
-          switchTab('home');
-        } else {
-          alert("Invalid JSON format. It should be an array of objects [ { ... } ].");
+        if (!Array.isArray(parsed) || !parsed.every(item => item && typeof item === 'object' && !Array.isArray(item))) {
+          alert("Invalid format. Import a JSON array containing article objects.");
+          return;
         }
+        articlesData = parsed;
+        alert(`Successfully loaded ${articlesData.length} articles!`);
+        updateExportJSON();
+        persistLocalDraft();
+        validateJSONData();
+        refreshThumbnailPreview();
+        switchTab('home');
       } catch (e) {
-        alert("Error parsing JSON. Please check your syntax.");
+        alert("JSON parsing failed: " + e.message);
         console.error(e);
       }
     }
@@ -255,10 +297,16 @@
       exportBox.value = JSON.stringify(articlesData, null, 2);
     }
 
-    function copyJSON() {
+    async function copyJSON() {
       const exportBox = document.getElementById('export-json');
-      exportBox.select();
-      document.execCommand('copy');
+      exportBox.value = JSON.stringify(articlesData, null, 2);
+      try {
+        await navigator.clipboard.writeText(exportBox.value);
+      } catch (_) {
+        exportBox.focus(); exportBox.select();
+        const ok = document.execCommand('copy');
+        if (!ok) { alert('Clipboard copy failed. Select the JSON text and copy it manually.'); return; }
+      }
       const btn = document.getElementById('btn-copy');
       btn.innerHTML = '<i class="fa-solid fa-check mr-2"></i>Copied!';
       setTimeout(() => btn.innerHTML = 'Copy to Clipboard', 2000);
@@ -346,6 +394,7 @@
       }
       
       updatePreview(); // Trigger initial preview render
+      refreshThumbnailPreview();
       switchTab('editor');
     }
 
@@ -354,31 +403,39 @@
     }
 
     function saveArticle() {
-      const id = document.getElementById('edit-id').value;
+      const id = document.getElementById('edit-id').value.trim();
+      if (!id) { alert('Article ID is required.'); return; }
+      const existingIndex = articlesData.findIndex(a => String(a.id) === id);
+      // Preserve unknown/custom JSON fields (e.g. slug, sources, author metadata).
+      const previous = existingIndex > -1 ? articlesData[existingIndex] : {};
       const newArticle = {
+        ...previous,
         id: id,
-        title: document.getElementById('edit-title').value,
-        excerpt: document.getElementById('edit-excerpt').value,
+        title: document.getElementById('edit-title').value.trim(),
+        excerpt: document.getElementById('edit-excerpt').value.trim(),
         content: document.getElementById('edit-content').value,
-        category: document.getElementById('edit-category').value,
-        author: document.getElementById('edit-author').value,
-        date: document.getElementById('edit-date').value,
-        imageUrl: document.getElementById('edit-image').value
+        category: document.getElementById('edit-category').value.trim(),
+        author: document.getElementById('edit-author').value.trim(),
+        date: document.getElementById('edit-date').value.trim(),
+        imageUrl: document.getElementById('edit-image').value.trim()
       };
+      if (!newArticle.title) { alert('Article title is required.'); return; }
+      if (!newArticle.content.trim()) { alert('Article content is empty.'); return; }
 
-      const existingIndex = articlesData.findIndex(a => a.id === id);
-      if (existingIndex > -1) {
-        articlesData[existingIndex] = newArticle;
-      } else {
-        articlesData.unshift(newArticle); // Put new article at the top
-      }
+      if (existingIndex > -1) articlesData[existingIndex] = newArticle;
+      else articlesData.unshift(newArticle);
 
-      alert("Article saved! Don't forget to go to 'JSON Data' to copy your new JSON.");
+      updateExportJSON();
+      persistLocalDraft();
+      refreshThumbnailPreview();
+      validateJSONData();
+      alert("Article saved to the editor. Download or copy the JSON to save it to your repository.");
       switchTab('home');
     }
 
     // --- LIVE PREVIEW ---
     function updatePreview() {
+      persistLocalDraft();
       const content = document.getElementById('edit-content').value;
       const previewBox = document.getElementById('preview-content');
       
@@ -390,6 +447,212 @@
         previewBox.innerHTML = content;
       }
     }
+
+
+    // --- ENHANCED DRAFT / VALIDATION / ASSET TOOLS ---
+    const LOCAL_DRAFT_KEY = 'horizonscan-maker-draft-v2';
+
+    function persistLocalDraft() {
+      try {
+        localStorage.setItem(LOCAL_DRAFT_KEY, JSON.stringify({
+          savedAt: new Date().toISOString(),
+          articles: articlesData,
+          editor: {
+            id: document.getElementById('edit-id').value,
+            title: document.getElementById('edit-title').value,
+            category: document.getElementById('edit-category').value,
+            author: document.getElementById('edit-author').value,
+            date: document.getElementById('edit-date').value,
+            image: document.getElementById('edit-image').value,
+            excerpt: document.getElementById('edit-excerpt').value,
+            content: document.getElementById('edit-content').value
+          }
+        }));
+        const status = document.getElementById('draft-status');
+        if (status) {
+          status.textContent = 'Draft saved locally';
+          status.className = 'text-xs font-bold px-3 py-2 rounded-full bg-emerald-100 text-emerald-700';
+        }
+      } catch (error) {
+        console.warn('Could not save local draft:', error);
+        const status = document.getElementById('draft-status');
+        if (status) {
+          status.textContent = 'Local save unavailable';
+          status.className = 'text-xs font-bold px-3 py-2 rounded-full bg-amber-100 text-amber-700';
+        }
+      }
+    }
+
+    function restoreLocalDraft() {
+      try {
+        const raw = localStorage.getItem(LOCAL_DRAFT_KEY);
+        if (!raw) return;
+        const saved = JSON.parse(raw);
+        if (!saved || !Array.isArray(saved.articles)) return;
+        const restore = confirm('A local maker draft was found' + (saved.savedAt ? ' (' + new Date(saved.savedAt).toLocaleString() + ')' : '') + '. Restore it?');
+        if (!restore) return;
+        articlesData = saved.articles;
+        const fields = saved.editor || {};
+        const map = {
+          'edit-id': 'id', 'edit-title': 'title', 'edit-category': 'category',
+          'edit-author': 'author', 'edit-date': 'date', 'edit-image': 'image',
+          'edit-excerpt': 'excerpt', 'edit-content': 'content'
+        };
+        Object.entries(map).forEach(([elementId, key]) => {
+          const el = document.getElementById(elementId);
+          if (el) el.value = fields[key] || '';
+        });
+        document.getElementById('import-json').value = JSON.stringify(articlesData, null, 2);
+        updateExportJSON();
+        renderList();
+        refreshThumbnailPreview();
+        validateJSONData();
+        const status = document.getElementById('draft-status');
+        if (status) {
+          status.textContent = 'Draft restored';
+          status.className = 'text-xs font-bold px-3 py-2 rounded-full bg-emerald-100 text-emerald-700';
+        }
+      } catch (error) {
+        console.warn('Could not restore local draft:', error);
+      }
+    }
+
+    function clearLocalDraft() {
+      if (!confirm('Delete the locally saved draft from this browser? This will not delete your downloaded files or repository data.')) return;
+      localStorage.removeItem(LOCAL_DRAFT_KEY);
+      const status = document.getElementById('draft-status');
+      if (status) {
+        status.textContent = 'Local draft cleared';
+        status.className = 'text-xs font-bold px-3 py-2 rounded-full bg-slate-100 text-slate-600';
+      }
+    }
+
+    function downloadJSON() {
+      const json = JSON.stringify(articlesData, null, 2);
+      try { JSON.parse(json); } catch (e) { alert('Cannot export invalid JSON: ' + e.message); return; }
+      const blob = new Blob([json + '\n'], { type: 'application/json;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = 'data-1.json';
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function validateJSONData() {
+      const report = document.getElementById('validation-report');
+      if (!report) return;
+      const errors = [];
+      const warnings = [];
+      if (!Array.isArray(articlesData)) errors.push('Root must be a JSON array.');
+      const ids = new Set();
+      articlesData.forEach((article, index) => {
+        const label = 'Article #' + (index + 1);
+        if (!article || typeof article !== 'object' || Array.isArray(article)) {
+          errors.push(label + ': entry must be an object.'); return;
+        }
+        if (article.id === undefined || article.id === null || String(article.id).trim() === '') errors.push(label + ': missing id.');
+        else {
+          const id = String(article.id);
+          if (ids.has(id)) errors.push(label + ': duplicate id "' + id + '".');
+          ids.add(id);
+        }
+        ['title', 'category', 'author', 'date', 'excerpt', 'content'].forEach(key => {
+          if (typeof article[key] !== 'string' || !article[key].trim()) warnings.push(label + ': missing/empty "' + key + '".');
+        });
+        const image = article.imageUrl || article.image;
+        if (!image) warnings.push(label + ': no imageUrl/image field.');
+        if (typeof article.content === 'string' && /<img\b[^>]*src=["'](?:thum|\.\.?\/)/i.test(article.content)) {
+          warnings.push(label + ': article content contains a relative image URL; ensure it resolves from the article page.');
+        }
+        if (typeof article.content === 'string' && /<svg\b/i.test(article.content) && !/<\/svg>/i.test(article.content)) {
+          errors.push(label + ': SVG appears unclosed.');
+        }
+        if (article.sources && !Array.isArray(article.sources)) warnings.push(label + ': "sources" exists but is not an array.');
+      });
+      const message = [
+        errors.length ? 'ERRORS:\n' + errors.map(x => '• ' + x).join('\n') : 'No structural errors found.',
+        warnings.length ? '\nWARNINGS:\n' + warnings.map(x => '• ' + x).join('\n') : '\nNo warnings found.'
+      ].join('\n');
+      report.textContent = message;
+      report.className = 'text-xs whitespace-pre-wrap min-h-28 ' + (errors.length ? 'text-rose-700' : warnings.length ? 'text-amber-700' : 'text-emerald-700');
+      return { errors, warnings };
+    }
+
+    function refreshThumbnailPreview() {
+      const input = document.getElementById('edit-image');
+      const image = document.getElementById('thumbnail-preview');
+      const placeholder = document.getElementById('thumbnail-placeholder');
+      const status = document.getElementById('thumbnail-url-status');
+      if (!input || !image || !placeholder || !status) return;
+      const raw = input.value.trim();
+      image.onerror = () => {
+        image.classList.add('hidden');
+        placeholder.classList.remove('hidden');
+        placeholder.textContent = 'Image failed to load. Check filename, folder and deployed URL.';
+        status.textContent = 'Could not load: ' + raw;
+        status.className = 'text-xs mt-2 text-rose-700 break-all';
+      };
+      image.onload = () => {
+        image.classList.remove('hidden');
+        placeholder.classList.add('hidden');
+        status.textContent = 'Loaded successfully: ' + image.src;
+        status.className = 'text-xs mt-2 text-emerald-700 break-all';
+      };
+      if (!raw) {
+        image.removeAttribute('src');
+        image.classList.add('hidden');
+        placeholder.classList.remove('hidden');
+        placeholder.textContent = 'No image URL entered.';
+        status.textContent = '';
+        return;
+      }
+      const absolute = /^https?:\/\//i.test(raw) ? raw : new URL(raw.replace(/^\.\//, '').replace(/^\//, ''), window.location.origin + '/').href;
+      image.src = absolute;
+      status.textContent = 'Checking: ' + absolute;
+    }
+
+    function checkThumbnail() {
+      refreshThumbnailPreview();
+      const input = document.getElementById('edit-image');
+      if (!input || !input.value.trim()) alert('Enter an image path or URL first.');
+    }
+
+    function insertSVGBlock() {
+      const textarea = document.getElementById('edit-content');
+      const name = prompt('Short SVG title for accessibility:', 'Concept flowchart');
+      if (name === null) return;
+      const width = prompt('SVG viewBox width (e.g. 960):', '960');
+      if (width === null) return;
+      const height = prompt('SVG viewBox height (e.g. 640):', '640');
+      if (height === null) return;
+      const safeWidth = /^\d+(\.\d+)?$/.test(width) ? width : '960';
+      const safeHeight = /^\d+(\.\d+)?$/.test(height) ? height : '640';
+      const safeTitle = name.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      const snippet = `\n<div class="diagram not-prose" style="max-width:100%;overflow-x:auto;margin:2rem 0;padding:1rem;border:1px solid #dbe4ec;border-radius:1rem;background:#f8fafc">\n<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${safeWidth} ${safeHeight}" role="img" aria-labelledby="diagram-title diagram-desc" style="display:block;width:100%;height:auto">\n  <title id="diagram-title">${safeTitle}</title>\n  <desc id="diagram-desc">Replace this description with a concise explanation of the diagram.</desc>\n  <!-- Add shapes, connectors, labels and markers here. Use inline styles or SVG attributes so the diagram is self-contained. -->\n  <rect x="20" y="20" width="${Number(safeWidth)-40}" height="${Number(safeHeight)-40}" rx="18" fill="#ffffff" stroke="#cbd5e1"/>\n  <text x="48" y="72" font-family="Arial, sans-serif" font-size="28" font-weight="700" fill="#102a43">${safeTitle}</text>\n</svg>\n</div>\n`;
+      insertAtCursor(textarea, snippet);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      restoreLocalDraft();
+      const ids = ['edit-id', 'edit-title', 'edit-category', 'edit-author', 'edit-date', 'edit-image', 'edit-excerpt', 'edit-content'];
+      ids.forEach(id => {
+        const element = document.getElementById(id);
+        if (!element) return;
+        element.addEventListener('input', () => {
+          if (id === 'edit-image') refreshThumbnailPreview();
+          persistLocalDraft();
+        });
+      });
+      document.getElementById('import-json').addEventListener('input', () => {
+        // Save the last import text too, so work in the import panel is not lost on reload.
+        try { localStorage.setItem(LOCAL_DRAFT_KEY + '-import', document.getElementById('import-json').value); } catch (_) {}
+      });
+      const storedImport = localStorage.getItem(LOCAL_DRAFT_KEY + '-import');
+      if (storedImport && !document.getElementById('import-json').value) document.getElementById('import-json').value = storedImport;
+    });
 
     // --- SELECTION TRACKING (fixes: toolbar buttons stealing focus/selection) ---
     // Klik tombol toolbar bisa bikin textarea kehilangan fokus, dan di beberapa
