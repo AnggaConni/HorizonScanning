@@ -187,6 +187,8 @@
             <h2 class="text-lg font-bold text-slate-800"><i class="fa-solid fa-eye mr-2 text-emerald-500"></i>Live Preview</h2>
             <div class="flex flex-wrap items-center gap-2">
               <span id="visual-mode-status" class="text-xs font-semibold text-slate-500 bg-slate-100 px-2 py-1 rounded">Code sync on</span>
+              <button type="button" onclick="undoEditorChange()" class="text-xs font-bold bg-white border border-slate-300 text-slate-700 px-3 py-2 rounded-lg" title="Undo (Ctrl+Z)"><i class="fa-solid fa-rotate-left mr-1"></i>Undo</button>
+              <button type="button" onclick="redoEditorChange()" class="text-xs font-bold bg-white border border-slate-300 text-slate-700 px-3 py-2 rounded-lg" title="Redo (Ctrl+Y)"><i class="fa-solid fa-rotate-right mr-1"></i>Redo</button>
               <button type="button" id="visual-edit-toggle" onclick="toggleVisualEdit()" class="text-xs font-bold bg-violet-600 hover:bg-violet-700 text-white px-3 py-2 rounded-lg"><i class="fa-solid fa-hand-pointer mr-1"></i>Visual Edit</button>
               <button type="button" id="visual-sync-button" onclick="finishVisualEdit()" class="hidden text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg"><i class="fa-solid fa-check mr-1"></i>Finish & Sync</button>
             </div>
@@ -498,6 +500,66 @@
 
 
 
+
+    // --- EDITOR UNDO / REDO ---
+    const editorHistory = { states: [], index: -1, limit: 80, lastValue: null, timer: null };
+
+    function captureEditorState(force = false) {
+      const textarea = document.getElementById('edit-content');
+      if (!textarea) return;
+      const value = textarea.value;
+      if (!force && value === editorHistory.lastValue) return;
+      // Ignore repeated snapshots; cap history to avoid unbounded memory use.
+      if (editorHistory.index >= 0 && editorHistory.states[editorHistory.index] === value) return;
+      editorHistory.states = editorHistory.states.slice(0, editorHistory.index + 1);
+      editorHistory.states.push(value);
+      if (editorHistory.states.length > editorHistory.limit) editorHistory.states.shift();
+      editorHistory.index = editorHistory.states.length - 1;
+      editorHistory.lastValue = value;
+      updateUndoRedoButtons();
+    }
+
+    function updateUndoRedoButtons() {
+      const undo = document.querySelector('button[onclick="undoEditorChange()"]');
+      const redo = document.querySelector('button[onclick="redoEditorChange()"]');
+      if (undo) undo.disabled = editorHistory.index <= 0;
+      if (redo) redo.disabled = editorHistory.index < 0 || editorHistory.index >= editorHistory.states.length - 1;
+    }
+
+    function restoreEditorHistory(index) {
+      if (index < 0 || index >= editorHistory.states.length) return;
+      editorHistory.index = index;
+      const textarea = document.getElementById('edit-content');
+      textarea.value = editorHistory.states[index];
+      editorHistory.lastValue = textarea.value;
+      updatePreview();
+      persistLocalDraft();
+      updateExportJSON();
+      updateUndoRedoButtons();
+    }
+
+    function undoEditorChange() { restoreEditorHistory(editorHistory.index - 1); }
+    function redoEditorChange() { restoreEditorHistory(editorHistory.index + 1); }
+
+    function bindEditorHistory() {
+      const textarea = document.getElementById('edit-content');
+      if (!textarea) return;
+      captureEditorState(true);
+      textarea.addEventListener('input', () => {
+        clearTimeout(editorHistory.timer);
+        editorHistory.timer = setTimeout(() => captureEditorState(), 250);
+      });
+      document.addEventListener('keydown', event => {
+        if (!(event.ctrlKey || event.metaKey)) return;
+        const key = event.key.toLowerCase();
+        if (key === 'z' && !event.shiftKey) {
+          event.preventDefault(); undoEditorChange();
+        } else if (key === 'y' || (key === 'z' && event.shiftKey)) {
+          event.preventDefault(); redoEditorChange();
+        }
+      });
+    }
+
     // --- VISUAL BUILDER (WYSIWYG-LITE) ---
     let visualEditMode = false;
     let draggedVisualNode = null;
@@ -551,6 +613,7 @@
         if (!node.className) node.removeAttribute('class');
       });
       textarea.value = box.innerHTML;
+      captureEditorState();
       savedSelection = { start: textarea.value.length, end: textarea.value.length };
       persistLocalDraft();
       updateExportJSON();
@@ -928,6 +991,7 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       bindVisualBuilderEvents();
+      bindEditorHistory();
       restoreLocalDraft();
       const ids = ['edit-id', 'edit-title', 'edit-category', 'edit-author', 'edit-date', 'edit-image', 'edit-excerpt', 'edit-content'];
       ids.forEach(id => {
