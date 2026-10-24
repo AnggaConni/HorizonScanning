@@ -19,6 +19,8 @@
     #preview-content.visual-edit-mode [data-vbuilder-node="true"]:active { cursor: grabbing; }
     #preview-content.visual-edit-mode .vbuilder-dragging { opacity: .45; outline: 2px solid #8b5cf6; }
     #preview-content.visual-edit-mode .vbuilder-drop-target { box-shadow: inset 0 3px 0 #8b5cf6; }
+    #preview-content.visual-edit-mode [data-vbuilder-selected="true"] { outline: 2px solid #7c3aed !important; outline-offset: 2px; }
+
 
     /* Scrollbar styling for a cleaner look in the 2-column layout */
     .custom-scroll::-webkit-scrollbar { width: 6px; }
@@ -190,6 +192,34 @@
             </div>
           </div>
           <p id="visual-edit-help" class="hidden text-xs text-violet-800 bg-violet-50 border border-violet-200 rounded-lg p-3 mb-3">Visual mode: click text to edit it directly. Drag a highlighted block to reorder it. Changes are synchronized back to the HTML code on the left. Complex nested layouts and SVG internals may still need code editing.</p>
+          <div id="visual-inspector" class="hidden mb-3 rounded-xl border border-violet-200 bg-violet-50 p-3">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+              <div><p class="text-xs font-extrabold uppercase tracking-wider text-violet-700">Selected element</p><p id="visual-selected-label" class="text-sm font-bold text-slate-800">Nothing selected</p></div>
+              <div class="flex gap-2">
+                <button type="button" onclick="duplicateVisualElement()" class="text-xs font-bold rounded-lg bg-white border px-2 py-2"><i class="fa-regular fa-copy mr-1"></i>Duplicate</button>
+                <button type="button" onclick="deleteVisualElement()" class="text-xs font-bold rounded-lg bg-rose-600 text-white px-2 py-2"><i class="fa-solid fa-trash mr-1"></i>Delete</button>
+              </div>
+            </div>
+            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-2">
+              <label class="text-xs font-semibold text-slate-600">Text content<input id="vp-text" class="mt-1 w-full rounded-lg border border-slate-300 p-2 text-sm font-normal" placeholder="Selected text"></label>
+              <label class="text-xs font-semibold text-slate-600">Text color<input id="vp-color" type="color" value="#1e293b" class="mt-1 w-full h-9 rounded-lg border border-slate-300 bg-white p-1"></label>
+              <label class="text-xs font-semibold text-slate-600">Background<input id="vp-bg" type="color" value="#ffffff" class="mt-1 w-full h-9 rounded-lg border border-slate-300 bg-white p-1"></label>
+              <label class="text-xs font-semibold text-slate-600">Font size (px)<input id="vp-size" type="number" min="8" max="96" class="mt-1 w-full rounded-lg border border-slate-300 p-2 text-sm font-normal" placeholder="e.g. 24"></label>
+              <label class="text-xs font-semibold text-slate-600">Padding (px)<input id="vp-padding" type="number" min="0" max="120" class="mt-1 w-full rounded-lg border border-slate-300 p-2 text-sm font-normal" placeholder="e.g. 16"></label>
+              <label class="text-xs font-semibold text-slate-600">Corner radius (px)<input id="vp-radius" type="number" min="0" max="100" class="mt-1 w-full rounded-lg border border-slate-300 p-2 text-sm font-normal" placeholder="e.g. 12"></label>
+              <label class="text-xs font-semibold text-slate-600">Width<select id="vp-width" class="mt-1 w-full rounded-lg border border-slate-300 p-2 text-sm font-normal"><option value="">Keep current</option><option value="100%">Full width</option><option value="75%">75%</option><option value="50%">50%</option><option value="fit-content">Fit content</option></select></label>
+              <label class="text-xs font-semibold text-slate-600">Text alignment<select id="vp-align" class="mt-1 w-full rounded-lg border border-slate-300 p-2 text-sm font-normal"><option value="">Keep current</option><option value="left">Left</option><option value="center">Center</option><option value="right">Right</option><option value="justify">Justify</option></select></label>
+              <label class="text-xs font-semibold text-slate-600 sm:col-span-2 lg:col-span-3">Image URL (for selected image)<input id="vp-image" class="mt-1 w-full rounded-lg border border-slate-300 p-2 text-sm font-normal" placeholder="https://... or thum/image.png"></label>
+            </div>
+            <div class="flex flex-wrap gap-2 mt-3">
+              <button type="button" onclick="applyVisualProperties()" class="rounded-lg bg-violet-700 hover:bg-violet-800 text-white text-sm font-bold px-4 py-2"><i class="fa-solid fa-wand-magic-sparkles mr-1"></i>Apply properties</button>
+              <button type="button" onclick="addVisualBlock('h3')" class="rounded-lg bg-white border text-slate-700 text-sm font-bold px-3 py-2">+ Heading</button>
+              <button type="button" onclick="addVisualBlock('p')" class="rounded-lg bg-white border text-slate-700 text-sm font-bold px-3 py-2">+ Paragraph</button>
+              <button type="button" onclick="addVisualBlock('blockquote')" class="rounded-lg bg-white border text-slate-700 text-sm font-bold px-3 py-2">+ Quote</button>
+              <button type="button" onclick="addVisualBlock('div')" class="rounded-lg bg-white border text-slate-700 text-sm font-bold px-3 py-2">+ Card</button>
+            </div>
+            <p class="text-xs text-slate-500 mt-2">Properties become inline HTML styles. SVG internals are selectable for text edits, but complex vector geometry is best edited in source code.</p>
+          </div>
           <div class="overflow-y-auto custom-scroll pr-4 flex-1 prose max-w-none" id="preview-content">
             <!-- Live preview will be injected here -->
             <div class="text-slate-400 italic text-center mt-20">Preview konten akan muncul di sini...</div>
@@ -509,7 +539,7 @@
       const textarea = document.getElementById('edit-content');
       if (!box || !textarea) return;
       // Remove editor-only attributes/classes before serializing HTML.
-      box.querySelectorAll('[data-vbuilder-node], [data-vbuilder-index], .vbuilder-dragging, .vbuilder-drop-target').forEach(node => {
+      box.querySelectorAll('[data-vbuilder-node], [data-vbuilder-index], [data-vbuilder-selected], .vbuilder-dragging, .vbuilder-drop-target').forEach(node => {
         node.removeAttribute('data-vbuilder-node');
         node.removeAttribute('data-vbuilder-index');
         node.classList.remove('vbuilder-dragging', 'vbuilder-drop-target');
@@ -542,11 +572,127 @@
       updatePreview();
     }
 
+
+    let selectedVisualElement = null;
+
+    function selectVisualElement(node) {
+      const box = document.getElementById('preview-content');
+      if (!visualEditMode || !node || node === box) return;
+      if (selectedVisualElement) selectedVisualElement.removeAttribute('data-vbuilder-selected');
+      selectedVisualElement = node;
+      selectedVisualElement.setAttribute('data-vbuilder-selected', 'true');
+      const inspector = document.getElementById('visual-inspector');
+      inspector.classList.remove('hidden');
+      const tag = node.tagName ? node.tagName.toLowerCase() : 'element';
+      const classes = typeof node.className === 'string' && node.className ? '.' + node.className.trim().split(/\s+/).slice(0,2).join('.') : '';
+      document.getElementById('visual-selected-label').textContent = '<' + tag + '>' + classes;
+      const textField = document.getElementById('vp-text');
+      textField.value = (node.innerText || node.textContent || '').trim().slice(0, 500);
+      const css = window.getComputedStyle(node);
+      document.getElementById('vp-color').value = rgbToHex(css.color) || '#1e293b';
+      document.getElementById('vp-bg').value = rgbToHex(css.backgroundColor) || '#ffffff';
+      document.getElementById('vp-size').value = parseInt(css.fontSize, 10) || '';
+      document.getElementById('vp-padding').value = parseInt(css.paddingTop, 10) || 0;
+      document.getElementById('vp-radius').value = parseInt(css.borderTopLeftRadius, 10) || 0;
+      document.getElementById('vp-width').value = ['100%','75%','50%','fit-content'].includes(node.style.width) ? node.style.width : '';
+      document.getElementById('vp-align').value = ['left','center','right','justify'].includes(node.style.textAlign) ? node.style.textAlign : '';
+      document.getElementById('vp-image').value = tag === 'img' ? (node.getAttribute('src') || '') : '';
+    }
+
+    function rgbToHex(value) {
+      if (!value || value === 'transparent') return null;
+      const parts = value.match(/\d+/g);
+      if (!parts || parts.length < 3) return null;
+      return '#' + parts.slice(0,3).map(n => Math.max(0,Math.min(255,Number(n))).toString(16).padStart(2,'0')).join('');
+    }
+
+    function applyVisualProperties() {
+      const node = selectedVisualElement;
+      if (!node) { alert('Click an element in the preview first.'); return; }
+      const text = document.getElementById('vp-text').value;
+      if (node.tagName && node.tagName.toLowerCase() !== 'img' && node.tagName.toLowerCase() !== 'svg') {
+        // Only replace text when the selected element has no child elements, to avoid destroying nested layouts.
+        if (node.children.length === 0 && text !== (node.textContent || '').trim()) node.textContent = text;
+      } else if (node.tagName && node.tagName.toLowerCase() === 'svg') {
+        // Avoid replacing SVG descendants; only allow edits when a text element itself is selected.
+      }
+      node.style.color = document.getElementById('vp-color').value;
+      node.style.backgroundColor = document.getElementById('vp-bg').value;
+      const size = Number(document.getElementById('vp-size').value);
+      if (size >= 8 && size <= 96) node.style.fontSize = size + 'px';
+      const padding = Number(document.getElementById('vp-padding').value);
+      if (padding >= 0 && padding <= 120) node.style.padding = padding + 'px';
+      const radius = Number(document.getElementById('vp-radius').value);
+      if (radius >= 0 && radius <= 100) node.style.borderRadius = radius + 'px';
+      const width = document.getElementById('vp-width').value;
+      if (width) node.style.width = width;
+      const align = document.getElementById('vp-align').value;
+      if (align) node.style.textAlign = align;
+      const image = document.getElementById('vp-image').value.trim();
+      if (node.tagName && node.tagName.toLowerCase() === 'img' && image) node.setAttribute('src', image);
+      syncVisualToCode();
+      selectVisualElement(node);
+    }
+
+    function addVisualBlock(tag) {
+      const box = document.getElementById('preview-content');
+      if (!visualEditMode) { alert('Turn on Visual Edit first.'); return; }
+      const node = document.createElement(tag);
+      if (tag === 'h3') node.textContent = 'New section heading';
+      else if (tag === 'p') node.textContent = 'Write your paragraph here.';
+      else if (tag === 'blockquote') {
+        node.textContent = 'Add a meaningful quote here.';
+        node.style.borderLeft = '4px solid #0d9488';
+        node.style.padding = '12px 16px';
+        node.style.backgroundColor = '#f1f5f9';
+      } else {
+        node.textContent = 'Card content';
+        node.style.border = '1px solid #cbd5e1';
+        node.style.borderRadius = '12px';
+        node.style.padding = '20px';
+        node.style.backgroundColor = '#ffffff';
+        node.style.margin = '16px 0';
+      }
+      if (selectedVisualElement && selectedVisualElement.parentElement === box) selectedVisualElement.after(node);
+      else box.appendChild(node);
+      prepareVisualNodes();
+      selectVisualElement(node);
+      syncVisualToCode();
+    }
+
+    function duplicateVisualElement() {
+      if (!selectedVisualElement) return;
+      const clone = selectedVisualElement.cloneNode(true);
+      clone.removeAttribute('data-vbuilder-selected');
+      clone.removeAttribute('data-vbuilder-node');
+      clone.removeAttribute('data-vbuilder-index');
+      selectedVisualElement.after(clone);
+      prepareVisualNodes();
+      selectVisualElement(clone);
+      syncVisualToCode();
+    }
+
+    function deleteVisualElement() {
+      if (!selectedVisualElement) return;
+      if (!confirm('Delete the selected element from the article HTML?')) return;
+      const old = selectedVisualElement;
+      selectedVisualElement = null;
+      old.remove();
+      document.getElementById('visual-inspector').classList.add('hidden');
+      prepareVisualNodes();
+      syncVisualToCode();
+    }
+
     function bindVisualBuilderEvents() {
       const box = document.getElementById('preview-content');
       if (!box) return;
       box.addEventListener('input', () => {
         if (visualEditMode) syncVisualToCode();
+      });
+      box.addEventListener('click', event => {
+        if (!visualEditMode) return;
+        const node = event.target.closest('*');
+        if (node && node !== box) selectVisualElement(node);
       });
       box.addEventListener('dragstart', event => {
         if (!visualEditMode) return;
