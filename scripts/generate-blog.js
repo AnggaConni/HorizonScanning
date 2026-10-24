@@ -25,6 +25,32 @@ function slugify(text) {
         .replace(/\-\-+/g, '-');        // Ganti multiple - dengan single -
 }
 
+// Resolve local image paths from the site root and URL-encode Unicode filenames.
+// This is important for social crawlers such as Facebook, which may reject raw Unicode URLs.
+function absoluteAssetUrl(assetPath) {
+    const raw = String(assetPath || '').trim();
+    if (/^(https?:)?\/\//i.test(raw) || /^(data:|blob:)/i.test(raw)) return raw;
+
+    const cleanPath = raw.replace(/^(\.\/)+/, '').replace(/^\/+/, '');
+    const encodedPath = cleanPath.split('/').map(segment => {
+        try {
+            return encodeURIComponent(decodeURIComponent(segment));
+        } catch {
+            return encodeURIComponent(segment);
+        }
+    }).join('/');
+    return `${baseUrl}/${encodedPath}`;
+}
+
+// Content can contain its own <img> tags. Resolve relative image sources too,
+// because article content is rendered from /blog/article/, not from the site root.
+function fixContentImageUrls(content) {
+    return String(content || '').replace(
+        /(<img\b[^>]*?\bsrc=["'])(?!https?:|\/\/|data:|blob:|#)([^"']+)(["'])/gi,
+        (match, prefix, src, suffix) => `${prefix}${absoluteAssetUrl(src)}${suffix}`
+    );
+}
+
 // 3. Baca dan gabungkan semua data artikel dari data.json, data-1.json, data-2.json, dst.
 // File hanya diproses jika cocok dengan pola data*.json di folder /blog.
 const dataFiles = fs.readdirSync(dataDir)
@@ -92,21 +118,12 @@ articles.forEach(article => {
     const articleUrl = slug ? `blog/article/${slug}.html` : '#';
     const fallbackImage = 'https://via.placeholder.com/1200x600/0f172a/ffffff?text=HorizonScan+AI';
     
-    // Normalisasi Gambar
-    let imageUrl = article.image || article.imageUrl || fallbackImage;
+    // Normalisasi gambar: gunakan satu URL absolut yang sama untuk halaman dan social metadata.
+    const imageUrl = article.image || article.imageUrl || fallbackImage;
+    const ogImageUrl = absoluteAssetUrl(imageUrl);
+    const pageImageUrl = ogImageUrl;
     
-    // ==========================================
-    // TWEAK: URL Absolute untuk SEO & Sosmed
-    // ==========================================
     const articleAbsoluteUrl = `${baseUrl}/${articleUrl}`;
-    
-    let ogImageUrl = imageUrl;
-    // Jika gambar dari lokal (bukan link http luar), jadikan absolute URL
-    if (!imageUrl.startsWith('http')) {
-        // Membersihkan / atau ./ di awal string agar tidak dobel
-        const cleanImagePath = imageUrl.replace(/^[\.\/]+/, ''); 
-        ogImageUrl = `${baseUrl}/${cleanImagePath}`;
-    }
 
     // A. Buat Card untuk dimasukkan ke blog.html (List)
     articleCards += `
@@ -157,6 +174,9 @@ articles.forEach(article => {
     <meta property="og:title" content="${article.title}">
     <meta property="og:description" content="${article.excerpt}">
     <meta property="og:image" content="${ogImageUrl}">
+    <meta property="og:image:secure_url" content="${ogImageUrl}">
+    <meta property="og:image:alt" content="${article.title.replace(/"/g, '&quot;')}">
+    <meta property="og:image:type" content="image/png">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
@@ -164,6 +184,7 @@ articles.forEach(article => {
     <meta name="twitter:title" content="${article.title}">
     <meta name="twitter:description" content="${article.excerpt}">
     <meta name="twitter:image" content="${ogImageUrl}">
+    <meta name="twitter:image:alt" content="${article.title.replace(/"/g, '&quot;')}">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
@@ -275,7 +296,7 @@ articles.forEach(article => {
     </header>
 
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
-        <img src="${imageUrl.startsWith('http') ? imageUrl : '../../' + imageUrl.replace(/^[\.\/]+/, '')}" alt="${article.title}" class="w-full h-auto rounded-2xl shadow-lg border border-slate-200" onerror="this.src='${fallbackImage}'">
+        <img src="${pageImageUrl}" alt="${article.title}" class="w-full h-auto rounded-2xl shadow-lg border border-slate-200" onerror="this.src='${fallbackImage}'">
     </div>
 
     <main class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
@@ -284,7 +305,7 @@ articles.forEach(article => {
             prose-a:text-teal-600 hover:prose-a:text-teal-500 prose-a:font-semibold prose-a:no-underline hover:prose-a:underline
             prose-img:rounded-xl prose-img:shadow-md
             prose-li:marker:text-teal-500">
-            ${article.content}
+            ${fixContentImageUrls(article.content)}
         </article>
         
         <div class="mt-16 pt-8 border-t border-slate-200 text-center notranslate">
