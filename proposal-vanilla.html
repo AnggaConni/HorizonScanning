@@ -16,11 +16,13 @@
 <header class="no-print sticky top-0 z-30 bg-white border-b border-slate-200 px-4 py-3 flex flex-wrap items-center justify-between gap-3">
 <div class="font-bold text-lg"><i class="fa-solid fa-file-lines text-blue-600 mr-2"></i>Proposal Builder <span class="text-xs text-slate-400">Vanilla JS</span></div>
 <div class="flex flex-wrap gap-2">
+<button id="languageBtn" class="px-3 py-2 rounded-lg bg-slate-100">EN / ID</button>
 <button id="settingsBtn" class="px-3 py-2 rounded-lg bg-slate-100"><i class="fa-solid fa-gear"></i> AI settings</button>
 <button id="sampleBtn" class="px-3 py-2 rounded-lg bg-emerald-100 text-emerald-800">Load sample</button>
 <label class="px-3 py-2 rounded-lg bg-slate-100 cursor-pointer">Load JSON<input id="loadJson" type="file" accept=".json" class="hidden"></label>
 <button id="saveJson" class="px-3 py-2 rounded-lg bg-slate-100">Save JSON</button>
 <button id="printBtn" class="px-3 py-2 rounded-lg bg-slate-800 text-white">PDF / Print</button>
+<button id="docxBtn" class="px-3 py-2 rounded-lg bg-blue-600 text-white">Word export</button>
 </div>
 </header>
 <div id="settings" class="no-print hidden bg-white border-b p-4">
@@ -44,6 +46,14 @@
 <label class="text-sm">Date<input data-cover="date" class="cover w-full border rounded p-2 mt-1"></label></div></section>
 <section id="editorPanel" class="bg-white rounded-xl border p-6">
 <div class="flex items-start justify-between gap-3 mb-4"><div><h2 id="sectionTitle" class="text-xl font-bold"></h2><p class="text-sm text-slate-500">Edit content directly. Changes are reflected in the saved proposal.</p></div><button id="aiSection" class="no-print rounded-lg bg-violet-100 text-violet-700 px-3 py-2 font-semibold">AI assist section</button></div>
+<div class="no-print flex flex-wrap gap-2 mb-2 border rounded-lg bg-slate-50 p-2">
+<button type="button" data-command="bold" class="px-3 py-1 rounded bg-white border font-bold">B</button>
+<button type="button" data-command="italic" class="px-3 py-1 rounded bg-white border italic">I</button>
+<button type="button" data-command="insertUnorderedList" class="px-3 py-1 rounded bg-white border">• List</button>
+<button type="button" data-command="insertOrderedList" class="px-3 py-1 rounded bg-white border">1. List</button>
+<button type="button" data-command="formatBlock" data-value="H3" class="px-3 py-1 rounded bg-white border">H3</button>
+<button type="button" data-command="formatBlock" data-value="P" class="px-3 py-1 rounded bg-white border">P</button>
+</div>
 <div id="richEditor" contenteditable="true" class="border rounded-lg p-4 prose max-w-none"></div>
 <div id="frameworkEditor" class="hidden space-y-3"></div>
 <div id="rabEditor" class="hidden"></div>
@@ -55,6 +65,206 @@
 (() => {
 'use strict';
 const $ = s => document.querySelector(s);
+const sampleDataEN = {
+    cover: { 
+        title: 'PROJECT PROPOSAL', 
+        subtitle: 'Blue-Food Youth Vanguard: Ocean Literacy & Sustainable Blue Economy for Kaltim', 
+        author: 'Borneo Marine Innovation Hub', 
+        target: 'Global Ocean Resilience Grant', 
+        date: 'October 2026' 
+    },
+    sections: [
+        { 
+            id: 'exec', 
+            title: 'Executive Summary', 
+            type: 'richtext', 
+            content: '<h3>Executive Summary</h3><p>East Kalimantan (Kaltim) is undergoing a massive demographic shift due to the relocation of Indonesia\'s capital (IKN). This rapid population growth poses a critical threat to regional food security. The <strong>Blue-Food Youth Vanguard</strong> initiative tackles this by shifting the paradigm from land-based agriculture to a sustainable <strong>Blue Economy</strong>.</p><p>We target the most critical demographic: <strong>Senior High School (SMA) students</strong>. By integrating comprehensive <em>Ocean Literacy</em> and establishing hands-on <em>Smart Aquaculture Labs</em> in 20 coastal schools, we aim to transform 1,000 youths from passive consumers into proactive "Ecopreneurs." We are seeking <strong>$75,000</strong> to incubate this next generation of marine innovators, ensuring long-term aquatic food security and ecological conservation in East Kalimantan.</p>' 
+        },
+        { 
+            id: 'bab1', 
+            title: 'Chapter I - Background', 
+            type: 'richtext', 
+            content: '<h3>1.1 Background</h3><p>As the new epicenter of Indonesia (IKN), East Kalimantan faces an unprecedented population influx. Traditional land agriculture is insufficient and often leads to deforestation. The region\'s extensive coastline and marine biodiversity present an untapped potential for a resilient <strong>Blue Economy</strong> (sustainable aquaculture, microalgae, and sustainable fisheries) to meet future food demands.</p><h3>1.2 Problem Statement</h3><p>Despite living in coastal areas, youth in Kaltim (specifically SMA students) lack foundational <strong>Ocean Literacy</strong>. The fisheries and marine sectors are heavily stigmatized as "low-income, traditional labor." Without technological integration and educational intervention, there will be a generational gap in marine-based food production, leading to severe food insecurity and environmental degradation.</p>' 
+        },
+        { 
+            id: 'bab2', 
+            title: 'Chapter II - Project Objectives', 
+            type: 'richtext', 
+            content: '<ul><li><strong>Curriculum Integration:</strong> Implement a localized "Ocean Literacy & Blue Food" module for 1,000 SMA students across 20 coastal schools in Balikpapan, Penajam Paser Utara, and Kutai Kartanegara.</li><li><strong>Infrastructure:</strong> Deploy 20 "Mini Smart-Aquaculture Labs" equipped with IoT water sensors to provide hands-on experience in sustainable seafood cultivation (e.g., spirulina, local crustacean hatcheries).</li><li><strong>Capacity Building:</strong> Train 40 biology and entrepreneurship teachers as Master Trainers to ensure program sustainability.</li></ul>' 
+        },
+        { 
+            id: 'bab3', 
+            title: 'Chapter III - Project Benefits', 
+            type: 'richtext', 
+            content: '<h3>Strategic Impacts</h3><p><strong>1. Food Security:</strong> Decentralizes food production by equipping communities to sustainably harvest marine resources, reducing dependency on imported food for the new capital.<br><strong>2. Economic Innovation:</strong> Fosters a new wave of Gen-Z "Blue Ecopreneurs" capable of creating startups in marine biotechnology, sustainable seafood packaging, and zero-waste aquaculture.<br><strong>3. Ecological Preservation:</strong> Promotes a deep understanding of ocean ecosystems, drastically reducing destructive fishing practices and marine pollution through educated community action.</p>' 
+        },
+        { 
+            id: 'bab4', 
+            title: 'Chapter IV - Scope of Work', 
+            type: 'richtext', 
+            content: '<p><strong>In-Scope:</strong> Development of Ocean Literacy modules, Training of Trainers (ToT) for high school teachers, procurement and installation of IoT-based Mini Aquaculture Labs, and hosting a 6-month student incubation program culminating in a Blue Pitching Competition.</p><p><strong>Out-of-Scope:</strong> Commercial-scale land acquisition, deep-sea exploration, and ongoing operational funding for schools beyond the 12-month pilot phase.</p>' 
+        },
+        { 
+            id: 'bab5', 
+            title: 'Chapter V - Methodology (Framework)', 
+            type: 'framework', 
+            nodes: [
+                { id: 1, title: 'Phase 1: Co-Creation', description: 'Designing Ocean Literacy modules with marine biologists & local educators' }, 
+                { id: 2, title: 'Phase 2: Capacity Building', description: 'Intensive ToT for 40 SMA Teachers on Blue Economy & IoT systems' }, 
+                { id: 3, title: 'Phase 3: Lab Deployment', description: 'Installing Mini Smart-Aquaculture Labs in 20 target high schools' },
+                { id: 4, title: 'Phase 4: Youth Incubation', description: '6-month student-led cultivation and business model development' }
+            ] 
+        },
+        { 
+            id: 'bab6', 
+            title: 'Chapter VI - Timeline', 
+            type: 'richtext', 
+            content: '<ul><li><strong>Month 1-2:</strong> Curriculum Design, Stakeholder Alignment (Local Education Agency).</li><li><strong>Month 3-4:</strong> Teacher ToT Workshops & Procurement of Lab Hardware.</li><li><strong>Month 5-6:</strong> Installation of 20 Labs and Program Launch in Schools.</li><li><strong>Month 7-11:</strong> Student Incubation, Cultivation Cycle, and Mentorship.</li><li><strong>Month 12:</strong> "Kaltim Blue Youth Summit" (Harvesting, Startup Pitching, & Evaluation).</li></ul>' 
+        },
+        { 
+            id: 'bab7', 
+            title: 'Chapter VII - Team Structure', 
+            type: 'richtext', 
+            content: '<ul><li><strong>Project Director:</strong> Dr. Aryo Bima, M.Sc (Marine Resilience Expert)</li><li><strong>Youth Education Lead:</strong> Sarah Wijaya, M.Ed (Curriculum Specialist)</li><li><strong>Blue Tech Engineer:</strong> Rian Pratama, S.T. (IoT & Aquaculture Infrastructure)</li><li><strong>M&E Specialist:</strong> Nabila Putri, S.Pi (Impact & Sustainability Analyst)</li></ul>' 
+        },
+        { 
+            id: 'bab8', 
+            title: 'Chapter VIII - Risk Management', 
+            type: 'richtext', 
+            content: '<p><strong>Risk 1: Low student engagement due to complex biological concepts.</strong><br><em>Mitigation:</em> Gamify the learning process and introduce seed-funding rewards for the most innovative student-led business ideas.</p><p><strong>Risk 2: Hardware failure in Aquaculture Labs (water quality crashes).</strong><br><em>Mitigation:</em> Utilize automated IoT alerts directly connected to our technical team\'s server, and train student "Lab Captains" on rapid response protocols.</p>' 
+        },
+        { 
+            id: 'bab9', 
+            title: 'Chapter IX - Monitoring & Evaluation', 
+            type: 'richtext', 
+            content: '<h3>Key Performance Indicators (KPIs)</h3><ul><li><strong>Educational:</strong> Minimum 40% increase in students\' Ocean Literacy assessment scores (pre- vs. post-test).</li><li><strong>Operational:</strong> 100% of the 20 Mini Labs successfully complete at least one harvest cycle.</li><li><strong>Economic:</strong> 50 viable "Blue Economy" canvas models submitted by student teams during the final Summit.</li></ul>' 
+        },
+        { 
+            id: 'bab11', 
+            title: 'Chapter X - Budget Plan (RAB)', 
+            type: 'rab', 
+            rows: [
+                { id: 1, uraian: 'IoT Smart-Aquaculture Lab Modules', qty: 20, unit: 'Schools', harga: 1500 }, 
+                { id: 2, uraian: 'Curriculum Dev & Expert Honorariums', qty: 1, unit: 'Lump Sum', harga: 15000 },
+                { id: 3, uraian: 'Teacher Training Workshops (ToT)', qty: 40, unit: 'Pax', harga: 250 },
+                { id: 4, uraian: 'Youth Summit & Seed Funding Grants', qty: 10, unit: 'Teams', harga: 2000 }
+            ] 
+        },
+        { 
+            id: 'bab12', 
+            title: 'Chapter XI - Budget Justification', 
+            type: 'richtext', 
+            content: '<p>The bulk of the hardware investment (<strong>$30,000</strong>) goes directly into school assets, transforming empty school yards into permanent experiential learning centers. The Seed Funding Grants (<strong>$20,000</strong>) are crucial as they incentivize high schoolers to view the ocean not just academically, but as a viable, modern entrepreneurial career path, directly addressing the core problem.</p>' 
+        },
+        { 
+            id: 'bab13', 
+            title: 'Chapter XII - Conclusion', 
+            type: 'richtext', 
+            content: '<p>The future of East Kalimantan\'s food security lies not in its shrinking forests, but in its vast, intelligent use of the ocean. By funding the <strong>Blue-Food Youth Vanguard</strong>, you are not merely building aquaculture labs; you are cultivating a generation of ocean-literate leaders who will safeguard the ecological and economic future of Indonesia\'s new capital. We invite you to partner with us in this transformative initiative.</p>' 
+        }
+    ]
+};
+
+const sampleDataID = {
+    cover: { 
+        title: 'PROPOSAL PENGAJUAN PROYEK', 
+        subtitle: 'Garda Pemuda Pangan Biru: Literasi Kelautan & Ekonomi Biru Berkelanjutan untuk Kaltim', 
+        author: 'Pusat Inovasi Bahari Borneo', 
+        target: 'Hibah Ketahanan Pangan Nasional', 
+        date: 'Oktober 2026' 
+    },
+    sections: [
+        { 
+            id: 'exec', 
+            title: 'Ringkasan Eksekutif', 
+            type: 'richtext', 
+            content: '<h3>Ringkasan Eksekutif</h3><p>Kalimantan Timur (Kaltim) tengah mengalami lonjakan demografi yang masif seiring dengan pemindahan Ibu Kota Nusantara (IKN). Pertumbuhan populasi yang pesat ini menjadi ancaman serius bagi ketahanan pangan regional. Inisiatif <strong>Garda Pemuda Pangan Biru</strong> hadir untuk mengatasi krisis ini dengan menggeser paradigma dari pertanian berbasis lahan darat menuju <strong>Ekonomi Biru (Blue Economy)</strong> yang berkelanjutan.</p><p>Kami menyasar demografi paling krusial: <strong>Siswa Sekolah Menengah Atas (SMA)</strong>. Melalui integrasi kurikulum <em>Literasi Kelautan (Ocean Literacy)</em> yang komprehensif dan pembangunan <em>Lab Akuakultur Pintar berbasis IoT</em> di 20 sekolah pesisir, kami menargetkan transformasi 1.000 pemuda dari konsumen pasif menjadi "Ecopreneur" bahari yang proaktif. Kami mengajukan dana sebesar <strong>Rp 1.150.000.000</strong> untuk menginkubasi generasi inovator maritim ini, guna memastikan ketahanan pangan perairan jangka panjang dan pelestarian ekologi di Kaltim.</p>' 
+        },
+        { 
+            id: 'bab1', 
+            title: 'Bab I - Latar Belakang', 
+            type: 'richtext', 
+            content: '<h3>1.1 Latar Belakang</h3><p>Sebagai episentrum baru Indonesia (IKN), Kaltim menghadapi arus masuk populasi yang belum pernah terjadi sebelumnya. Pertanian darat tradisional tidak lagi memadai dan seringkali berujung pada deforestasi. Di sisi lain, garis pantai Kaltim yang luas dan keanekaragaman hayati lautnya menawarkan potensi <strong>Ekonomi Biru</strong> (akuakultur berkelanjutan, mikroalga, dan perikanan ramah lingkungan) yang belum tergarap maksimal untuk memenuhi lonjakan permintaan pangan masa depan.</p><h3>1.2 Rumusan Masalah</h3><p>Meski tinggal di wilayah pesisir, generasi muda Kaltim (khususnya anak SMA) sangat kekurangan pemahaman dasar mengenai <strong>Literasi Kelautan</strong>. Sektor perikanan dan kelautan masih menanggung stigma sebagai "pekerjaan tradisional berpenghasilan rendah." Tanpa adanya intervensi edukasi dan integrasi teknologi, Kaltim akan menghadapi jurang regenerasi (generational gap) dalam produksi pangan maritim, yang bermuara pada krisis pangan dan degradasi lingkungan.</p>' 
+        },
+        { 
+            id: 'bab2', 
+            title: 'Bab II - Tujuan Proyek', 
+            type: 'richtext', 
+            content: '<ul><li><strong>Integrasi Kurikulum:</strong> Mengimplementasikan modul lokal "Literasi Kelautan & Pangan Biru" bagi 1.000 siswa SMA di 20 sekolah pesisir (Balikpapan, Penajam Paser Utara, dan Kutai Kartanegara).</li><li><strong>Infrastruktur:</strong> Membangun 20 "Lab Akuakultur Pintar Mini" yang dilengkapi sensor kualitas air IoT guna memberikan pengalaman praktis dalam budidaya hasil laut berkelanjutan (misal: spirulina, pembenihan krustasea lokal).</li><li><strong>Peningkatan Kapasitas (Capacity Building):</strong> Melatih 40 guru Biologi dan Kewirausahaan sebagai Master Trainer untuk menjamin keberlanjutan program jangka panjang.</li></ul>' 
+        },
+        { 
+            id: 'bab3', 
+            title: 'Bab III - Manfaat Proyek', 
+            type: 'richtext', 
+            content: '<h3>Dampak Strategis</h3><p><strong>1. Ketahanan Pangan:</strong> Mendesentralisasi produksi pangan dengan membekali komunitas akar rumput untuk memanen sumber daya laut secara berkelanjutan, menekan ketergantungan pasokan pangan impor untuk wilayah IKN.<br><strong>2. Inovasi Ekonomi:</strong> Melahirkan gelombang baru Gen-Z "Ecopreneur Biru" yang mampu mendirikan startup di bidang bioteknologi kelautan, kemasan hasil laut ramah lingkungan, dan akuakultur minim limbah (zero-waste).<br><strong>3. Pelestarian Ekologi:</strong> Menanamkan kepedulian mendalam terhadap ekosistem laut yang terbukti secara drastis menekan praktik penangkapan ikan merusak (destructive fishing) dan polusi laut melalui aksi komunitas yang teredukasi.</p>' 
+        },
+        { 
+            id: 'bab4', 
+            title: 'Bab IV - Ruang Lingkup', 
+            type: 'richtext', 
+            content: '<p><strong>Cakupan Proyek (In-Scope):</strong> Pengembangan modul Literasi Kelautan, program Training of Trainers (ToT) bagi guru SMA, pengadaan dan instalasi Lab Akuakultur Mini berbasis IoT, serta penyelenggaraan program inkubasi siswa selama 6 bulan yang ditutup dengan Kompetisi Pitching Ekonomi Biru.</p><p><strong>Di Luar Cakupan (Out-of-Scope):</strong> Pembebasan lahan skala komersial industri, eksplorasi laut dalam, dan biaya operasional sekolah rutin pasca fase percontohan (pilot phase) 12 bulan berakhir.</p>' 
+        },
+        { 
+            id: 'bab5', 
+            title: 'Bab V - Metodologi (Framework)', 
+            type: 'framework', 
+            nodes: [
+                { id: 1, title: 'Fase 1: Ko-Kreasi', description: 'Perancangan modul Literasi Kelautan bersama ahli biologi maritim & praktisi pendidikan lokal' }, 
+                { id: 2, title: 'Fase 2: Peningkatan Kapasitas', description: 'ToT Intensif bagi 40 Guru SMA tentang Ekonomi Biru & Penggunaan Sistem IoT' }, 
+                { id: 3, title: 'Fase 3: Penggelaran Lab', description: 'Instalasi Lab Akuakultur Pintar Mini di 20 SMA pesisir yang dituju' },
+                { id: 4, title: 'Fase 4: Inkubasi Pemuda', description: 'Pendampingan 6 bulan siklus budidaya & perancangan model bisnis (Business Canvas) oleh siswa' }
+            ] 
+        },
+        { 
+            id: 'bab6', 
+            title: 'Bab VI - Linimasa', 
+            type: 'richtext', 
+            content: '<ul><li><strong>Bulan 1-2:</strong> Desain Kurikulum dan Penyelarasan Pemangku Kepentingan (Dinas Pendidikan Provinsi).</li><li><strong>Bulan 3-4:</strong> Pelatihan ToT Guru & Pengadaan Perangkat Lab IoT.</li><li><strong>Bulan 5-6:</strong> Instalasi 20 Lab di Sekolah & Peluncuran Program.</li><li><strong>Bulan 7-11:</strong> Masa Inkubasi Siswa, Siklus Budidaya Aktif, dan Mentoring Startup.</li><li><strong>Bulan 12:</strong> "Kaltim Blue Youth Summit" (Panen Raya, Pitching Bisnis Siswa, & Evaluasi Dampak).</li></ul>' 
+        },
+        { 
+            id: 'bab7', 
+            title: 'Bab VII - Struktur Tim', 
+            type: 'richtext', 
+            content: '<ul><li><strong>Direktur Proyek:</strong> Dr. Aryo Bima, M.Sc (Pakar Ketahanan Ekosistem Laut)</li><li><strong>Koordinator Edukasi Pemuda:</strong> Sarah Wijaya, M.Ed (Spesialis Pengembangan Kurikulum)</li><li><strong>Teknisi Blue Tech:</strong> Rian Pratama, S.T. (Ahli IoT & Infrastruktur Akuakultur)</li><li><strong>Spesialis M&E:</strong> Nabila Putri, S.Pi (Analis Dampak Lingkungan & Keberlanjutan)</li></ul>' 
+        },
+        { 
+            id: 'bab8', 
+            title: 'Bab VIII - Manajemen Risiko', 
+            type: 'richtext', 
+            content: '<p><strong>Risiko 1: Rendahnya partisipasi siswa karena konsep biologi yang dianggap membosankan.</strong><br><em>Mitigasi:</em> Menerapkan metode gamifikasi dalam pembelajaran dan menyediakan hadiah "Seed-Funding" (Modal Awal) untuk ide bisnis kelompok yang paling inovatif.</p><p><strong>Risiko 2: Kegagalan perangkat keras pada Lab Akuakultur (kualitas air memburuk mendadak).</strong><br><em>Mitigasi:</em> Memanfaatkan fitur notifikasi darurat IoT yang terhubung langsung ke server teknisi pusat kami, serta melatih "Kapten Lab" dari perwakilan siswa untuk prosedur tanggap darurat.</p>' 
+        },
+        { 
+            id: 'bab9', 
+            title: 'Bab IX - Monitoring & Evaluasi', 
+            type: 'richtext', 
+            content: '<h3>Indikator Kinerja Utama (KPI)</h3><ul><li><strong>Edukasi:</strong> Peningkatan skor asesmen Literasi Kelautan siswa minimal sebesar 40% (perbandingan Pre-Test dan Post-Test).</li><li><strong>Operasional:</strong> 100% dari 20 Lab Mini berhasil menuntaskan sekurang-kurangnya satu siklus panen penuh.</li><li><strong>Ekonomi:</strong> Terkumpulnya 50 proposal "Blue Economy Business Canvas" yang layak jalan dari tim-tim siswa saat Summit penutupan.</li></ul>' 
+        },
+        { 
+            id: 'bab11', 
+            title: 'Bab X - Rencana Anggaran (RAB)', 
+            type: 'rab', 
+            rows: [
+                { id: 1, uraian: 'Modul Lab Akuakultur Cerdas Berbasis IoT', qty: 20, unit: 'Sekolah', harga: 22500000 }, 
+                { id: 2, uraian: 'Pengembangan Kurikulum & Honorarium Pakar', qty: 1, unit: 'Lump Sum', harga: 225000000 },
+                { id: 3, uraian: 'Workshop Pelatihan Guru (ToT)', qty: 40, unit: 'Peserta', harga: 3750000 },
+                { id: 4, uraian: 'Kaltim Youth Summit & Hibah Seed Funding', qty: 10, unit: 'Tim', harga: 30000000 }
+            ] 
+        },
+        { 
+            id: 'bab12', 
+            title: 'Bab XI - Justifikasi Anggaran', 
+            type: 'richtext', 
+            content: '<p>Bagian terbesar dari investasi infrastruktur keras (<strong>Rp 450.000.000</strong>) disalurkan langsung sebagai aset sekolah, menyulap lahan kosong sekolah menjadi pusat pembelajaran berbasis pengalaman yang permanen. Sementara itu, Hibah Modal Awal/Seed Funding (<strong>Rp 300.000.000</strong>) sangat krusial karena ini adalah katalis utama yang memotivasi anak SMA untuk memandang laut bukan hanya sebagai subjek akademis, tetapi sebagai jalur karir kewirausahaan modern yang bergengsi, yang secara langsung menjawab akar permasalahan stigma saat ini.</p>' 
+        },
+        { 
+            id: 'bab13', 
+            title: 'Bab XII - Kesimpulan', 
+            type: 'richtext', 
+            content: '<p>Masa depan ketahanan pangan Kalimantan Timur tidak terletak pada hutan-hutannya yang semakin menyusut, melainkan pada pemanfaatan lautnya yang cerdas dan berwawasan teknologi. Dengan mendanai inisiatif <strong>Garda Pemuda Pangan Biru</strong>, Anda tidak sekadar membangun fasilitas lab akuakultur; Anda sedang menumbuhkan generasi pemimpin melek-laut (ocean-literate) yang akan mengamankan masa depan ekologi sekaligus ekonomi ibu kota baru Indonesia. Kami mengundang Anda untuk berkolaborasi mewujudkan transformasi nyata ini.</p>' 
+        }
+    ]
+};
+
 const state = {
  provider:'gemini', model:'gemini-3.8-flash', apiKey:'',
  cover:{title:'PROJECT PROPOSAL',subtitle:'Your Project Title',author:'Organization Name',target:'Target Donor/Investor',date:'Submission Date'},
@@ -82,8 +292,11 @@ const modelOptions = {
 };
 let activeKey = '';
 const current = () => state.sections.find(s=>s.id===state.active);
+let lang='en';
+function sanitizeHtml(html){const doc=new DOMParser().parseFromString(String(html??''),'text/html');doc.querySelectorAll('script,style,iframe,object,embed,form,input,button,svg,math').forEach(el=>el.remove());const allowed=new Set(['P','BR','H1','H2','H3','H4','UL','OL','LI','STRONG','B','EM','I','U','BLOCKQUOTE','TABLE','THEAD','TBODY','TFOOT','TR','TH','TD']);doc.querySelectorAll('*').forEach(el=>{if(!allowed.has(el.tagName)){el.replaceWith(...el.childNodes);return;}[...el.attributes].forEach(a=>{if(!['colspan','rowspan'].includes(a.name.toLowerCase()))el.removeAttribute(a.name);});});return doc.body.innerHTML;}
+function cleanProposalData(data){if(!data||!data.cover||!Array.isArray(data.sections))throw Error('Invalid proposal structure');data.sections.forEach(s=>{if(s.type==='richtext')s.content=sanitizeHtml(s.content);if(s.type==='framework'&&!Array.isArray(s.nodes))s.nodes=[];if(s.type==='rab'&&!Array.isArray(s.rows))s.rows=[];});return data;}
 function renderNav(){ $('#nav').replaceChildren(); state.sections.forEach(s=>{const b=document.createElement('button');b.className='w-full text-left px-3 py-2 rounded text-sm '+(s.id===state.active?'bg-blue-100 text-blue-700':'hover:bg-slate-100');b.textContent=s.title;b.onclick=()=>{saveActive();state.active=s.id;renderEditor();renderNav()};$('#nav').append(b)});}
-function saveActive(){const s=current();if(!s)return;if(s.type==='richtext')s.content=$('#richEditor').innerHTML;}
+function saveActive(){const s=current();if(!s)return;if(s.type==='richtext')s.content=sanitizeHtml($('#richEditor').innerHTML);}
 function renderEditor(){
  const s=current();$('#sectionTitle').textContent=s.title;
  $('#richEditor').classList.toggle('hidden',s.type!=='richtext');$('#frameworkEditor').classList.toggle('hidden',s.type!=='framework');$('#rabEditor').classList.toggle('hidden',s.type!=='rab');
@@ -106,12 +319,13 @@ async function askAI(prompt){
  const res=await fetch(url,{method:'POST',headers,body:JSON.stringify(body)});const json=await res.json();if(!res.ok)throw Error(json.error?.message||'AI request failed ('+res.status+')');
  return p==='gemini'?json.candidates?.[0]?.content?.parts?.map(x=>x.text||'').join('\n'):p==='claude'?json.content?.map(x=>x.text||'').join('\n'):json.choices?.[0]?.message?.content;
 }
-async function assist(s){saveActive();$('#status').textContent='AI is working…';try{const answer=await askAI(promptFor(s));if(s.type==='richtext')s.content=answer;else {const clean=answer.replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/,'');const parsed=JSON.parse(clean);if(s.type==='framework')s.nodes=parsed;else s.rows=parsed;}renderEditor();$('#status').textContent='AI update complete.';}catch(e){$('#status').textContent=e.message;alert(e.message)}}
+async function assist(s){saveActive();$('#status').textContent='AI is working…';try{const answer=await askAI(promptFor(s));if(s.type==='richtext')s.content=sanitizeHtml(answer);else {const clean=answer.replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/,'');const parsed=JSON.parse(clean);if(s.type==='framework')s.nodes=parsed;else s.rows=parsed;}renderEditor();$('#status').textContent='AI update complete.';}catch(e){$('#status').textContent=e.message;alert(e.message)}}
 function exportJson(){saveActive();const blob=new Blob([JSON.stringify({cover:state.cover,sections:state.sections},null,2)],{type:'application/json'});download(blob,'proposal.json')}
 function download(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();URL.revokeObjectURL(a.href)}
-function importJson(file){const reader=new FileReader();reader.onload=()=>{try{const d=JSON.parse(reader.result);if(!d.cover||!Array.isArray(d.sections))throw Error();state.cover=d.cover;state.sections=d.sections;state.active=state.sections[0]?.id||'exec';updateCover();renderNav();renderEditor()}catch{alert('Invalid proposal JSON file.')}};reader.readAsText(file)}
+function importJson(file){const reader=new FileReader();reader.onload=()=>{try{const d=cleanProposalData(JSON.parse(reader.result));state.cover=d.cover;state.sections=d.sections;state.active=state.sections[0]?.id||'exec';updateCover();renderNav();renderEditor()}catch{alert('Invalid proposal JSON file or unsupported content.')}};reader.readAsText(file)}
 function renderPrint(){saveActive();const root=$('#printDocument');root.innerHTML='<div class="page-break text-center flex flex-col justify-center min-h-screen"><h1 class="text-4xl font-bold">'+escapeHtml(state.cover.title)+'</h1><h2 class="text-2xl mt-5">'+escapeHtml(state.cover.subtitle)+'</h2><p class="mt-12">Prepared by: '+escapeHtml(state.cover.author)+'</p><p>Addressed to: '+escapeHtml(state.cover.target)+'</p><p class="mt-8">'+escapeHtml(state.cover.date)+'</p></div>'+state.sections.map(s=>'<section class="mb-8"><h2 class="text-2xl font-bold border-b mb-3">'+escapeHtml(s.title)+'</h2>'+(s.type==='richtext'?s.content:s.type==='framework'?s.nodes.map(n=>'<div class="border p-3 mb-2"><b>'+escapeHtml(n.title)+'</b><p>'+escapeHtml(n.description)+'</p></div>').join(''):'<table class="w-full border-collapse"><tr><th class="border p-2">Description</th><th class="border p-2">Qty</th><th class="border p-2">Unit</th><th class="border p-2">Price</th><th class="border p-2">Total</th></tr>'+s.rows.map(r=>'<tr><td class="border p-2">'+escapeHtml(r.uraian)+'</td><td class="border p-2">'+r.qty+'</td><td class="border p-2">'+escapeHtml(r.unit)+'</td><td class="border p-2">'+Number(r.harga).toLocaleString()+'</td><td class="border p-2">'+(r.qty*r.harga).toLocaleString()+'</td></tr></table>')+'</section>').join('')}
 function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function exportWord(){saveActive();const cover=state.cover;const body=state.sections.map(s=>{let content='';if(s.type==='richtext')content=sanitizeHtml(s.content);else if(s.type==='framework')content=s.nodes.map((n,i)=>'<div class="framework-card"><strong>Phase '+(i+1)+': '+escapeHtml(n.title)+'</strong><p>'+escapeHtml(n.description)+'</p></div>').join('');else{let total=0;const rows=s.rows.map((r,i)=>{const rowTotal=Number(r.qty)*Number(r.harga);total+=rowTotal;return '<tr><td>'+(i+1)+'</td><td>'+escapeHtml(r.uraian)+'</td><td>'+Number(r.qty)+'</td><td>'+escapeHtml(r.unit)+'</td><td>'+Number(r.harga).toLocaleString()+'</td><td>'+rowTotal.toLocaleString()+'</td></tr>';}).join('');content='<table><thead><tr><th>No.</th><th>Description</th><th>Qty</th><th>Unit</th><th>Unit price</th><th>Total</th></tr></thead><tbody>'+rows+'</tbody><tfoot><tr><td colspan="5"><strong>GRAND TOTAL</strong></td><td><strong>'+total.toLocaleString()+'</strong></td></tr></tfoot></table>';}return '<h2>'+escapeHtml(s.title)+'</h2>'+content;}).join('');const html='<!doctype html><html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>Proposal</title><style>body{font-family:Calibri,Arial;color:#333}h1{text-align:center;color:#1e3a8a}h2{color:#2563eb;border-bottom:1px solid #ccc;margin-top:28px}table{border-collapse:collapse;width:100%;margin-top:10px}th,td{border:1px solid #ccc;padding:7px;text-align:left}.cover{text-align:center;margin:90px 0;page-break-after:always}.framework-card{border:1px solid #ccc;padding:12px;margin-bottom:12px}</style></head><body><div class="cover"><h1>'+escapeHtml(cover.title)+'</h1><h2 style="border:0;color:#333">'+escapeHtml(cover.subtitle)+'</h2><p><b>Prepared by:</b><br>'+escapeHtml(cover.author)+'</p><p><b>Addressed to:</b><br>'+escapeHtml(cover.target)+'</p><p>'+escapeHtml(cover.date)+'</p></div>'+body+'</body></html>';download(new Blob(['\\ufeff',html],{type:'application/msword'}),'Proposal_Project.doc');}
 $('#provider').onchange=e=>{state.provider=e.target.value;state.model=modelOptions[state.provider][0][0];renderModels();$('#settingsNote').textContent=state.provider==='deepseek'?'DeepSeek API endpoint: api.deepseek.com/chat/completions':state.provider==='claude'?'Claude browser requests may be restricted; production use should go through a server proxy.':''};
 $('#model').onchange=e=>state.model=e.target.value;$('#apiKey').oninput=e=>activeKey=e.target.value;
 $('#settingsBtn').onclick=()=>$('#settings').classList.toggle('hidden');$('#closeSettings').onclick=()=>$('#settings').classList.add('hidden');
@@ -120,7 +334,11 @@ $('#addFramework').onclick=()=>{const s=current();s.nodes.push({id:Date.now(),ti
 $('#addRab').onclick=()=>{const s=current();s.rows.push({id:Date.now(),uraian:'New item',qty:1,unit:'Unit',harga:0});renderRab(s)};
 $('#saveJson').onclick=exportJson;$('#loadJson').onchange=e=>{if(e.target.files[0])importJson(e.target.files[0]);e.target.value=''};
 $('#printBtn').onclick=()=>{renderPrint();window.print()};
-$('#sampleBtn').onclick=()=>{state.cover={title:'PROJECT PROPOSAL',subtitle:'Blue-Food Youth Vanguard',author:'Borneo Marine Innovation Hub',target:'Global Ocean Resilience Grant',date:'October 2026'};state.sections[0].content='<h3>Executive Summary</h3><p>A community-centered project concept focused on ocean literacy and a sustainable blue economy.</p>';updateCover();renderEditor()};
+$('#docxBtn').onclick=exportWord;
+document.querySelectorAll('[data-command]').forEach(btn=>btn.onclick=()=>{$('#richEditor').focus();document.execCommand(btn.dataset.command,false,btn.dataset.value||null);saveActive();});
+$('#richEditor').addEventListener('input',saveActive);
+$('#languageBtn').onclick=()=>{lang=lang==='en'?'id':'en';$('#languageBtn').textContent=lang==='en'?'EN / ID':'ID / EN';$('#sampleBtn').textContent=lang==='en'?'Load sample':'Muat contoh';$('#saveJson').textContent=lang==='en'?'Save JSON':'Simpan JSON';$('#printBtn').textContent=lang==='en'?'PDF / Print':'Cetak / PDF';$('#docxBtn').textContent=lang==='en'?'Word export':'Ekspor Word';$('#settingsBtn').innerHTML=lang==='en'?'<i class="fa-solid fa-gear"></i> AI settings':'<i class="fa-solid fa-gear"></i> Pengaturan AI';$('#aiSection').textContent=lang==='en'?'AI assist section':'Bantu bab dengan AI';$('#aiReviseAll').textContent=lang==='en'?'AI revise all text':'Revisi semua teks dengan AI';};
+$('#sampleBtn').onclick=()=>{const sample=lang==='en'?sampleDataEN:sampleDataID;const copy=JSON.parse(JSON.stringify(sample));state.cover={...copy.cover};state.sections=cleanProposalData(copy).sections;state.active=state.sections[0]?.id||'exec';updateCover();renderNav();renderEditor()};
 updateCover();renderModels();renderNav();renderEditor();
 })();
 </script>
