@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Proposal Builder — Vanilla</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+@media print { body{background:#fff!important}.no-print{display:none!important}.print-only{display:block!important}.page-break{break-after:page} }
+.print-only{display:none}
+[contenteditable=true]{min-height:18rem;outline:none}
+</style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans">
+<header class="no-print sticky top-0 z-30 bg-white border-b border-slate-200 px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+<div class="font-bold text-lg"><i class="fa-solid fa-file-lines text-blue-600 mr-2"></i>Proposal Builder <span class="text-xs text-slate-400">Vanilla JS</span></div>
+<div class="flex flex-wrap gap-2">
+<button id="settingsBtn" class="px-3 py-2 rounded-lg bg-slate-100"><i class="fa-solid fa-gear"></i> AI settings</button>
+<button id="sampleBtn" class="px-3 py-2 rounded-lg bg-emerald-100 text-emerald-800">Load sample</button>
+<label class="px-3 py-2 rounded-lg bg-slate-100 cursor-pointer">Load JSON<input id="loadJson" type="file" accept=".json" class="hidden"></label>
+<button id="saveJson" class="px-3 py-2 rounded-lg bg-slate-100">Save JSON</button>
+<button id="printBtn" class="px-3 py-2 rounded-lg bg-slate-800 text-white">PDF / Print</button>
+</div>
+</header>
+<div id="settings" class="no-print hidden bg-white border-b p-4">
+<div class="max-w-5xl mx-auto grid md:grid-cols-2 gap-4">
+<div><h2 class="font-bold mb-2">AI provider and API keys</h2><p class="text-xs text-amber-700 mb-3">For personal/local use only: browser-based API keys are visible in DevTools. Use a backend proxy for shared/public deployments. Keys are not included in proposal JSON exports.</p>
+<label class="block text-sm mb-1">Provider</label><select id="provider" class="w-full border rounded p-2 mb-2"><option value="gemini">Google Gemini</option><option value="openai">OpenAI</option><option value="claude">Anthropic Claude</option><option value="deepseek">DeepSeek</option></select>
+<label class="block text-sm mb-1">Model</label><select id="model" class="w-full border rounded p-2 mb-2"></select>
+<label class="block text-sm mb-1">API key</label><input id="apiKey" type="password" autocomplete="off" class="w-full border rounded p-2" placeholder="Paste API key (kept in this tab only)">
+</div>
+<div class="flex flex-col justify-between"><div><h3 class="font-bold mb-2">Model choices</h3><p class="text-sm text-slate-600">Gemini: 3.8 Flash (recommended) or 3.7 Flash. OpenAI, Claude and DeepSeek use the provider model IDs configured below.</p><p id="settingsNote" class="text-xs text-slate-500 mt-2"></p></div><button id="closeSettings" class="self-end px-4 py-2 rounded bg-blue-600 text-white">Close</button></div>
+</div></div>
+<div class="max-w-7xl mx-auto p-4 grid lg:grid-cols-[250px_1fr] gap-4">
+<aside class="no-print bg-white rounded-xl border p-3 h-fit"><h2 class="font-bold px-2 py-2 text-sm text-slate-500">DOCUMENT SECTIONS</h2><nav id="nav" class="space-y-1"></nav><button id="aiReviseAll" class="w-full mt-4 rounded-lg bg-violet-600 text-white p-3 font-semibold">AI revise all text</button><p id="status" class="text-xs text-slate-500 mt-2"></p></aside>
+<main class="min-w-0">
+<section id="coverPanel" class="bg-white rounded-xl border p-6 mb-4">
+<h2 class="text-xl font-bold mb-4">Cover page</h2><div class="grid md:grid-cols-2 gap-3">
+<label class="text-sm">Document title<input data-cover="title" class="cover w-full border rounded p-2 mt-1"></label>
+<label class="text-sm">Project name / subtitle<input data-cover="subtitle" class="cover w-full border rounded p-2 mt-1"></label>
+<label class="text-sm">Prepared by<input data-cover="author" class="cover w-full border rounded p-2 mt-1"></label>
+<label class="text-sm">Addressed to<input data-cover="target" class="cover w-full border rounded p-2 mt-1"></label>
+<label class="text-sm">Date<input data-cover="date" class="cover w-full border rounded p-2 mt-1"></label></div></section>
+<section id="editorPanel" class="bg-white rounded-xl border p-6">
+<div class="flex items-start justify-between gap-3 mb-4"><div><h2 id="sectionTitle" class="text-xl font-bold"></h2><p class="text-sm text-slate-500">Edit content directly. Changes are reflected in the saved proposal.</p></div><button id="aiSection" class="no-print rounded-lg bg-violet-100 text-violet-700 px-3 py-2 font-semibold">AI assist section</button></div>
+<div id="richEditor" contenteditable="true" class="border rounded-lg p-4 prose max-w-none"></div>
+<div id="frameworkEditor" class="hidden space-y-3"></div>
+<div id="rabEditor" class="hidden"></div>
+<div class="no-print flex flex-wrap gap-2 mt-4"><button id="addFramework" class="hidden rounded bg-slate-100 px-3 py-2">Add methodology phase</button><button id="addRab" class="hidden rounded bg-slate-100 px-3 py-2">Add budget row</button></div>
+</section>
+</main></div>
+<section id="printDocument" class="print-only max-w-4xl mx-auto p-8 bg-white"></section>
+<script>
+(() => {
+'use strict';
+const $ = s => document.querySelector(s);
+const state = {
+ provider:'gemini', model:'gemini-3.8-flash', apiKey:'',
+ cover:{title:'PROJECT PROPOSAL',subtitle:'Your Project Title',author:'Organization Name',target:'Target Donor/Investor',date:'Submission Date'},
+ sections:[
+ {id:'exec',title:'Executive Summary',type:'richtext',content:'<p>Summary of the entire proposal...</p>'},
+ {id:'bab1',title:'Chapter I — Background',type:'richtext',content:'<h3>1.1 Background</h3><p>Current condition...</p><h3>1.2 Problem Statement</h3><p>The core problem to be solved...</p>'},
+ {id:'bab2',title:'Chapter II — Project Objectives',type:'richtext',content:'<p>General and specific objectives...</p>'},
+ {id:'bab3',title:'Chapter III — Project Benefits',type:'richtext',content:'<p>Internal, external, and sustainability impacts...</p>'},
+ {id:'bab4',title:'Chapter IV — Scope of Work',type:'richtext',content:'<p>What will and will not be done...</p>'},
+ {id:'bab5',title:'Chapter V — Methodology',type:'framework',nodes:[{id:1,title:'Phase 1: Preparation',description:'Research and licensing'}]},
+ {id:'bab6',title:'Chapter VI — Timeline',type:'richtext',content:'<p>Project execution schedule...</p>'},
+ {id:'bab7',title:'Chapter VII — Team Structure',type:'richtext',content:'<p>Team structure and responsibilities...</p>'},
+ {id:'bab8',title:'Chapter VIII — Risk Management',type:'richtext',content:'<p>Risk identification and mitigation...</p>'},
+ {id:'bab9',title:'Chapter IX — Monitoring & Evaluation',type:'richtext',content:'<p>KPIs and success indicators...</p>'},
+ {id:'bab11',title:'Chapter X — Budget Plan (RAB)',type:'rab',rows:[{id:1,uraian:'Project Manager Honorarium',qty:3,unit:'Months',harga:1000}]},
+ {id:'bab12',title:'Chapter XI — Budget Justification',type:'richtext',content:'<p>Reasons why the funds are needed...</p>'},
+ {id:'bab13',title:'Chapter XII — Conclusion',type:'richtext',content:'<p>Conclusion and call for collaboration...</p>'}
+ ], active:'exec'
+};
+const modelOptions = {
+ gemini:[['gemini-3.8-flash','Gemini 3.8 Flash (recommended)'],['gemini-3.7-flash','Gemini 3.7 Flash']],
+ openai:[['gpt-4.1','GPT-4.1'],['gpt-4.1-mini','GPT-4.1 mini'],['gpt-4o','GPT-4o']],
+ claude:[['claude-sonnet-4-5-20250929','Claude Sonnet 4.5'],['claude-3-7-sonnet-20250219','Claude 3.7 Sonnet']],
+ deepseek:[['deepseek-chat','DeepSeek Chat'],['deepseek-reasoner','DeepSeek Reasoner']]
+};
+let activeKey = '';
+const current = () => state.sections.find(s=>s.id===state.active);
+function renderNav(){ $('#nav').replaceChildren(); state.sections.forEach(s=>{const b=document.createElement('button');b.className='w-full text-left px-3 py-2 rounded text-sm '+(s.id===state.active?'bg-blue-100 text-blue-700':'hover:bg-slate-100');b.textContent=s.title;b.onclick=()=>{saveActive();state.active=s.id;renderEditor();renderNav()};$('#nav').append(b)});}
+function saveActive(){const s=current();if(!s)return;if(s.type==='richtext')s.content=$('#richEditor').innerHTML;}
+function renderEditor(){
+ const s=current();$('#sectionTitle').textContent=s.title;
+ $('#richEditor').classList.toggle('hidden',s.type!=='richtext');$('#frameworkEditor').classList.toggle('hidden',s.type!=='framework');$('#rabEditor').classList.toggle('hidden',s.type!=='rab');
+ $('#addFramework').classList.toggle('hidden',s.type!=='framework');$('#addRab').classList.toggle('hidden',s.type!=='rab');
+ $('#richEditor').innerHTML=s.type==='richtext'?s.content:'';
+ if(s.type==='framework')renderFramework(s);if(s.type==='rab')renderRab(s);
+}
+function renderFramework(s){const root=$('#frameworkEditor');root.replaceChildren();s.nodes.forEach((n,i)=>{const card=document.createElement('div');card.className='border rounded-lg p-3 grid md:grid-cols-[1fr_1fr_auto] gap-2';card.innerHTML='<input class="border rounded p-2" aria-label="Phase title"><input class="border rounded p-2" aria-label="Description"><button class="text-red-600 px-2" aria-label="Remove phase"><i class="fa-solid fa-trash"></i></button>';card.children[0].value=n.title;card.children[1].value=n.description;card.children[0].oninput=e=>n.title=e.target.value;card.children[1].oninput=e=>n.description=e.target.value;card.children[2].onclick=()=>{s.nodes.splice(i,1);renderFramework(s)};root.append(card)})}
+function renderRab(s){const root=$('#rabEditor');root.replaceChildren();const table=document.createElement('table');table.className='w-full text-sm border-collapse';table.innerHTML='<thead><tr><th class="border p-2">Description</th><th class="border p-2">Qty</th><th class="border p-2">Unit</th><th class="border p-2">Unit price</th><th class="border p-2">Total</th><th class="border p-2">×</th></tr></thead><tbody></tbody><tfoot><tr><th colspan="4" class="text-right p-2">GRAND TOTAL</th><th id="grand" class="p-2 text-right"></th><th></th></tr></tfoot>';const body=table.querySelector('tbody');
+ s.rows.forEach((r,i)=>{const tr=document.createElement('tr');['uraian','qty','unit','harga'].forEach((k)=>{const td=document.createElement('td');td.className='border p-1';const inp=document.createElement('input');inp.className='w-full min-w-12 p-2';inp.value=r[k];inp.type=(k==='qty'||k==='harga')?'number':'text';inp.oninput=()=>{r[k]=(k==='qty'||k==='harga')?Number(inp.value):inp.value;updateTotals()};td.append(inp);tr.append(td)});const total=document.createElement('td');total.className='border p-2 text-right';total.dataset.rowTotal=i;tr.append(total);const del=document.createElement('td');del.className='border p-2';del.innerHTML='<button class="text-red-600">×</button>';del.firstChild.onclick=()=>{s.rows.splice(i,1);renderRab(s)};tr.append(del);body.append(tr)});root.append(table);function updateTotals(){let sum=0;s.rows.forEach((r,i)=>{const t=Number(r.qty)*Number(r.harga);sum+=t;table.querySelector('[data-row-total="'+i+'"]').textContent=t.toLocaleString()});$('#grand').textContent=sum.toLocaleString()}updateTotals()}
+function updateCover(){document.querySelectorAll('[data-cover]').forEach(i=>i.value=state.cover[i.dataset.cover]);document.querySelectorAll('[data-cover]').forEach(i=>i.oninput=()=>state.cover[i.dataset.cover]=i.value)}
+function renderModels(){const select=$('#model');select.replaceChildren();(modelOptions[state.provider]||[]).forEach(([v,label])=>{const o=document.createElement('option');o.value=v;o.textContent=label;select.append(o)});select.value=state.model;if(!select.value)select.selectedIndex=0;state.model=select.value}
+function promptFor(s){return 'Please improve and complete this proposal section. Return only the revised content.\nSection: '+s.title+'\nCurrent content: '+(s.type==='richtext'?s.content:JSON.stringify(s.type==='rab'?s.rows:s.nodes));}
+async function askAI(prompt){
+ const p=state.provider,m=state.model,k=activeKey;if(!k)throw Error('Enter your API key in AI settings first.');
+ let url,headers,body;
+ if(p==='gemini'){url='https://generativelanguage.googleapis.com/v1beta/models/'+encodeURIComponent(m)+':generateContent?key='+encodeURIComponent(k);headers={'Content-Type':'application/json'};body={contents:[{parts:[{text:prompt}]}]};}
+ else if(p==='openai'||p==='deepseek'){url=p==='openai'?'https://api.openai.com/v1/chat/completions':'https://api.deepseek.com/chat/completions';headers={'Content-Type':'application/json','Authorization':'Bearer '+k};body={model:m,messages:[{role:'user',content:prompt}]};}
+ else {url='https://api.anthropic.com/v1/messages';headers={'Content-Type':'application/json','x-api-key':k,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'};body={model:m,max_tokens:4096,messages:[{role:'user',content:prompt}]};}
+ const res=await fetch(url,{method:'POST',headers,body:JSON.stringify(body)});const json=await res.json();if(!res.ok)throw Error(json.error?.message||'AI request failed ('+res.status+')');
+ return p==='gemini'?json.candidates?.[0]?.content?.parts?.map(x=>x.text||'').join('\n'):p==='claude'?json.content?.map(x=>x.text||'').join('\n'):json.choices?.[0]?.message?.content;
+}
+async function assist(s){saveActive();$('#status').textContent='AI is working…';try{const answer=await askAI(promptFor(s));if(s.type==='richtext')s.content=answer;else {const clean=answer.replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/,'');const parsed=JSON.parse(clean);if(s.type==='framework')s.nodes=parsed;else s.rows=parsed;}renderEditor();$('#status').textContent='AI update complete.';}catch(e){$('#status').textContent=e.message;alert(e.message)}}
+function exportJson(){saveActive();const blob=new Blob([JSON.stringify({cover:state.cover,sections:state.sections},null,2)],{type:'application/json'});download(blob,'proposal.json')}
+function download(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();URL.revokeObjectURL(a.href)}
+function importJson(file){const reader=new FileReader();reader.onload=()=>{try{const d=JSON.parse(reader.result);if(!d.cover||!Array.isArray(d.sections))throw Error();state.cover=d.cover;state.sections=d.sections;state.active=state.sections[0]?.id||'exec';updateCover();renderNav();renderEditor()}catch{alert('Invalid proposal JSON file.')}};reader.readAsText(file)}
+function renderPrint(){saveActive();const root=$('#printDocument');root.innerHTML='<div class="page-break text-center flex flex-col justify-center min-h-screen"><h1 class="text-4xl font-bold">'+escapeHtml(state.cover.title)+'</h1><h2 class="text-2xl mt-5">'+escapeHtml(state.cover.subtitle)+'</h2><p class="mt-12">Prepared by: '+escapeHtml(state.cover.author)+'</p><p>Addressed to: '+escapeHtml(state.cover.target)+'</p><p class="mt-8">'+escapeHtml(state.cover.date)+'</p></div>'+state.sections.map(s=>'<section class="mb-8"><h2 class="text-2xl font-bold border-b mb-3">'+escapeHtml(s.title)+'</h2>'+(s.type==='richtext'?s.content:s.type==='framework'?s.nodes.map(n=>'<div class="border p-3 mb-2"><b>'+escapeHtml(n.title)+'</b><p>'+escapeHtml(n.description)+'</p></div>').join(''):'<table class="w-full border-collapse"><tr><th class="border p-2">Description</th><th class="border p-2">Qty</th><th class="border p-2">Unit</th><th class="border p-2">Price</th><th class="border p-2">Total</th></tr>'+s.rows.map(r=>'<tr><td class="border p-2">'+escapeHtml(r.uraian)+'</td><td class="border p-2">'+r.qty+'</td><td class="border p-2">'+escapeHtml(r.unit)+'</td><td class="border p-2">'+Number(r.harga).toLocaleString()+'</td><td class="border p-2">'+(r.qty*r.harga).toLocaleString()+'</td></tr></table>')+'</section>').join('')}
+function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+$('#provider').onchange=e=>{state.provider=e.target.value;state.model=modelOptions[state.provider][0][0];renderModels();$('#settingsNote').textContent=state.provider==='deepseek'?'DeepSeek API endpoint: api.deepseek.com/chat/completions':state.provider==='claude'?'Claude browser requests may be restricted; production use should go through a server proxy.':''};
+$('#model').onchange=e=>state.model=e.target.value;$('#apiKey').oninput=e=>activeKey=e.target.value;
+$('#settingsBtn').onclick=()=>$('#settings').classList.toggle('hidden');$('#closeSettings').onclick=()=>$('#settings').classList.add('hidden');
+$('#aiSection').onclick=()=>assist(current());$('#aiReviseAll').onclick=async()=>{if(!confirm('Revise all text sections sequentially?'))return;for(const s of state.sections.filter(s=>s.type==='richtext')){state.active=s.id;renderEditor();await assist(s)}};
+$('#addFramework').onclick=()=>{const s=current();s.nodes.push({id:Date.now(),title:'New phase',description:'Describe this phase'});renderFramework(s)};
+$('#addRab').onclick=()=>{const s=current();s.rows.push({id:Date.now(),uraian:'New item',qty:1,unit:'Unit',harga:0});renderRab(s)};
+$('#saveJson').onclick=exportJson;$('#loadJson').onchange=e=>{if(e.target.files[0])importJson(e.target.files[0]);e.target.value=''};
+$('#printBtn').onclick=()=>{renderPrint();window.print()};
+$('#sampleBtn').onclick=()=>{state.cover={title:'PROJECT PROPOSAL',subtitle:'Blue-Food Youth Vanguard',author:'Borneo Marine Innovation Hub',target:'Global Ocean Resilience Grant',date:'October 2026'};state.sections[0].content='<h3>Executive Summary</h3><p>A community-centered project concept focused on ocean literacy and a sustainable blue economy.</p>';updateCover();renderEditor()};
+updateCover();renderModels();renderNav();renderEditor();
+})();
+</script>
+</body>
+</html>
