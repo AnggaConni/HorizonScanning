@@ -1,0 +1,389 @@
+
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WHAT IS A RESOURCE, REALLY? | Horizon Scan AI</title>
+    <meta name="description" content="When people hear the word resources, they often think of money, oil, minerals, land, or other natural resources. But there is another resource without which most organizations cannot turn budgets, infrastructure, or plans into results: human capability.">
+    <link rel="canonical" href="https://horizon-scanning.org/blog/article/what-is-a-resource-really.html" />
+    
+    <!-- Open Graph / Facebook / LinkedIn / WA -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://horizon-scanning.org/blog/article/what-is-a-resource-really.html">
+    <meta property="og:title" content="WHAT IS A RESOURCE, REALLY?">
+    <meta property="og:description" content="When people hear the word resources, they often think of money, oil, minerals, land, or other natural resources. But there is another resource without which most organizations cannot turn budgets, infrastructure, or plans into results: human capability.">
+    <meta property="og:image" content="https://horizon-scanning.org/thum/brainresource.png">
+    <meta property="og:image:secure_url" content="https://horizon-scanning.org/thum/brainresource.png">
+    <meta property="og:image:alt" content="WHAT IS A RESOURCE, REALLY?">
+    <meta property="og:image:type" content="image/png">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://horizon-scanning.org/blog/article/what-is-a-resource-really.html">
+    <meta name="twitter:title" content="WHAT IS A RESOURCE, REALLY?">
+    <meta name="twitter:description" content="When people hear the word resources, they often think of money, oil, minerals, land, or other natural resources. But there is another resource without which most organizations cannot turn budgets, infrastructure, or plans into results: human capability.">
+    <meta name="twitter:image" content="https://horizon-scanning.org/thum/brainresource.png">
+    <meta name="twitter:image:alt" content="WHAT IS A RESOURCE, REALLY?">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- ============================================== -->
+    <!-- SCRIPT AUTO-TRANSLATE BERDASARKAN BAHASA BROWSER -->
+    <!-- ============================================== -->
+    <style>
+        /* Sembunyikan banner bawaan Google Translate agar tampilan tetap rapi */
+        .VIpgJd-ZVi9od-ORHb-OEVmcd { display: none !important; }
+        .goog-te-banner-frame.skiptranslate { display: none !important; }
+        body { top: 0 !important; }
+    </style>
+    <script>
+        // Deteksi bahasa browser
+        var userLang = navigator.language || navigator.userLanguage;
+        var langCode = userLang.split('-')[0];
+        var pageLang = 'en'; // Asumsi bahasa asli konten Anda adalah English
+
+        // Jika bahasa browser BUKAN bahasa asli, dan belum diset, paksakan translate
+        if (langCode !== pageLang && document.cookie.indexOf('googtrans=') === -1) {
+            document.cookie = "googtrans=/" + pageLang + "/" + langCode + "; path=/;";
+            document.cookie = "googtrans=/" + pageLang + "/" + langCode + "; path=/; domain=" + location.hostname + ";";
+        }
+    </script>
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en',
+                autoDisplay: false
+            }, 'google_translate_element');
+        }
+    </script>
+    <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    <!-- ============================================== -->
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        navy: { 800: '#1e293b', 900: '#0f172a', 950: '#020617' },
+                        teal: { 400: '#2dd4bf', 500: '#14b8a6', 600: '#0d9488' }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- CUSTOM CSS UNTUK RICH TEXT -->
+    <style>
+        .prose table { width: 100%; border-collapse: collapse; margin-top: 2rem; margin-bottom: 2rem; }
+        .prose th, .prose td { border: 1px solid #e2e8f0; padding: 1rem; text-align: left; }
+        .prose th { background-color: #f8fafc; color: #0f172a; font-weight: 700; }
+        .prose tr:nth-child(even) { background-color: #f8fafc; }
+        
+        .table-responsive { overflow-x: auto; width: 100%; border-radius: 0.5rem; box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1); border: 1px solid #e2e8f0; }
+        .table-responsive table { margin: 0; border: none; }
+
+        .callout { padding: 1.5rem; border-radius: 0.75rem; margin: 2rem 0; border-left: 4px solid #0d9488; background-color: #f0fdfa; }
+        .callout h4 { margin-top: 0 !important; color: #0f172a !important; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; }
+        .callout p:last-child { margin-bottom: 0 !important; }
+
+        .prose blockquote { border-left-color: #0d9488; font-style: normal; background-color: #f8fafc; padding: 1rem 1.5rem; border-radius: 0 0.75rem 0.75rem 0; color: #334155; }
+        .prose blockquote p { margin: 0; }
+
+        .chart-container { background: white; border: 1px solid #e2e8f0; border-radius: 1rem; padding: 2rem; margin: 2.5rem 0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); text-align: center; }
+        .chart-container img { margin: 0 auto; border-radius: 0.5rem; }
+        .chart-caption { font-size: 0.875rem; color: #64748b; margin-top: 1rem; text-align: center; font-style: italic; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased">
+    
+    <!-- Element Google Translate Tersembunyi -->
+    <div id="google_translate_element" style="display:none;"></div>
+
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm notranslate">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <a href="../../index.html" class="flex items-center gap-2">
+                    <i class="ph ph-radar text-teal-600 text-2xl"></i>
+                    <span class="font-bold text-lg text-navy-900 tracking-tight">HorizonScan<span class="text-teal-600">AI</span></span>
+                </a>
+                <a href="../../blog.html" class="text-sm font-bold text-slate-600 hover:text-teal-600 flex items-center gap-1 transition-colors">
+                    <i class="ph-bold ph-arrow-left"></i> Back to Articles
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <header class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-8">
+        <span class="inline-block bg-teal-100 text-teal-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-4 shadow-sm notranslate">
+            Human Resources · Political Patronage · Organizational Accountability
+        </span>
+        <h1 class="text-3xl md:text-5xl font-extrabold text-navy-900 mb-6 leading-tight">WHAT IS A RESOURCE, REALLY?</h1>
+        
+        <div class="flex items-center gap-4 text-sm text-slate-500 font-medium notranslate">
+            <div class="flex items-center gap-2">
+                <i class="ph-fill ph-user-circle text-xl text-slate-400"></i> Angga Conni Saputra
+            </div>
+            <span>•</span>
+            <div class="flex items-center gap-2">
+                <i class="ph-fill ph-calendar-blank text-lg text-slate-400"></i> November 6, 2026
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
+        <img src="https://horizon-scanning.org/thum/brainresource.png" alt="WHAT IS A RESOURCE, REALLY?" class="w-full h-auto rounded-2xl shadow-lg border border-slate-200" onerror="this.src='https://via.placeholder.com/1200x600/0f172a/ffffff?text=HorizonScan+AI'">
+    </div>
+
+    <main class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
+        <article class="prose prose-slate prose-lg max-w-none 
+            prose-headings:text-navy-900 prose-headings:font-bold 
+            prose-a:text-teal-600 hover:prose-a:text-teal-500 prose-a:font-semibold prose-a:no-underline hover:prose-a:underline
+            prose-img:rounded-xl prose-img:shadow-md
+            prose-li:marker:text-teal-500">
+            
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Article 88 — What Is a Resource, Really?</title>
+<style>
+:root{--ink:#17243a;--muted:#5e6d80;--line:#d8e1eb;--paper:#fff;--wash:#f5f8fc;--blue:#2563eb;--gold:#b7791f;--rose:#be3455;--green:#177e65}
+*{box-sizing:border-box}body{margin:0;background:#edf2f7;color:var(--ink);font:16px/1.78 system-ui,-apple-system,"Segoe UI",sans-serif}
+.article{max-width:900px;margin:28px auto;background:var(--paper);padding:clamp(22px,5vw,60px);border:1px solid var(--line);border-radius:20px}
+.eyebrow{font-size:.78rem;font-weight:850;letter-spacing:.13em;text-transform:uppercase;color:#57708d}
+h1{font-size:clamp(2.1rem,5vw,3.4rem);line-height:1.08;letter-spacing:-.04em;margin:.5rem 0}
+.deck{font-size:1.2rem;color:#4d5d72;line-height:1.65}
+h2{margin:2.7rem 0 .65rem;font-size:1.65rem;line-height:1.25;letter-spacing:-.02em}
+h3{margin:1.5rem 0 .45rem;font-size:1.12rem}
+p{margin:.85rem 0}li{margin:.5rem 0}
+.callout{margin:1.3rem 0;padding:1rem 1.2rem;border:1px solid var(--line);border-radius:14px;background:var(--wash)}
+.callout.dark{background:#142a45;color:white;border-color:#142a45}.callout.dark strong{color:#f6d779}
+blockquote{margin:1.5rem 0;padding:1rem 1.3rem;border-left:4px solid var(--blue);background:#eff6ff;font-size:1.15rem;font-weight:700}
+.visual{margin:1.4rem 0;padding:12px;border:1px solid var(--line);border-radius:16px;background:#fbfdff}
+.visual svg{width:100%;height:auto;display:block}
+.visual-note,.small{font-size:.88rem;color:var(--muted)}
+.controls{display:flex;flex-wrap:wrap;gap:8px;margin:.8rem 0}
+button{border:1px solid #b9c8d9;background:white;color:var(--ink);padding:.55rem .9rem;border-radius:999px;font-weight:750;cursor:pointer}
+button[aria-pressed="true"]{background:#172f4c;color:#fff;border-color:#172f4c}
+svg text{font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+.sources li{overflow-wrap:anywhere}.sources a{color:#1d4ed8}
+hr{border:0;border-top:1px solid var(--line);margin:2rem 0}
+@media(max-width:600px){.article{margin:0;border-radius:0}.visual{padding:5px}h2{font-size:1.45rem}}
+</style>
+</head>
+<body>
+<main class="article">
+<p class="eyebrow">Article 88 · Human Resources · Political Patronage · Organizational Accountability</p>
+<h1>WHAT IS A RESOURCE, REALLY?</h1>
+<p class="deck"><strong>The Politics of Gratitude: When Loyalty Becomes More Valuable Than Expertise</strong></p>
+<p>When people hear the word <em>resources</em>, they often think of money, oil, minerals, land, or other natural resources. But there is another resource without which most organizations cannot turn budgets, infrastructure, or plans into results: <strong>human capability.</strong></p>
+<p>People do not simply occupy positions. They interpret evidence, solve problems, build systems, maintain institutional memory, make decisions, and deliver services. Human beings are not interchangeable line items. Their knowledge, judgement, experience, and ability to learn are part of an organization’s real capacity.</p>
+<p>And yet, the way some organizations allocate money can reveal a strange contradiction: they may spend generously to preserve political relationships, while treating professional expertise as an expense to be minimized.</p>
+
+<h2>1. The contradiction: expensive connections, discounted expertise</h2>
+<p>Consider a pattern—not a claim about every organization, country, or political appointment:</p>
+<ol>
+<li>An organization is willing to spend substantial money on a person connected to a powerful official, political ally, family, or inner circle.</li>
+<li>The appointment may preserve access, reward loyalty, fulfill an obligation, or strengthen a relationship.</li>
+<li>When the organization needs a specialist whose work is genuinely important, the hiring conversation suddenly becomes about finding the lowest possible price.</li>
+<li>The specialist’s expertise is described as “support,” “nice to have,” or replaceable—even when the organization knows the role is critical.</li>
+<li>The decision is shaped less by the value and risk of the work than by who should receive the opportunity or whose relationship must be protected.</li>
+</ol>
+<p>This is the paradox: <strong>the organization may understand the value of expertise, yet its incentives reward something else.</strong> It is not necessarily that leaders cannot recognize skill. Sometimes skill simply does not deliver the same immediate political or relational return as patronage.</p>
+<div class="callout"><strong>A necessary distinction:</strong> a low offer alone does not prove favoritism. Pay can be constrained by a salary scale, procurement rules, budget limits, or a poorly designed job description. The concern is the pattern: discretionary spending for connections alongside persistent underinvestment in capabilities the organization says it needs.</div>
+
+<h2>2. What forces can push an organization toward this?</h2>
+<p>Patronage is not always one person making one obviously corrupt decision. It can emerge from a chain of pressures. A politician may need allies; an executive may need political cover; a manager may fear retaliation; a hiring process may be opaque; and the costs of poor technical decisions may be delayed or borne by someone else.</p>
+<div class="visual">
+<svg id="pressureSvg" viewBox="0 0 900 590" role="img" aria-labelledby="pressureTitle pressureDesc">
+<title id="pressureTitle">How organizational pressure can privilege connections over expertise</title>
+<desc id="pressureDesc">A flow diagram from political incentives, reciprocal obligations, opaque hiring, and weak accountability into patronage-based resource allocation, followed by consequences for expertise and organizational performance.</desc>
+<defs><marker id="arr88a" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0 0 L0 6 L8 3z" fill="#7b8da4"/></marker></defs>
+<rect x="2" y="2" width="896" height="586" rx="18" fill="#f8fafc" stroke="#d8e1eb"/>
+<text x="24" y="32" fill="#60738a" font-size="13" font-weight="900" letter-spacing="1.5">PRESSURES → DECISION LOGIC → ORGANIZATIONAL COST</text>
+<g font-size="15" font-weight="750" text-anchor="middle">
+<rect x="24" y="64" width="195" height="100" rx="14" fill="#e0edff" stroke="#7ba7ee" stroke-width="2"/>
+<text x="121" y="91" fill="#214b91">Political incentive</text><text x="121" y="115" fill="#355779" font-size="12" font-weight="500">Reward allies</text><text x="121" y="133" fill="#355779" font-size="12" font-weight="500">Maintain access / support</text>
+<rect x="242" y="64" width="195" height="100" rx="14" fill="#fff1cf" stroke="#e5b94c" stroke-width="2"/>
+<text x="339" y="91" fill="#875b08">Reciprocity</text><text x="339" y="115" fill="#805f26" font-size="12" font-weight="500">“I helped you;</text><text x="339" y="133" fill="#805f26" font-size="12" font-weight="500">you owe me”</text>
+<rect x="460" y="64" width="195" height="100" rx="14" fill="#fce7ef" stroke="#e68aa8" stroke-width="2"/>
+<text x="557" y="91" fill="#9c3152">Opaque hiring</text><text x="557" y="115" fill="#8b5265" font-size="12" font-weight="500">Discretion without</text><text x="557" y="133" fill="#8b5265" font-size="12" font-weight="500">transparent criteria</text>
+<rect x="678" y="64" width="198" height="100" rx="14" fill="#e8e5ff" stroke="#a69ae8" stroke-width="2"/>
+<text x="777" y="91" fill="#5c4b9b">Weak accountability</text><text x="777" y="115" fill="#6a6190" font-size="12" font-weight="500">Costs are hidden,</text><text x="777" y="133" fill="#6a6190" font-size="12" font-weight="500">delayed, or externalized</text>
+</g>
+<g stroke="#7b8da4" stroke-width="2.5" fill="none" marker-end="url(#arr88a)">
+<path d="M121 164 V204 H450 V234"/><path d="M339 164 V204 H450 V234"/><path d="M557 164 V204 H450 V234"/><path d="M777 164 V204 H450 V234"/>
+<path d="M450 318 V355 H220 V389"/><path d="M450 355 H680 V389"/>
+<path d="M220 474 V505 H450 V526"/><path d="M680 474 V505 H450 V526"/>
+</g>
+<rect x="220" y="234" width="460" height="84" rx="16" fill="#172f4c" stroke="#172f4c"/>
+<text x="450" y="265" text-anchor="middle" font-size="19" font-weight="900" fill="#fff">PATRONAGE-LED ALLOCATION</text>
+<text x="450" y="290" text-anchor="middle" font-size="13" fill="#dce7f5">Who gets the opportunity can outweigh what the role requires</text>
+<rect x="24" y="389" width="392" height="85" rx="14" fill="#fff0f1" stroke="#e58a99" stroke-width="2"/>
+<text x="220" y="418" text-anchor="middle" font-size="16" font-weight="850" fill="#a33147">Connections are rewarded</text>
+<text x="220" y="441" text-anchor="middle" font-size="12" fill="#8c5965">Access, loyalty, status, reciprocal favors</text>
+<rect x="484" y="389" width="392" height="85" rx="14" fill="#fff7e5" stroke="#e2bb60" stroke-width="2"/>
+<text x="680" y="418" text-anchor="middle" font-size="16" font-weight="850" fill="#875b08">Expertise is cost-minimized</text>
+<text x="680" y="441" text-anchor="middle" font-size="12" fill="#8b713d">Skills treated as negotiable overhead</text>
+<rect x="150" y="526" width="600" height="45" rx="12" fill="#dcefe8" stroke="#77b9a3" stroke-width="2"/>
+<text x="450" y="554" text-anchor="middle" font-size="15" font-weight="850" fill="#17634f">Lower capability · weaker trust · higher long-term risk</text>
+</svg>
+<p class="visual-note">Conceptual systems map—not a claim that every appointment follows this exact sequence. Multiple pressures can reinforce one another.</p>
+</div>
+<p>Several well-established concepts help describe these dynamics:</p>
+<ul>
+<li><strong>Political patronage:</strong> positions or benefits are distributed through political relationships rather than solely through role-related merit.</li>
+<li><strong>Clientelism:</strong> a reciprocal exchange in which a benefit is made conditional on political support or loyalty.</li>
+<li><strong>Nepotism:</strong> favoritism toward relatives.</li>
+<li><strong>Cronyism:</strong> favoritism toward friends or close associates.</li>
+<li><strong>Organizational capture:</strong> decisions are bent toward a narrow group’s interests rather than the organization’s stated purpose.</li>
+</ul>
+<p>These terms overlap, but they are not identical. A political appointment is not automatically clientelism; the key issue is whether benefits and loyalty are exchanged, whether merit is displaced, and whether the process is accountable.</p>
+
+<h2>3. Why can an ordinary appointment be valued more than an expert?</h2>
+<p>One answer is that organizations can be operating with two different “value systems” at once.</p>
+<div class="visual">
+<svg viewBox="0 0 900 410" role="img" aria-labelledby="valueTitle valueDesc">
+<title id="valueTitle">Two competing ways of valuing a position</title><desc id="valueDesc">A side-by-side contrast between relational value and professional value, with their immediate benefits and longer-term organizational consequences.</desc>
+<rect x="2" y="2" width="896" height="406" rx="18" fill="#f8fafc" stroke="#d8e1eb"/>
+<rect x="25" y="30" width="410" height="330" rx="16" fill="#fff1f2" stroke="#e5a0ac" stroke-width="2"/>
+<rect x="465" y="30" width="410" height="330" rx="16" fill="#eaf4ff" stroke="#93b9eb" stroke-width="2"/>
+<text x="230" y="65" text-anchor="middle" font-size="19" font-weight="900" fill="#a33147">RELATIONAL VALUE</text>
+<text x="670" y="65" text-anchor="middle" font-size="19" font-weight="900" fill="#245a9b">PROFESSIONAL VALUE</text>
+<g font-size="14" fill="#623c47">
+<text x="55" y="112" font-weight="800">What is being valued?</text><text x="55" y="138">• Political access</text><text x="55" y="162">• Loyalty / reciprocal obligation</text><text x="55" y="186">• Trust within an inner circle</text>
+<text x="55" y="230" font-weight="800">Immediate return</text><text x="55" y="256">• Relationship preserved</text><text x="55" y="280">• Favor or support secured</text>
+<text x="55" y="324" font-weight="800">Risk: competence may be secondary</text>
+</g>
+<g font-size="14" fill="#355779">
+<text x="495" y="112" font-weight="800">What is being valued?</text><text x="495" y="138">• Applied knowledge and judgement</text><text x="495" y="162">• Experience and problem-solving</text><text x="495" y="186">• Ability to deliver reliable outcomes</text>
+<text x="495" y="230" font-weight="800">Longer-term return</text><text x="495" y="256">• Better decisions and delivery</text><text x="495" y="280">• Risk reduced; capability grows</text>
+<text x="495" y="324" font-weight="800">Risk: value is harder to see or price</text>
+</g>
+<path d="M435 195 H465" stroke="#7b8da4" stroke-width="4"/>
+<text x="450" y="386" text-anchor="middle" font-size="12" fill="#60738a">Healthy governance aligns both: trusted people must also meet role requirements.</text>
+</svg>
+</div>
+<p>Relational benefits can be immediate and visible: someone is pleased, an alliance is maintained, a promise is fulfilled. The value of expertise may be less visible at first. A specialist can prevent a failure that never happens, improve a decision that would otherwise be poor, or build a system whose benefits arrive months later.</p>
+<p>This creates a familiar organizational trap: <strong>the cost of hiring an expert is visible today; the cost of not having expertise may appear much later.</strong> When decision-makers are rewarded for short-term relationships and not held accountable for long-term performance, the incentives can become badly misaligned.</p>
+<p>It is also possible to undervalue expertise because it is difficult to assess. If leaders do not know how to distinguish high-quality technical work from a polished presentation, they may fall back on price, familiarity, credentials, or personal trust. That is a management problem—not proof that expertise has no value.</p>
+
+<h2>4. The research: this is not merely a personal impression</h2>
+<p>Research documents that political connections can affect who is hired and how public organizations select employees. For example, Colonnelli, Prem, and Teso’s study of Brazil’s public workforce from 1997 to 2014 found that political connections were an important determinant of public employment, that patronage played a role, and that political considerations led to the selection of less competent individuals in the setting they studied.</p>
+<p>That finding should be interpreted carefully: it is evidence from a specific country, period, and research design—not a universal claim about every political appointment. Still, it illustrates the risk when political connections substitute for competence.</p>
+<p>OECD guidance on public integrity emphasizes merit-based, transparent recruitment and objective qualification and performance criteria. It also notes that patronage and nepotism can undermine integrity and, in extreme cases, create roles to reward allies rather than meet real organizational needs.</p>
+<p>Meanwhile, the OECD’s guidance on senior public service recruitment recognizes a genuine tension: political responsiveness matters, but appointments also need leadership assessment, transparency, accountability, and safeguards against undue political influence.</p>
+
+<h2>5. If we cannot reject the appointee, what should we do?</h2>
+<p>Here is the practical question. Suppose someone has already been appointed. Perhaps the appointment was political. Perhaps rejecting the person is not within your authority—or is simply not feasible.</p>
+<p>Do we give up? Do we silently accept that they do not understand the role?</p>
+<p>I would argue for a different response: <strong>do not confuse accepting the appointment with accepting incompetence.</strong> If the person holds the responsibility, they must learn the responsibility.</p>
+<p>That does not mean humiliating them, shouting at them, or pretending that every gap can be solved through pressure. It means building a disciplined learning and accountability process. “Pecut” should mean a demanding standard, structured practice, direct feedback, and consequences for refusing to learn—not abuse.</p>
+
+<div class="visual">
+<svg id="trainingSvg" viewBox="0 0 900 650" role="img" aria-labelledby="trainingTitle trainingDesc">
+<title id="trainingTitle">A demanding but fair pathway to competence</title>
+<desc id="trainingDesc">A process beginning with role expectations, then a diagnostic, an individual learning plan, coached practice, evidence-based assessment, and accountability or reassignment if competence is not achieved.</desc>
+<defs><marker id="arr88b" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0 0 L0 6 L8 3z" fill="#7b8da4"/></marker></defs>
+<rect x="2" y="2" width="896" height="646" rx="18" fill="#f8fafc" stroke="#d8e1eb"/>
+<text x="24" y="32" fill="#60738a" font-size="13" font-weight="900" letter-spacing="1.5">FROM APPOINTMENT TO COMPETENCE</text>
+<g stroke="#7b8da4" stroke-width="2.5" fill="none" marker-end="url(#arr88b)">
+<path d="M450 120 V145"/><path d="M450 220 V245"/><path d="M450 320 V345"/><path d="M450 420 V445"/><path d="M450 520 V545"/>
+</g>
+<g text-anchor="middle">
+<rect x="185" y="55" width="530" height="65" rx="14" fill="#e0edff" stroke="#7ba7ee" stroke-width="2"/>
+<text x="450" y="81" font-size="17" font-weight="900" fill="#214b91">1 · DEFINE THE ROLE</text><text x="450" y="103" font-size="12" fill="#355779">Responsibilities, decisions, standards, non-negotiable knowledge</text>
+<rect x="185" y="145" width="530" height="75" rx="14" fill="#fff1cf" stroke="#e5b94c" stroke-width="2"/>
+<text x="450" y="173" font-size="17" font-weight="900" fill="#875b08">2 · DIAGNOSE THE GAP</text><text x="450" y="196" font-size="12" fill="#805f26">Short oral / written assessment; separate “does not know” from “will not learn”</text>
+<rect x="185" y="245" width="530" height="75" rx="14" fill="#e8e5ff" stroke="#a69ae8" stroke-width="2"/>
+<text x="450" y="273" font-size="17" font-weight="900" fill="#5c4b9b">3 · SET A LEARNING CONTRACT</text><text x="450" y="296" font-size="12" fill="#6a6190">Mentor, modules, deadlines, practice tasks, evidence of progress</text>
+<rect x="185" y="345" width="530" height="75" rx="14" fill="#e0f2e9" stroke="#80c0a7" stroke-width="2"/>
+<text x="450" y="373" font-size="17" font-weight="900" fill="#17634f">4 · COACH + PRACTISE</text><text x="450" y="396" font-size="12" fill="#3d7664">Case exercises, real deliverables, feedback, repeat until proficient</text>
+<rect x="185" y="445" width="530" height="75" rx="14" fill="#e0edff" stroke="#7ba7ee" stroke-width="2"/>
+<text x="450" y="473" font-size="17" font-weight="900" fill="#214b91">5 · ASSESS WITH EVIDENCE</text><text x="450" y="496" font-size="12" fill="#355779">Can they explain, decide, and perform to the role’s standard?</text>
+<rect x="185" y="545" width="530" height="75" rx="14" fill="#172f4c" stroke="#172f4c" stroke-width="2"/>
+<text x="450" y="573" font-size="17" font-weight="900" fill="#f6d779">6 · ACCOUNTABILITY</text><text x="450" y="596" font-size="12" fill="#e2eaf5">Competence achieved → trust and autonomy; not achieved → more support, limits, or reassignment</text>
+</g>
+</svg>
+<p class="visual-note">The goal is capability, not punishment. The assessment should match the actual duties and be fair, documented, and proportionate.</p>
+</div>
+
+<h3>Step 1 — Make the job requirements explicit</h3>
+<p>Do not rely on vague expectations such as “be a good leader” or “understand the sector.” Translate the role into observable capabilities: what must this person know, explain, decide, produce, and be accountable for?</p>
+<h3>Step 2 — Diagnose before prescribing</h3>
+<p>Ask the person to explain the core concepts, walk through a realistic case, or review a sample deliverable. A knowledge gap, a lack of experience, a language barrier, and a refusal to learn are different problems. They require different responses.</p>
+<h3>Step 3 — Create a learning contract</h3>
+<p>Agree on a mentor, learning materials, practice assignments, deadlines, and the evidence that will demonstrate progress. A title should not exempt someone from learning; it should make the learning expectations clearer.</p>
+<h3>Step 4 — Coach, practise, and challenge</h3>
+<p>Use real work. Ask the appointee to defend a decision, explain the evidence, identify uncertainty, and respond to feedback. Repeat the cycle. A demanding leader does not merely say “you should know this.” They create the conditions and insist that the person reaches the required standard.</p>
+<h3>Step 5 — Assess performance, not loyalty or confidence</h3>
+<p>Someone may sound confident and still misunderstand the subject. Someone may be inexperienced and learn quickly. Use work samples, scenario-based assessments, transparent criteria, and feedback from relevant experts.</p>
+<h3>Step 6 — Keep accountability real</h3>
+<p>If the person meets the standard, give them greater autonomy. If they are improving but not there yet, provide additional support and time where appropriate. If they repeatedly refuse to learn or cannot safely perform essential duties, restrict decision authority, redesign the role, or pursue reassignment through fair and lawful procedures.</p>
+
+<div class="callout dark"><strong>My principle:</strong> if we cannot always control who gets appointed, we must at least insist on what the appointment requires. Political selection cannot be a permanent exemption from professional standards.</div>
+
+<h2>6. Expertise is not a luxury item</h2>
+<p>Imagine an organization working in science but failing to understand scientific evidence. Imagine a public health leader who cannot distinguish a strong study from a weak one. Imagine a monitoring and evaluation manager who cannot explain indicators, data quality, or the limits of causal claims.</p>
+<p>Should we be embarrassed? Yes—not because people begin their careers knowing everything, but because a position carries a duty to learn what is necessary to do the job responsibly.</p>
+<p>There is a difference between <strong>“I do not know yet”</strong> and <strong>“I do not need to know.”</strong> The first can be the beginning of professional growth. The second can become a risk to the entire organization.</p>
+<p>And the same standard should apply to how we pay people. If expertise is essential, compensation should reflect the required level of skill, responsibility, scarcity, and impact—within transparent and defensible pay structures. Paying the lowest possible amount is not automatically efficient if it increases delivery risk, turnover, rework, or the likelihood of failure.</p>
+
+<h2>7. Human resources means developing human capability</h2>
+<p>We cannot claim to value people while treating their knowledge as disposable. Nor can we claim to value expertise while refusing to invest in it.</p>
+<p>A healthy organization should be able to answer:</p>
+<ul>
+<li>What capabilities do we actually need?</li>
+<li>Are people selected and paid using clear, role-related criteria?</li>
+<li>Can we explain why a position exists and what value it creates?</li>
+<li>Do appointees receive support to learn—and are they held accountable for doing so?</li>
+<li>Can professional experts speak honestly when evidence contradicts political preference?</li>
+</ul>
+<p>These are not anti-politics questions. They are questions about whether an organization can remain competent, trustworthy, and useful while navigating political realities.</p>
+
+<blockquote>Being appointed is not the same as being competent. Being connected is not the same as being qualified. And being grateful to someone who gave you an opportunity does not exempt you from the responsibility to do your job properly.</blockquote>
+<p class="deck"><strong>The appointment may be political. The responsibility is still professional.</strong></p>
+<p>That is what we lack—not necessarily resources or money, but a consistent commitment to developing human capability.</p>
+<p>So before asking how much an organization should spend on its resources, perhaps we should ask a more fundamental question:</p>
+<p><strong>Do we even understand what a resource is?</strong></p>
+
+<hr>
+<h2>Research and further reading</h2>
+<ol class="sources">
+<li><strong>Colonnelli, E., Prem, M., &amp; Teso, E. (2020).</strong> “Patronage and Selection in Public Sector Organizations.” <em>American Economic Review, 110</em>(10), 3071–3099. Study of Brazil’s public workforce; reports political connections as a major determinant of employment and political considerations selecting less competent individuals in the studied setting. <a href="https://pubs.aeaweb.org/doi/10.1257/aer.20181491" target="_blank" rel="noopener">Raw link: AEA</a></li>
+<li><strong>OECD (2020).</strong> “Merit.” <em>OECD Public Integrity Handbook.</em> Explains merit-based recruitment, objective criteria, transparent processes, and risks from patronage and nepotism. <a href="https://www.oecd.org/en/publications/2020/05/oecd-public-integrity-handbook_598692a5/full-report/merit_2cd724a3.html" target="_blank" rel="noopener">Raw link: OECD</a></li>
+<li><strong>OECD (2021).</strong> “Special focus: Managing the senior level public service.” <em>Public Employment and Management 2021.</em> Discusses leadership competency assessment, transparency, accountability, and balancing political responsiveness with merit and stability. <a href="https://www.oecd.org/en/publications/2021/12/public-employment-and-management-2021_6a1fc237/full-report/component-5.html" target="_blank" rel="noopener">Raw link: OECD</a></li>
+<li><strong>OECD Recommendation on Public Integrity (2017).</strong> Recommends fair, open, merit-based recruitment and selection, with objective criteria and accountability. <a href="https://legalinstruments.oecd.org/en/instruments/OECD-LEGAL-0445/" target="_blank" rel="noopener">Raw link: OECD Legal Instruments</a></li>
+<li><strong>Trantidis, A. (2025).</strong> “Clientelism.” <em>Cambridge Elements in Political Economy.</em> Defines clientelism as conditional provision of resources or advantages in exchange for political support. <a href="https://www.cambridge.org/core/elements/clientelism/E23ABE885BA3D5DF0D3ABD1260D492D0" target="_blank" rel="noopener">Raw link: Cambridge University Press</a></li>
+<li><strong>Kuipers, N. (2026).</strong> “Bureaucratic Selection and Weberian Values: Lab-in-the-Field Evidence from Indonesia.” <em>The Journal of Politics, 88</em>(1), 234–249. An Indonesia-focused experiment examining merit-based selection, patronage, and bureaucratic values. <a href="https://doi.org/10.1086/734258" target="_blank" rel="noopener">Raw link: DOI</a></li>
+<li><strong>León, A., &amp; Santos, K. (2026).</strong> “Political accountability and bureaucratic selection.” <em>Journal of Public Economics, 255</em>, 105580. Reports that anti-corruption audits improved skill-task matching, with mechanisms including political accountability, recruitment effort, and reduced patronage. <a href="https://doi.org/10.1016/j.jpubeco.2026.105580" target="_blank" rel="noopener">Raw link: DOI</a></li>
+</ol>
+<p class="small">Evidence and framing note: research findings are summarized in context and do not establish that every politically appointed person is unqualified, that every low salary offer is favoritism, or that one training approach works for all roles. The diagrams are conceptual models authored for this article, not empirical causal estimates.</p>
+</main>
+<script>
+(function(){
+const svg=document.getElementById('pressureSvg');
+if(svg){svg.setAttribute('tabindex','0');}
+})();
+</script>
+</body>
+
+        </article>
+        
+        <div class="mt-16 pt-8 border-t border-slate-200 text-center notranslate">
+            <h3 class="text-xl font-bold text-navy-900 mb-4">Share this insight</h3>
+            <div class="flex justify-center gap-4">
+                <a href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fhorizon-scanning.org%2Fblog%2Farticle%2Fwhat-is-a-resource-really.html" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-[#0A66C2] hover:text-white transition-all shadow-sm hover:shadow"><i class="ph-fill ph-linkedin-logo text-xl"></i></a>
+                <a href="https://twitter.com/intent/tweet?url=https%3A%2F%2Fhorizon-scanning.org%2Fblog%2Farticle%2Fwhat-is-a-resource-really.html&text=WHAT%20IS%20A%20RESOURCE%2C%20REALLY%3F" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-[#1DA1F2] hover:text-white transition-all shadow-sm hover:shadow"><i class="ph-fill ph-twitter-logo text-xl"></i></a>
+                <a href="https://api.whatsapp.com/send?text=WHAT%20IS%20A%20RESOURCE%2C%20REALLY%3F%20-%20https%3A%2F%2Fhorizon-scanning.org%2Fblog%2Farticle%2Fwhat-is-a-resource-really.html" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-[#25D366] hover:text-white transition-all shadow-sm hover:shadow"><i class="ph-fill ph-whatsapp-logo text-xl"></i></a>
+            </div>
+        </div>
+    </main>
+
+</body>
+</html>
+    
