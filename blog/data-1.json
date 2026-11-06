@@ -285,6 +285,7 @@
       }
     ]
   },
+
   {
     "id": "88",
     "title": "WHAT IS A RESOURCE, REALLY?",
@@ -295,4 +296,5 @@
     "date": "November 6, 2026",
     "imageUrl": "thum/whatisresource.png"
   }
+
 ]
