@@ -687,22 +687,24 @@
         
         <div class="mt-16 mb-12 notranslate">
             <div class="mx-auto max-w-xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 text-center shadow-sm">
-                <div class="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-teal-50 text-teal-600"><i class="ph ph-rss text-2xl"></i></div>
+                
                 <h3 class="text-xl font-bold text-navy-900 mb-2">Follow Horizon Scanning</h3>
                 <p class="text-sm text-slate-500 mb-5">Get new insights and foresight articles delivered to your inbox.</p>
                 <style>
-                    .followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .form-preview{display:flex!important;flex-direction:column!important;justify-content:center!important;margin:0!important;padding:clamp(17px,5%,28px)!important;max-width:none!important;border-radius:10px!important;box-shadow:none!important}
+                    .followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .form-preview{display:flex!important;flex-direction:row!important;align-items:center!important;gap:8px!important;margin:0!important;padding:0!important;max-width:none!important;border:0!important;border-radius:0!important;box-shadow:none!important}
                     .followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .form-preview,.followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .form-preview *{box-sizing:border-box!important}
-                    .followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .preview-heading{width:100%!important}
+                    .followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .preview-heading{display:none!important}
                     .followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .preview-heading h5{margin:0!important}
-                    .followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .preview-input-field{margin-top:16px!important;width:100%!important}
-                    .followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .preview-input-field input{width:100%!important;height:44px!important;border-radius:8px!important;border:1px solid #cbd5e1!important;background:#fff!important;color:#0f172a!important;font-family:Arial,sans-serif!important;font-size:14px!important}
+                    .followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .preview-input-field{margin:0!important;flex:1 1 auto!important;width:auto!important;min-width:0!important}
+                    .followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .preview-input-field input{width:100%!important;height:38px!important;border-radius:7px!important;border:1px solid #cbd5e1!important;background:#fff!important;color:#0f172a!important;font-family:Arial,sans-serif!important;font-size:14px!important}
                     .followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .preview-input-field input::placeholder{color:#64748b!important;opacity:1!important}
-                    .followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .preview-submit-button{margin-top:12px!important;width:100%!important}
-                    .followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .preview-submit-button button{width:100%!important;height:44px!important;border:0!important;border-radius:999px!important;line-height:normal!important;background:#0d9488!important;color:#fff!important;font-family:Arial,sans-serif!important;font-weight:700!important}
-                    .followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .powered-by-line{color:#64748b!important;font-family:Arial,sans-serif!important;font-size:11px!important;margin-top:8px!important}
+                    .followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .preview-submit-button{margin:0!important;flex:0 0 112px!important;width:112px!important}
+                    .followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .preview-submit-button button{width:100%!important;height:38px!important;border:0!important;border-radius:7px!important;line-height:normal!important;background:#0d9488!important;color:#fff!important;font-family:Arial,sans-serif!important;font-weight:700!important}
+                    .followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .powered-by-line{color:#64748b!important;font-family:Arial,sans-serif!important;font-size:10px!important;margin-top:3px!important}
                     .followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .powered-by-line img{height:1.1em!important;max-height:1.1em!important}
-                </style>
+                @media(max-width:520px){.followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .form-preview{flex-wrap:wrap!important}.followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .preview-input-field{flex:1 1 100%!important}.followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .preview-submit-button{flex:1 1 100%!important;width:100%!important}}
+                    @media(max-width:520px){.followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .form-preview{flex-wrap:wrap!important}.followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .preview-input-field{flex:1 1 100%!important}.followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .preview-submit-button{flex:1 1 100%!important;width:100%!important}}
+            </style>
                 <div class="followit--follow-form-container" attr-a attr-b attr-c attr-d attr-e attr-f>
                     <form action="https://api.follow.it/subscription-form/L2JvNTVzV3R6M3BzMnFqOHhoaTE5NDJXNGM3WVE0R2hnODd2NjFoaUpUUCtVckxTL0QxY0VENlZhQjM2VjZWZ2VrczNLUDdKbmxRcjFiQndZQ1FOYWF5d0YrWEtnM3dkMVhFZk5sMzVFcGhDeHhENmtRVEQ4RTlsb3ZlcG4yLzJ8K2RNb3hFM0x1cFUvSnZiWEx3NUlQRlNvaUdMMmkrRTNGWkh4MTNNdGwwbz0=/8" method="post">
                         <div class="form-preview" style="background-color:#fff;position:relative;border:0">
@@ -713,10 +715,10 @@
                     </form>
                     <a href="https://follow.it" class="powered-by-line">Powered by <img src="https://follow.it/images/colored-logo.svg" alt="follow.it" height="17"></a>
                 </div>
-                <div class="mt-4 border-t border-slate-100 pt-4">
+                <div class="mt-2 pt-1">
                     <a href="https://horizon-scanning.org/feed.xml" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-sm font-semibold text-teal-700 hover:text-teal-800"><i class="ph-bold ph-rss"></i> Prefer an RSS reader? Open the RSS feed</a>
                 </div>
-                <p class="mt-3 text-xs text-slate-400">You can unsubscribe at any time.</p>
+                <p class="mt-1 text-[10px] text-slate-400">You can unsubscribe at any time.</p>
             </div>
         </div>
 
