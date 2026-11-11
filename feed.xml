@@ -8,7 +8,7 @@
     <link>https://horizon-scanning.org/blog.html</link>
     <description>Independent insights, methodologies, and analysis on navigating uncertainty, strategic foresight, governance, technology, and society.</description>
     <language>en</language>
-    <lastBuildDate>Wed, 11 Nov 2026 11:54:13 GMT</lastBuildDate>
+    <lastBuildDate>Wed, 11 Nov 2026 11:57:16 GMT</lastBuildDate>
     <atom:link href="https://horizon-scanning.org/feed.xml" rel="self" type="application/rss+xml" xmlns:atom="http://www.w3.org/2005/Atom" />
     <item>
       <title>THE SHU PARADOX</title>
@@ -159,6 +159,187 @@ hr{border:0;border-top:1px solid var(--line);margin:2rem 0}
 <p class="small">Evidence note: these studies support the importance of voice, psychological safety, and listening; they do not prove that a particular organization has sidelined a particular expert, nor that every dissenting employee is correct. The Shu–Mathiu diagram is an interpretive model. The recommendations are a practical synthesis of the cited research, not a claim that one standardized intervention has been tested as a package.</p>
 </main></body>]]></content:encoded>
       <media:thumbnail url="https://horizon-scanning.org/thum/suikoden2.png" />
+    </item>
+    <item>
+      <title>TRANSACTIONAL RECIPROCITY: WHEN KINDNESS BECOMES AN UNWRITTEN CONTRACT</title>
+      <link>https://horizon-scanning.org/blog/article/transactional-reciprocity-when-kindness-becomes-an-unwritten-contract.html</link>
+      <guid isPermaLink="true">https://horizon-scanning.org/blog/article/transactional-reciprocity-when-kindness-becomes-an-unwritten-contract.html</guid>
+      <pubDate>Wed, 11 Nov 2026 00:00:00 GMT</pubDate>
+      <category>Social Psychology · Transactional Reciprocity · Moral Indebtedness · Professional Ethics</category>
+      <dc:creator>Angga Conni Saputra</dc:creator>
+      <description>Why I hesitate to ask friends for help unless absolutely necessary. Gratitude, moral indebtedness, hidden expectations, and the invisible social contracts that can turn kindness into leverage over someone&apos;s future decisions.</description>
+      <content:encoded><![CDATA[<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Article 90 — Transactional Reciprocity</title>
+<style>
+:root{--ink:#17243a;--muted:#5e6d80;--line:#d8e1eb;--paper:#fff;--wash:#f5f8fc;--blue:#2563eb;--gold:#b7791f;--rose:#be3455;--green:#177e65}
+*{box-sizing:border-box}body{margin:0;background:#edf2f7;color:var(--ink);font:16px/1.78 system-ui,-apple-system,"Segoe UI",sans-serif}
+.article{max-width:900px;margin:28px auto;background:var(--paper);padding:clamp(22px,5vw,60px);border:1px solid var(--line);border-radius:20px}
+.eyebrow{font-size:.78rem;font-weight:850;letter-spacing:.13em;text-transform:uppercase;color:#57708d}
+h1{font-size:clamp(2.1rem,5vw,3.4rem);line-height:1.08;letter-spacing:-.04em;margin:.5rem 0}
+.deck{font-size:1.2rem;color:#4d5d72;line-height:1.65}
+h2{margin:2.7rem 0 .65rem;font-size:1.65rem;line-height:1.25;letter-spacing:-.02em}
+h3{margin:1.5rem 0 .45rem;font-size:1.12rem}
+p{margin:.85rem 0}li{margin:.5rem 0}
+.callout{margin:1.3rem 0;padding:1rem 1.2rem;border:1px solid var(--line);border-radius:14px;background:var(--wash)}
+.callout.dark{background:#142a45;color:white;border-color:#142a45}.callout.dark strong{color:#f6d779}
+blockquote{margin:1.5rem 0;padding:1rem 1.3rem;border-left:4px solid var(--blue);background:#eff6ff;font-size:1.15rem;font-weight:700}
+.visual{margin:1.4rem 0;padding:12px;border:1px solid var(--line);border-radius:16px;background:#fbfdff}
+.visual svg{width:100%;height:auto;display:block}
+.visual-note,.small{font-size:.88rem;color:var(--muted)}
+.sources li{overflow-wrap:anywhere}.sources a{color:#1d4ed8}
+hr{border:0;border-top:1px solid var(--line);margin:2rem 0}
+@media(max-width:600px){.article{margin:0;border-radius:0}.visual{padding:5px}h2{font-size:1.45rem}}
+</style>
+</head>
+<body>
+<main class="article">
+<p class="eyebrow">Article 90 · Social Psychology · Reciprocity · Professional Ethics · Human Relationships</p>
+<h1>TRANSACTIONAL RECIPROCITY: WHEN KINDNESS BECOMES AN UNWRITTEN CONTRACT</h1>
+<p class="deck"><strong>Why I would rather give help than ask for it, and why I prefer clear agreements over invisible debts.</strong></p>
+<p>Why am I reluctant to ask friends or other people for help unless it is absolutely necessary?</p>
+<p>It is not because I dislike helping others. Quite the opposite.</p>
+<p>I simply don't want a favor to become an invisible debt that someone can collect years later.</p>
+<p>I believe there is a difference between <strong>gratitude, reciprocity, and transactional obligation.</strong></p>
+<p>This is also why organizations like the United Nations have rules governing gifts and benefits: to protect integrity, independence, impartiality, and prevent conflicts of interest or undue influence over professional decisions.</p>
+<p>Let me explain.</p>
+
+<h2>1. When a favor becomes an unwritten contract</h2>
+<p>Imagine someone helps you through a difficult period in your life.</p>
+<p>You genuinely appreciate it. You are grateful, and you never forget what they did.</p>
+<p>But several years later, that person approaches you with a request:</p>
+<blockquote>"My child needs a job. Can you help get them into your organization?"</blockquote>
+<p>Now you face a dilemma.</p>
+<p>There might be other candidates who are more qualified, more experienced, and more deserving of the opportunity.</p>
+<p>Do you prioritize the child because of your personal debt to their parent?</p>
+<p>If you do, you might be unfair to other candidates.</p>
+<p>If you refuse, you might be accused of being ungrateful.</p>
+<p>This is precisely why I am cautious about accepting favors.</p>
+<p><strong>Gratitude should not automatically become a lifelong obligation to fulfill someone else's requests.</strong></p>
+<p>A favor that was originally presented as unconditional kindness can gradually become a source of leverage. The recipient may discover that the original assistance came with expectations that were never explicitly communicated.</p>
+<div class="callout"><strong>The distinction:</strong> Remembering someone's kindness is healthy. Being expected to surrender future professional judgment because of that kindness is a different matter.</div>
+
+<h2>2. There is nothing wrong with a transparent professional exchange</h2>
+<p>For example, I might help someone prepare several project proposals, develop applications, write code, and deliver the actual working products.</p>
+<p>In return, I might ask for a professional recommendation letter.</p>
+<p>I consider that reasonable.</p>
+<p>Why?</p>
+<p>Because the work has been delivered. The applications and code are already in their hands. There is a tangible contribution, and the request for professional recognition is transparent.</p>
+<p>I am not asking for an undefined personal favor. I am asking for professional recognition based on the actual contribution I made.</p>
+<p>There is a difference between a mutually understood exchange and an undefined obligation that suddenly appears years later.</p>
+<p>I don't mind reciprocity.</p>
+<p>I mind hidden expectations.</p>
+<div class="callout dark"><strong>My preference:</strong><br>"I help you with this, and you help me with that."<br><br>Both parties understand the arrangement. No guessing, no emotional accounting, and no collecting favors several years later.</div>
+
+<h2>3. The problem with saying "I helped you, but you keep asking for more."</h2>
+<p>Consider humanitarian assistance.</p>
+<p>Imagine refugees who have lost almost everything.</p>
+<p>An organization provides food, drinking water, and temporary accommodation.</p>
+<p>But are those the only things human beings need?</p>
+<p>What about sanitation, healthcare, reproductive health, education, psychological well-being, social interaction, and recreational activities?</p>
+<p><strong>Survival is not the same as living with dignity.</strong></p>
+<p>If the organization cannot provide everything, that is understandable. Resources are limited, and priorities must be established.</p>
+<p>But imagine the organization starts complaining:</p>
+<blockquote>"We have already given them food and shelter. Why are they asking for more?"</blockquote>
+<p>This is where I see a dangerous misunderstanding.</p>
+<p>Providing basic assistance does not mean the recipient must stop having other legitimate human needs.</p>
+<p>The recipient is not automatically being ungrateful simply because the initial assistance was insufficient.</p>
+<p>Of course, assistance has limits. But those limits should be communicated honestly rather than turning legitimate needs into a moral accusation against the recipient.</p>
+<p>Humanitarian assistance is not a personal favor that gives the donor ownership over the recipient's expectations. It is a response to human needs, guided by dignity, accountability, and available resources.</p>
+<p>There is an important distinction between recognizing resource constraints and making recipients feel guilty for having needs.</p>
+
+<h2>4. Not every relationship should operate like a transaction</h2>
+<p>I also recognize that different relationships have different expectations.</p>
+<p>I have a different perspective when asking for help from my parents, siblings, or someone I genuinely love, such as a husband or wife.</p>
+<p>Even when there are expectations or personal interests involved, I can accept that kind of reciprocity differently.</p>
+<p>Why?</p>
+<p>Because family and intimate relationships are built around ongoing mutual commitment, shared responsibilities, and emotional bonds.</p>
+<p>They are not necessarily equivalent to professional relationships or ordinary friendships.</p>
+<p>I don't expect every relationship to be completely free of self-interest.</p>
+<p>But I do expect some clarity about what kind of relationship and obligation we are entering.</p>
+<p>Not every exchange needs to be calculated. A healthy family relationship, for example, often involves generalized reciprocity: people give and receive over time without keeping an exact record of every contribution.</p>
+<p>However, that does not mean every friendship or professional relationship should operate under the same expectations.</p>
+
+<h2>5. The real issue: Gratitude versus indebtedness</h2>
+<p>Research in social psychology distinguishes between gratitude and indebtedness.</p>
+<p>They are related, but they are not identical.</p>
+<p><strong>Gratitude</strong> is appreciating what someone has done for you.</p>
+<p><strong>Indebtedness</strong> is feeling that you owe someone something in return.</p>
+<p>And when someone perceives that a favor was given strategically, with an expectation of future repayment, the resulting obligation can feel more like pressure than genuine appreciation.</p>
+<p>This is an important distinction. Someone can appreciate a person's generosity while simultaneously feeling uncomfortable about the obligation to repay it.</p>
+<p>The problem becomes more complicated when the expected repayment is never communicated.</p>
+<p>One person believes they have given unconditional assistance. The other person may feel they have entered an informal contract without knowing its terms.</p>
+<p>Years later, both parties may have completely different understandings of what happened.</p>
+<p>This is why I prefer to be careful when asking for favors.</p>
+<p>I would rather find a professional solution, pay for a service, or solve a problem independently than create an undefined social obligation.</p>
+<p>I don't want someone to feel that I owe them something they never explicitly told me about.</p>
+<p>And I don't want to use my past kindness as leverage over someone else's future decisions either.</p>
+
+<h2>6. Why professional organizations regulate gifts and favors</h2>
+<p>This issue is not limited to personal relationships. It also matters in professional institutions.</p>
+<p>Organizations such as the United Nations maintain ethical rules concerning gifts, benefits, outside interests, and conflicts of interest.</p>
+<p>Why?</p>
+<p>Because professional decisions should not be influenced by personal favors, financial interests, relationships, or expectations of future reciprocity.</p>
+<p>Imagine an employee who receives substantial personal assistance from a contractor, supplier, government representative, or another individual seeking to influence an official decision.</p>
+<p>Even if the employee believes they can remain objective, the situation can create a conflict of interest or the appearance of undue influence.</p>
+<p>It can undermine public trust.</p>
+<p>The issue is not necessarily that every gift is corrupt or every favor is suspicious. The concern is that personal generosity can create obligations, dependencies, or perceptions that compromise professional independence.</p>
+<p>This is why transparent procedures, disclosure requirements, and restrictions on certain gifts and benefits matter.</p>
+<p><strong>Professional integrity requires more than having good intentions. It also requires avoiding situations that can compromise, or appear to compromise, independent judgment.</strong></p>
+
+<h2>7. Why I prefer to give rather than ask</h2>
+<p>And perhaps this explains why I tend to help people more often than I ask them for help.</p>
+<p>When I help someone, I know what I am offering, what I am contributing, and where my boundaries are.</p>
+<p>I don't have to worry about someone bringing up an old favor years later, questioning my decisions, or expecting something in return that was never discussed.</p>
+<p>There is also an interesting psychological dynamic: people who receive substantial help may develop a sense of indebtedness. Sometimes, they become uncomfortable disagreeing, setting boundaries, or refusing future requests because they perceive themselves as being indebted to the giver.</p>
+<p>I recognize that this is not necessarily a healthy foundation for every relationship, and I don't expect people to remain silent simply because I helped them.</p>
+<p>But it illustrates why I am more comfortable being the giver than the recipient.</p>
+<p>Personally, I would rather avoid that psychological burden altogether.</p>
+<p>My preferred arrangement is simple: <strong>direct and transparent reciprocity.</strong></p>
+<p>You help me with something, and I help you with something in return.</p>
+<blockquote>"I help you with this, and you help me with that."</blockquote>
+<p>No mysterious obligations. No emotional accounting. No collecting favors several years later.</p>
+<p>If we agree on an exchange, we both know what we are getting into.</p>
+<p>And if someone genuinely wants to help me without expecting anything in return, I appreciate that. But I would rather not make a habit of depending on other people's generosity.</p>
+<p>Perhaps I am overly cautious, but I value relationships where people can freely say yes, freely say no, and never have to wonder what an old favor will cost them in the future.</p>
+<p>I would rather have a clear agreement than an invisible debt.</p>
+
+<h2>8. The difference between helping and controlling</h2>
+<p>There is one final distinction worth making.</p>
+<p>Helping someone should not give us ownership over their future decisions.</p>
+<p>If I help someone, I should not expect to control whom they hire, whom they marry, what opportunities they pursue, or which decisions they make years later.</p>
+<p>Likewise, if someone helps me, I should not automatically be expected to surrender my professional judgment or personal autonomy.</p>
+<p>We can acknowledge past generosity without turning it into a permanent instrument of influence.</p>
+<p>And this principle should apply in both directions.</p>
+<p>I don't want to be controlled by someone's generosity, and I don't want my generosity to become a tool for controlling someone else.</p>
+
+<div class="callout dark"><strong>My principle:</strong><br>I want people to help me because they genuinely want to, not because they expect something from me. And I want to help others without making them feel that they owe me their future.</div>
+
+<h2>My point is simple</h2>
+<ul>
+<li>You can be grateful without being permanently indebted.</li>
+<li>You can help someone without owning their future decisions.</li>
+<li>You can accept assistance without surrendering your right to say no later.</li>
+<li>You can acknowledge someone's kindness without sacrificing fairness toward other people.</li>
+<li>You can establish reciprocity without creating hidden obligations.</li>
+</ul>
+<blockquote>Kindness should build relationships, not create invisible contracts that can be enforced whenever the benefactor wants.</blockquote>
+<p class="deck"><strong>I would rather have a clear agreement than an invisible debt.</strong></p>
+<hr>
+<h2>References and further reading</h2>
+<ol class="sources">
+<li><strong>Gouldner, A. W. (1960).</strong> "The Norm of Reciprocity: A Preliminary Statement." <em>American Sociological Review.</em> A foundational explanation of reciprocity as a social norm. <a href="https://doi.org/10.2307/2092623" target="_blank" rel="noopener">Raw link: DOI</a></li>
+<li><strong>Greater Good Science Center, UC Berkeley.</strong> Articles on gratitude, indebtedness, and the psychology of giving and receiving. <a href="https://greatergood.berkeley.edu/" target="_blank" rel="noopener">Raw link: Greater Good Magazine</a></li>
+<li><strong>Big Think.</strong> "'Don't Mention It': Yeah, Right!" Discusses hidden expectations and the social obligations attached to favors. <a href="https://bigthink.com/influence-power-politics/dont-mention-it-yeah-right/" target="_blank" rel="noopener">Raw link: Big Think</a></li>
+<li><strong>Cleveland Clinic.</strong> "How To Recognize (and Stop) a Guilt Trip." Explains how guilt can be used to influence another person's decisions and boundaries. <a href="https://health.clevelandclinic.org/guilt-trip" target="_blank" rel="noopener">Raw link: Cleveland Clinic</a></li>
+<li><strong>Sphere Association.</strong> <em>The Sphere Handbook.</em> Humanitarian principles and minimum standards concerning dignity, assistance, accountability, and essential human needs. <a href="https://spherestandards.org/handbook/" target="_blank" rel="noopener">Raw link: Sphere Handbook</a></li>
+<li><strong>United Nations Ethics Office.</strong> Guidance on ethics, gifts, outside interests, and conflicts of interest. <a href="https://www.un.org/en/ethics/" target="_blank" rel="noopener">Raw link: UN Ethics Office</a></li>
+</ol>
+<p class="small">Conceptual note: Transactional Reciprocity is used here as an editorial framing for exchanges involving explicit or implicit expectations of repayment. It is not presented as a standalone psychological diagnosis or universally established scientific theory. Gratitude, indebtedness, and reciprocity can have healthy as well as unhealthy forms. This article focuses on situations where expectations are unclear, disproportionate, or used as leverage.</p>
+</main>
+</body>]]></content:encoded>
+      <media:thumbnail url="https://horizon-scanning.org/thum/transactional-reciprocity.png" />
     </item>
     <item>
       <title>WHAT IS A RESOURCE, REALLY?</title>
@@ -11535,624 +11716,6 @@ When reality changes the plan, does the updated information reach everyone affec
   <p class='text-amber-800 text-sm leading-relaxed m-0'>This article continues the discussion from <em>"Living Heritage as a Peacebuilder?"</em>, where the central idea was that social systems often contain mechanisms that shape how people coexist and respond to conflict.</p>
 </div>]]></content:encoded>
       <media:thumbnail url="https://horizon-scanning.org/thum/stopmemorizingstrategies.png" />
-    </item>
-    <item>
-      <title>The Hidden Price of Waiting: Mastering Cost of Delay in High-Stakes Decisions</title>
-      <link>https://horizon-scanning.org/blog/article/the-hidden-price-of-waiting-mastering-cost-of-delay-in-high-stakes-decisions.html</link>
-      <guid isPermaLink="true">https://horizon-scanning.org/blog/article/the-hidden-price-of-waiting-mastering-cost-of-delay-in-high-stakes-decisions.html</guid>
-      <pubDate>Fri, 21 Aug 2026 00:00:00 GMT</pubDate>
-      <category>Business &amp; Decision Science</category>
-      <dc:creator>Angga Conni Saputra</dc:creator>
-      <description>Every day a decision is postponed, value quietly leaks away — sometimes linearly, sometimes off a cliff. This article unpacks the economics of delay through Real Options Theory, WSJF, and ISO 31000 risk principles, and includes a fully interactive Enterprise Cost of Delay &amp; Time-Criticality Simulator embedded seamlessly in the middle of the article.</description>
-      <content:encoded><![CDATA[<p class="lead text-xl md:text-2xl text-slate-600 font-light leading-relaxed mb-8">There is a myth in project management that time is money. The truth is more brutal than that: time is a decaying asset, and the moment you miss a deadline, that asset does not depreciate in a straight line — it often falls off a cliff.</p>
-
-<p>I started thinking seriously about this after watching two very different failures. One was a startup that delayed a product launch by two weeks to "polish the UI," only to watch a competitor capture the market first. The other was a disaster relief coordination team that delayed a supply drop by three days because of an approval bottleneck — and the value of that delay was measured in a currency far heavier than money.</p>
-
-<p>Both cases share the same underlying structure. Both are victims of what economists and agile practitioners call the <strong>Cost of Delay (CoD)</strong> — the quantifiable financial and strategic loss incurred for every unit of time a decision, project, or intervention is postponed.</p>
-
-<h3 class="text-2xl font-extrabold text-slate-900 mt-16 mb-6">Why "Being Late" Is Not a Single Kind of Problem</h3>
-
-<p>Most people intuitively understand that being late is bad. Few people understand that <em>how</em> a thing decays in value is just as important as <em>how long</em> it is delayed.</p>
-
-<p>Consider four completely different scenarios:</p>
-
-<ul class="space-y-2 mb-8 ml-4 list-disc list-inside text-slate-700">
-  <li><strong>A quarterly compliance report</strong> filed four days late. Annoying, but essentially harmless. Value decays almost linearly, if at all.</li>
-  <li><strong>A product launch</strong> delayed by two weeks in a fast-moving market. Every week that passes, a competitor edges closer, and the total addressable market shrinks. Decay is exponential.</li>
-  <li><strong>An M&A negotiation</strong> where the counterparty has other options. The longer you wait, the more likely they walk away — not gradually, but through a psychological and contractual threshold.</li>
-  <li><strong>A disaster response window</strong> — the so-called "Golden Hour" in emergency medicine, or the 72-hour survival window in earthquake response. Value does not decay slowly here. It collapses instantly once a threshold is crossed. This is a Hard Cliff.</li>
-</ul>
-
-<p>Traditional project management tools — Gantt charts, burn-down charts, simple variance analysis — capture <em>that</em> something is late. They almost never capture <em>how much that lateness actually costs</em>, nor do they distinguish between a linear administrative delay and a catastrophic, irreversible one.</p>
-
-<h3 class="text-2xl font-extrabold text-slate-900 mt-16 mb-6">Borrowing from Agile, Risk Management, and Real Options Theory</h3>
-
-<p>The framework I want to walk through here draws on three distinct disciplines that rarely get combined into a single practical tool:</p>
-
-<p><strong>1. WSJF (Weighted Shortest Job First)</strong> — a prioritization technique from the Scaled Agile Framework (SAFe) that ranks work based on Cost of Delay divided by job duration. It forces teams to ask not "what is urgent" but "what is expensive to postpone."</p>
-
-<p><strong>2. ISO 31000 Risk Analysis</strong> — which teaches us to separate <em>likelihood</em> from <em>consequence</em>, and crucially, to evaluate risk severity through multiple lenses: how reversible is the damage, how volatile is the environment, and how fast does the exposure window close.</p>
-
-<p><strong>3. Real Options Theory</strong> — borrowed from financial economics, where the right (but not obligation) to act at a future date has a quantifiable value that decays as the option nears expiration or as uncertainty resolves against you. A market opportunity, much like a call option, has a "time value" that bleeds away the longer you hesitate.</p>
-
-<p>When you combine these three lenses, you stop asking simply "are we late?" and start asking a much sharper question: <em>"Given how this specific type of value decays, how much money — and how much strategic option value — are we burning per day of delay, and is it economically rational to pay extra to accelerate?"</em></p>
-
-<h3 class="text-2xl font-extrabold text-slate-900 mt-16 mb-6">The Two Components of Cost of Delay</h3>
-
-<p>Most naive CoD calculations only look at one number: potential revenue lost. That is incomplete. In reality, cost of delay is made of two very different components that must be added together:</p>
-
-<p><strong>Component 1 — Direct Overhead Loss.</strong> This is the boring, linear part: every extra day of the project consumes salaries, rent, utilities, opportunity cost of the team's time. It is simply <code>Days Delayed × Daily Burn Rate</code>. Predictable, unavoidable, and often underestimated because it hides inside "we'll just work a bit longer."</p>
-
-<p><strong>Component 2 — Value Decay Loss.</strong> This is the interesting, non-linear part. The target value at stake (a contract, a market opportunity, a life to be saved, a negotiation) does not remain constant while you're late. It erodes — and the shape of that erosion curve depends entirely on the nature of the opportunity.</p>
-
-<div class="bg-teal-50 border border-teal-100 rounded-xl p-6 my-8">
-  <p class="text-sm font-bold text-teal-800 mb-2">Note</p>
-  <p class="text-sm text-teal-700 leading-relaxed">The interactive tool below implements exactly this two-component model, using a criticality multiplier (λ) derived from three qualitative risk dimensions: Decay Speed, Irreversibility, and Counterparty Risk. It also includes a Crashing ROI module — telling you whether it is economically rational to pay extra money to accelerate a late project.</p>
-</div>
-
-<!-- ==================== INTERACTIVE CALCULATOR ==================== -->
-<div class="not-prose my-12">
-
-  <div class="flex items-center gap-3 mb-4">
-    <div class="h-px flex-1 bg-gradient-to-r from-transparent via-indigo-300 to-indigo-400"></div>
-    <span class="text-[11px] font-bold uppercase tracking-[0.15em] text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full border border-indigo-100">Interactive Simulator</span>
-    <div class="h-px flex-1 bg-gradient-to-l from-transparent via-indigo-300 to-indigo-400"></div>
-  </div>
-
-  <div class="bg-amber-50 border-l-4 border-amber-500 p-4 mb-5 rounded-r-lg">
-    <p class="text-sm text-amber-900 font-bold mb-1">How to use the Cost of Delay Simulator</p>
-    <ul class="list-disc list-inside text-sm text-amber-800 space-y-1">
-      <li>Enter your planned vs. actual/estimated duration, the value at stake, and your daily burn rate (Panel 1).</li>
-      <li>Select how fast value decays, how reversible the loss is, and how volatile your counterparty/environment is (Panel 2).</li>
-      <li>Optionally simulate a "crashing" scenario — paying extra to cut delay days — and see whether it's economically rational (Panel 3).</li>
-      <li>Review the Risk Score gauge, decay curve, total Cost of Delay, and the Crashing ROI verdict in the results panel.</li>
-      <li>Tap the Quick Load presets to see how radically the decay <em>shape</em> changes the financial outcome.</li>
-    </ul>
-  </div>
-
-  <div id="cod-app-container" class="w-full rounded-2xl overflow-hidden shadow-xl ring-1 ring-slate-200 bg-slate-50">
-  </div>
-
-  <p class="text-center text-xs text-slate-400 mt-3 italic">Fig. 1 — Enterprise Cost of Delay &amp; Time-Criticality Simulator. All calculations run locally in your browser; nothing is transmitted or stored.</p>
-
-</div>
-
-<template id="cod-app-template"><!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Enterprise Cost of Delay &amp; Time-Criticality Simulator</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<style>
-  html, body { overflow: hidden !important; }
-  body {
-    background: #f8fafc;
-    color: #0f172a;
-    font-family: 'Inter', system-ui, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    margin: 0;
-  }
-  .gauge-arc { transition: stroke-dasharray .6s cubic-bezier(.4,0,.2,1), stroke .6s ease; }
-  .panel {
-    background: #fff;
-    border: 1px solid #e6ebf2;
-    border-radius: 14px;
-    box-shadow: 0 1px 2px rgba(15,23,42,.04);
-  }
-  .fld {
-    width: 100%;
-    padding: 8px 11px;
-    font-size: 13px;
-    border: 1px solid #cbd5e1;
-    border-radius: 8px;
-    outline: none;
-    background: #fff;
-    transition: border-color .15s, box-shadow .15s;
-  }
-  .fld:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,.14); }
-  select.fld { background: #f8fafc; cursor: pointer; }
-  .lbl { display:block; font-size:11px; font-weight:600; color:#334155; margin-bottom:4px; letter-spacing:.01em; }
-  .hint { font-size:10px; color:#94a3b8; margin-top:3px; line-height:1.35; }
-  .sect-title {
-    display:flex; align-items:center; gap:8px;
-    font-size:14px; font-weight:700; color:#1e293b;
-    padding-bottom:10px; margin-bottom:14px;
-    border-bottom:1px solid #eef2f7;
-  }
-  .badge-num {
-    width:22px; height:22px; border-radius:6px;
-    background:#eef2ff; color:#4f46e5;
-    display:flex; align-items:center; justify-content:center;
-    font-size:11px; font-weight:800; flex-shrink:0;
-  }
-  .kpi { background:#f8fafc; border:1px solid #e6ebf2; border-radius:12px; padding:12px 13px; }
-  .kpi-lbl { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#94a3b8; }
-  .preset-btn {
-    padding:7px 12px; font-size:11.5px; font-weight:600;
-    background:#fff; color:#4338ca;
-    border:1px solid #c7d2fe; border-radius:8px;
-    cursor:pointer; transition:all .15s; white-space:nowrap;
-  }
-  .preset-btn:hover { background:#eef2ff; border-color:#818cf8; transform:translateY(-1px); }
-  .preset-btn:active { transform:translateY(0); }
-</style>
-</head>
-<body>
-<div id="root" class="p-4 sm:p-6">
-
-  <!-- Compact header -->
-  <div class="mb-4">
-    <h1 class="text-xl sm:text-2xl font-black tracking-tight text-slate-900 leading-tight">
-      Enterprise <span class="text-indigo-600">Cost of Delay</span> Simulator
-    </h1>
-    <p class="text-xs sm:text-[13px] text-slate-500 mt-1">
-      Quantify financial loss, strategic option erosion, and whether paying to accelerate is worth it.
-    </p>
-  </div>
-
-  <!-- Presets -->
-  <div class="panel p-3 mb-5" style="background:#f5f7ff; border-color:#e0e7ff;">
-    <div class="flex flex-col sm:flex-row sm:items-center gap-2.5">
-      <span class="text-[10px] font-bold uppercase tracking-[.08em] text-indigo-800 shrink-0">⚡ Quick Load</span>
-      <div class="flex flex-wrap gap-2">
-        <button class="preset-btn" onclick="loadPreset('launch')">🚀 Product Launch</button>
-        <button class="preset-btn" onclick="loadPreset('drr')">🚨 Disaster Response</button>
-        <button class="preset-btn" onclick="loadPreset('ma')">🤝 M&amp;A Deal</button>
-        <button class="preset-btn" onclick="loadPreset('admin')">📄 Routine Admin</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
-
-    <!-- ============ INPUTS ============ -->
-    <div class="lg:col-span-5 space-y-4">
-
-      <div class="panel p-4">
-        <div class="sect-title">
-          <span class="badge-num">1</span>
-          <span class="flex-1">Time &amp; Financial Impact</span>
-          <span class="text-[10px] font-medium text-indigo-500">USD ($)</span>
-        </div>
-        <div class="grid grid-cols-2 gap-3 mb-3">
-          <div>
-            <label class="lbl">Planned Duration (Days)</label>
-            <input type="number" id="planned" value="30" min="1" class="fld">
-          </div>
-          <div>
-            <label class="lbl">Actual / Estimated (Days)</label>
-            <input type="number" id="actual" value="45" min="0" class="fld">
-          </div>
-        </div>
-        <div class="space-y-3 pt-3 border-t border-slate-100">
-          <div>
-            <label class="lbl">Target Value / Revenue at Stake ($)</label>
-            <input type="number" id="valueAtStake" value="500000" step="10000" class="fld">
-            <p class="hint">Total business value intended to be captured at T₀.</p>
-          </div>
-          <div>
-            <label class="lbl">Daily Burn Rate / Operating Cost ($)</label>
-            <input type="number" id="dailyBurnRate" value="5000" step="500" class="fld">
-            <p class="hint">Salaries, team, and fixed overhead consumed per day of delay.</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="panel p-4">
-        <div class="sect-title">
-          <span class="badge-num">2</span>
-          <span>Sensitivity &amp; Risk Factors</span>
-        </div>
-        <div class="space-y-3">
-          <div>
-            <label class="lbl">Value Decay Speed</label>
-            <select id="sensitivity" class="fld">
-              <option value="1">No Decay — Linear / Administrative</option>
-              <option value="1.5">Moderate Decay — Gradual Loss</option>
-              <option value="2.5" selected>Rapid Decay — Exponential / Fast Market</option>
-              <option value="4">Hard Cliff — Total Loss / DRR Golden Hour</option>
-            </select>
-          </div>
-          <div>
-            <label class="lbl">Irreversibility (Recovery Level)</label>
-            <select id="irreversibility" class="fld">
-              <option value="1">Fully Recoverable — can work extra hours</option>
-              <option value="1.5" selected>Partially Recoverable</option>
-              <option value="2.5">Permanently Lost — time / biological / momentum</option>
-            </select>
-          </div>
-          <div>
-            <label class="lbl">External &amp; Counterparty Risk</label>
-            <select id="counterparty" class="fld">
-              <option value="1">Low — static environment / contractually bound</option>
-              <option value="1.5">Medium — standard market risk</option>
-              <option value="2.5" selected>High — volatile / partner could walk away</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <div class="panel p-4" style="border-left:3px solid #4f46e5;">
-        <div class="sect-title">
-          <span class="badge-num">3</span>
-          <span>Acceleration Simulation (Crashing)</span>
-        </div>
-        <p class="hint" style="margin:-6px 0 12px 0;">Test whether adding resources to recover the schedule pays for itself.</p>
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="lbl">Acceleration Cost ($)</label>
-            <input type="number" id="crashCost" value="30000" step="1000" class="fld">
-          </div>
-          <div>
-            <label class="lbl">Days Successfully Cut</label>
-            <input type="number" id="daysSaved" value="10" min="0" class="fld">
-          </div>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- ============ RESULTS ============ -->
-    <div class="lg:col-span-7 space-y-4">
-
-      <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-        <div class="kpi col-span-2 md:col-span-1">
-          <p class="kpi-lbl">Total Cost of Delay</p>
-          <p class="text-lg md:text-xl font-black text-red-600 mt-1 leading-tight" id="totalFinancialCost">$0</p>
-          <p class="text-[9.5px] text-slate-400 mt-1 leading-snug" id="costBreakdown">Loss + Overhead</p>
-        </div>
-        <div class="kpi">
-          <p class="kpi-lbl">Time Overrun</p>
-          <p class="text-lg md:text-xl font-black text-slate-800 mt-1" id="baseOverrun">0%</p>
-          <p class="text-[9.5px] text-slate-400 mt-1" id="daysOverrunText">0 days behind</p>
-        </div>
-        <div class="kpi">
-          <p class="kpi-lbl">Criticality λ</p>
-          <p class="text-lg md:text-xl font-black text-indigo-600 mt-1" id="multiplier">1.00x</p>
-          <p class="text-[9.5px] text-slate-400 mt-1">Combined sensitivity</p>
-        </div>
-      </div>
-
-      <div class="panel p-4">
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 items-center">
-          <div class="flex flex-col items-center justify-center relative">
-            <svg viewBox="0 0 200 112" class="w-44">
-              <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="#e8edf3" stroke-width="15" stroke-linecap="round"/>
-              <path id="gaugeArc" d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="#22c55e" stroke-width="15" stroke-linecap="round" stroke-dasharray="0, 251.2" class="gauge-arc"/>
-            </svg>
-            <div class="absolute bottom-1 flex flex-col items-center">
-              <span class="text-[9px] font-bold text-slate-400 uppercase tracking-[.1em]">Risk Score</span>
-              <span id="riskScoreDisplay" class="text-3xl font-black text-slate-800 leading-none">0</span>
-            </div>
-          </div>
-          <div>
-            <div class="flex justify-between items-baseline mb-1.5">
-              <span class="text-[11px] font-bold text-slate-700">Value Decay Projection</span>
-              <span class="text-[9.5px] font-medium text-slate-400" id="decayTypeLabel">Exponential</span>
-            </div>
-            <svg id="decayGraph" viewBox="0 0 200 100" preserveAspectRatio="none" class="w-full h-24 bg-white rounded-lg border border-slate-200"></svg>
-            <p class="hint text-center">Vertical axis = cumulative value lost. Dashed line = target T₀.</p>
-          </div>
-        </div>
-      </div>
-
-      <div id="crashRoiBox" class="panel p-4" style="background:#f5f7ff; border-color:#e0e7ff;">
-        <div class="flex justify-between items-start gap-3">
-          <div class="min-w-0">
-            <h4 class="text-[10px] font-bold uppercase tracking-[.07em] text-indigo-800">Crashing ROI Verdict</h4>
-            <p class="text-[13px] font-bold text-indigo-950 mt-1 leading-snug" id="crashRecommendation">Calculating…</p>
-          </div>
-          <span id="roiBadge" class="text-[10px] font-black px-2 py-1 rounded shrink-0" style="background:#c7d2fe;color:#3730a3;">ROI: 0%</span>
-        </div>
-        <p class="text-[11.5px] text-indigo-900/75 mt-2 leading-relaxed" id="crashDetailText">
-          Feasibility of the additional acceleration cost versus the loss it avoids.
-        </p>
-      </div>
-
-      <div id="statusBox" class="p-4 rounded-xl border-l-4 transition-colors duration-500">
-        <h3 id="statusTitle" class="text-[13.5px] font-bold mb-1">Status</h3>
-        <p id="statusDesc" class="text-[11.5px] leading-relaxed text-slate-600"></p>
-      </div>
-
-      <div class="panel p-4">
-        <h3 class="text-[11px] font-bold uppercase tracking-[.06em] text-slate-500 mb-2.5">Formula</h3>
-        <p class="font-mono text-[10.5px] bg-slate-50 border border-slate-200 rounded-lg p-2.5 mb-2.5 leading-relaxed text-slate-700 overflow-x-auto whitespace-nowrap">
-          CoD = (ΔDays × BurnRate) + V₀ × [1 − (1 − r)^ΔDays]&nbsp;&nbsp;where r = 0.02λ
-        </p>
-        <ul class="text-[11px] text-slate-600 space-y-1 list-disc list-inside">
-          <li><b>λ</b> = Decay × Irreversibility × Counterparty ÷ 2</li>
-          <li><b>Hard Cliff:</b> value collapses to zero past the tolerance threshold</li>
-          <li><b>Crashing ROI</b> = (Avoided Cost − Acceleration Cost) ÷ Acceleration Cost</li>
-        </ul>
-      </div>
-
-    </div>
-  </div>
-</div>
-
-<script>
-(function(){
-  'use strict';
-
-  var IDS = ['planned','actual','valueAtStake','dailyBurnRate','sensitivity','irreversibility','counterparty','crashCost','daysSaved'];
-  function $(id){ return document.getElementById(id); }
-  function num(id, min){ var v = parseFloat($(id).value); if(isNaN(v)) v = 0; return Math.max(min===undefined?0:min, v); }
-
-  function fmt(n){
-    return new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(n||0);
-  }
-
-  function decayLoss(days, planned, sensitivity, lambda, V0){
-    if(sensitivity === 4){
-      return (days > planned*0.2) ? V0 : (planned>0 ? (days/planned)*V0*0.5 : 0);
-    }
-    var r = Math.min(0.08, 0.02*lambda);
-    return V0 * (1 - Math.pow(1-r, days));
-  }
-
-  function calculate(){
-    var planned = Math.max(1, num('planned',1));
-    var actual = num('actual',0);
-    var V0 = num('valueAtStake',0);
-    var burn = num('dailyBurnRate',0);
-    var sensitivity = parseFloat($('sensitivity').value);
-    var irrev = parseFloat($('irreversibility').value);
-    var cparty = parseFloat($('counterparty').value);
-    var crashCost = num('crashCost',0);
-    var daysSaved = num('daysSaved',0);
-
-    var daysDelayed = Math.max(0, actual - planned);
-    var overrunPct = ((actual - planned)/planned)*100;
-    var lambda = (sensitivity * irrev * cparty)/2;
-    var riskScore = Math.max(0, Math.max(0, overrunPct) * lambda);
-
-    var overhead = daysDelayed * burn;
-    var valueLoss = decayLoss(daysDelayed, planned, sensitivity, lambda, V0);
-    var totalCoD = overhead + valueLoss;
-
-    var daysAfter = Math.max(0, daysDelayed - daysSaved);
-    var crashCoD = (daysAfter*burn) + decayLoss(daysAfter, planned, sensitivity, lambda, V0);
-    var avoided = Math.max(0, totalCoD - crashCoD);
-    var net = avoided - crashCost;
-    var roi = crashCost > 0 ? (net/crashCost)*100 : 0;
-
-    render({
-      daysDelayed:daysDelayed, overrunPct:overrunPct, lambda:lambda, riskScore:riskScore,
-      totalCoD:totalCoD, overhead:overhead, valueLoss:valueLoss,
-      crashCost:crashCost, daysSaved:daysSaved, avoided:avoided, net:net, roi:roi
-    });
-    drawGraph(planned, sensitivity, lambda, daysDelayed);
-    reportHeight();
-  }
-
-  function render(d){
-    $('baseOverrun').textContent = (d.overrunPct>0?'+':'') + d.overrunPct.toFixed(1) + '%';
-    $('daysOverrunText').textContent = d.daysDelayed + (d.daysDelayed===1?' day':' days') + ' behind';
-    $('multiplier').textContent = d.lambda.toFixed(2) + 'x';
-    $('riskScoreDisplay').textContent = Math.round(d.riskScore);
-    $('totalFinancialCost').textContent = fmt(d.totalCoD);
-    $('costBreakdown').textContent = 'Decay ' + fmt(d.valueLoss) + '  ·  Overhead ' + fmt(d.overhead);
-
-    var badge = $('roiBadge'), rec = $('crashRecommendation'), det = $('crashDetailText');
-    if(d.daysSaved > 0 && d.crashCost > 0){
-      badge.textContent = 'ROI: ' + d.roi.toFixed(0) + '%';
-      if(d.net > 0){
-        rec.textContent = '✅ Accelerate — economically justified';
-        rec.style.color = '#065f46';
-        det.textContent = 'Spending ' + fmt(d.crashCost) + ' avoids ' + fmt(d.avoided) + ' of delay cost. Net benefit: ' + fmt(d.net) + '.';
-        badge.style.background = '#a7f3d0'; badge.style.color = '#065f46';
-      } else {
-        rec.textContent = '⚠️ Do not accelerate — cost exceeds benefit';
-        rec.style.color = '#991b1b';
-        det.textContent = 'Acceleration costs ' + fmt(d.crashCost) + ' but only avoids ' + fmt(d.avoided) + '. Net loss: ' + fmt(Math.abs(d.net)) + '.';
-        badge.style.background = '#fecaca'; badge.style.color = '#991b1b';
-      }
-    } else {
-      badge.textContent = 'ROI: N/A';
-      badge.style.background = '#e2e8f0'; badge.style.color = '#475569';
-      rec.textContent = 'Enter acceleration cost and days saved →';
-      rec.style.color = '#3730a3';
-      det.textContent = 'Simulate whether adding budget or personnel is worth the time recovered.';
-    }
-
-    var ARC = Math.PI*80;
-    var pct = Math.min(d.riskScore/400, 1);
-    var arc = $('gaugeArc');
-    arc.style.strokeDasharray = (ARC*pct) + ', ' + ARC;
-
-    var t = tier(d.riskScore);
-    arc.style.stroke = t.color;
-    var box = $('statusBox');
-    box.style.background = t.bg;
-    box.style.borderLeftColor = t.color;
-    $('statusTitle').textContent = t.title;
-    $('statusTitle').style.color = t.color;
-    $('statusDesc').textContent = t.desc;
-  }
-
-  function tier(s){
-    if(s <= 0) return {color:'#10b981',bg:'#ecfdf5',title:'On Time / Safe',desc:'The project is on schedule. All opportunity value and strategic options remain fully intact.'};
-    if(s <= 30) return {color:'#22c55e',bg:'#f0fdf4',title:'Low Risk / Minor Friction',desc:'Minor operational slippage. Value erosion is limited and easily absorbed by normal buffers.'};
-    if(s <= 80) return {color:'#eab308',bg:'#fefce8',title:'Moderate / Erosion Beginning',desc:'The delay is starting to eat into potential margin. Minor schedule intervention is advisable now.'};
-    if(s <= 200) return {color:'#f97316',bg:'#fff7ed',title:'High / Active Intervention Needed',desc:'The opportunity window is narrowing fast. Seriously evaluate an acceleration (crashing) budget.'};
-    return {color:'#ef4444',bg:'#fef2f2',title:'Critical / Option Value Failure',desc:'Most of the opportunity value is permanently lost. Reassess whether the initiative is still viable.'};
-  }
-
-  function drawGraph(planned, sensitivity, lambda, daysDelayed){
-    var svg = $('decayGraph'), lbl = $('decayTypeLabel');
-    var W = 200, H = 100, maxDays = planned*2;
-
-    lbl.textContent = sensitivity===1 ? 'Linear'
-                    : sensitivity===1.5 ? 'Moderate'
-                    : sensitivity===2.5 ? 'Rapid exponential'
-                    : 'Hard cliff';
-
-    var pts = '', area = '';
-    for(var x=0; x<=W; x+=4){
-      var day = (x/W)*maxDays;
-      var delay = Math.max(0, day - planned);
-      var y;
-      if(sensitivity===4){
-        y = (delay > planned*0.2) ? H : (delay/planned)*(H*0.5);
-      } else {
-        var r = Math.min(0.08, 0.02*lambda);
-        y = H*(1 - Math.pow(1-r, delay));
-      }
-      y = Math.min(H-3, Math.max(3, y));
-      pts += x + ',' + y + ' ';
-    }
-    area = '0,' + H + ' ' + pts + W + ',' + H;
-
-    var tx = (planned/maxDays)*W;
-    var cx = (Math.min(planned+daysDelayed, maxDays)/maxDays)*W;
-    var cy;
-    if(sensitivity===4){
-      cy = (daysDelayed > planned*0.2) ? H : (daysDelayed/planned)*(H*0.5);
-    } else {
-      var rr = Math.min(0.08, 0.02*lambda);
-      cy = H*(1 - Math.pow(1-rr, daysDelayed));
-    }
-    cy = Math.min(H-4, Math.max(4, cy));
-
-    svg.innerHTML =
-      '<defs><linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">' +
-      '<stop offset="0%" stop-color="#6366f1" stop-opacity=".22"/>' +
-      '<stop offset="100%" stop-color="#6366f1" stop-opacity=".02"/></linearGradient></defs>' +
-      '<line x1="0" y1="33" x2="200" y2="33" stroke="#f1f5f9" stroke-width="1"/>' +
-      '<line x1="0" y1="66" x2="200" y2="66" stroke="#f1f5f9" stroke-width="1"/>' +
-      '<polygon fill="url(#g1)" points="' + area + '"/>' +
-      '<line x1="' + tx + '" y1="0" x2="' + tx + '" y2="100" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3,3"/>' +
-      '<polyline fill="none" stroke="#4f46e5" stroke-width="2" points="' + pts + '"/>' +
-      '<circle cx="' + cx + '" cy="' + cy + '" r="3.5" fill="#ef4444" stroke="#fff" stroke-width="1.5"/>';
-  }
-
-  var PRESETS = {
-    launch: {planned:30, actual:45, valueAtStake:1000000, dailyBurnRate:10000, sensitivity:'2.5', irreversibility:'2.5', counterparty:'2.5', crashCost:50000, daysSaved:10},
-    drr:    {planned:7,  actual:12, valueAtStake:2000000, dailyBurnRate:25000, sensitivity:'4',   irreversibility:'2.5', counterparty:'1.5', crashCost:100000, daysSaved:4},
-    ma:     {planned:60, actual:90, valueAtStake:5000000, dailyBurnRate:15000, sensitivity:'2.5', irreversibility:'1.5', counterparty:'2.5', crashCost:150000, daysSaved:20},
-    admin:  {planned:14, actual:18, valueAtStake:50000,   dailyBurnRate:1000,  sensitivity:'1',   irreversibility:'1',   counterparty:'1',   crashCost:5000,  daysSaved:3}
-  };
-
-  window.loadPreset = function(k){
-    var p = PRESETS[k]; if(!p) return;
-    for(var key in p){ if($(key)) $(key).value = p[key]; }
-    calculate();
-  };
-
-  // ---- Auto-height reporting to parent (kills inner scrollbar) ----
-  var lastH = 0;
-  function reportHeight(){
-    var h = Math.ceil(document.getElementById('root').getBoundingClientRect().height) + 24;
-    if(Math.abs(h - lastH) > 2){
-      lastH = h;
-      parent.postMessage({ type: 'cod-height', height: h }, '*');
-    }
-  }
-
-  IDS.forEach(function(id){
-    var el = $(id);
-    if(el){ el.addEventListener('input', calculate); el.addEventListener('change', calculate); }
-  });
-
-  window.addEventListener('resize', reportHeight);
-  if(window.ResizeObserver){
-    new ResizeObserver(reportHeight).observe(document.getElementById('root'));
-  }
-
-  calculate();
-  setTimeout(reportHeight, 120);
-  setTimeout(reportHeight, 500);
-  setTimeout(reportHeight, 1200);
-})();
-</script>
-</body>
-</html>
-</template>
-
-<script>
-(function(){
-  function boot(){
-    var tpl = document.getElementById('cod-app-template');
-    var box = document.getElementById('cod-app-container');
-    if(!tpl || !box || box.dataset.mounted) return;
-    box.dataset.mounted = '1';
-
-    var iframe = document.createElement('iframe');
-    iframe.id = 'cod-app-frame';
-    iframe.style.width = '100%';
-    iframe.style.height = '900px';
-    iframe.style.border = 'none';
-    iframe.style.display = 'block';
-    iframe.style.overflow = 'hidden';
-    iframe.setAttribute('scrolling', 'no');
-    iframe.setAttribute('title', 'Enterprise Cost of Delay Simulator');
-    iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-popups');
-    iframe.srcdoc = tpl.innerHTML;
-    box.appendChild(iframe);
-
-    window.addEventListener('message', function(e){
-      var d = e.data;
-      if(d && d.type === 'cod-height' && typeof d.height === 'number'){
-        var h = Math.max(400, Math.min(4000, d.height));
-        iframe.style.height = h + 'px';
-      }
-    });
-  }
-
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', boot);
-  } else {
-    boot();
-  }
-})();
-</script>
-
-<p class="mt-10">Try switching between the four Quick Load presets inside the simulator above. Notice how an identical percentage of "lateness" — say, a 50% time overrun — produces wildly different financial consequences depending on whether the decay curve is linear, exponential, or a hard cliff. That difference is the entire point of this framework: <strong>delay is not a single number, it is a shape.</strong></p>
-
-<h3 class="text-2xl font-extrabold text-slate-900 mt-16 mb-6">Reading the Risk Score and the Decay Curve</h3>
-
-<p>The simulator compresses three qualitative judgments — Decay Speed, Irreversibility, and Counterparty Risk — into a single Criticality Multiplier (λ). This is deliberately simple by design: in real enterprise risk workshops, teams rarely have the patience for a twenty-variable regression model. What they need is a fast, defensible way to separate "this delay is annoying" from "this delay is existential."</p>
-
-<p>The Risk Score gauge translates λ and your overrun percentage into a single 0–400+ scale. A score under 30 usually means you're looking at friction, not failure. A score above 200 typically signals that a large share of your original opportunity value is already gone — and no amount of hustling later will bring it back if the underlying decay is exponential or cliff-shaped.</p>
-
-<p>The shaded decay curve is arguably the most important visual in the tool. It answers a question no spreadsheet variance report can answer: <em>at what point does further delay stop being marginally costly and start being catastrophically costly?</em> For Hard Cliff scenarios (disaster response, expiring legal windows, biological deadlines), that point is sharp and visible as a near-vertical jump. For exponential decay (competitive markets, negotiation leverage), the curve bends steadily and never fully plateaus — meaning the incentive to accelerate never really disappears.</p>
-
-<h3 class="text-2xl font-extrabold text-slate-900 mt-16 mb-6">When Should You Actually Pay to Go Faster?</h3>
-
-<p>This is where the Crashing ROI module becomes the most practically useful part of the whole exercise. "Crashing" a schedule — a formal project management term — means injecting extra resources (overtime, additional staff, expedited shipping, premium vendors) to shorten the timeline, at an additional direct cost.</p>
-
-<p>The naive intuition is: "if we're late, spend money to catch up." But that intuition frequently leads to wasted spending. The simulator forces a more disciplined comparison:</p>
-
-<ul class="space-y-2 mb-8 ml-4 list-disc list-inside text-slate-700">
-  <li>Calculate the Cost of Delay if nothing changes (baseline CoD).</li>
-  <li>Calculate the Cost of Delay after the proposed acceleration (crashed CoD).</li>
-  <li>The difference between these two is the <strong>Avoided Cost</strong> — what you actually save by paying to go faster.</li>
-  <li>Subtract the price of acceleration itself. What remains is the <strong>Net Savings</strong>, and this is the only number that should drive the decision.</li>
-</ul>
-
-<p>If Net Savings is negative, spending money to accelerate is economically irrational — no matter how uncomfortable the delay feels emotionally. Conversely, in Hard Cliff and rapid-decay scenarios, even an expensive acceleration budget is frequently justified, because the alternative is losing nearly all the value at stake.</p>
-
-<h3 class="text-2xl font-extrabold text-slate-900 mt-16 mb-6">A Framework, Not a Verdict</h3>
-
-<p>It is worth being honest about the limitations of this tool. The multiplier λ is a structured simplification of judgment calls that, in the real world, deserve a room full of stakeholders debating them — a legal team's view of counterparty risk will differ from a sales team's view of the same clock. The exponential decay approximation is a modeling choice, not a law of physics; real markets sometimes decay in bursts tied to specific external triggers (a competitor's announcement, a regulatory deadline) rather than smoothly over time.</p>
-
-<p>What this framework does provide is a shared vocabulary and a fast, transparent starting point for a conversation that too often happens purely on gut feeling. It turns "we're a bit behind schedule, but it should be fine" into an explicit, falsifiable, revisitable number — one that a CFO, a project manager, and a field operations lead can all interrogate using the same formula.</p>
-
-<p class="text-lg font-bold text-slate-900 border-l-4 border-indigo-600 pl-4 py-1 mt-10">Cost of Delay is not about punishing lateness. It is about making the invisible price of waiting visible enough that an organization can make a conscious, economically grounded choice — accelerate, absorb the loss, or walk away — instead of drifting into the cliff by default.</p>
-
-<p class="text-slate-500 text-sm mt-6">#CostOfDelay #WSJF #RealOptionsTheory #ISO31000 #ProjectManagement #RiskAnalysis #CrashingCost #DecisionScience #AgilePrioritization #OpportunityCost</p>
-
-<div class="not-prose mt-20 mb-8 p-8 md:p-10 bg-slate-50 border border-slate-200 rounded-[1.5rem] shadow-inner">
-  <h4 class="text-2xl font-extrabold text-slate-900 mb-6">Conceptual Note</h4>
-  <div class="space-y-4 text-sm text-slate-700 leading-relaxed">
-    <p>This tool synthesizes three established frameworks: Weighted Shortest Job First (WSJF) from the Scaled Agile Framework, risk severity principles from ISO 31000, and the time-decay-of-option-value concept from Real Options Theory in financial economics. It is intended as a structured decision-support instrument for prioritization conversations, not as a certified financial or actuarial model.</p>
-    <p>All monetary outputs depend entirely on the accuracy of the inputs supplied by the user — value at stake, burn rate, and the qualitative risk selections. For high-stakes decisions (capital allocation, disaster response resourcing, legal negotiations), this simulator should support, not replace, expert judgment and formal risk assessment processes.</p>
-  </div>
-</div>
-]]></content:encoded>
-      <media:thumbnail url="https://horizon-scanning.org/thum/delaycost.png" />
     </item>
   </channel>
 </rss>
