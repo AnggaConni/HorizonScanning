@@ -166,6 +166,7 @@ articles.forEach(article => {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${article.title} | Horizon Scan AI</title>
     <meta name="description" content="${article.excerpt}">
+    <link rel="alternate" type="application/rss+xml" title="Horizon Scanning RSS" href="${baseUrl}/feed.xml">
     <link rel="canonical" href="${articleAbsoluteUrl}" />
     
     <!-- Open Graph / Facebook / LinkedIn / WA -->
@@ -339,6 +340,7 @@ const blogIndexHtml = `
     
     <!-- Meta SEO untuk Blog Index -->
     <meta name="description" content="Publications, methodologies, and case studies on navigating uncertainty and mastering horizon scanning.">
+    <link rel="alternate" type="application/rss+xml" title="Horizon Scanning RSS" href="${baseUrl}/feed.xml">
     <meta property="og:title" content="Strategic Insights | Horizon Scan AI">
     <meta property="og:description" content="Publications, methodologies, and case studies on navigating uncertainty and mastering horizon scanning.">
     <meta property="og:url" content="${baseUrl}/blog.html">
@@ -557,6 +559,67 @@ sitemapXml += `\n</urlset>`;
 
 // Tulis ke file sitemap.xml
 fs.writeFileSync(sitemapPath, sitemapXml);
+
+// =========================================================
+// 8. AUTO-GENERATE RSS 2.0 FEED
+// =========================================================
+function xmlEscape(value) {
+    return String(value ?? '').replace(/[<>&"']/g, char => ({
+        '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;', "'": '&apos;'
+    })[char]);
+}
+
+function cdata(value) {
+    return String(value ?? '').replace(/]]>/g, ']]]]><![CDATA[>');
+}
+
+function toRfc822Date(value) {
+    const parsed = new Date(value);
+    if (Number.isNaN(parsed.getTime())) return new Date().toUTCString();
+    return parsed.toUTCString();
+}
+
+const rssItems = [...articles]
+    .sort((a, b) => new Date(b.date) - new Date(a.date))
+    .slice(0, 30)
+    .map(article => {
+        const slug = article.slug || (article.title ? slugify(article.title) : '');
+        const articleUrl = `${baseUrl}/blog/article/${slug}.html`;
+        const imageUrl = absoluteAssetUrl(article.image || article.imageUrl || '');
+        const description = article.excerpt || '';
+        const content = fixContentImageUrls(article.content || '');
+        return `    <item>
+      <title>${xmlEscape(article.title)}</title>
+      <link>${xmlEscape(articleUrl)}</link>
+      <guid isPermaLink="true">${xmlEscape(articleUrl)}</guid>
+      <pubDate>${toRfc822Date(article.date)}</pubDate>
+      <category>${xmlEscape(article.category || 'General')}</category>
+      <dc:creator>${xmlEscape(article.author || 'Horizon Scanning')}</dc:creator>
+      <description>${xmlEscape(description)}</description>
+      <content:encoded><![CDATA[${cdata(content)}]]></content:encoded>
+      ${imageUrl ? `<enclosure url="${xmlEscape(imageUrl)}" type="image/jpeg" length="0" />` : ''}
+    </item>`;
+    }).join('\n');
+
+const rssXml = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"
+     xmlns:content="http://purl.org/rss/1.0/modules/content/"
+     xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Horizon Scanning</title>
+    <link>${baseUrl}/blog.html</link>
+    <description>Independent insights, methodologies, and analysis on navigating uncertainty, strategic foresight, governance, technology, and society.</description>
+    <language>en</language>
+    <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
+    <atom:link href="${baseUrl}/feed.xml" rel="self" type="application/rss+xml" xmlns:atom="http://www.w3.org/2005/Atom" />
+${rssItems}
+  </channel>
+</rss>`;
+
+const rssPath = path.join(__dirname, '../feed.xml');
+fs.writeFileSync(rssPath, rssXml, 'utf-8');
+console.log(`📡 feed.xml generated with ${Math.min(articles.length, 30)} latest articles.`);
+
 console.log(`🗺️  sitemap.xml berhasil di-generate dengan ${articles.length} link artikel.`);
 
 console.log('\n✅ SUKSES!');
