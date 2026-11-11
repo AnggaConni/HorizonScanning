@@ -129,7 +129,7 @@ articles.forEach(article => {
     articleCards += `
         <a href="${articleUrl}" data-title="${article.title.replace(/"/g, '&quot;')}" data-category="${article.category}" data-timestamp="${new Date(article.date).getTime()}" class="article-card bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-all duration-300 flex flex-col group transform hover:-translate-y-1">
             <div class="h-48 overflow-hidden relative border-b border-slate-100">
-                <img src="${pageImageUrl}" alt="${article.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.src='${fallbackImage}'">
+                <img src="${pageImageUrl}" alt="${article.title}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.src='${fallbackImage}'">
                 <span class="absolute top-4 left-4 bg-teal-600 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">
                     ${article.category}
                 </span>
@@ -376,6 +376,12 @@ const blogIndexHtml = `
     <!-- Meta SEO untuk Blog Index -->
     <meta name="description" content="Publications, methodologies, and case studies on navigating uncertainty and mastering horizon scanning.">
     <link rel="alternate" type="application/rss+xml" title="Horizon Scanning RSS" href="${baseUrl}/feed.xml">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='none' stroke='%230d9488' stroke-width='10'/><circle cx='50' cy='50' r='25' fill='none' stroke='%230d9488' stroke-width='8'/><circle cx='50' cy='50' r='8' fill='%230d9488'/></svg>">
+    <link rel="apple-touch-icon" href="${baseUrl}/thumbnail.png">
+    <meta property="og:image" content="${baseUrl}/thumbnail.png">
+    <meta property="og:image:alt" content="Horizon Scan AI — Strategic Insights">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="${baseUrl}/thumbnail.png">
     <meta property="og:title" content="Strategic Insights | Horizon Scan AI">
     <meta property="og:description" content="Publications, methodologies, and case studies on navigating uncertainty and mastering horizon scanning.">
     <meta property="og:url" content="${baseUrl}/blog.html">
@@ -450,6 +456,41 @@ const blogIndexHtml = `
     <section class="pt-16 pb-10 bg-gradient-to-b from-white to-slate-50 text-center px-4">
         <h1 class="text-4xl md:text-5xl font-extrabold text-navy-900 mb-4 tracking-tight">Strategic Insights</h1>
         <p class="text-slate-500 max-w-2xl mx-auto text-lg">Publications, methodologies, and case studies on navigating uncertainty and mastering horizon scanning.</p>
+    </section>
+
+    <section class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 mb-10 notranslate">
+        <div class="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 text-center shadow-sm">
+            <div class="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-teal-50 text-teal-600"><i class="ph ph-rss text-2xl"></i></div>
+            <h2 class="text-xl font-bold text-navy-900 mb-2">Follow Horizon Scanning</h2>
+            <p class="text-sm text-slate-500 mb-5">Get new insights and foresight articles delivered to your inbox.</p>
+            <style>
+                .followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .form-preview{display:flex!important;flex-direction:column!important;justify-content:center!important;margin:0!important;padding:clamp(17px,5%,28px)!important;max-width:none!important;border-radius:10px!important;box-shadow:none!important}
+                .followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .form-preview,.followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .form-preview *{box-sizing:border-box!important}
+                .followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .preview-heading{width:100%!important}
+                .followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .preview-heading h5{margin:0!important}
+                .followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .preview-input-field{margin-top:16px!important;width:100%!important}
+                .followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .preview-input-field input{width:100%!important;height:44px!important;border-radius:8px!important;border:1px solid #cbd5e1!important;background:#fff!important;color:#0f172a!important;font-family:Arial,sans-serif!important;font-size:14px!important}
+                .followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .preview-input-field input::placeholder{color:#64748b!important;opacity:1!important}
+                .followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .preview-submit-button{margin-top:12px!important;width:100%!important}
+                .followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .preview-submit-button button{width:100%!important;height:44px!important;border:0!important;border-radius:999px!important;line-height:normal!important;background:#0d9488!important;color:#fff!important;font-family:Arial,sans-serif!important;font-weight:700!important}
+                .followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .powered-by-line{color:#64748b!important;font-family:Arial,sans-serif!important;font-size:11px!important;margin-top:8px!important}
+                .followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .powered-by-line img{height:1.1em!important;max-height:1.1em!important}
+            </style>
+            <div class="followit--follow-form-container" attr-a attr-b attr-c attr-d attr-e attr-f>
+                <form action="https://api.follow.it/subscription-form/L2JvNTVzV3R6M3BzMnFqOHhoaTE5NDJXNGM3WVE0R2hnODd2NjFoaUpUUCtVckxTL0QxY0VENlZhQjM2VjZWZ2VrczNLUDdKbmxRcjFiQndZQ1FOYWF5d0YrWEtnM3dkMVhFZk5sMzVFcGhDeHhENmtRVEQ4RTlsb3ZlcG4yLzJ8K2RNb3hFM0x1cFUvSnZiWEx3NUlQRlNvaUdMMmkrRTNGWkh4MTNNdGwwbz0=/8" method="post">
+                    <div class="form-preview" style="background-color:#fff;position:relative;border:0">
+                        <div class="preview-heading"><h5 style="font-family:Arial;font-weight:bold;color:#0f172a;font-size:16px;text-align:center">Follow Horizon Scanning</h5></div>
+                        <div class="preview-input-field"><input type="email" name="email" required placeholder="Enter your email address" spellcheck="false" aria-label="Email address"></div>
+                        <div class="preview-submit-button"><button type="submit">Follow</button></div>
+                    </div>
+                </form>
+                <a href="https://follow.it" class="powered-by-line">Powered by <img src="https://follow.it/images/colored-logo.svg" alt="follow.it" height="17"></a>
+            </div>
+            <div class="mt-4 border-t border-slate-100 pt-4">
+                <a href="${baseUrl}/feed.xml" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-sm font-semibold text-teal-700 hover:text-teal-800"><i class="ph-bold ph-rss"></i> Prefer an RSS reader? Open the RSS feed</a>
+            </div>
+            <p class="mt-3 text-xs text-slate-400">You can unsubscribe at any time.</p>
+        </div>
     </section>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8 mt-8 notranslate">
