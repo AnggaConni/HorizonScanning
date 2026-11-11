@@ -597,14 +597,14 @@ const rssItems = [...articles]
       <dc:creator>${xmlEscape(article.author || 'Horizon Scanning')}</dc:creator>
       <description>${xmlEscape(description)}</description>
       <content:encoded><![CDATA[${cdata(content)}]]></content:encoded>
-      ${imageUrl ? `<enclosure url="${xmlEscape(imageUrl)}" type="image/jpeg" length="0" />` : ''}
+      ${imageUrl ? `<media:thumbnail url="${xmlEscape(imageUrl)}" />` : ''}
     </item>`;
     }).join('\n');
 
 const rssXml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0"
      xmlns:content="http://purl.org/rss/1.0/modules/content/"
-     xmlns:dc="http://purl.org/dc/elements/1.1/">
+     xmlns:dc="http://purl.org/dc/elements/1.1/"\n     xmlns:media="http://search.yahoo.com/mrss/">
   <channel>
     <title>Horizon Scanning</title>
     <link>${baseUrl}/blog.html</link>
