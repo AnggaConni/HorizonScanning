@@ -378,10 +378,10 @@ const blogIndexHtml = `
     <link rel="alternate" type="application/rss+xml" title="Horizon Scanning RSS" href="${baseUrl}/feed.xml">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='none' stroke='%230d9488' stroke-width='10'/><circle cx='50' cy='50' r='25' fill='none' stroke='%230d9488' stroke-width='8'/><circle cx='50' cy='50' r='8' fill='%230d9488'/></svg>">
     <link rel="apple-touch-icon" href="${baseUrl}/thumbnail.png">
-    <meta property="og:image" content="${baseUrl}/thumbnail.png">
+    <meta property="og:image" content="${baseUrl}/thum/blogarticle.png">
     <meta property="og:image:alt" content="Horizon Scan AI — Strategic Insights">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:image" content="${baseUrl}/thumbnail.png">
+    <meta name="twitter:image" content="${baseUrl}/thum/blogarticle.png">
     <meta property="og:title" content="Strategic Insights | Horizon Scan AI">
     <meta property="og:description" content="Publications, methodologies, and case studies on navigating uncertainty and mastering horizon scanning.">
     <meta property="og:url" content="${baseUrl}/blog.html">
