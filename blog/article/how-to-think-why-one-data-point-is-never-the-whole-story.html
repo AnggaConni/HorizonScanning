@@ -526,6 +526,23 @@
 <blockquote class="not-prose my-10 border-l-4 border-amber-600 pl-6 py-2 italic text-xl md:text-2xl text-slate-800 font-light leading-snug">&ldquo;So the next time a verdict arrives fully formed — about someone's character, someone's intentions, or even a policy on paper — the question worth asking isn't does this make sense? It's the harder one: What else could explain this — and have I actually checked, or did I just stop at the first thing that felt true?&rdquo;</blockquote>
         </article>
         
+        <div class="mt-16 mb-12 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 text-center notranslate shadow-sm">
+            <div class="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-teal-50 text-teal-600">
+                <i class="ph ph-rss text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-navy-900 mb-2">Follow Horizon Scanning</h3>
+            <p class="text-sm text-slate-500 max-w-xl mx-auto mb-5">Get new insights in your preferred RSS reader. No email address or account required.</p>
+            <div class="flex flex-col sm:flex-row justify-center gap-3">
+                <a href="https://horizon-scanning.org/feed.xml" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-2 rounded-full bg-teal-600 px-6 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-teal-700">
+                    <i class="ph-bold ph-rss"></i> Follow via RSS
+                </a>
+                <button type="button" onclick="navigator.clipboard.writeText('https://horizon-scanning.org/feed.xml').then(() => { const label = this.querySelector('[data-copy-label]'); label.textContent = 'Copied!'; setTimeout(() => label.textContent = 'Copy RSS link', 1800); }).catch(() => window.prompt('Copy this RSS feed URL:', 'https://horizon-scanning.org/feed.xml'))" class="inline-flex items-center justify-center gap-2 rounded-full border border-slate-300 bg-white px-6 py-3 text-sm font-bold text-slate-700 transition hover:border-teal-600 hover:text-teal-700">
+                    <i class="ph-bold ph-copy"></i> <span data-copy-label>Copy RSS link</span>
+                </button>
+            </div>
+            <p class="mt-4 text-xs text-slate-400">You stay in control. We don't collect your email or track your subscription.</p>
+        </div>
+
         <div class="mt-16 pt-8 border-t border-slate-200 text-center notranslate">
             <h3 class="text-xl font-bold text-navy-900 mb-4">Share this insight</h3>
             <div class="flex justify-center gap-4">
