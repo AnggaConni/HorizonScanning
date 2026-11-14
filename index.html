@@ -957,6 +957,41 @@
         </div>
     </section>
     <!-- ─── End MyJOBS Opportunity Radar ─────────────────────────── -->
+    <!-- ─── Humanitarian Situation Briefs ───────────────────────── -->
+    <section id="humanitarian-briefs" class="bg-slate-50 py-8 sm:py-10 border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-4">
+                <div>
+                    <div class="flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-[.18em] text-rose-600 mb-1">
+                        <i class="ph-fill ph-first-aid-kit text-sm"></i> Humanitarian intelligence
+                        <span class="h-1 w-1 rounded-full bg-rose-500"></span>
+                        <span class="text-slate-400">MyJOBS · ReliefWeb</span>
+                    </div>
+                    <h2 class="text-lg sm:text-xl font-extrabold tracking-tight text-navy-900">Signals from the humanitarian frontlines</h2>
+                    <p class="mt-1 mb-0 text-xs text-slate-500">A quick glimpse of humanitarian opportunities. Open any card to read the original listing on ReliefWeb.</p>
+                </div>
+                <a href="https://anggaconni.github.io/MyJOBS/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-xs font-bold text-teal-700 hover:text-teal-900 whitespace-nowrap">
+                    Explore all opportunities on MyJOBS <i class="ph-bold ph-arrow-up-right"></i>
+                </a>
+            </div>
+            <div class="relative">
+                <div id="humanitarian-carousel" class="flex gap-3 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-3 pr-2" style="scrollbar-width:thin" aria-label="Humanitarian opportunities sourced from ReliefWeb">
+                    <div class="min-w-[230px] sm:min-w-[270px] max-w-[300px] snap-start rounded-xl border border-slate-200 bg-white p-4 animate-pulse">
+                        <div class="h-2 w-24 rounded bg-slate-200 mb-3"></div><div class="h-4 w-full rounded bg-slate-200 mb-2"></div><div class="h-4 w-4/5 rounded bg-slate-200"></div>
+                    </div>
+                    <div class="min-w-[230px] sm:min-w-[270px] max-w-[300px] snap-start rounded-xl border border-slate-200 bg-white p-4 animate-pulse">
+                        <div class="h-2 w-24 rounded bg-slate-200 mb-3"></div><div class="h-4 w-full rounded bg-slate-200 mb-2"></div><div class="h-4 w-4/5 rounded bg-slate-200"></div>
+                    </div>
+                </div>
+                <div class="flex items-center justify-end gap-2 mt-1">
+                    <span id="humanitarian-updated" class="mr-auto text-[10px] text-slate-400">Live dataset · MyJOBS</span>
+                    <button type="button" id="humanitarian-prev" aria-label="Scroll humanitarian updates left" class="h-8 w-8 rounded-full border border-slate-300 bg-white text-slate-600 hover:border-teal-500 hover:text-teal-700"><i class="ph-bold ph-caret-left"></i></button>
+                    <button type="button" id="humanitarian-next" aria-label="Scroll humanitarian updates right" class="h-8 w-8 rounded-full border border-slate-300 bg-white text-slate-600 hover:border-teal-500 hover:text-teal-700"><i class="ph-bold ph-caret-right"></i></button>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- ─── End Humanitarian Situation Briefs ───────────────────── -->
 
 <section id="about" class="py-20 bg-white" itemscope itemtype="https://schema.org/Article">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -3790,6 +3825,50 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+});
+</script>
+
+
+<script>
+/* Humanitarian-only carousel: MyJOBS owns the ReliefWeb API ingestion. */
+document.addEventListener('DOMContentLoaded', () => {
+    const track = document.getElementById('humanitarian-carousel');
+    if (!track) return;
+    const escapeHTML = (value) => String(value || '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+    const formatDate = (value) => {
+        if (!value || value === 'Unknown') return 'Recent update';
+        const date = new Date(value);
+        return Number.isNaN(date.getTime()) ? escapeHTML(value) : date.toLocaleDateString(undefined, {day:'numeric',month:'short',year:'numeric'});
+    };
+    const render = (items) => {
+        if (!items.length) {
+            track.innerHTML = '<div class="rounded-xl border border-slate-200 bg-white px-4 py-3 text-xs text-slate-500">No humanitarian opportunities are available in the latest MyJOBS feed. Visit MyJOBS to explore all listings.</div>';
+            return;
+        }
+        track.innerHTML = items.slice(0, 10).map(item => {
+            const country = item.country || item.location || 'Global response';
+            const organization = item.company || 'ReliefWeb';
+            return '<a href="' + escapeHTML(item.original_url) + '" target="_blank" rel="noopener noreferrer" class="group min-w-[230px] sm:min-w-[270px] max-w-[300px] snap-start rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-teal-400 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-teal-500">' +
+                '<div class="flex items-center justify-between gap-2 mb-2"><span class="truncate text-[10px] font-extrabold uppercase tracking-wider text-rose-600"><i class="ph-fill ph-first-aid-kit mr-1"></i>' + escapeHTML(country) + '</span><span class="shrink-0 text-[10px] text-slate-400">' + formatDate(item.posted_at) + '</span></div>' +
+                '<h3 class="text-sm font-bold leading-snug text-slate-800 group-hover:text-teal-700 line-clamp-3">' + escapeHTML(item.title) + '</h3>' +
+                '<div class="mt-3 flex items-center justify-between gap-2 border-t border-slate-100 pt-2"><span class="truncate text-[10px] text-slate-500">' + escapeHTML(organization) + '</span><span class="shrink-0 text-[10px] font-bold text-teal-700">Read on ReliefWeb ↗</span></div></a>';
+        }).join('');
+    };
+    fetch('https://anggaconni.github.io/MyJOBS/vacancy.json?v=' + Date.now(), {cache:'no-store'})
+        .then(response => { if (!response.ok) throw new Error('MyJOBS feed unavailable'); return response.json(); })
+        .then(data => {
+            // Strictly include MyJOBS records normalized from ReliefWeb.
+            const humanitarianJobs = (data.jobs || []).filter(item =>
+                String(item.source || '').toLowerCase() === 'reliefweb' &&
+                /^https:\/\/reliefweb\.int\//i.test(item.original_url || '')
+            );
+            render(humanitarianJobs);
+            const updated = data.last_updated || data.updated_at;
+            if (updated) document.getElementById('humanitarian-updated').textContent = 'MyJOBS feed · Updated ' + formatDate(updated);
+        })
+        .catch(() => render([]));
+    document.getElementById('humanitarian-prev')?.addEventListener('click', () => track.scrollBy({left:-320,behavior:'smooth'}));
+    document.getElementById('humanitarian-next')?.addEventListener('click', () => track.scrollBy({left:320,behavior:'smooth'}));
 });
 </script>
 
