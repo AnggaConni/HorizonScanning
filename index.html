@@ -933,6 +933,30 @@
                                 <div class="rounded-xl border border-slate-700 bg-slate-800/70 p-3"><div class="text-[10px] text-slate-400">Sources</div><div class="mt-1 text-sm font-extrabold text-white">Multi-source</div></div>
                                 <div class="rounded-xl border border-slate-700 bg-slate-800/70 p-3"><div class="text-[10px] text-slate-400">Access</div><div class="mt-1 text-sm font-extrabold text-emerald-300">Free to explore</div></div>
                             </div>
+                            <div class="mt-4 rounded-xl border border-slate-700 bg-slate-950/70 p-3">
+                                <div class="mb-2 flex items-center justify-between gap-2">
+                                    <div class="flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-wider text-rose-300">
+                                        <i class="ph-fill ph-first-aid-kit"></i> Humanitarian briefs
+                                        <span class="text-slate-500">· ReliefWeb</span>
+                                    </div>
+                                    <a href="https://anggaconni.github.io/MyJOBS/" target="_blank" rel="noopener noreferrer" class="shrink-0 text-[9px] font-bold text-teal-300 hover:text-white">See all ↗</a>
+                                </div>
+                                <div id="humanitarian-carousel" class="flex gap-2 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-1" style="scrollbar-width:thin" aria-label="Humanitarian opportunities from ReliefWeb">
+                                    <div class="min-w-[175px] max-w-[190px] snap-start rounded-lg border border-slate-700 bg-slate-800/80 p-2 animate-pulse">
+                                        <div class="mb-2 h-2 w-16 rounded bg-slate-600"></div><div class="mb-1 h-3 w-full rounded bg-slate-600"></div><div class="h-3 w-4/5 rounded bg-slate-600"></div>
+                                    </div>
+                                    <div class="min-w-[175px] max-w-[190px] snap-start rounded-lg border border-slate-700 bg-slate-800/80 p-2 animate-pulse">
+                                        <div class="mb-2 h-2 w-16 rounded bg-slate-600"></div><div class="mb-1 h-3 w-full rounded bg-slate-600"></div><div class="h-3 w-4/5 rounded bg-slate-600"></div>
+                                    </div>
+                                </div>
+                                <div class="mt-1 flex items-center justify-between">
+                                    <span id="humanitarian-updated" class="text-[9px] text-slate-500">Latest MyJOBS feed</span>
+                                    <div class="flex gap-1">
+                                        <button type="button" id="humanitarian-prev" aria-label="Scroll humanitarian briefs left" class="flex h-6 w-6 items-center justify-center rounded-md border border-slate-700 text-slate-400 hover:text-teal-300"><i class="ph-bold ph-caret-left text-xs"></i></button>
+                                        <button type="button" id="humanitarian-next" aria-label="Scroll humanitarian briefs right" class="flex h-6 w-6 items-center justify-center rounded-md border border-slate-700 text-slate-400 hover:text-teal-300"><i class="ph-bold ph-caret-right text-xs"></i></button>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="mt-4 space-y-2.5">
                                 <div class="rounded-xl border border-slate-700 bg-slate-800/60 p-3">
                                     <div class="flex items-center justify-between gap-2"><span class="text-xs font-bold text-white">Find roles that match your direction</span><i class="ph-fill ph-sparkle text-teal-300"></i></div>
@@ -957,6 +981,7 @@
         </div>
     </section>
     <!-- ─── End MyJOBS Opportunity Radar ─────────────────────────── -->
+
 
 <section id="about" class="py-20 bg-white" itemscope itemtype="https://schema.org/Article">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -3790,6 +3815,49 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+});
+</script>
+
+
+<script>
+/* Small humanitarian teaser: read the ReliefWeb subset from MyJOBS. */
+document.addEventListener('DOMContentLoaded', () => {
+    const track = document.getElementById('humanitarian-carousel');
+    if (!track) return;
+    const escapeHTML = (value) => String(value || '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+    const formatDate = (value) => {
+        if (!value || value === 'Unknown') return 'Recent';
+        const date = new Date(value);
+        return Number.isNaN(date.getTime()) ? escapeHTML(value) : date.toLocaleDateString(undefined, {day:'numeric',month:'short'});
+    };
+    const render = (items) => {
+        if (!items.length) {
+            track.innerHTML = '<div class="min-w-full rounded-lg border border-slate-700 bg-slate-800/80 p-2 text-[10px] text-slate-400">No humanitarian listings in the latest feed. <a class="font-bold text-teal-300" href="https://anggaconni.github.io/MyJOBS/" target="_blank" rel="noopener noreferrer">Explore MyJOBS ↗</a></div>';
+            return;
+        }
+        track.innerHTML = items.slice(0, 8).map(item => {
+            const location = item.country || item.location || 'Global';
+            const organization = item.company || 'ReliefWeb';
+            return '<a href="' + escapeHTML(item.original_url) + '" target="_blank" rel="noopener noreferrer" class="group min-w-[175px] max-w-[190px] snap-start rounded-lg border border-slate-700 bg-slate-800/80 p-2 transition hover:border-teal-400 focus:outline-none focus:ring-1 focus:ring-teal-400">' +
+                '<div class="mb-1 flex items-center justify-between gap-1"><span class="truncate text-[9px] font-bold uppercase tracking-wide text-rose-300">' + escapeHTML(location) + '</span><span class="shrink-0 text-[9px] text-slate-500">' + formatDate(item.posted_at) + '</span></div>' +
+                '<h4 class="line-clamp-2 text-[10px] font-bold leading-snug text-slate-100 group-hover:text-teal-200">' + escapeHTML(item.title) + '</h4>' +
+                '<div class="mt-1 truncate text-[9px] text-slate-400">' + escapeHTML(organization) + ' · <span class="font-semibold text-teal-300">ReliefWeb ↗</span></div></a>';
+        }).join('');
+    };
+    fetch('https://anggaconni.github.io/MyJOBS/vacancy.json?v=' + Date.now(), {cache:'no-store'})
+        .then(response => { if (!response.ok) throw new Error('MyJOBS feed unavailable'); return response.json(); })
+        .then(data => {
+            const humanitarianJobs = (data.jobs || []).filter(item =>
+                String(item.source || '').toLowerCase() === 'reliefweb' &&
+                /^https:\/\/reliefweb\.int\//i.test(item.original_url || '')
+            );
+            render(humanitarianJobs);
+            const updated = data.last_updated || data.updated_at;
+            if (updated) document.getElementById('humanitarian-updated').textContent = 'Feed · ' + formatDate(updated);
+        })
+        .catch(() => render([]));
+    document.getElementById('humanitarian-prev')?.addEventListener('click', () => track.scrollBy({left:-190,behavior:'smooth'}));
+    document.getElementById('humanitarian-next')?.addEventListener('click', () => track.scrollBy({left:190,behavior:'smooth'}));
 });
 </script>
 

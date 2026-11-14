@@ -230,3 +230,8 @@ Strategic Foresight · Policy Innovation · Digital Systems
 ---
 
 If you use these tools for research or workshops, document where evidence came from, preserve alternative interpretations, and keep a clear distinction between observed facts, hypotheses, model-generated suggestions, and decisions made by people.
+
+
+## MyJOBS humanitarian teaser
+
+The homepage's compact humanitarian carousel reads the published `vacancy.json` dataset from MyJOBS and filters only records where `source` is `ReliefWeb` and the original URL points to `reliefweb.int`. MyJOBS remains the single ReliefWeb API consumer and data pipeline; HorizonScanning does not store a second API credential, run a second fetch workflow, or maintain a duplicate feed. Each teaser card links to its original ReliefWeb listing, while the "See all" link opens MyJOBS.
