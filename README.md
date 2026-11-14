@@ -230,3 +230,10 @@ Strategic Foresight · Policy Innovation · Digital Systems
 ---
 
 If you use these tools for research or workshops, document where evidence came from, preserve alternative interpretations, and keep a clear distinction between observed facts, hypotheses, model-generated suggestions, and decisions made by people.
+
+
+## Humanitarian updates on the landing page
+
+The homepage includes a compact, horizontally scrollable carousel populated only from ReliefWeb's public **Reports** resource (humanitarian reports and situation updates). It does not mix in job listings, Indonesian job portals, local vacancy feeds, or other HorizonScanning content. Each card links directly to its ReliefWeb report.
+
+The scheduled workflow `.github/workflows/humanitarian.yml` refreshes `humanitarian.json` every six hours. It requires an approved ReliefWeb API appname stored as the repository Actions secret `RELIEFWEB_APPNAME`. ReliefWeb requires an approved appname on every API request; request one through the official ReliefWeb API documentation before enabling the feed.
