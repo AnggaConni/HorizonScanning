@@ -3856,9 +3856,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 '<div class="mt-3 flex items-center justify-between gap-2 border-t border-slate-100 pt-2"><span class="truncate text-[10px] text-slate-500">' + escapeHTML(source) + '</span><span class="shrink-0 text-[10px] font-bold text-teal-700">Read on ReliefWeb ↗</span></div></a>';
         }).join('');
     };
-    fetch('humanitarian.json?v=' + Date.now(), {cache:'no-store'})
-        .then(response => { if (!response.ok) throw new Error('Feed unavailable'); return response.json(); })
-        .then(data => { render(data.items || []); if (data.updated_at) document.getElementById('humanitarian-updated').textContent = 'Updated ' + formatDate(data.updated_at) + ' · ReliefWeb'; })
+    // MyJOBS is the single source of truth: it already fetches and normalizes
+    // ReliefWeb data into vacancy.json. HorizonScanning only reads that feed.
+    fetch('https://anggaconni.github.io/MyJOBS/vacancy.json?v=' + Date.now(), {cache:'no-store'})
+        .then(response => { if (!response.ok) throw new Error('MyJOBS feed unavailable'); return response.json(); })
+        .then(data => {
+            const jobs = (data.jobs || []).filter(item =>
+                String(item.source || '').toLowerCase() === 'reliefweb' &&
+                /^https:\/\/reliefweb\.int\//i.test(item.original_url || '')
+            );
+            const items = jobs.map(item => ({
+                title: item.title,
+                url: item.original_url,
+                date: item.posted_at,
+                country: item.country || item.location || 'Global response',
+                source: item.company || 'ReliefWeb'
+            }));
+            render(items);
+            const updated = data.last_updated || data.updated_at;
+            if (updated) document.getElementById('humanitarian-updated').textContent = 'MyJOBS feed · Updated ' + formatDate(updated);
+        })
         .catch(() => render([]));
     document.getElementById('humanitarian-prev')?.addEventListener('click', () => track.scrollBy({left:-320,behavior:'smooth'}));
     document.getElementById('humanitarian-next')?.addEventListener('click', () => track.scrollBy({left:320,behavior:'smooth'}));
