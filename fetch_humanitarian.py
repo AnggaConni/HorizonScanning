@@ -63,7 +63,7 @@ def main():
         "count": len(items),
         "items": items,
     }
-    OUTPUT.write_text(json.dumps(output, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8")
+    OUTPUT.write_text(json.dumps(output, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"Wrote {len(items)} humanitarian reports to {OUTPUT}")
 
 
