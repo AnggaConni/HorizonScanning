@@ -402,13 +402,8 @@
       document.getElementById('view-date').textContent = article.date;
       
       const contentContainer = document.getElementById('view-content');
-      contentContainer.innerHTML = ''; // Clear old content
-
-      // To execute embedded <script> tags inside the JSON HTML string, we use createContextualFragment
-      const range = document.createRange();
-      range.selectNode(document.body);
-      const documentFragment = range.createContextualFragment(article.content);
-      contentContainer.appendChild(documentFragment);
+      // Render article styles inside a scoped content root; never let article CSS affect the CMS.
+      renderArticleHTML(contentContainer, article.content);
 
       switchTab('viewer');
     }
@@ -482,19 +477,81 @@
       switchTab('home');
     }
 
+    // --- ARTICLE HTML ISOLATION ---
+    // Article styles are scoped to .article-content so they cannot restyle the CMS.
+    // This keeps full-page article CSS (body, nav, section, .grid, etc.) inside its content area.
+    function scopeArticleCSS(cssText) {
+      const temp = document.createElement('style');
+      temp.textContent = cssText;
+      document.head.appendChild(temp);
+      let output = '';
+      const scopeRules = rules => {
+        let result = '';
+        Array.from(rules || []).forEach(rule => {
+          if (rule.type === CSSRule.STYLE_RULE) {
+            const selectors = rule.selectorText.split(',').map(raw => {
+              let selector = raw.trim();
+              if (!selector) return '';
+              if (selector === '*') return '.article-content, .article-content *';
+              selector = selector.replace(/(^|\\s)(html|body|:root)(?=\\s|$|[.#:[>+~])/g, '$1.article-content');
+              if (selector === '.article-content') return selector;
+              if (selector.startsWith('.article-content')) return selector;
+              return '.article-content ' + selector;
+            }).filter(Boolean);
+            if (selectors.length) result += selectors.join(',') + '{' + rule.style.cssText + '}';
+          } else if (rule.type === CSSRule.MEDIA_RULE || rule.type === CSSRule.SUPPORTS_RULE) {
+            result += rule.conditionText ? '@' + (rule.type === CSSRule.MEDIA_RULE ? 'media ' : 'supports ') + rule.conditionText + '{' + scopeRules(rule.cssRules) + '}' : rule.cssText;
+          } else {
+            // Preserve keyframes, font-face and other at-rules unchanged.
+            result += rule.cssText;
+          }
+        });
+        return result;
+      };
+      try { output = scopeRules(temp.sheet.cssRules); }
+      catch (error) { console.warn('Could not scope an article stylesheet:', error); output = cssText; }
+      temp.remove();
+      return output;
+    }
+
+    function renderArticleHTML(container, html) {
+      if (!container) return;
+      container.classList.add('article-content');
+      const parsed = new DOMParser().parseFromString(String(html || ''), 'text/html');
+      const styles = Array.from(parsed.querySelectorAll('style'));
+      const scripts = Array.from(parsed.querySelectorAll('script'));
+      // Scripts are deliberately not executed inside the CMS page.
+      scripts.forEach(script => script.remove());
+      container.replaceChildren();
+
+      styles.forEach(sourceStyle => {
+        const style = document.createElement('style');
+        style.dataset.articleStyle = 'true';
+        style.dataset.originalCss = sourceStyle.textContent || '';
+        style.textContent = scopeArticleCSS(sourceStyle.textContent || '');
+        container.appendChild(style);
+      });
+
+      const content = document.createDocumentFragment();
+      Array.from(parsed.body.childNodes).forEach(node => {
+        if (node.nodeName === 'STYLE' || node.nodeName === 'SCRIPT') return;
+        content.appendChild(document.importNode(node, true));
+      });
+      container.appendChild(content);
+    }
+
     // --- LIVE PREVIEW ---
     function updatePreview() {
       persistLocalDraft();
       const content = document.getElementById('edit-content').value;
       const previewBox = document.getElementById('preview-content');
       if (visualEditMode && document.activeElement === previewBox) return;
-      
+
       if (content.trim() === '') {
+        previewBox.classList.remove('article-content');
         previewBox.innerHTML = '<div class="text-slate-400 italic text-center mt-20">Preview konten akan muncul di sini...</div>';
       } else {
-        // Render raw HTML. Note: <script> tags won't execute in live preview to prevent browser crashes during typing.
-        // They will execute perfectly once Saved & read in the main "Articles" tab.
-        previewBox.innerHTML = content;
+        renderArticleHTML(previewBox, content);
       }
     }
 
@@ -612,7 +669,17 @@
         node.classList.remove('vbuilder-dragging', 'vbuilder-drop-target');
         if (!node.className) node.removeAttribute('class');
       });
-      textarea.value = box.innerHTML;
+      // Restore the original (unscoped) CSS when syncing visual edits back to source.
+      const articleStyles = Array.from(box.querySelectorAll('style[data-article-style="true"]'))
+        .map(style => '<style>\\n' + (style.dataset.originalCss || '') + '\\n</style>');
+      const articleMarkup = Array.from(box.childNodes)
+        .filter(node => !(node.nodeType === 1 && node.matches('style[data-article-style="true"]')))
+        .map(node => {
+          const holder = document.createElement('div');
+          holder.appendChild(node.cloneNode(true));
+          return holder.innerHTML;
+        }).join('');
+      textarea.value = articleStyles.join('\\n') + '\\n' + articleMarkup;
       captureEditorState();
       savedSelection = { start: textarea.value.length, end: textarea.value.length };
       persistLocalDraft();
