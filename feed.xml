@@ -8,7 +8,7 @@
     <link>https://horizon-scanning.org/blog.html</link>
     <description>Independent insights, methodologies, and analysis on navigating uncertainty, strategic foresight, governance, technology, and society.</description>
     <language>en</language>
-    <lastBuildDate>Tue, 17 Nov 2026 22:40:57 GMT</lastBuildDate>
+    <lastBuildDate>Tue, 17 Nov 2026 23:02:19 GMT</lastBuildDate>
     <atom:link href="https://horizon-scanning.org/feed.xml" rel="self" type="application/rss+xml" xmlns:atom="http://www.w3.org/2005/Atom" />
     <item>
       <title>How Do Magicians “Read Your Mind”? They Don’t. They Just Close the Doors.</title>
@@ -18,41 +18,7 @@
       <category>Reverse Psychology, Choice Architecture, Behavioral Economics, Human Behaviour, Cognitive Bias, Psychological Manipulation, Decision Making, Persuasion, Psychology of Magic, Equivoque</category>
       <dc:creator>Angga Conni Saputra</dc:creator>
       <description>How do magicians seem to read our minds without actually knowing what we think? The secret is often not mind reading, but understanding human behaviour. From reverse psychology and choice architecture to anchoring bias and psychological priming, discover how everyday decisions can be subtly influenced by the way choices are presented. Sometimes, the real trick isn&apos;t predicting what people will choose, but controlling which choices they see.</description>
-      <content:encoded><![CDATA[<style>
-.magician-article{--ma-text:#f3eee6;--ma-muted:#c2b9aa;--ma-line:#494033;--ma-accent:#fb923c;color:var(--ma-text);font-family:Georgia,"Times New Roman",serif;font-size:17px;line-height:1.78;max-width:100%;overflow-wrap:anywhere}
-.magician-article *{box-sizing:border-box}
-.magician-article p,.magician-article li{color:var(--ma-text);font:inherit;line-height:inherit}
-.magician-article p{margin:1rem 0}
-.magician-article h2{color:#fff;font:800 clamp(1.35rem,3.5vw,1.8rem)/1.25 Inter,system-ui,sans-serif;letter-spacing:-.025em;margin:0 0 .85rem}
-.magician-article b,.magician-article strong{color:#fff;font-weight:800}
-.magician-article a{color:#fdba74;text-decoration:underline;text-underline-offset:3px}
-.magician-article .tag{display:inline-block;color:#fdba74;font:800 .72rem/1.3 Inter,system-ui,sans-serif;letter-spacing:.13em;text-transform:uppercase;margin:0 0 .8rem}
-.magician-article .say{background:linear-gradient(145deg,#242019,#1c1914);color:var(--ma-text);border:1px solid #514431;border-left:4px solid var(--ma-accent);border-radius:14px;padding:1rem 1.2rem;margin:1.25rem 0;box-shadow:0 10px 28px rgba(0,0,0,.16)}
-.magician-article .say p{color:var(--ma-text);margin:.55rem 0}
-.magician-article .big{font-size:1.18rem;font-weight:700;color:#fff;line-height:1.55}
-.magician-article .hl{background:rgba(251,146,60,.2);color:#ffd5ad;padding:.08em .35em;border-radius:5px}
-.magician-article section{border-top:1px solid var(--ma-line);padding:2rem 0 .5rem;margin:2rem 0 0;color:var(--ma-text)}
-.magician-article figure{margin:1.5rem 0}
-.magician-article figure svg{display:block;width:100%;height:auto;background:#211d18;border:1px solid var(--ma-line);border-radius:14px;padding:.5rem}
-.magician-article figcaption{color:var(--ma-muted);font:500 .82rem/1.5 Inter,system-ui,sans-serif;text-align:center;margin-top:.6rem}
-.magician-article .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.85rem;margin:1.25rem 0}
-.magician-article .card{min-width:0;background:linear-gradient(150deg,#252018,#1d1a15);color:var(--ma-text);border:1px solid #514431;border-radius:13px;padding:1rem}
-.magician-article .card p{color:var(--ma-text);font-size:.96rem;margin:.45rem 0}
-.magician-article .card b{display:block;color:#fdba74;font:800 1rem/1.4 Inter,system-ui,sans-serif;margin-bottom:.4rem}
-.magician-article .note{color:var(--ma-muted)!important;font-size:.88rem;line-height:1.6}
-.magician-article ul.k{list-style:disc;padding-left:1.35rem;margin:1rem 0}
-.magician-article ul.k li{padding-left:.2rem;margin:.55rem 0}
-.magician-article ul.k li::marker{color:var(--ma-accent)}
-.magician-article ol.steps{list-style:none;counter-reset:ma-step;padding:0;margin:1rem 0}
-.magician-article ol.steps li{counter-increment:ma-step;position:relative;padding:.75rem .9rem .75rem 3rem;margin:.7rem 0;background:#211d18;border:1px solid #514431;border-radius:12px}
-.magician-article ol.steps li::before{content:counter(ma-step);position:absolute;left:.85rem;top:.78rem;width:1.55rem;height:1.55rem;display:grid;place-items:center;border-radius:50%;background:var(--ma-accent);color:#21150d;font:800 .8rem Inter,system-ui,sans-serif}
-.magician-article .end{color:#fff;font:800 clamp(1.25rem,3vw,1.65rem)/1.35 Inter,system-ui,sans-serif;text-align:center;margin:2rem 0 1rem}
-.magician-article .hash{color:var(--ma-muted);font:500 .82rem/1.7 Inter,system-ui,sans-serif;text-align:center}
-.magician-article .src{padding-left:1.25rem}
-.magician-article .src li{margin:.7rem 0;font-size:.92rem}
-@media(max-width:640px){.magician-article{font-size:16px;line-height:1.72}.magician-article .grid{grid-template-columns:1fr}.magician-article .say{padding:.9rem 1rem}.magician-article section{padding-top:1.55rem;margin-top:1.6rem}}
-</style>
-<div class="magician-article">
+      <content:encoded><![CDATA[<div class="magician-article">
 <div class="tag">Psychology of magic</div>
 <h1>How Do Magicians “Read Your Mind”? They Don’t. They Just Close the Doors.</h1>
 
@@ -68,20 +34,22 @@
 <h2>The mouse and the five exits</h2>
 <p>Imagine a room with 5 exits and a mouse inside. You close 4 of them. You don’t need to read the mouse’s mind. You already know which exit it will take: the 5th.</p>
 <figure>
-<svg viewBox="0 0 640 270" role="img" aria-label="A room with five doors. Four are closed and marked with a cross. One is open and a mouse heads toward it.">
-<defs><marker id="ah" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--ok)"/></marker></defs>
-<rect x="20" y="44" width="600" height="206" rx="14" fill="none" stroke="var(--mut)" stroke-width="2"/>
-<g font-family="system-ui,sans-serif" font-size="13" text-anchor="middle" fill="var(--fg)">
-<rect x="54" y="32" width="52" height="24" rx="4" fill="var(--bad)"/><text x="80" y="50" fill="#fff" font-size="16">✕</text>
-<rect x="174" y="32" width="52" height="24" rx="4" fill="var(--bad)"/><text x="200" y="50" fill="#fff" font-size="16">✕</text>
-<rect x="294" y="32" width="52" height="24" rx="4" fill="var(--bad)"/><text x="320" y="50" fill="#fff" font-size="16">✕</text>
-<rect x="414" y="32" width="52" height="24" rx="4" fill="var(--bad)"/><text x="440" y="50" fill="#fff" font-size="16">✕</text>
-<rect x="534" y="32" width="52" height="24" rx="4" fill="var(--ok)"/><text x="560" y="50" fill="#fff" font-size="14">OPEN</text>
-<text x="80" y="78" fill="var(--mut)">closed</text><text x="200" y="78" fill="var(--mut)">closed</text><text x="320" y="78" fill="var(--mut)">closed</text><text x="440" y="78" fill="var(--mut)">closed</text><text x="560" y="78" fill="var(--ok)">the one door left</text>
-<text x="150" y="190" font-size="38">🐭</text>
-<text x="320" y="238" fill="var(--mut)">No mind reading needed. Only one exit makes sense.</text>
-</g>
-<path d="M190 170 C330 150 470 110 548 92" fill="none" stroke="var(--ok)" stroke-width="3" stroke-dasharray="7 6" marker-end="url(#ah)"/>
+<svg viewBox="0 0 640 270" role="img" aria-label="A room with five exits. Four doors are closed and one is open. A mouse is inside the room.">
+  <rect x="18" y="48" width="604" height="202" rx="16" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+  <g font-family="system-ui,sans-serif" font-size="13" text-anchor="middle">
+    <rect x="52" y="26" width="56" height="30" rx="6" fill="#dc2626"/><text x="80" y="47" fill="#ffffff" font-size="19">×</text>
+    <rect x="172" y="26" width="56" height="30" rx="6" fill="#dc2626"/><text x="200" y="47" fill="#ffffff" font-size="19">×</text>
+    <rect x="292" y="26" width="56" height="30" rx="6" fill="#dc2626"/><text x="320" y="47" fill="#ffffff" font-size="19">×</text>
+    <rect x="412" y="26" width="56" height="30" rx="6" fill="#dc2626"/><text x="440" y="47" fill="#ffffff" font-size="19">×</text>
+    <rect x="532" y="26" width="56" height="30" rx="6" fill="#16a34a"/><text x="560" y="46" fill="#ffffff" font-size="12" font-weight="700">OPEN</text>
+    <text x="80" y="78" fill="#64748b">closed</text><text x="200" y="78" fill="#64748b">closed</text>
+    <text x="320" y="78" fill="#64748b">closed</text><text x="440" y="78" fill="#64748b">closed</text>
+    <text x="560" y="78" fill="#15803d">only exit</text>
+  </g>
+  <path d="M188 178 C300 168 432 132 540 102" fill="none" stroke="#16a34a" stroke-width="3" stroke-dasharray="7 6"/>
+  <path d="M530 94 L548 100 L535 113" fill="none" stroke="#16a34a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="150" y="194" font-size="36" text-anchor="middle">🐭</text>
+  <text x="320" y="232" fill="#334155" font-family="system-ui,sans-serif" font-size="13" text-anchor="middle">No mind reading needed. Only one exit remains.</text>
 </svg>
 <figcaption>Close 4 exits and the 5th one predicts itself.</figcaption>
 </figure>
@@ -120,20 +88,23 @@
 <p>This is the trick street magicians love most. <b>Shotgunning</b> means firing many guesses at once, like a shotgun spreading pellets, hoping some land.</p>
 <div class="say"><p>“I’m sensing someone close to you… a family member? A name starting with ‘M’… or maybe ‘S’? Something about travel… a recent decision… a little worry about money or work.”</p></div>
 <figure>
-<svg viewBox="0 0 640 210" role="img" aria-label="Many small pellets fan out from the left toward a target circle. Most miss, three hit.">
-<polygon points="40,105 540,25 540,185" fill="var(--ac)" opacity=".08"/>
-<circle cx="540" cy="105" r="52" fill="none" stroke="var(--mut)" stroke-width="2"/>
-<circle cx="540" cy="105" r="26" fill="none" stroke="var(--mut)" stroke-width="1.5"/>
-<circle cx="40" cy="105" r="9" fill="var(--fg)"/>
-<g fill="var(--mut)" opacity=".7">
-<circle cx="160" cy="66" r="5"/><circle cx="200" cy="140" r="5"/><circle cx="240" cy="48" r="5"/><circle cx="262" cy="158" r="5"/><circle cx="300" cy="92" r="5"/><circle cx="332" cy="150" r="5"/><circle cx="362" cy="52" r="5"/><circle cx="400" cy="172" r="5"/><circle cx="424" cy="112" r="5"/><circle cx="452" cy="34" r="5"/><circle cx="474" cy="182" r="5"/><circle cx="500" cy="22" r="5"/><circle cx="520" cy="196" r="5"/><circle cx="596" cy="176" r="5"/>
-</g>
-<g fill="var(--ok)"><circle cx="520" cy="94" r="7"/><circle cx="546" cy="116" r="7"/><circle cx="562" cy="88" r="7"/></g>
-<g font-family="system-ui,sans-serif" font-size="13" fill="var(--fg)">
-<text x="40" y="132" text-anchor="middle">magician</text>
-<text x="540" y="200" text-anchor="middle" fill="var(--ok)">hits: “Wow, yes!”</text>
-<text x="300" y="20" text-anchor="middle" fill="var(--mut)">misses: quickly forgotten</text>
-</g>
+<svg viewBox="0 0 640 250" role="img" aria-label="A wide fan of guesses spreads from a magician toward a target. Most guesses miss and a few hit.">
+  <path d="M70 122 L520 35 L520 210 Z" fill="#f97316" opacity=".10"/>
+  <circle cx="70" cy="122" r="10" fill="#172033"/>
+  <text x="70" y="151" fill="#172033" font-family="system-ui,sans-serif" font-size="13" text-anchor="middle">magician</text>
+  <circle cx="535" cy="122" r="58" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
+  <circle cx="535" cy="122" r="32" fill="none" stroke="#cbd5e1" stroke-width="2"/>
+  <g fill="#64748b" opacity=".85">
+    <circle cx="160" cy="78" r="5"/><circle cx="190" cy="168" r="5"/><circle cx="220" cy="56" r="5"/>
+    <circle cx="250" cy="190" r="5"/><circle cx="280" cy="98" r="5"/><circle cx="310" cy="157" r="5"/>
+    <circle cx="340" cy="68" r="5"/><circle cx="370" cy="181" r="5"/><circle cx="400" cy="112" r="5"/>
+    <circle cx="430" cy="48" r="5"/><circle cx="455" cy="196" r="5"/><circle cx="480" cy="83" r="5"/>
+  </g>
+  <g fill="#16a34a"><circle cx="520" cy="106" r="7"/><circle cx="542" cy="132" r="7"/><circle cx="556" cy="111" r="7"/></g>
+  <g font-family="system-ui,sans-serif" font-size="13">
+    <text x="320" y="22" fill="#64748b" text-anchor="middle">misses: quickly forgotten</text>
+    <text x="535" y="224" fill="#15803d" text-anchor="middle" font-weight="700">a few hits</text>
+  </g>
 </svg>
 <figcaption>A few pellets hit. We remember those and forget the rest.</figcaption>
 </figure>
