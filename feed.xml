@@ -8,7 +8,7 @@
     <link>https://horizon-scanning.org/blog.html</link>
     <description>Independent insights, methodologies, and analysis on navigating uncertainty, strategic foresight, governance, technology, and society.</description>
     <language>en</language>
-    <lastBuildDate>Tue, 17 Nov 2026 22:35:06 GMT</lastBuildDate>
+    <lastBuildDate>Tue, 17 Nov 2026 22:38:42 GMT</lastBuildDate>
     <atom:link href="https://horizon-scanning.org/feed.xml" rel="self" type="application/rss+xml" xmlns:atom="http://www.w3.org/2005/Atom" />
     <item>
       <title>How Do Magicians “Read Your Mind”? They Don’t. They Just Close the Doors.</title>
@@ -18,350 +18,41 @@
       <category>Reverse Psychology, Choice Architecture, Behavioral Economics, Human Behaviour, Cognitive Bias, Psychological Manipulation, Decision Making, Persuasion, Psychology of Magic, Equivoque</category>
       <dc:creator>Angga Conni Saputra</dc:creator>
       <description>How do magicians seem to read our minds without actually knowing what we think? The secret is often not mind reading, but understanding human behaviour. From reverse psychology and choice architecture to anchoring bias and psychological priming, discover how everyday decisions can be subtly influenced by the way choices are presented. Sometimes, the real trick isn&apos;t predicting what people will choose, but controlling which choices they see.</description>
-      <content:encoded><![CDATA[<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>How Do Magicians “Read Your Mind”? They Just Close the Doors</title>
-<style>
-
-
-:root {
-  --bg: #fbfaf7;
-  --fg: #1d1b19;
-  --mut: #6b665f;
-  --card: #ffffff;
-  --line: #e5e1d8;
-  --ac: #c2410c;
-  --ok: #15803d;
-  --bad: #b91c1c;
-
-  box-sizing: border-box;
-  padding-top: env(safe-area-inset-top, 0px);
-  padding-bottom: env(safe-area-inset-bottom, 0px);
-  color-scheme: light;
-}
-
-/* Dark theme: controlled by data-theme */
-:root[data-theme="dark"] {
-  --bg: #15130f;
-  --fg: #f1ede6;
-  --mut: #a39d92;
-  --card: #1f1c17;
-  --line: #34302a;
-  --ac: #fb923c;
-  --ok: #4ade80;
-  --bad: #f87171;
-
-  color-scheme: dark;
-}
-
-/* Automatic dark mode when no explicit theme is selected */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]):not([data-theme="dark"]) {
-    --bg: #15130f;
-    --fg: #f1ede6;
-    --mut: #a39d92;
-    --card: #1f1c17;
-    --line: #34302a;
-    --ac: #fb923c;
-    --ok: #4ade80;
-    --bad: #f87171;
-
-    color-scheme: dark;
-  }
-}
-
-/* Global box sizing */
-*,
-*::before,
-*::after {
-  box-sizing: inherit;
-}
-
-/* Base */
-html {
-  scroll-padding-top: env(safe-area-inset-top, 0px);
-  background: var(--bg);
-  color: var(--fg);
-}
-
-body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--fg);
-  font: 17px/1.65 Georgia, "Times New Roman", serif;
-}
-
-/* Main container */
-main {
-  max-width: 720px;
-  margin: 0 auto;
-  padding: 28px 18px 56px;
-  color: var(--fg);
-}
-
-/* Headings */
-h1 {
-  color: var(--fg);
-  font: 800 clamp(1.7rem, 6vw, 2.5rem)/1.15
-    system-ui, -apple-system, "Segoe UI", sans-serif;
-  margin: .2em 0 .5em;
-}
-
-h2 {
-  color: var(--fg);
-  font: 700 1.3rem/1.3
-    system-ui, -apple-system, "Segoe UI", sans-serif;
-  margin: 0 0 .5em;
-}
-
-h3, h4, h5, h6 {
-  color: var(--fg);
-}
-
-/* Category tag */
-.tag {
-  color: var(--ac);
-  font: 600 .8rem system-ui, sans-serif;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-}
-
-/* Sections */
-section {
-  color: var(--fg);
-  border-top: 1px solid var(--line);
-  padding: 28px 0 4px;
-  margin-top: 24px;
-}
-
-/* Quotation / dialogue card */
-.say {
-  background: var(--card);
-  color: var(--fg) !important;
-  border: 1px solid var(--line);
-  border-left: 4px solid var(--ac);
-  border-radius: 10px;
-  padding: 14px 16px;
-  margin: 12px 0;
-}
-
-/* Force all quotation content to inherit correct color */
-.say p,
-.say span,
-.say strong,
-.say b,
-.say em,
-.say i,
-.say blockquote {
-  color: inherit !important;
-}
-
-.say p {
-  margin: .4em 0;
-}
-
-/* Large emphasis text */
-.big {
-  color: var(--fg);
-  font-size: 1.2rem;
-  font-weight: 700;
-}
-
-/* Figures and illustrations */
-figure {
-  margin: 18px 0;
-}
-
-figure svg {
-  width: 100%;
-  height: auto;
-  display: block;
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 12px;
-}
-
-figcaption {
-  color: var(--mut);
-  font: .85rem system-ui, sans-serif;
-  margin-top: 6px;
-  text-align: center;
-}
-
-/* Grid layout */
-.grid {
-  display: grid;
-  gap: 12px;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  margin: 16px 0;
-}
-
-/* Content cards */
-.card {
-  background: var(--card);
-  color: var(--fg);
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 14px 16px;
-}
-
-.card p,
-.card span,
-.card li {
-  color: inherit;
-}
-
-.card b {
-  display: block;
-  font-family: system-ui, sans-serif;
-  margin-bottom: 4px;
-  color: inherit;
-}
-
-.card p {
-  margin: .3em 0;
-  font-size: .95rem;
-}
-
-/* Secondary notes */
-.note {
-  color: var(--mut);
-  font-size: .9rem;
-}
-
-/* Lists */
-ol.steps li,
-ul.k li {
-  margin: .4em 0;
-  color: var(--fg);
-}
-
-/* Highlight */
-.hl {
-  background: color-mix(in srgb, var(--ac) 14%, transparent);
-  color: var(--fg);
-  padding: 1px 5px;
-  border-radius: 4px;
-}
-
-/* Sources */
-.src li {
-  margin: .5em 0;
-  font-size: .92rem;
-  color: var(--fg);
-}
-
-/* Links */
-a {
-  color: var(--ac);
-  text-decoration-thickness: 1px;
-  text-underline-offset: 3px;
-}
-
-a:hover {
-  opacity: .8;
-}
-
-/* Closing statement */
-.end {
-  color: var(--fg);
-  font: 800 1.35rem/1.3 system-ui, sans-serif;
-  text-align: center;
-  margin: 30px 0 10px;
-}
-
-/* Hashtags */
-.hash {
-  color: var(--mut);
-  font: .85rem system-ui, sans-serif;
-  text-align: center;
-}
-
-/* Responsive adjustments */
-@media (max-width: 480px) {
-  main {
-    padding: 22px 16px 44px;
-  }
-
-  .grid {
-    grid-template-columns: 1fr;
-  }
-
-  .say {
-    padding: 12px 14px;
-  }
-}
-
-
-/* =========================================
-   GLOBAL TEXT COLOR FIX
-   ========================================= */
-
-/* Default text color for all content */
-main {
-  color: var(--fg);
-}
-
-/* Paragraphs, lists and quotation elements */
-main p,
-main li,
-main blockquote,
-main div,
-main span {
-  color: var(--fg);
-}
-
-/* Preserve muted text */
-main .note,
-main .hash,
-main figcaption {
-  color: var(--mut) !important;
-}
-
-/* Preserve accent colors */
-main .tag,
-main a {
-  color: var(--ac);
-}
-
-/* Quotation cards */
-main .say,
-main .say p,
-main .say span {
-  color: var(--fg) !important;
-}
-
-/* Content cards */
-main .card,
-main .card p,
-main .card li {
-  color: var(--fg);
-}
-
-/* Headings */
-main h1,
-main h2,
-main h3,
-main h4,
-main h5,
-main h6 {
-  color: var(--fg);
-}
-
-/* Explicit light/dark theme consistency */
-:root[data-theme="dark"] main p,
-:root[data-theme="dark"] main li,
-:root[data-theme="dark"] main blockquote {
-  color: #f1ede6;
-}
-
-
+      <content:encoded><![CDATA[<style>
+.magician-article{--ma-text:#f3eee6;--ma-muted:#c2b9aa;--ma-line:#494033;--ma-accent:#fb923c;color:var(--ma-text);font-family:Georgia,"Times New Roman",serif;font-size:17px;line-height:1.78;max-width:100%;overflow-wrap:anywhere}
+.magician-article *{box-sizing:border-box}
+.magician-article p,.magician-article li{color:var(--ma-text);font:inherit;line-height:inherit}
+.magician-article p{margin:1rem 0}
+.magician-article h2{color:#fff;font:800 clamp(1.35rem,3.5vw,1.8rem)/1.25 Inter,system-ui,sans-serif;letter-spacing:-.025em;margin:0 0 .85rem}
+.magician-article b,.magician-article strong{color:#fff;font-weight:800}
+.magician-article a{color:#fdba74;text-decoration:underline;text-underline-offset:3px}
+.magician-article .tag{display:inline-block;color:#fdba74;font:800 .72rem/1.3 Inter,system-ui,sans-serif;letter-spacing:.13em;text-transform:uppercase;margin:0 0 .8rem}
+.magician-article .say{background:linear-gradient(145deg,#242019,#1c1914);color:var(--ma-text);border:1px solid #514431;border-left:4px solid var(--ma-accent);border-radius:14px;padding:1rem 1.2rem;margin:1.25rem 0;box-shadow:0 10px 28px rgba(0,0,0,.16)}
+.magician-article .say p{color:var(--ma-text);margin:.55rem 0}
+.magician-article .big{font-size:1.18rem;font-weight:700;color:#fff;line-height:1.55}
+.magician-article .hl{background:rgba(251,146,60,.2);color:#ffd5ad;padding:.08em .35em;border-radius:5px}
+.magician-article section{border-top:1px solid var(--ma-line);padding:2rem 0 .5rem;margin:2rem 0 0;color:var(--ma-text)}
+.magician-article figure{margin:1.5rem 0}
+.magician-article figure svg{display:block;width:100%;height:auto;background:#211d18;border:1px solid var(--ma-line);border-radius:14px;padding:.5rem}
+.magician-article figcaption{color:var(--ma-muted);font:500 .82rem/1.5 Inter,system-ui,sans-serif;text-align:center;margin-top:.6rem}
+.magician-article .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.85rem;margin:1.25rem 0}
+.magician-article .card{min-width:0;background:linear-gradient(150deg,#252018,#1d1a15);color:var(--ma-text);border:1px solid #514431;border-radius:13px;padding:1rem}
+.magician-article .card p{color:var(--ma-text);font-size:.96rem;margin:.45rem 0}
+.magician-article .card b{display:block;color:#fdba74;font:800 1rem/1.4 Inter,system-ui,sans-serif;margin-bottom:.4rem}
+.magician-article .note{color:var(--ma-muted)!important;font-size:.88rem;line-height:1.6}
+.magician-article ul.k{list-style:disc;padding-left:1.35rem;margin:1rem 0}
+.magician-article ul.k li{padding-left:.2rem;margin:.55rem 0}
+.magician-article ul.k li::marker{color:var(--ma-accent)}
+.magician-article ol.steps{list-style:none;counter-reset:ma-step;padding:0;margin:1rem 0}
+.magician-article ol.steps li{counter-increment:ma-step;position:relative;padding:.75rem .9rem .75rem 3rem;margin:.7rem 0;background:#211d18;border:1px solid #514431;border-radius:12px}
+.magician-article ol.steps li::before{content:counter(ma-step);position:absolute;left:.85rem;top:.78rem;width:1.55rem;height:1.55rem;display:grid;place-items:center;border-radius:50%;background:var(--ma-accent);color:#21150d;font:800 .8rem Inter,system-ui,sans-serif}
+.magician-article .end{color:#fff;font:800 clamp(1.25rem,3vw,1.65rem)/1.35 Inter,system-ui,sans-serif;text-align:center;margin:2rem 0 1rem}
+.magician-article .hash{color:var(--ma-muted);font:500 .82rem/1.7 Inter,system-ui,sans-serif;text-align:center}
+.magician-article .src{padding-left:1.25rem}
+.magician-article .src li{margin:.7rem 0;font-size:.92rem}
+@media(max-width:640px){.magician-article{font-size:16px;line-height:1.72}.magician-article .grid{grid-template-columns:1fr}.magician-article .say{padding:.9rem 1rem}.magician-article section{padding-top:1.55rem;margin-top:1.6rem}}
 </style>
-
-</head>
-<body>
-<main>
+<div class="magician-article">
 <div class="tag">Psychology of magic</div>
 <h1>How Do Magicians “Read Your Mind”? They Don’t. They Just Close the Doors.</h1>
 
@@ -501,9 +192,7 @@ main h6 {
 </ul>
 <p class="note">The Verywell Mind page itself couldn’t be opened in this session, so its points are drawn from its search summary. Please give it a quick read before posting.</p>
 </section>
-</main>
-</body>
-]]></content:encoded>
+</div>]]></content:encoded>
       <media:thumbnail url="https://horizon-scanning.org/thum/ReversePsychology.png" />
     </item>
     <item>
