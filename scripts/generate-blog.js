@@ -494,20 +494,25 @@ const blogIndexHtml = `
     </section>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8 mt-8 notranslate">
-        <div class="flex flex-col md:flex-row justify-between items-center gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-            <div class="relative w-full md:w-96">
-                <i class="ph ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                <input type="text" id="searchInput" placeholder="Search articles by title..." class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500">
-            </div>
-            <div class="flex gap-3 w-full md:w-auto">
-                <select id="categoryFilter" class="w-full md:w-auto px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-600 focus:outline-none focus:border-teal-500">
+        <div class="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_minmax(220px,280px)_minmax(150px,190px)] gap-3 items-center bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm w-full min-w-0">
+            <label class="relative block w-full min-w-0">
+                <i class="ph ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+                <input type="search" id="searchInput" placeholder="Search articles by title, description, or category..." aria-label="Search articles" autocomplete="off" class="block w-full min-w-0 pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500">
+                <button type="button" id="clearSearch" aria-label="Clear search" title="Clear search" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700"><i class="ph-bold ph-x"></i></button>
+            </label>
+            <label class="block w-full min-w-0">
+                <span class="sr-only">Filter by category</span>
+                <select id="categoryFilter" aria-label="Filter by category" class="block w-full min-w-0 max-w-full truncate px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-600 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500">
                     ${categoryOptions}
                 </select>
-                <select id="sortFilter" class="w-full md:w-auto px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-600 focus:outline-none focus:border-teal-500">
+            </label>
+            <label class="block w-full min-w-0">
+                <span class="sr-only">Sort articles</span>
+                <select id="sortFilter" aria-label="Sort articles" class="block w-full min-w-0 max-w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-600 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500">
                     <option value="newest">Newest First</option>
                     <option value="oldest">Oldest First</option>
                 </select>
-            </div>
+            </label>
         </div>
     </div>
 
@@ -524,58 +529,67 @@ const blogIndexHtml = `
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const searchInput = document.getElementById('searchInput');
+            const clearSearch = document.getElementById('clearSearch');
             const categoryFilter = document.getElementById('categoryFilter');
             const sortFilter = document.getElementById('sortFilter');
             const articleGrid = document.getElementById('articleGrid');
             const emptyState = document.getElementById('emptyState');
-            // Ambil semua card yang sudah di-generate
-            let cards = Array.from(document.querySelectorAll('.article-card'));
+            if (!searchInput || !categoryFilter || !sortFilter || !articleGrid || !emptyState) return;
+
+            const normalizeText = value => String(value)
+                .normalize('NFD')
+                .replace(/[\\u0300-\\u036f]/g, '')
+                .toLocaleLowerCase()
+                .trim();
+
+            const cards = Array.from(articleGrid.querySelectorAll('.article-card')).map((element, index) => ({
+                element,
+                index,
+                timestamp: Number(element.dataset.timestamp) || 0,
+                category: element.dataset.category || '',
+                searchText: normalizeText([
+                    element.dataset.title || '',
+                    element.querySelector('p')?.textContent || '',
+                    element.dataset.category || ''
+                ].join(' '))
+            }));
 
             function filterAndSort() {
-                const searchTerm = searchInput.value.toLowerCase();
+                const term = normalizeText(searchInput.value);
                 const category = categoryFilter.value;
-                const sortOrder = sortFilter.value;
-                let visibleCount = 0;
+                const order = sortFilter.value;
 
-                // 1. Proses Filter (Pencarian & Kategori)
-                cards.forEach(card => {
-                    const title = card.getAttribute('data-title').toLowerCase();
-                    const cardCategory = card.getAttribute('data-category');
-                    
-                    const matchesSearch = title.includes(searchTerm);
-                    const matchesCategory = category === 'all' || cardCategory === category;
-
-                    if (matchesSearch && matchesCategory) {
-                        card.style.display = 'flex'; // Munculkan
-                        visibleCount++;
-                    } else {
-                        card.style.display = 'none'; // Sembunyikan
-                    }
+                const visible = cards.filter(card => {
+                    const matchesSearch = !term || card.searchText.includes(term);
+                    const matchesCategory = category === 'all' || card.category === category;
+                    card.element.hidden = !(matchesSearch && matchesCategory);
+                    return matchesSearch && matchesCategory;
                 });
 
-                // 2. Proses Sorting
-                const visibleCards = cards.filter(card => card.style.display !== 'none');
-                
-                visibleCards.sort((a, b) => {
-                    const timeA = parseInt(a.getAttribute('data-timestamp'));
-                    const timeB = parseInt(b.getAttribute('data-timestamp'));
-                    return sortOrder === 'newest' ? timeB - timeA : timeA - timeB;
+                visible.sort((a, b) => {
+                    const dateOrder = order === 'newest'
+                        ? b.timestamp - a.timestamp
+                        : a.timestamp - b.timestamp;
+                    return dateOrder || a.index - b.index;
                 });
 
-                // Terapkan urutan baru ke DOM
-                visibleCards.forEach(card => articleGrid.appendChild(card));
+                visible.forEach(card => articleGrid.appendChild(card.element));
+                cards.filter(card => !visible.includes(card))
+                    .forEach(card => articleGrid.appendChild(card.element));
 
-                // 3. Tampilkan Empty State
-                if (visibleCount === 0) {
-                    emptyState.classList.remove('hidden');
-                } else {
-                    emptyState.classList.add('hidden');
-                }
+                emptyState.classList.toggle('hidden', visible.length > 0);
+                clearSearch?.classList.toggle('hidden', searchInput.value.length === 0);
             }
 
             searchInput.addEventListener('input', filterAndSort);
             categoryFilter.addEventListener('change', filterAndSort);
             sortFilter.addEventListener('change', filterAndSort);
+            clearSearch?.addEventListener('click', () => {
+                searchInput.value = '';
+                searchInput.focus();
+                filterAndSort();
+            });
+            filterAndSort();
         });
     </script>
 </body>
