@@ -239,8 +239,16 @@
     </div>
 
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
+        <div id="articleGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Article cards are preserved here from the existing page. -->
+        </div>
+        <div id="emptyState" class="hidden text-center py-12 text-slate-500">
+            <i class="ph-fill ph-file-dashed text-4xl mb-3 text-slate-300"></i>
+            <p>No articles found matching your criteria.</p>
+        </div>
+    </main>
 
-    <script>
+<script>
         document.addEventListener('DOMContentLoaded', () => {
             const searchInput = document.getElementById('searchInput');
             const clearSearch = document.getElementById('clearSearch');
