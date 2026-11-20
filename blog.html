@@ -130,102 +130,13 @@
         <div class="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_minmax(220px,280px)_minmax(150px,190px)] gap-3 items-center bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm w-full min-w-0">
             <label class="relative block w-full min-w-0">
                 <i class="ph ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
-                <input
-                    type="search"
-                    id="searchInput"
-                    placeholder="Search articles by title, description, or category..."
-                    aria-label="Search articles"
-                    autocomplete="off"
-                    class="block w-full min-w-0 pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
-                >
-                <button type="button" id="clearSearch" aria-label="Clear search" title="Clear search" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700">
-                    <i class="ph-bold ph-x"></i>
-                </button>
+                <input type="search" id="searchInput" placeholder="Search articles by title, description, or category..." aria-label="Search articles" autocomplete="off" class="block w-full min-w-0 pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500">
+                <button type="button" id="clearSearch" aria-label="Clear search" title="Clear search" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700"><i class="ph-bold ph-x"></i></button>
             </label>
             <label class="block w-full min-w-0">
                 <span class="sr-only">Filter by category</span>
                 <select id="categoryFilter" aria-label="Filter by category" class="block w-full min-w-0 max-w-full truncate px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-600 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500">
-                    <option value="all">All Categories (80)</option>
-                    <option value="Reverse Psychology, Choice Architecture, Behavioral Economics, Human Behaviour, Cognitive Bias, Psychological Manipulation, Decision Making, Persuasion, Psychology of Magic, Equivoque">Reverse Psychology, Choice Architecture, Behavioral Economics, Human Behaviour, Cognitive Bias, Psychological Manipulation, Decision Making, Persuasion, Psychology of Magic, Equivoque</option>
-                    <option value="Social Psychology · Cognitive Bias · Social Comparison">Social Psychology · Cognitive Bias · Social Comparison</option>
-                    <option value="Social Psychology · Schadenfreude · Media Spectacle · Empathy · Social Ethics">Social Psychology · Schadenfreude · Media Spectacle · Empathy · Social Ethics</option>
-                    <option value="Social Psychology · Cognitive Bias · Social Comparison · Intellectual Humility · Cognitive Diversity">Social Psychology · Cognitive Bias · Social Comparison · Intellectual Humility · Cognitive Diversity</option>
-                    <option value="Organizational Learning · Expert Voice · Strategic Leadership">Organizational Learning · Expert Voice · Strategic Leadership</option>
-                    <option value="Social Psychology · Transactional Reciprocity · Moral Indebtedness · Professional Ethics">Social Psychology · Transactional Reciprocity · Moral Indebtedness · Professional Ethics</option>
-                    <option value="Human Resources · Political Patronage · Organizational Accountability">Human Resources · Political Patronage · Organizational Accountability</option>
-                    <option value="Effort, Conflict Repair &amp; Problem-Solving">Effort, Conflict Repair &amp; Problem-Solving</option>
-                    <option value="Psychology, Cognitive Load &amp; Problem-Solving">Psychology, Cognitive Load &amp; Problem-Solving</option>
-                    <option value="Psychology, Cognitive Development &amp; Lifelong Learning">Psychology, Cognitive Development &amp; Lifelong Learning</option>
-                    <option value="Psychology, Adaptive Thinking &amp; Problem Solving">Psychology, Adaptive Thinking &amp; Problem Solving</option>
-                    <option value="Human Resources, Workplace Ethics &amp; Accountability">Human Resources, Workplace Ethics &amp; Accountability</option>
-                    <option value="Living Heritage, Dialogue &amp; Intellectual Humility">Living Heritage, Dialogue &amp; Intellectual Humility</option>
-                    <option value="Psychology, Human Behaviour &amp; Disaster Resilience">Psychology, Human Behaviour &amp; Disaster Resilience</option>
-                    <option value="Living Heritage, Cultural Values &amp; Human Dignity">Living Heritage, Cultural Values &amp; Human Dignity</option>
-                    <option value="Social Change, Education &amp; Systems Thinking">Social Change, Education &amp; Systems Thinking</option>
-                    <option value="Social Change, Persuasion &amp; Consent">Social Change, Persuasion &amp; Consent</option>
-                    <option value="Inclusion, Foresight &amp; Behavioural Science">Inclusion, Foresight &amp; Behavioural Science</option>
-                    <option value="Cognitive Science, Inclusive Leadership &amp; Human Resource Management">Cognitive Science, Inclusive Leadership &amp; Human Resource Management</option>
-                    <option value="Living Heritage, Critical Thinking &amp; Systems Thinking">Living Heritage, Critical Thinking &amp; Systems Thinking</option>
-                    <option value="Living Heritage, Foresight &amp; Information Analysis">Living Heritage, Foresight &amp; Information Analysis</option>
-                    <option value="Living Heritage, Strategic Foresight &amp; Context Blindness">Living Heritage, Strategic Foresight &amp; Context Blindness</option>
-                    <option value="Living Heritage, Inclusion, Foresight &amp; Disaster Risk Reduction">Living Heritage, Inclusion, Foresight &amp; Disaster Risk Reduction</option>
-                    <option value="Relationships, Diplomacy &amp; Decision Models">Relationships, Diplomacy &amp; Decision Models</option>
-                    <option value="Living Heritage, Policy Design &amp; Inclusive Systems">Living Heritage, Policy Design &amp; Inclusive Systems</option>
-                    <option value="Living Heritage, Culture &amp; Workplace Coordination">Living Heritage, Culture &amp; Workplace Coordination</option>
-                    <option value="Living Heritage, Culture &amp; Social Psychology">Living Heritage, Culture &amp; Social Psychology</option>
-                    <option value="Living Heritage, Javanese Culture &amp; Reconciliation">Living Heritage, Javanese Culture &amp; Reconciliation</option>
-                    <option value="Living Heritage &amp; Mental Models">Living Heritage &amp; Mental Models</option>
-                    <option value="Culture &amp; Inclusion">Culture &amp; Inclusion</option>
-                    <option value="Culture, Inclusion &amp; Cognitive Diversity">Culture, Inclusion &amp; Cognitive Diversity</option>
-                    <option value="Psychology &amp; Strategy">Psychology &amp; Strategy</option>
-                    <option value="Systems Thinking &amp; Strategy">Systems Thinking &amp; Strategy</option>
-                    <option value="Business &amp; Decision Science">Business &amp; Decision Science</option>
-                    <option value="Behavioral Science &amp; Reflection">Behavioral Science &amp; Reflection</option>
-                    <option value="Cultural Heritage &amp; Peacebuilding">Cultural Heritage &amp; Peacebuilding</option>
-                    <option value="Story - Psychological Thriller">Story - Psychological Thriller</option>
-                    <option value="Behavioral Science &amp; Psychology">Behavioral Science &amp; Psychology</option>
-                    <option value="Self-Awareness, Psychology &amp; Personal Essay">Self-Awareness, Psychology &amp; Personal Essay</option>
-                    <option value="Relationships, Psychology &amp; Personal Essay">Relationships, Psychology &amp; Personal Essay</option>
-                    <option value="Measurement Science, Humanitarian Practice &amp; Cultural Heritage">Measurement Science, Humanitarian Practice &amp; Cultural Heritage</option>
-                    <option value="Strategy, Planning &amp; Decision Science">Strategy, Planning &amp; Decision Science</option>
-                    <option value="Reflection - Faith, Psychology &amp; Philosophy">Reflection - Faith, Psychology &amp; Philosophy</option>
-                    <option value="Reflection - Heritage &amp; Behavioral Science">Reflection - Heritage &amp; Behavioral Science</option>
-                    <option value="Behavioral Science">Behavioral Science</option>
-                    <option value="Communication Psychology &amp; Human Behavior">Communication Psychology &amp; Human Behavior</option>
-                    <option value="Cognitive Psychology &amp; Decision Science">Cognitive Psychology &amp; Decision Science</option>
-                    <option value="Cultural Psychology &amp; Sociology">Cultural Psychology &amp; Sociology</option>
-                    <option value="Essay - Psychology">Essay - Psychology</option>
-                    <option value="Cognitive Psychology &amp; Performance Science">Cognitive Psychology &amp; Performance Science</option>
-                    <option value="Strategic Analysis &amp; Decision Science">Strategic Analysis &amp; Decision Science</option>
-                    <option value="Psychological Fiction &amp; Behavioral Science">Psychological Fiction &amp; Behavioral Science</option>
-                    <option value="Personal Operating Systems &amp; Development Practice">Personal Operating Systems &amp; Development Practice</option>
-                    <option value="Psikologi Organisasi &amp; Behavioral Science">Psikologi Organisasi &amp; Behavioral Science</option>
-                    <option value="Essay - Critical Thinking">Essay - Critical Thinking</option>
-                    <option value="Cognitive Bias &amp; Digital Psychology">Cognitive Bias &amp; Digital Psychology</option>
-                    <option value="Psychology &amp; Human Relations">Psychology &amp; Human Relations</option>
-                    <option value="Essay - Learning Science">Essay - Learning Science</option>
-                    <option value="Story - Cerpen">Story - Cerpen</option>
-                    <option value="Disaster Risk Reduction &amp; Tactical Foresight">Disaster Risk Reduction &amp; Tactical Foresight</option>
-                    <option value="Environmental Foresight &amp; CSR">Environmental Foresight &amp; CSR</option>
-                    <option value="Global Policy &amp; Innovation">Global Policy &amp; Innovation</option>
-                    <option value="Agri-Tech &amp; Consumer Foresight">Agri-Tech &amp; Consumer Foresight</option>
-                    <option value="Global Policy &amp; Health">Global Policy &amp; Health</option>
-                    <option value="Behavioral Diplomacy &amp; Foresight">Behavioral Diplomacy &amp; Foresight</option>
-                    <option value="Behavioral Psychology &amp; Lifestyle">Behavioral Psychology &amp; Lifestyle</option>
-                    <option value="Behavioral Foresight &amp; Strategy">Behavioral Foresight &amp; Strategy</option>
-                    <option value="Neuroscience &amp; Cognitive Foresight">Neuroscience &amp; Cognitive Foresight</option>
-                    <option value="Supply Chain Foresight &amp; Operations">Supply Chain Foresight &amp; Operations</option>
-                    <option value="Digital Strategy &amp; Foresight">Digital Strategy &amp; Foresight</option>
-                    <option value="Behavioral Science &amp; Systems Thinking">Behavioral Science &amp; Systems Thinking</option>
-                    <option value="Innovation Intelligence">Innovation Intelligence</option>
-                    <option value="Corporate Capacity Building">Corporate Capacity Building</option>
-                    <option value="Applied Foresight">Applied Foresight</option>
-                    <option value="Policy &amp; Strategy">Policy &amp; Strategy</option>
-                    <option value="Tech Tutorials &amp; Web Architecture">Tech Tutorials &amp; Web Architecture</option>
-                    <option value="Foresight Strategy">Foresight Strategy</option>
-                    <option value="Methodology">Methodology</option>
-                    <option value="Strategy &amp; Negotiation">Strategy &amp; Negotiation</option>
-                    <option value="Decision Making">Decision Making</option>
+                    <option value="all">All Categories</option><option value="Reverse Psychology, Choice Architecture, Behavioral Economics, Human Behaviour, Cognitive Bias, Psychological Manipulation, Decision Making, Persuasion, Psychology of Magic, Equivoque">Reverse Psychology, Choice Architecture, Behavioral Economics, Human Behaviour, Cognitive Bias, Psychological Manipulation, Decision Making, Persuasion, Psychology of Magic, Equivoque</option><option value="Social Psychology · Cognitive Bias · Social Comparison">Social Psychology · Cognitive Bias · Social Comparison</option><option value="Social Psychology · Schadenfreude · Media Spectacle · Empathy · Social Ethics">Social Psychology · Schadenfreude · Media Spectacle · Empathy · Social Ethics</option><option value="Social Psychology · Cognitive Bias · Social Comparison · Intellectual Humility · Cognitive Diversity">Social Psychology · Cognitive Bias · Social Comparison · Intellectual Humility · Cognitive Diversity</option><option value="Organizational Learning · Expert Voice · Strategic Leadership">Organizational Learning · Expert Voice · Strategic Leadership</option><option value="Social Psychology · Transactional Reciprocity · Moral Indebtedness · Professional Ethics">Social Psychology · Transactional Reciprocity · Moral Indebtedness · Professional Ethics</option><option value="Human Resources · Political Patronage · Organizational Accountability">Human Resources · Political Patronage · Organizational Accountability</option><option value="Effort, Conflict Repair & Problem-Solving">Effort, Conflict Repair & Problem-Solving</option><option value="Psychology, Cognitive Load & Problem-Solving">Psychology, Cognitive Load & Problem-Solving</option><option value="Psychology, Cognitive Development & Lifelong Learning">Psychology, Cognitive Development & Lifelong Learning</option><option value="Psychology, Adaptive Thinking & Problem Solving">Psychology, Adaptive Thinking & Problem Solving</option><option value="Human Resources, Workplace Ethics & Accountability">Human Resources, Workplace Ethics & Accountability</option><option value="Living Heritage, Dialogue & Intellectual Humility">Living Heritage, Dialogue & Intellectual Humility</option><option value="Psychology, Human Behaviour & Disaster Resilience">Psychology, Human Behaviour & Disaster Resilience</option><option value="Living Heritage, Cultural Values & Human Dignity">Living Heritage, Cultural Values & Human Dignity</option><option value="Social Change, Education & Systems Thinking">Social Change, Education & Systems Thinking</option><option value="Social Change, Persuasion & Consent">Social Change, Persuasion & Consent</option><option value="Inclusion, Foresight & Behavioural Science">Inclusion, Foresight & Behavioural Science</option><option value="Cognitive Science, Inclusive Leadership & Human Resource Management">Cognitive Science, Inclusive Leadership & Human Resource Management</option><option value="Living Heritage, Critical Thinking & Systems Thinking">Living Heritage, Critical Thinking & Systems Thinking</option><option value="Living Heritage, Foresight & Information Analysis">Living Heritage, Foresight & Information Analysis</option><option value="Living Heritage, Strategic Foresight & Context Blindness">Living Heritage, Strategic Foresight & Context Blindness</option><option value="Living Heritage, Inclusion, Foresight & Disaster Risk Reduction">Living Heritage, Inclusion, Foresight & Disaster Risk Reduction</option><option value="Relationships, Diplomacy & Decision Models">Relationships, Diplomacy & Decision Models</option><option value="Living Heritage, Policy Design & Inclusive Systems">Living Heritage, Policy Design & Inclusive Systems</option><option value="Living Heritage, Culture & Workplace Coordination">Living Heritage, Culture & Workplace Coordination</option><option value="Living Heritage, Culture & Social Psychology">Living Heritage, Culture & Social Psychology</option><option value="Living Heritage, Javanese Culture & Reconciliation">Living Heritage, Javanese Culture & Reconciliation</option><option value="Living Heritage & Mental Models">Living Heritage & Mental Models</option><option value="Culture & Inclusion">Culture & Inclusion</option><option value="Culture, Inclusion & Cognitive Diversity">Culture, Inclusion & Cognitive Diversity</option><option value="Psychology & Strategy">Psychology & Strategy</option><option value="Systems Thinking & Strategy">Systems Thinking & Strategy</option><option value="Business & Decision Science">Business & Decision Science</option><option value="Behavioral Science & Reflection">Behavioral Science & Reflection</option><option value="Cultural Heritage & Peacebuilding">Cultural Heritage & Peacebuilding</option><option value="Story - Psychological Thriller">Story - Psychological Thriller</option><option value="Behavioral Science & Psychology">Behavioral Science & Psychology</option><option value="Self-Awareness, Psychology & Personal Essay">Self-Awareness, Psychology & Personal Essay</option><option value="Relationships, Psychology & Personal Essay">Relationships, Psychology & Personal Essay</option><option value="Measurement Science, Humanitarian Practice & Cultural Heritage">Measurement Science, Humanitarian Practice & Cultural Heritage</option><option value="Strategy, Planning & Decision Science">Strategy, Planning & Decision Science</option><option value="Reflection - Faith, Psychology & Philosophy">Reflection - Faith, Psychology & Philosophy</option><option value="Reflection - Heritage & Behavioral Science">Reflection - Heritage & Behavioral Science</option><option value="Behavioral Science">Behavioral Science</option><option value="Communication Psychology & Human Behavior">Communication Psychology & Human Behavior</option><option value="Cognitive Psychology & Decision Science">Cognitive Psychology & Decision Science</option><option value="Cultural Psychology & Sociology">Cultural Psychology & Sociology</option><option value="Essay - Psychology">Essay - Psychology</option><option value="Cognitive Psychology & Performance Science">Cognitive Psychology & Performance Science</option><option value="Strategic Analysis & Decision Science">Strategic Analysis & Decision Science</option><option value="Psychological Fiction & Behavioral Science">Psychological Fiction & Behavioral Science</option><option value="Personal Operating Systems & Development Practice">Personal Operating Systems & Development Practice</option><option value="Psikologi Organisasi & Behavioral Science">Psikologi Organisasi & Behavioral Science</option><option value="Essay - Critical Thinking">Essay - Critical Thinking</option><option value="Cognitive Bias & Digital Psychology">Cognitive Bias & Digital Psychology</option><option value="Psychology & Human Relations">Psychology & Human Relations</option><option value="Essay - Learning Science">Essay - Learning Science</option><option value="Story - Cerpen">Story - Cerpen</option><option value="Disaster Risk Reduction & Tactical Foresight">Disaster Risk Reduction & Tactical Foresight</option><option value="Environmental Foresight & CSR">Environmental Foresight & CSR</option><option value="Global Policy & Innovation">Global Policy & Innovation</option><option value="Agri-Tech & Consumer Foresight">Agri-Tech & Consumer Foresight</option><option value="Global Policy & Health">Global Policy & Health</option><option value="Behavioral Diplomacy & Foresight">Behavioral Diplomacy & Foresight</option><option value="Behavioral Psychology & Lifestyle">Behavioral Psychology & Lifestyle</option><option value="Behavioral Foresight & Strategy">Behavioral Foresight & Strategy</option><option value="Neuroscience & Cognitive Foresight">Neuroscience & Cognitive Foresight</option><option value="Supply Chain Foresight & Operations">Supply Chain Foresight & Operations</option><option value="Digital Strategy & Foresight">Digital Strategy & Foresight</option><option value="Behavioral Science & Systems Thinking">Behavioral Science & Systems Thinking</option><option value="Innovation Intelligence">Innovation Intelligence</option><option value="Corporate Capacity Building">Corporate Capacity Building</option><option value="Applied Foresight">Applied Foresight</option><option value="Policy & Strategy">Policy & Strategy</option><option value="Tech Tutorials & Web Architecture">Tech Tutorials & Web Architecture</option><option value="Foresight Strategy">Foresight Strategy</option><option value="Methodology">Methodology</option><option value="Strategy & Negotiation">Strategy & Negotiation</option><option value="Decision Making">Decision Making</option>
                 </select>
             </label>
             <label class="block w-full min-w-0">
@@ -237,16 +148,6 @@
             </label>
         </div>
     </div>
-
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
-        <div id="articleGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <!-- Article cards are preserved here from the existing page. -->
-        </div>
-        <div id="emptyState" class="hidden text-center py-12 text-slate-500">
-            <i class="ph-fill ph-file-dashed text-4xl mb-3 text-slate-300"></i>
-            <p>No articles found matching your criteria.</p>
-        </div>
-    </main>
 
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
         <div id="articleGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -2167,7 +2068,7 @@
     
         <a href="blog/article/relationship-value-why-love-alone-is-never-enough.html" data-title="Relationship Value: Why Love Alone Is Never Enough" data-category="Psychology & Human Relations" data-timestamp="1784592000000" class="article-card bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-all duration-300 flex flex-col group transform hover:-translate-y-1">
             <div class="h-48 overflow-hidden relative border-b border-slate-100">
-                <img src="https://horizon-scanning.org/thum/relationship-value-calculator.jpg" alt="Relationship Value: Why Love Alone Is Never Enough" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.src='https://via.placeholder.com/1200x600/0f172a/ffffff?text=HorizonScan+AI'">
+                <img src="https://horizon-scanning.org/thum/relationship-value-calculator.png" alt="Relationship Value: Why Love Alone Is Never Enough" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.src='https://via.placeholder.com/1200x600/0f172a/ffffff?text=HorizonScan+AI'">
                 <span class="absolute top-4 left-4 bg-teal-600 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">
                     Psychology & Human Relations
                 </span>
@@ -3012,5 +2913,72 @@
             <p>No articles found matching your criteria.</p>
         </div>
     </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchInput = document.getElementById('searchInput');
+            const clearSearch = document.getElementById('clearSearch');
+            const categoryFilter = document.getElementById('categoryFilter');
+            const sortFilter = document.getElementById('sortFilter');
+            const articleGrid = document.getElementById('articleGrid');
+            const emptyState = document.getElementById('emptyState');
+            if (!searchInput || !categoryFilter || !sortFilter || !articleGrid || !emptyState) return;
+
+            const normalizeText = value => String(value)
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .toLocaleLowerCase()
+                .trim();
+
+            const cards = Array.from(articleGrid.querySelectorAll('.article-card')).map((element, index) => ({
+                element,
+                index,
+                timestamp: Number(element.dataset.timestamp) || 0,
+                category: element.dataset.category || '',
+                searchText: normalizeText([
+                    element.dataset.title || '',
+                    element.querySelector('p')?.textContent || '',
+                    element.dataset.category || ''
+                ].join(' '))
+            }));
+
+            function filterAndSort() {
+                const term = normalizeText(searchInput.value);
+                const category = categoryFilter.value;
+                const order = sortFilter.value;
+
+                const visible = cards.filter(card => {
+                    const matchesSearch = !term || card.searchText.includes(term);
+                    const matchesCategory = category === 'all' || card.category === category;
+                    card.element.hidden = !(matchesSearch && matchesCategory);
+                    return matchesSearch && matchesCategory;
+                });
+
+                visible.sort((a, b) => {
+                    const dateOrder = order === 'newest'
+                        ? b.timestamp - a.timestamp
+                        : a.timestamp - b.timestamp;
+                    return dateOrder || a.index - b.index;
+                });
+
+                visible.forEach(card => articleGrid.appendChild(card.element));
+                cards.filter(card => !visible.includes(card))
+                    .forEach(card => articleGrid.appendChild(card.element));
+
+                emptyState.classList.toggle('hidden', visible.length > 0);
+                clearSearch?.classList.toggle('hidden', searchInput.value.length === 0);
+            }
+
+            searchInput.addEventListener('input', filterAndSort);
+            categoryFilter.addEventListener('change', filterAndSort);
+            sortFilter.addEventListener('change', filterAndSort);
+            clearSearch?.addEventListener('click', () => {
+                searchInput.value = '';
+                searchInput.focus();
+                filterAndSort();
+            });
+            filterAndSort();
+        });
+    </script>
 </body>
 </html>
