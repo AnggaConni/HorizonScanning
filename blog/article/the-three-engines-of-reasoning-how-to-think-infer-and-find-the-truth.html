@@ -1,0 +1,541 @@
+
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Three Engines of Reasoning — How to Think, Infer, and Find the Truth | Horizon Scan AI</title>
+    <meta name="description" content="Every conclusion begins with information, but not every conclusion is reached in the same way. Learn how deductive, inductive, and abductive reasoning work, when to use each framework, how they complement one another, and how to avoid common reasoning traps.">
+    <link rel="alternate" type="application/rss+xml" title="Horizon Scanning RSS" href="https://horizon-scanning.org/feed.xml">
+    <link rel="canonical" href="https://horizon-scanning.org/blog/article/the-three-engines-of-reasoning-how-to-think-infer-and-find-the-truth.html" />
+    
+    <!-- Open Graph / Facebook / LinkedIn / WA -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://horizon-scanning.org/blog/article/the-three-engines-of-reasoning-how-to-think-infer-and-find-the-truth.html">
+    <meta property="og:title" content="The Three Engines of Reasoning — How to Think, Infer, and Find the Truth">
+    <meta property="og:description" content="Every conclusion begins with information, but not every conclusion is reached in the same way. Learn how deductive, inductive, and abductive reasoning work, when to use each framework, how they complement one another, and how to avoid common reasoning traps.">
+    <meta property="og:image" content="https://horizon-scanning.org/thum/nalar.png">
+    <meta property="og:image:secure_url" content="https://horizon-scanning.org/thum/nalar.png">
+    <meta property="og:image:alt" content="The Three Engines of Reasoning — How to Think, Infer, and Find the Truth">
+    <meta property="og:image:type" content="image/png">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://horizon-scanning.org/blog/article/the-three-engines-of-reasoning-how-to-think-infer-and-find-the-truth.html">
+    <meta name="twitter:title" content="The Three Engines of Reasoning — How to Think, Infer, and Find the Truth">
+    <meta name="twitter:description" content="Every conclusion begins with information, but not every conclusion is reached in the same way. Learn how deductive, inductive, and abductive reasoning work, when to use each framework, how they complement one another, and how to avoid common reasoning traps.">
+    <meta name="twitter:image" content="https://horizon-scanning.org/thum/nalar.png">
+    <meta name="twitter:image:alt" content="The Three Engines of Reasoning — How to Think, Infer, and Find the Truth">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- ============================================== -->
+    <!-- SCRIPT AUTO-TRANSLATE BERDASARKAN BAHASA BROWSER -->
+    <!-- ============================================== -->
+    <style>
+        /* Sembunyikan banner bawaan Google Translate agar tampilan tetap rapi */
+        .VIpgJd-ZVi9od-ORHb-OEVmcd { display: none !important; }
+        .goog-te-banner-frame.skiptranslate { display: none !important; }
+        body { top: 0 !important; }
+    </style>
+    <script>
+        // Deteksi bahasa browser
+        var userLang = navigator.language || navigator.userLanguage;
+        var langCode = userLang.split('-')[0];
+        var pageLang = 'en'; // Asumsi bahasa asli konten Anda adalah English
+
+        // Jika bahasa browser BUKAN bahasa asli, dan belum diset, paksakan translate
+        if (langCode !== pageLang && document.cookie.indexOf('googtrans=') === -1) {
+            document.cookie = "googtrans=/" + pageLang + "/" + langCode + "; path=/;";
+            document.cookie = "googtrans=/" + pageLang + "/" + langCode + "; path=/; domain=" + location.hostname + ";";
+        }
+    </script>
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en',
+                autoDisplay: false
+            }, 'google_translate_element');
+        }
+    </script>
+    <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    <!-- ============================================== -->
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        navy: { 800: '#1e293b', 900: '#0f172a', 950: '#020617' },
+                        teal: { 400: '#2dd4bf', 500: '#14b8a6', 600: '#0d9488' }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- CUSTOM CSS UNTUK RICH TEXT -->
+    <style>
+        .prose table { width: 100%; border-collapse: collapse; margin-top: 2rem; margin-bottom: 2rem; }
+        .prose th, .prose td { border: 1px solid #e2e8f0; padding: 1rem; text-align: left; }
+        .prose th { background-color: #f8fafc; color: #0f172a; font-weight: 700; }
+        .prose tr:nth-child(even) { background-color: #f8fafc; }
+        
+        .table-responsive { overflow-x: auto; width: 100%; border-radius: 0.5rem; box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1); border: 1px solid #e2e8f0; }
+        .table-responsive table { margin: 0; border: none; }
+
+        .callout { padding: 1.5rem; border-radius: 0.75rem; margin: 2rem 0; border-left: 4px solid #0d9488; background-color: #f0fdfa; }
+        .callout h4 { margin-top: 0 !important; color: #0f172a !important; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; }
+        .callout p:last-child { margin-bottom: 0 !important; }
+
+        .prose blockquote { border-left-color: #0d9488; font-style: normal; background-color: #f8fafc; padding: 1rem 1.5rem; border-radius: 0 0.75rem 0.75rem 0; color: #334155; }
+        .prose blockquote p { margin: 0; }
+
+        .chart-container { background: white; border: 1px solid #e2e8f0; border-radius: 1rem; padding: 2rem; margin: 2.5rem 0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); text-align: center; }
+        .chart-container img { margin: 0 auto; border-radius: 0.5rem; }
+        .chart-caption { font-size: 0.875rem; color: #64748b; margin-top: 1rem; text-align: center; font-style: italic; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased">
+    
+    <!-- Element Google Translate Tersembunyi -->
+    <div id="google_translate_element" style="display:none;"></div>
+
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm notranslate">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <a href="../../index.html" class="flex items-center gap-2">
+                    <i class="ph ph-radar text-teal-600 text-2xl"></i>
+                    <span class="font-bold text-lg text-navy-900 tracking-tight">HorizonScan<span class="text-teal-600">AI</span></span>
+                </a>
+                <a href="../../blog.html" class="text-sm font-bold text-slate-600 hover:text-teal-600 flex items-center gap-1 transition-colors">
+                    <i class="ph-bold ph-arrow-left"></i> Back to Articles
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <header class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-8">
+        <span class="inline-block bg-teal-100 text-teal-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-4 shadow-sm notranslate">
+            Critical Thinking & Cognitive Science
+        </span>
+        <h1 class="text-3xl md:text-5xl font-extrabold text-navy-900 mb-6 leading-tight">The Three Engines of Reasoning — How to Think, Infer, and Find the Truth</h1>
+        
+        <div class="flex items-center gap-4 text-sm text-slate-500 font-medium notranslate">
+            <div class="flex items-center gap-2">
+                <i class="ph-fill ph-user-circle text-xl text-slate-400"></i> Angga Conni Saputra
+            </div>
+            <span>•</span>
+            <div class="flex items-center gap-2">
+                <i class="ph-fill ph-calendar-blank text-lg text-slate-400"></i> November 22, 2026
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
+        <img src="https://horizon-scanning.org/thum/nalar.png" alt="The Three Engines of Reasoning — How to Think, Infer, and Find the Truth" class="w-full h-auto rounded-2xl shadow-lg border border-slate-200" onerror="this.src='https://via.placeholder.com/1200x600/0f172a/ffffff?text=HorizonScan+AI'">
+    </div>
+
+    <main class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
+        <article class="prose prose-slate prose-lg max-w-none 
+            prose-headings:text-navy-900 prose-headings:font-bold 
+            prose-a:text-teal-600 hover:prose-a:text-teal-500 prose-a:font-semibold prose-a:no-underline hover:prose-a:underline
+            prose-img:rounded-xl prose-img:shadow-md
+            prose-li:marker:text-teal-500">
+            <article class="reasoning-article">
+  <p class="lead text-xl md:text-2xl text-slate-600 font-light leading-relaxed mb-8">We make conclusions every day. We judge whether someone is trustworthy, try to understand why a project failed, predict what might happen next, and decide whether the information we receive is reliable. But have you ever stopped to ask: <em>How did I arrive at that conclusion?</em> There are different ways the human mind processes information to reach an answer. Understanding these methods can help us think more clearly, distinguish facts from assumptions, and avoid being fooled by conclusions that merely sound convincing.</p>
+
+  <p>Three fundamental frameworks help explain how we reason: <strong>Deductive Reasoning, Inductive Reasoning, and Abductive Reasoning.</strong> Each works differently. One tests what must be true, another discovers patterns, and the third searches for the best explanation.</p>
+
+  <div class="not-prose my-10 grid grid-cols-1 md:grid-cols-3 gap-5">
+    <div class="p-6 bg-blue-50 border border-blue-200 rounded-2xl">
+      <div class="text-blue-700 font-bold text-sm uppercase tracking-wider mb-2">01 · Deduction</div>
+      <h3 class="text-xl font-extrabold text-slate-900">From Rule to Conclusion</h3>
+      <p class="text-slate-700 text-sm mt-3">Start with a general rule and apply it to a specific case.</p>
+      <p class="text-blue-700 font-bold text-sm mt-3">If the premises are true and the logic is valid, the conclusion must be true.</p>
+    </div>
+    <div class="p-6 bg-emerald-50 border border-emerald-200 rounded-2xl">
+      <div class="text-emerald-700 font-bold text-sm uppercase tracking-wider mb-2">02 · Induction</div>
+      <h3 class="text-xl font-extrabold text-slate-900">From Observations to Patterns</h3>
+      <p class="text-slate-700 text-sm mt-3">Observe multiple cases and identify recurring patterns.</p>
+      <p class="text-emerald-700 font-bold text-sm mt-3">The conclusion becomes probable, not guaranteed.</p>
+    </div>
+    <div class="p-6 bg-amber-50 border border-amber-200 rounded-2xl">
+      <div class="text-amber-700 font-bold text-sm uppercase tracking-wider mb-2">03 · Abduction</div>
+      <h3 class="text-xl font-extrabold text-slate-900">From Evidence to Explanation</h3>
+      <p class="text-slate-700 text-sm mt-3">Look at the available evidence and find the explanation that best fits.</p>
+      <p class="text-amber-700 font-bold text-sm mt-3">The best explanation is not necessarily the only explanation.</p>
+    </div>
+  </div>
+
+
+  <h2 class="text-3xl font-extrabold text-slate-900 mt-16 mb-6">01. Deductive Reasoning — The Logic of Certainty</h2>
+  <p>Deductive reasoning begins with a general rule, applies it to a specific situation, and arrives at a conclusion. It is often described as <em>top-down reasoning</em>.</p>
+  <div class="not-prose my-8 p-6 md:p-8 bg-blue-50 border border-blue-200 rounded-2xl">
+    <h3 class="text-xl font-bold text-blue-900 mb-4">The Classic Example</h3>
+    <div class="space-y-3 text-slate-800">
+      <p><strong>Premise 1:</strong> All humans are mortal.</p>
+      <p><strong>Premise 2:</strong> Socrates is a human.</p>
+      <hr class="border-blue-200" />
+      <p class="text-blue-800 text-lg font-bold">Conclusion: Therefore, Socrates is mortal.</p>
+    </div>
+  </div>
+  <p>The conclusion does not require additional observation. If the premises are true and the logical structure is valid, the conclusion necessarily follows.</p>
+  <h3 class="text-xl font-bold mt-8 mb-4">How Deduction Works</h3>
+  <ol class="list-decimal pl-6 space-y-2">
+    <li>Establish a general rule.</li>
+    <li>Confirm that the specific case belongs to the rule.</li>
+    <li>Apply the rule to the case.</li>
+    <li>Derive the conclusion.</li>
+  </ol>
+  <h3 class="text-xl font-bold mt-8 mb-4">Practical Examples</h3>
+  <div class="not-prose grid grid-cols-1 md:grid-cols-2 gap-4 my-6">
+    <div class="p-5 bg-slate-50 border border-slate-200 rounded-xl">
+      <h4 class="font-bold text-slate-900">Workplace Policy</h4>
+      <p class="text-sm text-slate-700">All staff with expired contracts cannot access the staff portal. Rina's contract has expired. Therefore, Rina cannot access the staff portal under this rule.</p>
+    </div>
+    <div class="p-5 bg-slate-50 border border-slate-200 rounded-xl">
+      <h4 class="font-bold text-slate-900">Technology</h4>
+      <p class="text-sm text-slate-700">If a device has no power, it cannot boot. This device has no power. Therefore, it cannot boot.</p>
+    </div>
+  </div>
+  <div class="callout bg-blue-50 border-l-4 border-blue-500 p-6 rounded-r-2xl my-8">
+    <h4 class="font-bold text-blue-900 mb-2">The Deductive Question</h4>
+    <p class="text-blue-800 m-0">If my premises are true, does my conclusion necessarily follow? Or can I imagine a case where the premises are true but the conclusion is false?</p>
+  </div>
+  <p><strong>Important limitation:</strong> Valid logic does not automatically make your premises true. A perfectly structured argument can still produce a false conclusion if it begins with incorrect information.</p>
+
+
+  <h2 class="text-3xl font-extrabold text-slate-900 mt-16 mb-6">02. Inductive Reasoning — The Logic of Patterns</h2>
+  <p>Inductive reasoning moves from specific observations to a general pattern or broader conclusion. It is often described as <em>bottom-up reasoning</em>. We observe several cases, recognize similarities, and use them to form a hypothesis or generalization.</p>
+  <div class="not-prose my-8 p-6 md:p-8 bg-emerald-50 border border-emerald-200 rounded-2xl">
+    <h3 class="text-xl font-bold text-emerald-900 mb-4">Example: Observing Metals</h3>
+    <ul class="space-y-2 text-slate-800">
+      <li>Iron expands when heated.</li>
+      <li>Copper expands when heated.</li>
+      <li>Aluminum expands when heated.</li>
+      <li>Several other metals demonstrate similar behavior.</li>
+    </ul>
+    <hr class="border-emerald-200 my-4" />
+    <p class="text-emerald-800 font-bold m-0">Conclusion: Metals generally expand when heated.</p>
+  </div>
+  <p>This conclusion is based on repeated observations. It is useful, but it is not the same as proving a universal law from a deductive argument. The strength of inductive reasoning depends on the amount, quality, representativeness, and consistency of the evidence.</p>
+  <h3 class="text-xl font-bold mt-8 mb-4">Practical Example: Organizational Performance</h3>
+  <p>You observe that several projects in the same organization have experienced delays:</p>
+  <ul class="list-disc pl-6 space-y-2">
+    <li>Project A missed its deadline after procurement delays.</li>
+    <li>Project B experienced similar delays because vendors were unavailable.</li>
+    <li>Project C was delayed due to lengthy internal approvals.</li>
+    <li>Project D also experienced bottlenecks before implementation.</li>
+  </ul>
+  <p>You begin to identify a pattern and propose a general conclusion:</p>
+  <blockquote class="border-l-4 border-emerald-500 pl-4 italic text-lg">Projects in this organization may be vulnerable to administrative and procurement bottlenecks.</blockquote>
+  <p>That pattern could guide further investigation. However, you must avoid generalizing from too few cases or ignoring projects that completed successfully.</p>
+  <h3 class="text-xl font-bold mt-8 mb-4">What Makes Induction Stronger?</h3>
+  <ul class="list-disc pl-6 space-y-2">
+    <li>A larger and more representative sample.</li>
+    <li>Observations from different contexts and conditions.</li>
+    <li>Evidence that can be independently verified.</li>
+    <li>Attention to exceptions and contradictory evidence.</li>
+    <li>Conclusions that remain proportional to the available evidence.</li>
+  </ul>
+  <div class="callout bg-emerald-50 border-l-4 border-emerald-500 p-6 rounded-r-2xl my-8">
+    <h4 class="font-bold text-emerald-900 mb-2">The Inductive Question</h4>
+    <p class="text-emerald-800 m-0">What pattern can I reasonably infer from the observations I have? How representative is my evidence, and what could disprove this pattern?</p>
+  </div>
+
+
+  <h2 class="text-3xl font-extrabold text-slate-900 mt-16 mb-6">03. Abductive Reasoning — The Logic of the Best Explanation</h2>
+  <p>Abductive reasoning begins with an observation and asks what explanation would make the observation understandable. It is commonly known as <em>inference to the best explanation</em>.</p>
+  <p>It is especially useful when you do not know the cause of a situation and need to develop hypotheses that explain the evidence.</p>
+  <div class="not-prose my-8 p-6 md:p-8 bg-amber-50 border border-amber-200 rounded-2xl">
+    <h3 class="text-xl font-bold text-amber-900 mb-4">Example: Why Is the Road Wet?</h3>
+    <p class="text-slate-800"><strong>Observation:</strong> The road is wet, there are puddles, and the sky is cloudy.</p>
+    <p class="text-slate-800 mt-4"><strong>Possible explanations:</strong></p>
+    <ul class="space-y-2 text-slate-800">
+      <li>It recently rained.</li>
+      <li>Someone washed the road.</li>
+      <li>A water pipe is leaking.</li>
+    </ul>
+    <hr class="border-amber-200 my-4" />
+    <p class="text-amber-800 font-bold m-0">Rain may be the best explanation, but it is not yet confirmed.</p>
+  </div>
+  <h3 class="text-xl font-bold mt-8 mb-4">Practical Example: A Project Is Failing</h3>
+  <p>Imagine you are monitoring a project and discover:</p>
+  <ul class="list-disc pl-6 space-y-2">
+    <li>Milestones have been missed.</li>
+    <li>Team members are frequently waiting for approvals.</li>
+    <li>Suppliers have not delivered equipment.</li>
+    <li>Progress reports show a recurring procurement bottleneck.</li>
+  </ul>
+  <p>You develop several hypotheses:</p>
+  <div class="not-prose my-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="p-5 border border-slate-200 bg-slate-50 rounded-xl"><strong>H1 — Procurement</strong><p class="text-sm text-slate-600">Equipment and materials are not arriving on time.</p></div>
+    <div class="p-5 border border-slate-200 bg-slate-50 rounded-xl"><strong>H2 — Management</strong><p class="text-sm text-slate-600">Approvals are slowing down implementation.</p></div>
+    <div class="p-5 border border-slate-200 bg-slate-50 rounded-xl"><strong>H3 — Capacity</strong><p class="text-sm text-slate-600">The team lacks sufficient capacity or technical skills.</p></div>
+    <div class="p-5 border border-slate-200 bg-slate-50 rounded-xl"><strong>H4 — Planning</strong><p class="text-sm text-slate-600">The original timeline was unrealistic.</p></div>
+  </div>
+  <p>Abductive reasoning does not immediately declare one hypothesis to be the truth. Instead, it evaluates which explanation best accounts for the evidence, what assumptions it requires, and what additional information would help confirm or reject it.</p>
+  <div class="callout bg-amber-50 border-l-4 border-amber-500 p-6 rounded-r-2xl my-8">
+    <h4 class="font-bold text-amber-900 mb-2">The Abductive Question</h4>
+    <p class="text-amber-800 m-0">Which explanation best accounts for the facts? What alternative explanations exist, and what evidence could distinguish between them?</p>
+  </div>
+
+
+  <h2 class="text-3xl font-extrabold text-slate-900 mt-16 mb-6">04. Visualizing the Three Frameworks</h2>
+  <p>Although they are different, the three reasoning frameworks can be used together. The following diagram shows the direction in which each one moves and the kind of question it answers.</p>
+  <div class="not-prose my-8 overflow-x-auto bg-white border border-slate-200 rounded-2xl p-4 md:p-6">
+    <svg viewBox="0 0 960 600" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagram comparing deductive, inductive and abductive reasoning">
+      <defs>
+        <marker id="dedArrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#2563eb"/></marker>
+        <marker id="indArrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#059669"/></marker>
+        <marker id="abdArrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#d97706"/></marker>
+      </defs>
+      <rect x="10" y="10" width="940" height="580" rx="26" fill="#f8fafc"/>
+      <text x="480" y="55" text-anchor="middle" font-size="26" font-weight="800" fill="#0f172a">THREE WAYS TO REASON</text>
+      <text x="480" y="83" text-anchor="middle" font-size="15" fill="#475569">Different starting points · Different paths to a conclusion</text>
+      <rect x="55" y="125" width="255" height="425" rx="20" fill="#eff6ff" stroke="#bfdbfe" stroke-width="2"/>
+      <text x="182" y="165" text-anchor="middle" font-size="22" font-weight="800" fill="#1d4ed8">DEDUCTION</text>
+      <rect x="100" y="195" width="165" height="75" rx="12" fill="#dbeafe" stroke="#60a5fa"/>
+      <text x="182" y="225" text-anchor="middle" font-size="17" font-weight="700" fill="#1e40af">General Rule</text>
+      <text x="182" y="248" text-anchor="middle" font-size="14" fill="#1e40af">All A are B</text>
+      <path d="M182 270 L182 310" stroke="#2563eb" stroke-width="3" marker-end="url(#dedArrow)"/>
+      <rect x="100" y="315" width="165" height="75" rx="12" fill="#dbeafe" stroke="#60a5fa"/>
+      <text x="182" y="345" text-anchor="middle" font-size="17" font-weight="700" fill="#1e40af">Specific Case</text>
+      <text x="182" y="368" text-anchor="middle" font-size="14" fill="#1e40af">C is A</text>
+      <path d="M182 390 L182 430" stroke="#2563eb" stroke-width="3" marker-end="url(#dedArrow)"/>
+      <rect x="100" y="435" width="165" height="75" rx="12" fill="#bfdbfe" stroke="#2563eb" stroke-width="2"/>
+      <text x="182" y="465" text-anchor="middle" font-size="17" font-weight="700" fill="#1e40af">Conclusion</text>
+      <text x="182" y="488" text-anchor="middle" font-size="14" fill="#1e40af">C is B</text>
+      <text x="182" y="530" text-anchor="middle" font-size="14" font-weight="700" fill="#1d4ed8">What must be true?</text>
+      <rect x="352" y="125" width="255" height="425" rx="20" fill="#ecfdf5" stroke="#a7f3d0" stroke-width="2"/>
+      <text x="479" y="165" text-anchor="middle" font-size="22" font-weight="800" fill="#047857">INDUCTION</text>
+      <rect x="385" y="195" width="190" height="65" rx="12" fill="#d1fae5" stroke="#34d399"/>
+      <text x="480" y="225" text-anchor="middle" font-size="17" font-weight="700" fill="#065f46">Observation A</text>
+      <text x="480" y="246" text-anchor="middle" font-size="14" fill="#065f46">Case 1</text>
+      <rect x="385" y="280" width="190" height="65" rx="12" fill="#d1fae5" stroke="#34d399"/>
+      <text x="480" y="310" text-anchor="middle" font-size="17" font-weight="700" fill="#065f46">Observation B</text>
+      <text x="480" y="331" text-anchor="middle" font-size="14" fill="#065f46">Case 2</text>
+      <rect x="385" y="365" width="190" height="65" rx="12" fill="#d1fae5" stroke="#34d399"/>
+      <text x="480" y="395" text-anchor="middle" font-size="17" font-weight="700" fill="#065f46">Observation C</text>
+      <text x="480" y="416" text-anchor="middle" font-size="14" fill="#065f46">Case 3</text>
+      <path d="M480 430 L480 460" stroke="#059669" stroke-width="3" marker-end="url(#indArrow)"/>
+      <rect x="385" y="465" width="190" height="55" rx="12" fill="#a7f3d0" stroke="#059669" stroke-width="2"/>
+      <text x="480" y="490" text-anchor="middle" font-size="17" font-weight="700" fill="#065f46">General Pattern</text>
+      <text x="480" y="512" text-anchor="middle" font-size="13" fill="#065f46">Probable conclusion</text>
+      <text x="480" y="540" text-anchor="middle" font-size="14" font-weight="700" fill="#047857">What pattern emerges?</text>
+      <rect x="650" y="125" width="255" height="425" rx="20" fill="#fffbeb" stroke="#fde68a" stroke-width="2"/>
+      <text x="777" y="165" text-anchor="middle" font-size="22" font-weight="800" fill="#b45309">ABDUCTION</text>
+      <rect x="685" y="195" width="185" height="75" rx="12" fill="#fef3c7" stroke="#fbbf24"/>
+      <text x="777" y="225" text-anchor="middle" font-size="17" font-weight="700" fill="#92400e">Observed Facts</text>
+      <text x="777" y="248" text-anchor="middle" font-size="14" fill="#92400e">Evidence / Clues</text>
+      <path d="M777 270 L777 310" stroke="#d97706" stroke-width="3" marker-end="url(#abdArrow)"/>
+      <rect x="685" y="315" width="185" height="75" rx="12" fill="#fde68a" stroke="#f59e0b"/>
+      <text x="777" y="345" text-anchor="middle" font-size="17" font-weight="700" fill="#92400e">Possible Hypotheses</text>
+      <text x="777" y="368" text-anchor="middle" font-size="14" fill="#92400e">H1 · H2 · H3</text>
+      <path d="M777 390 L777 430" stroke="#d97706" stroke-width="3" marker-end="url(#abdArrow)"/>
+      <rect x="685" y="435" width="185" height="75" rx="12" fill="#fcd34d" stroke="#d97706" stroke-width="2"/>
+      <text x="777" y="465" text-anchor="middle" font-size="17" font-weight="700" fill="#92400e">Best Explanation</text>
+      <text x="777" y="488" text-anchor="middle" font-size="14" fill="#92400e">Not yet certain</text>
+      <text x="777" y="530" text-anchor="middle" font-size="14" font-weight="700" fill="#b45309">Why might this happen?</text>
+    </svg>
+  </div>
+
+  <p>Think of it this way: deduction is like checking whether a conclusion follows from the rules; induction is like learning a trend from historical data; and abduction is like investigating a mystery by comparing possible explanations.</p>
+
+
+  <h2 class="text-3xl font-extrabold text-slate-900 mt-16 mb-6">05. Using All Three Together — A Real Problem-Solving Cycle</h2>
+  <p>In practical analysis, these are not competing frameworks. They can be combined into a single process.</p>
+  <div class="not-prose my-8 p-6 bg-slate-50 border border-slate-200 rounded-2xl">
+    <div class="space-y-4">
+      <div class="p-4 bg-white rounded-xl border border-slate-200"><strong class="text-slate-900">STEP 1 — OBSERVE</strong><p class="text-sm text-slate-600 m-0 mt-2">Collect facts. What happened? What can be verified?</p></div>
+      <div class="p-4 bg-amber-50 rounded-xl border border-amber-200"><strong class="text-amber-900">STEP 2 — ABDUCE</strong><p class="text-sm text-amber-800 m-0 mt-2">Generate explanations that could account for the observed facts.</p></div>
+      <div class="p-4 bg-blue-50 rounded-xl border border-blue-200"><strong class="text-blue-900">STEP 3 — DEDUCE</strong><p class="text-sm text-blue-800 m-0 mt-2">If one hypothesis is true, what else should we expect to see?</p></div>
+      <div class="p-4 bg-slate-50 rounded-xl border border-slate-300"><strong class="text-slate-900">STEP 4 — TEST</strong><p class="text-sm text-slate-600 m-0 mt-2">Check the predictions against new evidence or observations.</p></div>
+      <div class="p-4 bg-emerald-50 rounded-xl border border-emerald-200"><strong class="text-emerald-900">STEP 5 — INDUCT</strong><p class="text-sm text-emerald-800 m-0 mt-2">Use repeated findings to identify broader patterns and update your beliefs.</p></div>
+      <div class="p-4 bg-white rounded-xl border border-slate-200"><strong class="text-slate-900">STEP 6 — UPDATE</strong><p class="text-sm text-slate-600 m-0 mt-2">Change your conclusion if new evidence contradicts it.</p></div>
+    </div>
+  </div>
+
+  <h3 class="text-xl font-bold mt-8 mb-4">Example: Why Did a Training Program Fail?</h3>
+  <p><strong>Observation:</strong> Attendance was low, and participants did not complete the training.</p>
+  <p><strong>Abduction:</strong> Possible explanations include an unsuitable schedule, irrelevant content, poor communication, or lack of supervisor support.</p>
+  <p><strong>Deduction:</strong> If schedule conflicts are the main cause, participants with overlapping work commitments should have lower attendance.</p>
+  <p><strong>Testing:</strong> Compare attendance records with work schedules, conduct interviews, and examine communication logs.</p>
+  <p><strong>Induction:</strong> If the same schedule-related pattern appears across multiple cohorts, scheduling may be a systemic issue.</p>
+  <p><strong>Update:</strong> Change the schedule or delivery model and test whether participation improves in the next cycle.</p>
+  <p>This is the foundation of analytical thinking: you do not merely explain a problem; you create a process to check whether your explanation is correct.</p>
+
+
+  <h2 class="text-3xl font-extrabold text-slate-900 mt-16 mb-6">06. Logical Fallacies — When Reasoning Goes Wrong</h2>
+  <p>Knowing these frameworks also helps you recognize mistakes in reasoning. A conclusion can sound convincing while being based on weak logic, biased evidence, or an irrelevant argument.</p>
+  <div class="not-prose my-8 grid grid-cols-1 md:grid-cols-2 gap-5">
+    <div class="p-5 bg-rose-50 border border-rose-200 rounded-xl"><h3 class="font-bold text-rose-900">Hasty Generalization</h3><p class="text-sm text-slate-700">Drawing a broad conclusion from too few cases.</p><p class="text-sm italic text-slate-600">“Two employees were incompetent. The entire generation is incompetent.”</p></div>
+    <div class="p-5 bg-orange-50 border border-orange-200 rounded-xl"><h3 class="font-bold text-orange-900">False Cause</h3><p class="text-sm text-slate-700">Assuming one event caused another simply because they happened together or in sequence.</p><p class="text-sm italic text-slate-600">“We introduced a new app, and productivity declined. The app caused it.”</p></div>
+    <div class="p-5 bg-violet-50 border border-violet-200 rounded-xl"><h3 class="font-bold text-violet-900">False Dilemma</h3><p class="text-sm text-slate-700">Presenting only two options when more alternatives exist.</p><p class="text-sm italic text-slate-600">“Either you support me or you're against me.”</p></div>
+    <div class="p-5 bg-sky-50 border border-sky-200 rounded-xl"><h3 class="font-bold text-sky-900">Circular Reasoning</h3><p class="text-sm text-slate-700">Using the conclusion itself as evidence to support the conclusion.</p><p class="text-sm italic text-slate-600">“He's trustworthy because he always tells the truth; I know he tells the truth because he's trustworthy.”</p></div>
+    <div class="p-5 bg-amber-50 border border-amber-200 rounded-xl"><h3 class="font-bold text-amber-900">Confirmation Bias</h3><p class="text-sm text-slate-700">Looking for evidence that supports what you already believe while ignoring contradictory information.</p></div>
+    <div class="p-5 bg-slate-100 border border-slate-200 rounded-xl"><h3 class="font-bold text-slate-900">Red Herring</h3><p class="text-sm text-slate-700">Changing the subject to distract from the original issue instead of addressing it.</p></div>
+  </div>
+  <p>One of the most important habits of a critical thinker is to actively look for evidence that could prove their own hypothesis wrong. If your conclusion cannot survive questioning, it may be time to revise it.</p>
+
+
+  <h2 class="text-3xl font-extrabold text-slate-900 mt-16 mb-6">07. Validity vs. Truth — A Critical Distinction</h2>
+  <p>A logically valid argument and a factually true argument are not always the same thing.</p>
+  <div class="not-prose my-8 p-6 bg-slate-100 border border-slate-200 rounded-2xl">
+    <p class="font-bold text-slate-900">Premise 1: All birds can fly.</p>
+    <p class="font-bold text-slate-900">Premise 2: Penguins are birds.</p>
+    <p class="font-bold text-slate-900">Conclusion: Penguins can fly.</p>
+    <p class="text-rose-700 font-semibold mt-4">The structure may be valid, but the first premise is false, so the argument is not sound.</p>
+  </div>
+  <p><strong>Validity</strong> refers to the logical structure: if the premises are true, must the conclusion follow?</p>
+  <p><strong>Soundness</strong> means that the argument is valid and its premises are actually true.</p>
+  <p>Critical thinking requires both logical structure and reliable information. You cannot produce a trustworthy conclusion from false assumptions simply by reasoning carefully.</p>
+
+
+  <h2 class="text-3xl font-extrabold text-slate-900 mt-16 mb-6">08. Practice — Can You Identify the Framework?</h2>
+  <div class="not-prose my-8 p-6 bg-slate-50 border border-slate-200 rounded-2xl">
+    <h3 class="text-xl font-bold text-slate-900">Case: The Underperforming Employees</h3>
+    <p class="text-slate-700">A manager says: “Three employees I recruited last year performed poorly. Therefore, young workers today are generally incompetent.”</p>
+    <p class="font-bold text-slate-900 mt-4">Additional facts:</p>
+    <ul class="text-slate-700 space-y-1">
+      <li>Three employees were hired for different roles.</li>
+      <li>They received minimal training.</li>
+      <li>The job descriptions changed after they joined.</li>
+      <li>Two employees resigned, and one remains.</li>
+      <li>The same manager conducted all three recruitment processes.</li>
+    </ul>
+  </div>
+  <h3 class="text-xl font-bold mt-8 mb-4">Analyze the Case</h3>
+  <p><strong>Deductive:</strong> Does the conclusion logically follow from the premises? What rule would have to be true for the manager's conclusion to be valid?</p>
+  <p><strong>Inductive:</strong> Is a sample of three employees sufficient to generalize about an entire generation? What sampling problems exist?</p>
+  <p><strong>Abductive:</strong> Which explanation best fits the facts? Could poor onboarding, changing job requirements, recruitment practices, or management issues explain the performance problems?</p>
+  <p>Try to separate the observable facts from interpretations before choosing your conclusion.</p>
+
+  <div class="not-prose my-10 p-6 bg-indigo-50 border border-indigo-200 rounded-2xl">
+    <h3 class="text-xl font-bold text-indigo-900 mb-3">A Simple Checklist for Better Reasoning</h3>
+    <ul class="space-y-2 text-indigo-900">
+      <li>☑ What do I actually know?</li>
+      <li>☑ What am I assuming?</li>
+      <li>☑ What is the logical structure of my conclusion?</li>
+      <li>☑ Is my sample representative?</li>
+      <li>☑ Are there alternative explanations?</li>
+      <li>☑ What evidence would change my mind?</li>
+      <li>☑ Does the strength of my conclusion match the strength of my evidence?</li>
+    </ul>
+  </div>
+
+
+  <h2 class="text-3xl font-extrabold text-slate-900 mt-16 mb-6">09. Learn From These Videos</h2>
+  <p>These educational videos explain the three frameworks, with examples and discussions of how reasoning works in research and critical thinking.</p>
+  <div class="not-prose my-8">
+    <div class="relative w-full overflow-hidden rounded-2xl shadow-xl aspect-video bg-slate-900">
+      <iframe class="absolute inset-0 w-full h-full" src="https://www.youtube.com/embed/ZSj_Y6O9m8w" title="Deductive Vs Inductive Vs Abductive Reasoning - Research Tube" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+    </div>
+    <p class="text-center text-sm text-slate-500 mt-3">Research Tube — Deductive Vs Inductive Vs Abductive Reasoning. A single video comparing the three types of reasoning.</p>
+  </div>
+  <div class="not-prose my-8">
+    <div class="relative w-full overflow-hidden rounded-2xl shadow-xl aspect-video bg-slate-900">
+      <iframe class="absolute inset-0 w-full h-full" src="https://www.youtube.com/embed/eacc24q_NCk" title="Types of Reasoning - Deductive, Inductive, and Abductive - Diogo Cortiz" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+    </div>
+    <p class="text-center text-sm text-slate-500 mt-3">Diogo Cortiz — Types of Reasoning. Explains advantages and limitations of the three approaches.</p>
+  </div>
+
+  <h2 class="text-3xl font-extrabold text-slate-900 mt-16 mb-6">10. The Ultimate Mental Model</h2>
+  <p>When you face a problem, use the three questions below to understand how your mind should approach it:</p>
+  <div class="not-prose my-8 grid grid-cols-1 md:grid-cols-3 gap-5">
+    <div class="p-6 bg-blue-50 border border-blue-200 rounded-2xl text-center"><p class="text-blue-700 font-bold text-sm uppercase">Deduction</p><p class="text-xl font-extrabold text-slate-900 mt-2">What must be true?</p><p class="text-sm text-slate-600">Apply rules and verify the logic.</p></div>
+    <div class="p-6 bg-emerald-50 border border-emerald-200 rounded-2xl text-center"><p class="text-emerald-700 font-bold text-sm uppercase">Induction</p><p class="text-xl font-extrabold text-slate-900 mt-2">What pattern emerges?</p><p class="text-sm text-slate-600">Observe, compare, and generalize carefully.</p></div>
+    <div class="p-6 bg-amber-50 border border-amber-200 rounded-2xl text-center"><p class="text-amber-700 font-bold text-sm uppercase">Abduction</p><p class="text-xl font-extrabold text-slate-900 mt-2">Why might this happen?</p><p class="text-sm text-slate-600">Find and test the best explanation.</p></div>
+  </div>
+  <p>These three frameworks form a powerful foundation for analytical thinking. Deduction helps you test consequences. Induction helps you learn from experience. Abduction helps you make sense of uncertainty.</p>
+  <p>Use them together, question your own assumptions, and stay willing to update your conclusions. The goal of reasoning is not to prove that you are right. The goal is to get closer to what is actually true.</p>
+  <p class="text-lg font-bold text-slate-900 border-l-4 border-indigo-500 pl-4 py-2 mt-10">Good thinkers don't just ask, “What do I believe?” They ask, “What evidence led me to believe it — and what would make me change my mind?”</p>
+
+  <div class="not-prose mt-16 mb-8 p-8 bg-slate-50 border border-slate-200 rounded-2xl">
+    <h3 class="text-2xl font-extrabold text-slate-900 mb-6">Sources & Further Learning</h3>
+    <div class="space-y-4">
+      <div class="p-5 bg-white rounded-xl border border-slate-200">
+        <span class="text-xs font-bold uppercase text-slate-500">Educational Video</span>
+        <p class="text-sm text-slate-800 mt-2">Research Tube (2021). Deductive Vs Inductive Vs Abductive Reasoning — definitions, differences, and examples.</p>
+        <a href="https://www.youtube.com/watch?v=ZSj_Y6O9m8w" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline">Watch on YouTube</a>
+      </div>
+      <div class="p-5 bg-white rounded-xl border border-slate-200">
+        <span class="text-xs font-bold uppercase text-slate-500">Educational Video</span>
+        <p class="text-sm text-slate-800 mt-2">Diogo Cortiz (2020). Types of Reasoning — Deductive, Inductive, and Abductive.</p>
+        <a href="https://www.youtube.com/watch?v=eacc24q_NCk" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline">Watch on YouTube</a>
+      </div>
+      <div class="p-5 bg-white rounded-xl border border-slate-200">
+        <span class="text-xs font-bold uppercase text-slate-500">Khan Academy · Critical Thinking</span>
+        <p class="text-sm text-slate-800 mt-2">Wireless Philosophy / Geoff Pynn. Critical thinking, deductive arguments, abductive arguments, validity, and soundness.</p>
+        <a href="https://www.khanacademy.org/partner-content/wi-phi/wiphi-critical-thinking/wiphi-fundamentals" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline">Explore the learning series</a>
+      </div>
+      <div class="p-5 bg-white rounded-xl border border-slate-200">
+        <span class="text-xs font-bold uppercase text-slate-500">Khan Academy · Deduction & Induction</span>
+        <p class="text-sm text-slate-800 mt-2">Inductive and deductive reasoning — understanding pattern-based inference versus conclusions that follow from premises.</p>
+        <a href="https://www.khanacademy.org/v/deductive-reasoning-1" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline">Watch the lesson</a>
+      </div>
+      <div class="p-5 bg-white rounded-xl border border-slate-200">
+        <span class="text-xs font-bold uppercase text-slate-500">Academic Reference</span>
+        <p class="text-sm text-slate-800 mt-2">Åsvoll, H. (2014). Abduction, deduction and induction: can these concepts be used for an understanding of methodological processes in interpretative case studies? International Journal of Qualitative Studies in Education, 27(3), 289–307.</p>
+        <a href="https://doi.org/10.1080/09518398.2012.759296" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline">Read the paper</a>
+      </div>
+    </div>
+  </div>
+</article>
+        </article>
+        
+        <div class="mt-16 mb-12 notranslate">
+            <div class="mx-auto max-w-xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 text-center shadow-sm">
+                
+                <h3 class="text-xl font-bold text-navy-900 mb-2">Follow Horizon Scanning</h3>
+                <p class="text-sm text-slate-500 mb-5">Get new insights and foresight articles delivered to your inbox.</p>
+                <style>
+                    .followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .form-preview{display:flex!important;flex-direction:row!important;align-items:center!important;gap:8px!important;margin:0!important;padding:0!important;max-width:none!important;border:0!important;border-radius:0!important;box-shadow:none!important}
+                    .followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .form-preview,.followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .form-preview *{box-sizing:border-box!important}
+                    .followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .preview-heading{display:none!important}
+                    .followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .preview-heading h5{margin:0!important}
+                    .followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .preview-input-field{margin:0!important;flex:1 1 auto!important;width:auto!important;min-width:0!important}
+                    .followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .preview-input-field input{width:100%!important;height:38px!important;border-radius:7px!important;border:1px solid #cbd5e1!important;background:#fff!important;color:#0f172a!important;font-family:Arial,sans-serif!important;font-size:14px!important}
+                    .followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .preview-input-field input::placeholder{color:#64748b!important;opacity:1!important}
+                    .followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .preview-submit-button{margin:0!important;flex:0 0 112px!important;width:112px!important}
+                    .followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .preview-submit-button button{width:100%!important;height:38px!important;border:0!important;border-radius:7px!important;line-height:normal!important;background:#0d9488!important;color:#fff!important;font-family:Arial,sans-serif!important;font-weight:700!important}
+                    .followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .powered-by-line{color:#64748b!important;font-family:Arial,sans-serif!important;font-size:10px!important;margin-top:3px!important}
+                    .followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .powered-by-line img{height:1.1em!important;max-height:1.1em!important}
+                @media(max-width:520px){.followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .form-preview{flex-wrap:wrap!important}.followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .preview-input-field{flex:1 1 100%!important}.followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .preview-submit-button{flex:1 1 100%!important;width:100%!important}}
+                    @media(max-width:520px){.followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .form-preview{flex-wrap:wrap!important}.followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .preview-input-field{flex:1 1 100%!important}.followit--follow-form-container[attr-a][attr-b][attr-c][attr-d][attr-e][attr-f] .preview-submit-button{flex:1 1 100%!important;width:100%!important}}
+            </style>
+                <div class="followit--follow-form-container" attr-a attr-b attr-c attr-d attr-e attr-f>
+                    <form action="https://api.follow.it/subscription-form/L2JvNTVzV3R6M3BzMnFqOHhoaTE5NDJXNGM3WVE0R2hnODd2NjFoaUpUUCtVckxTL0QxY0VENlZhQjM2VjZWZ2VrczNLUDdKbmxRcjFiQndZQ1FOYWF5d0YrWEtnM3dkMVhFZk5sMzVFcGhDeHhENmtRVEQ4RTlsb3ZlcG4yLzJ8K2RNb3hFM0x1cFUvSnZiWEx3NUlQRlNvaUdMMmkrRTNGWkh4MTNNdGwwbz0=/8" method="post">
+                        <div class="form-preview" style="background-color:#fff;position:relative;border:0">
+                            <div class="preview-heading"><h5 style="font-family:Arial;font-weight:bold;color:#0f172a;font-size:16px;text-align:center">Follow Horizon Scanning</h5></div>
+                            <div class="preview-input-field"><input type="email" name="email" required placeholder="Enter your email address" spellcheck="false" aria-label="Email address"></div>
+                            <div class="preview-submit-button"><button type="submit">Follow</button></div>
+                        </div>
+                    </form>
+                    <a href="https://follow.it" class="powered-by-line">Powered by <img src="https://follow.it/images/colored-logo.svg" alt="follow.it" height="17"></a>
+                </div>
+                <div class="mt-2 pt-1">
+                    <a href="https://horizon-scanning.org/feed.xml" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-sm font-semibold text-teal-700 hover:text-teal-800"><i class="ph-bold ph-rss"></i> Prefer an RSS reader? Open the RSS feed</a>
+                </div>
+                <p class="mt-1 text-[10px] text-slate-400">You can unsubscribe at any time.</p>
+            </div>
+        </div>
+
+        <div class="mt-16 pt-8 border-t border-slate-200 text-center notranslate">
+            <h3 class="text-xl font-bold text-navy-900 mb-4">Share this insight</h3>
+            <div class="flex justify-center gap-4">
+                <a href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fhorizon-scanning.org%2Fblog%2Farticle%2Fthe-three-engines-of-reasoning-how-to-think-infer-and-find-the-truth.html" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-[#0A66C2] hover:text-white transition-all shadow-sm hover:shadow"><i class="ph-fill ph-linkedin-logo text-xl"></i></a>
+                <a href="https://twitter.com/intent/tweet?url=https%3A%2F%2Fhorizon-scanning.org%2Fblog%2Farticle%2Fthe-three-engines-of-reasoning-how-to-think-infer-and-find-the-truth.html&text=The%20Three%20Engines%20of%20Reasoning%20%E2%80%94%20How%20to%20Think%2C%20Infer%2C%20and%20Find%20the%20Truth" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-[#1DA1F2] hover:text-white transition-all shadow-sm hover:shadow"><i class="ph-fill ph-twitter-logo text-xl"></i></a>
+                <a href="https://api.whatsapp.com/send?text=The%20Three%20Engines%20of%20Reasoning%20%E2%80%94%20How%20to%20Think%2C%20Infer%2C%20and%20Find%20the%20Truth%20-%20https%3A%2F%2Fhorizon-scanning.org%2Fblog%2Farticle%2Fthe-three-engines-of-reasoning-how-to-think-infer-and-find-the-truth.html" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-[#25D366] hover:text-white transition-all shadow-sm hover:shadow"><i class="ph-fill ph-whatsapp-logo text-xl"></i></a>
+            </div>
+        </div>
+    </main>
+
+</body>
+</html>
+    
